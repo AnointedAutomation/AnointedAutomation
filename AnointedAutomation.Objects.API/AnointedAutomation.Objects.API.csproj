@@ -9,10 +9,10 @@
 		<Title>AnointedAutomation.Objects.API</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Standardization for API Objects - AnointedAutomation.Objects.API</Description>
+		<Description>Custom IFormFile implementation for ASP.NET Core - AnointedAutomation.Objects.API</Description>
 		<RepositoryUrl>https://github.com/roku674/AnointedAutomation</RepositoryUrl>
-		<Version>0.0.16</Version>
-		<PackageTags>objects</PackageTags>
+		<Version>0.0.17</Version>
+		<PackageTags>aspnetcore;formfile</PackageTags>
 		<PackageReleaseNotes>https://github.com/roku674/AnointedAutomation/pkgs/nuget/AnointedAutomation.Objects.API</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -21,21 +21,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Remove="nuget.config" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.24" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
-		<ProjectReference Include="..\AnointedAutomation.Enums\AnointedAutomation.Enums.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Page Include="nuget.config" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 	<ItemGroup>
