@@ -27,8 +27,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
-		<PackageReference Include="MongoDB.Bson" Version="3.6.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="3.6.0" />
+		<PackageReference Include="MongoDB.Bson" Version="3.7.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.7.0" />
 	  <PackageReference Include="MongoDB.Driver.Core" Version="2.30.0" />
 	  <PackageReference Include="MongoDB.Driver.GridFS" Version="2.30.0" />
 	  <PackageReference Include="MongoDB.Libmongocrypt" Version="1.12.0" />
