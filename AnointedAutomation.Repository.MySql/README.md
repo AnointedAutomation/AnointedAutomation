@@ -73,3 +73,8 @@ int count = await userRepo.CountAsync(u => u.IsActive);
 ## License
 
 MIT License - See LICENSE file for details.
+
+## Author
+
+Created by Alexander Fields
+GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)

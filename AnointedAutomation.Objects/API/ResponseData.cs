@@ -67,7 +67,8 @@ namespace AnointedAutomation.Objects
         {
             { "Automation", "https://www.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
-            { "Creator", "https://www.alexanderfields.me" }
+            { "Creator", "https://www.alexanderfields.me" },
+            { "GitHub", "https://github.com/AnointedAutomation" }
         };
         /// <summary>
         /// Gets or sets the response message.
@@ -116,7 +117,8 @@ namespace AnointedAutomation.Objects
         {
             { "Automation", "https://www.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
-            { "Creator", "https://www.alexanderfields.me" }
+            { "Creator", "https://www.alexanderfields.me" },
+            { "GitHub", "https://github.com/AnointedAutomation" }
         };
         /// <summary>
         /// Gets or sets the response message.

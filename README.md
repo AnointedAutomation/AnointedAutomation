@@ -1,6 +1,10 @@
 # Anointed Automation .NET Code Repository
 
+[![GitHub](https://img.shields.io/badge/GitHub-AnointedAutomation-blue?logo=github)](https://github.com/AnointedAutomation)
+
 Welcome to the Anointed Automation repository! This repository contains our open-sourced .NET code, aimed at providing useful libraries and tools for the community.
+
+**GitHub Organization:** [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
 
 ### [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE_DICTIONARY.md)
 
