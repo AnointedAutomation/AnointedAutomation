@@ -5,15 +5,15 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageProjectUrl>https://github.com/roku674/AnointedAutomation</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/AnointedAutomation/AnointedAutomation</PackageProjectUrl>
     <Title>AnointedAutomation.Logging</Title>
     <Company>Anointed Automation LLC - Alexander Fields</Company>
     <Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
     <Description>Basic Structure for logging - AnointedAutomation.Logging </Description>
-    <RepositoryUrl>https://github.com/roku674/AnointedAutomation</RepositoryUrl>
+    <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>0.0.9</Version>
     <PackageTags>logging</PackageTags>
-    <PackageReleaseNotes>https://github.com/roku674/AnointedAutomation/pkgs/nuget/AnointedAutomation.Logging</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Logging</PackageReleaseNotes>
 	  <Authors>Anointed Automation LLC, Alexander Fields</Authors>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>

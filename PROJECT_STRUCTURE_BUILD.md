@@ -154,7 +154,7 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 ~/.dotnet/dotnet nuget push "AnointedAutomation.{LibraryName}/bin/Release/*.nupkg" --api-key $NUGET_API_KEY --source https://api.nuget.org/v3/index.json
 
 # Publish to GitHub Packages
-~/.dotnet/dotnet nuget push "AnointedAutomation.{LibraryName}/bin/Release/*.nupkg" --api-key $GITHUB_TOKEN --source https://nuget.pkg.github.com/roku674/index.json
+~/.dotnet/dotnet nuget push "AnointedAutomation.{LibraryName}/bin/Release/*.nupkg" --api-key $GITHUB_TOKEN --source https://nuget.pkg.github.com/AnointedAutomation/index.json
 ```
 
 ## Quality Gates
