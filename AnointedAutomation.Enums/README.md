@@ -119,3 +119,4 @@ PaymentProvider provider = PaymentProvider.Stripe;
 MIT License - Copyright © 2023 Anointed Automation, LLC
 
 Created by Alexander Fields - https://www.alexanderfields.me
+GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)

@@ -5,15 +5,15 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageProjectUrl>https://github.com/roku674/AnointedAutomation</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/AnointedAutomation/AnointedAutomation</PackageProjectUrl>
     <Title>AnointedAutomation.Memory</Title>
     <Company>Anointed Automation LLC - Alexander Fields</Company>
     <Copyright>Copyright © 2024 Anointed Automation, LLC All rights reserved.</Copyright>
     <Description>Basic things for memory management </Description>
-    <RepositoryUrl>https://github.com/roku674/AnointedAutomation</RepositoryUrl>
-    <Version>0.0.5</Version>
+    <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
+    <Version>0.0.6</Version>
     <PackageTags>memory</PackageTags>
-    <PackageReleaseNotes>https://github.com/roku674/AnointedAutomation/pkgs/nuget/AnointedAutomation.Memory</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Memory</PackageReleaseNotes>
 	  <Authors>Anointed Automation LLC, Alexander Fields</Authors>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>

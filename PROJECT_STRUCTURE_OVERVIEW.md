@@ -5,6 +5,8 @@
 ## Architecture
 This is a .NET solution containing multiple NuGet package libraries developed by Anointed Automation.
 
+**GitHub Organization:** [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
+
 ## Technology Stack
 - **.NET**: Target framework for all projects
 - **C#**: Primary programming language

@@ -139,5 +139,6 @@ This project is copyrighted © 2023 Anointed Automation, LLC.
 
 ## Author
 
-Created by **Alexander Fields**  
+Created by **Alexander Fields**
 For inquiries, please contact [Anointed Automation](https://anointedautomation.com).
+GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
