@@ -11,7 +11,7 @@
     <Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
     <Description>Middlewares for APIs - AnointedAutomation.APIMiddlewares</Description>
     <RepositoryUrl>https://github.com/roku674/AnointedAutomation</RepositoryUrl>
-    <Version>0.0.16</Version>
+    <Version>0.0.17</Version>
     <PackageTags>middleware</PackageTags>
     <PackageReleaseNotes>https://github.com/roku674/AnointedAutomation/pkgs/nuget/AnointedAutomation.APIMiddlewares</PackageReleaseNotes>
     <Authors>Anointed Automation LLC, Alexander Fields</Authors>

@@ -11,7 +11,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Custom IFormFile implementation for ASP.NET Core - AnointedAutomation.Objects.API</Description>
 		<RepositoryUrl>https://github.com/roku674/AnointedAutomation</RepositoryUrl>
-		<Version>0.0.17</Version>
+		<Version>0.0.18</Version>
 		<PackageTags>aspnetcore;formfile</PackageTags>
 		<PackageReleaseNotes>https://github.com/roku674/AnointedAutomation/pkgs/nuget/AnointedAutomation.Objects.API</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

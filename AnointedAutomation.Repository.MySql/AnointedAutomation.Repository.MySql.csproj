@@ -11,7 +11,7 @@
 		<Copyright>Copyright 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Repository for Generic MySQL Usage with Entity Framework Core - AnointedAutomation.Repository.MySql</Description>
 		<RepositoryUrl>https://github.com/roku674/AnointedAutomation</RepositoryUrl>
-		<Version>0.0.1</Version>
+		<Version>0.0.2</Version>
 		<PackageTags>MySQL;EFCore;Repository</PackageTags>
 		<PackageReleaseNotes>https://github.com/roku674/AnointedAutomation/pkgs/nuget/AnointedAutomation.Repository.MySql</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

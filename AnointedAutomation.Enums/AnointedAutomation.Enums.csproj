@@ -11,7 +11,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Shared enumerations for AnointedAutomation packages</Description>
 		<RepositoryUrl>https://github.com/roku674/AnointedAutomation</RepositoryUrl>
-		<Version>0.0.3</Version>
+		<Version>0.0.4</Version>
 		<PackageTags>enums</PackageTags>
 		<PackageReleaseNotes>https://github.com/roku674/AnointedAutomation/pkgs/nuget/AnointedAutomation.Enums</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
