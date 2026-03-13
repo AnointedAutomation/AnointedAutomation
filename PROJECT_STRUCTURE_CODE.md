@@ -65,6 +65,9 @@ All code files in the solution have been documented with XML documentation follo
   - Exception documentation
 
 ### 4. AnointedAutomation.Objects
+- ChristianEmoticons.cs - Static class with Christian-themed emoticon string constants
+  - LatinCross, OrthodoxCross, OutlinedCross, MalteseCross, Dagger, PrayingHands, Church, Bible, Dove, Angel, Star, Fish, Candle, Heart
+
 - Account/
   - User.cs - Full authentication model documentation
   - Profile.cs - Profile data model documentation
