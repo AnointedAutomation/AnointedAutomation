@@ -51,7 +51,7 @@ namespace AnointedAutomation.Objects
         /// <summary>
         /// Gets or sets the copyright and attribution information.
         /// </summary>
-        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.com created by Alexander Fields https://www.alexanderfields.me";
+        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net created by Alexander Fields https://www.alexanderfields.me";
         /// <summary>
         /// Gets or sets the response data payload.
         /// </summary>
@@ -105,7 +105,7 @@ namespace AnointedAutomation.Objects
         /// <summary>
         /// Gets or sets the copyright and attribution information.
         /// </summary>
-        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.com created by Alexander Fields https://www.alexanderfields.me";
+        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net created by Alexander Fields https://www.alexanderfields.me";
         /// <summary>
         /// Gets or sets the response data payload.
         /// </summary>

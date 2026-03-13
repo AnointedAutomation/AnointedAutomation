@@ -260,5 +260,5 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 Created by **Alexander Fields**
 Copyright © 2023 Anointed Automation, LLC
 
-For inquiries, please contact [Anointed Automation](https://anointedautomation.com).
+For inquiries, please contact [Anointed Automation](https://anointedautomation.net).
 GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
