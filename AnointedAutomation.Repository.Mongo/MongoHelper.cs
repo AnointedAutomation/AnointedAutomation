@@ -222,7 +222,16 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <summary>
-        /// Gets all documents from the specified collection.
+        /// WARNING: THIS METHOD IS DANGEROUS AND CAN CAUSE OutOfMemoryException!
+        /// Loads ALL documents with ALL fields into memory. For large collections or
+        /// collections with binary data, this WILL crash your application.
+        ///
+        /// USE INSTEAD:
+        /// - GetAllDocumentIdsAsync() to get only IDs (safe)
+        /// - GetFilteredDocumentsAsync() with a filter to limit results
+        /// - Use projection to exclude large fields like binary content
+        ///
+        /// Only use this method for small collections with small documents.
         /// </summary>
         /// <typeparam name="T">The type of documents to retrieve.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
@@ -231,6 +240,24 @@ namespace AnointedAutomation.Repository.Mongo
         {
             IMongoCollection<T> collection = GetCollection<T>(collectionName);
             return await collection.Find(x => true).ToListAsync();
+        }
+
+        /// <summary>
+        /// Gets all document IDs from the specified collection WITHOUT loading full documents.
+        /// This is the SAFE alternative to GetAllDocumentsAsync - use this when you need to
+        /// iterate over all documents but don't need the full document data immediately.
+        /// Uses projection to only fetch the _id field, preventing memory issues.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <returns>A list of all document IDs in the collection.</returns>
+        public async Task<List<string>> GetAllDocumentIdsAsync(string collectionName)
+        {
+            IMongoCollection<MongoDB.Bson.BsonDocument> collection = database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName);
+            ProjectionDefinition<MongoDB.Bson.BsonDocument> projection = Builders<MongoDB.Bson.BsonDocument>.Projection.Include("_id");
+            List<MongoDB.Bson.BsonDocument> documents = await collection.Find(FilterDefinition<MongoDB.Bson.BsonDocument>.Empty)
+                .Project(projection)
+                .ToListAsync();
+            return documents.ConvertAll(doc => doc["_id"].AsString);
         }
 
         /// <summary>
