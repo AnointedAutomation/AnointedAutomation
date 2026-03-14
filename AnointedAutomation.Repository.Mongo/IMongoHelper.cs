@@ -52,12 +52,30 @@ namespace AnointedAutomation.Repository.Mongo
         Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, FilterDefinition<T> filter);
 
         /// <summary>
-        /// Gets all documents from the specified collection.
+        /// WARNING: THIS METHOD IS DANGEROUS AND CAN CAUSE OutOfMemoryException!
+        /// Loads ALL documents with ALL fields into memory. For large collections or
+        /// collections with binary data, this WILL crash your application.
+        ///
+        /// USE INSTEAD:
+        /// - GetAllDocumentIdsAsync() to get only IDs (safe)
+        /// - GetFilteredDocumentsAsync() with a filter to limit results
+        /// - Use projection to exclude large fields like binary content
+        ///
+        /// Only use this method for small collections with small documents.
         /// </summary>
         /// <typeparam name="T">The type of documents to retrieve.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>A list of all documents in the collection.</returns>
         Task<List<T>> GetAllDocumentsAsync<T>(string collectionName);
+
+        /// <summary>
+        /// Gets all document IDs from the specified collection WITHOUT loading full documents.
+        /// This is the SAFE alternative to GetAllDocumentsAsync - use this when you need to
+        /// iterate over all documents but don't need the full document data immediately.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <returns>A list of all document IDs in the collection.</returns>
+        Task<List<string>> GetAllDocumentIdsAsync(string collectionName);
 
         /// <summary>
         /// Gets documents from the specified collection that match the filter.
