@@ -11,7 +11,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Standardization for Objects - AnointedAutomation.Objects</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>0.0.25</Version>
+		<Version>0.0.26</Version>
 		<PackageTags>objects</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Objects</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

@@ -11,7 +11,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Repository for Generic Mongo Usage - AnointedAutomation.Repository.Mongo</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>0.0.13</Version>
+		<Version>0.0.14</Version>
 		<PackageTags>Mongo</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Repository.Logging</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
