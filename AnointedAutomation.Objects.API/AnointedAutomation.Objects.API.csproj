@@ -25,6 +25,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Include="README.md" Pack="true" PackagePath="/" />
 	</ItemGroup>
 

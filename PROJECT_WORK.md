@@ -2,6 +2,22 @@
 
 ## Current Tasks
 
+### Objects.API Transitive Dependency Fix - COMPLETED ✅
+- **Description**: Added transitive dependency from Objects.API to Objects package so consumers don't need to reference both packages manually
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-03-14
+
+**Problem:** Consumers using `AnointedAutomation.Objects.API` had to manually add `AnointedAutomation.Objects` to get `ResponseData` and `ResponseData<T>` types.
+
+**Fix:** Added ProjectReference to Objects in Objects.API csproj.
+
+**File Changed:**
+- `AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj` - Added `<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />`
+
+**Action Required:** Bump version and republish Objects.API to NuGet for this to take effect.
+
+---
+
 ### Enterprise Payment Features Enhancement - COMPLETED ✅
 - **Description**: Added enterprise features from MERN template to C# billing objects (PCI-DSS audit, Luhn validation, subscription lifecycle, usage tracking)
 - **Status**: ✅ COMPLETED
