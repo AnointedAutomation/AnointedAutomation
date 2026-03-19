@@ -20,6 +20,11 @@ namespace AnointedAutomation.APIMiddleware.Objects
         /// </summary>
         public static event EventHandler<BannedIP> IPBanned;
 
+        /// <summary>
+        /// Event triggered when an IP address is unbanned.
+        /// </summary>
+        public static event EventHandler<string> IPUnbanned;
+
         // Method to add a banned IP with a reason
         /// <summary>
         /// Adds an IP address to the blacklist with a specified reason.
@@ -85,6 +90,30 @@ namespace AnointedAutomation.APIMiddleware.Objects
             return false;
         }
 
+        /// <summary>
+        /// Removes an IP address from the blacklist.
+        /// </summary>
+        /// <param name="ip">The IP address to unban.</param>
+        /// <returns>True if the IP was removed, false if it wasn't in the blacklist.</returns>
+        public static bool RemoveBannedIP(string ip)
+        {
+            if (string.IsNullOrWhiteSpace(ip))
+            {
+                return false;
+            }
+
+            if (blacklistedIPs.Remove(ip))
+            {
+                IPUnbanned?.Invoke(null, ip);
+                IPBlacklistMiddleware.AddLog(
+                    LogMessage.Informational($"IP {ip} removed from blacklist")
+                );
+                return true;
+            }
+
+            return false;
+        }
+
         // Method to clear all blacklisted IPs (for testing purposes)
         /// <summary>
         /// Clears all blacklisted IPs and event handlers (for testing purposes).
@@ -94,6 +123,7 @@ namespace AnointedAutomation.APIMiddleware.Objects
             blacklistedIPs.Clear();
             // Clear all event handlers
             IPBanned = null;
+            IPUnbanned = null;
         }
     }
 }
