@@ -240,17 +240,17 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         }
 
         [Fact]
-        public void TestConnection_ReturnsCollectionNames_WhenDatabaseIsValid()
+        public void TestConnection_WithLocalhost_ShouldNotThrowException()
         {
             // Arrange
             MongoHelper mongoHelper = new MongoHelper("test-db", "mongodb://localhost:27017");
 
-            // Act
-            List<string> result = mongoHelper.TestConnection();
+            // Act - Verify no unhandled exception is thrown
+            // The method handles its own exceptions internally and returns null on failure
+            Exception ex = Record.Exception(() => mongoHelper.TestConnection());
 
-            // Assert - Either returns a list (if MongoDB is running) or null (if not)
-            // This test validates the method executes without throwing unhandled exceptions
-            Assert.True(result != null || result == null); // Always passes - validates exception handling
+            // Assert - Method should not throw (it handles exceptions internally)
+            Assert.Null(ex);
         }
 
         [Fact]
