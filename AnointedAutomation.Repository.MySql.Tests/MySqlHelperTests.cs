@@ -6,6 +6,7 @@ using AnointedAutomation.Repository.MySql;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -1221,6 +1222,138 @@ namespace AnointedAutomation.Repository.MySql.Tests
 
             // Assert - Method should complete without exception
             Assert.Null(ex);
+        }
+
+        [Fact]
+        public void Create_ReturnsCachedInstance_WhenConnectionStringAlreadyCached()
+        {
+            // Arrange
+            MySqlHelperFactory factory = new MySqlHelperFactory();
+            string connectionString = "Server=testserver;Database=testdb;User=root;Password=pass;";
+
+            // Use reflection to access the private _cache field and pre-populate it
+            System.Reflection.FieldInfo cacheField = typeof(MySqlHelperFactory)
+                .GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            ConcurrentDictionary<string, IMySqlHelper> cache =
+                (ConcurrentDictionary<string, IMySqlHelper>)cacheField.GetValue(factory);
+
+            // Create a mock MySqlHelper to add to cache
+            Mock<IMySqlHelper> mockHelper = new Mock<IMySqlHelper>();
+            cache.TryAdd(connectionString, mockHelper.Object);
+
+            // Act - Call Create with the same connection string
+            IMySqlHelper result = factory.Create(connectionString);
+
+            // Assert - Should return the cached instance
+            Assert.Same(mockHelper.Object, result);
+        }
+
+        [Fact]
+        public void Create_ReturnsDifferentInstances_ForDifferentCachedConnectionStrings()
+        {
+            // Arrange
+            MySqlHelperFactory factory = new MySqlHelperFactory();
+            string connectionString1 = "Server=server1;Database=db1;User=root;Password=pass;";
+            string connectionString2 = "Server=server2;Database=db2;User=root;Password=pass;";
+
+            // Use reflection to access the private _cache field
+            System.Reflection.FieldInfo cacheField = typeof(MySqlHelperFactory)
+                .GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            ConcurrentDictionary<string, IMySqlHelper> cache =
+                (ConcurrentDictionary<string, IMySqlHelper>)cacheField.GetValue(factory);
+
+            // Create mock MySqlHelpers to add to cache
+            Mock<IMySqlHelper> mockHelper1 = new Mock<IMySqlHelper>();
+            Mock<IMySqlHelper> mockHelper2 = new Mock<IMySqlHelper>();
+            cache.TryAdd(connectionString1, mockHelper1.Object);
+            cache.TryAdd(connectionString2, mockHelper2.Object);
+
+            // Act
+            IMySqlHelper result1 = factory.Create(connectionString1);
+            IMySqlHelper result2 = factory.Create(connectionString2);
+
+            // Assert - Should return different cached instances
+            Assert.Same(mockHelper1.Object, result1);
+            Assert.Same(mockHelper2.Object, result2);
+            Assert.NotSame(result1, result2);
+        }
+
+        [Fact]
+        public void Remove_ReturnsTrue_WhenCachedInstanceExists()
+        {
+            // Arrange
+            MySqlHelperFactory factory = new MySqlHelperFactory();
+            string connectionString = "Server=testserver;Database=testdb;User=root;Password=pass;";
+
+            // Use reflection to access the private _cache field
+            System.Reflection.FieldInfo cacheField = typeof(MySqlHelperFactory)
+                .GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            ConcurrentDictionary<string, IMySqlHelper> cache =
+                (ConcurrentDictionary<string, IMySqlHelper>)cacheField.GetValue(factory);
+
+            // Add a mock to the cache
+            Mock<IMySqlHelper> mockHelper = new Mock<IMySqlHelper>();
+            cache.TryAdd(connectionString, mockHelper.Object);
+
+            // Act
+            bool result = factory.Remove(connectionString);
+
+            // Assert
+            Assert.True(result);
+            Assert.False(cache.ContainsKey(connectionString));
+        }
+
+        [Fact]
+        public void ClearCache_RemovesAllCachedInstances()
+        {
+            // Arrange
+            MySqlHelperFactory factory = new MySqlHelperFactory();
+            string connectionString1 = "Server=server1;Database=db1;User=root;Password=pass;";
+            string connectionString2 = "Server=server2;Database=db2;User=root;Password=pass;";
+
+            // Use reflection to access the private _cache field
+            System.Reflection.FieldInfo cacheField = typeof(MySqlHelperFactory)
+                .GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            ConcurrentDictionary<string, IMySqlHelper> cache =
+                (ConcurrentDictionary<string, IMySqlHelper>)cacheField.GetValue(factory);
+
+            // Add mocks to the cache
+            Mock<IMySqlHelper> mockHelper1 = new Mock<IMySqlHelper>();
+            Mock<IMySqlHelper> mockHelper2 = new Mock<IMySqlHelper>();
+            cache.TryAdd(connectionString1, mockHelper1.Object);
+            cache.TryAdd(connectionString2, mockHelper2.Object);
+
+            // Act
+            factory.ClearCache();
+
+            // Assert
+            Assert.Empty(cache);
+        }
+
+        [Fact]
+        public void Create_MultipleCalls_SameConnectionString_ReturnsSameInstance()
+        {
+            // Arrange
+            MySqlHelperFactory factory = new MySqlHelperFactory();
+            string connectionString = "Server=cached;Database=testdb;User=root;Password=pass;";
+
+            // Use reflection to pre-populate cache
+            System.Reflection.FieldInfo cacheField = typeof(MySqlHelperFactory)
+                .GetField("_cache", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            ConcurrentDictionary<string, IMySqlHelper> cache =
+                (ConcurrentDictionary<string, IMySqlHelper>)cacheField.GetValue(factory);
+
+            Mock<IMySqlHelper> mockHelper = new Mock<IMySqlHelper>();
+            cache.TryAdd(connectionString, mockHelper.Object);
+
+            // Act - Call Create multiple times
+            IMySqlHelper result1 = factory.Create(connectionString);
+            IMySqlHelper result2 = factory.Create(connectionString);
+            IMySqlHelper result3 = factory.Create(connectionString);
+
+            // Assert - All calls should return the same cached instance
+            Assert.Same(result1, result2);
+            Assert.Same(result2, result3);
         }
     }
 
