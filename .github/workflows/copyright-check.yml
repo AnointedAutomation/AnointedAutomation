@@ -205,7 +205,7 @@ jobs:
       
       - name: Close existing copyright PRs
         if: steps.check-changes.outputs.changes == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             // Find and close any existing monthly copyright PRs
@@ -241,7 +241,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.check-changes.outputs.changes == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const branchName = '${{ steps.create-branch.outputs.branch_name }}';
