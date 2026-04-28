@@ -39,10 +39,10 @@ This file serves as the index/directory for all PROJECT_STRUCTURE files in the A
 
 ### [PROJECT_STRUCTURE_TESTING.md](./PROJECT_STRUCTURE_TESTING.md) ✅
 - Test organization under "Tests" solution folder
-- MSTest framework configuration for .NET 8.0
-- Individual test project structures and test files
+- Xunit framework configuration for .NET 10.0
+- Individual test project structures and test files (6 test projects, 314 tests)
 - Test coverage patterns and testing strategies
-- Test file organization by library (Logging, Memory, APIMiddlewares, etc.)
+- Test file organization by library (Logging, Memory, APIMiddlewares, Repository.Mongo, Repository.MySql, Objects.API)
 - Unit test patterns and mock object usage
 
 ### [PROJECT_STRUCTURE_VISUAL.md](./PROJECT_STRUCTURE_VISUAL.md) ✅

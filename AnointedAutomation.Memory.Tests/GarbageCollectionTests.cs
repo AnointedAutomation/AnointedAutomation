@@ -76,28 +76,34 @@ namespace AnointedAutomation.Memory.Tests
 
         [Fact]
         /// <summary>
-        /// Tests that the garbage collection actually reduces memory usage.
+        /// Tests that PerformGarbageCollection actually triggers garbage collection.
+        /// Verifies GC ran by checking collection count increases.
         /// </summary>
-        public void GarbageCollection_MemoryTest()
+        public void GarbageCollection_TriggersGCCollection()
         {
             // Arrange
             var gc = new GarbageCollection();
             object state = null;
-            
-            // Allocate some memory that will be garbage collected
-            var memoryHog = new byte[1024 * 1024]; // 1MB
-            
+
+            // Get initial GC collection counts for all generations
+            int gen0Before = GC.CollectionCount(0);
+            int gen1Before = GC.CollectionCount(1);
+            int gen2Before = GC.CollectionCount(2);
+
             // Act
-            long memoryBefore = GC.GetTotalMemory(false);
             gc.PerformGarbageCollection(state);
-            memoryHog = null; // Make the memory available for collection
-            gc.PerformGarbageCollection(state);
-            long memoryAfter = GC.GetTotalMemory(true);
-            
-            // Assert
-            // We're not strictly asserting an exact value because memory management
-            // varies by runtime, but we can assert it didn't increase
-            Assert.True(memoryAfter <= memoryBefore);
+
+            // Get collection counts after
+            int gen0After = GC.CollectionCount(0);
+            int gen1After = GC.CollectionCount(1);
+            int gen2After = GC.CollectionCount(2);
+
+            // Assert - At least one generation should have been collected
+            // GC.Collect() triggers a full collection (all generations)
+            bool gcRan = (gen0After > gen0Before) ||
+                         (gen1After > gen1Before) ||
+                         (gen2After > gen2Before);
+            Assert.True(gcRan, "GC.Collect() should trigger at least one garbage collection");
         }
     }
 }
