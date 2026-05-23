@@ -211,3 +211,6 @@ Comprehensive guide covering:
 - **NuGet.org**: Package download statistics
 - **GitHub Packages**: Internal package metrics
 - **Security**: CodeQL scan results and alerts
+---
+
+**[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**

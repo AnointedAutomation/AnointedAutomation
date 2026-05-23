@@ -365,3 +365,7 @@ No GitHub issues were associated with these Dependabot PRs.
 ## GitHub Issues
 
 No open GitHub issues assigned.
+
+---
+
+**[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**

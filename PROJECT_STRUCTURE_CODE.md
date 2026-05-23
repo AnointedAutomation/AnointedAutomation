@@ -201,3 +201,6 @@ Key test files:
 - ✅ All properties documented
 - ✅ All events documented
 - ✅ All test classes documented
+---
+
+**[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**

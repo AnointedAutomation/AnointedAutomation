@@ -378,3 +378,6 @@ AnointedAutomation/
                     │  • Converters                       │
                     └─────────────────────────────────────┘
 ```
+---
+
+**[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**

@@ -48,3 +48,6 @@ All test projects are organized under a "Tests" solution folder:
 - Feature branches created from `develop`
 - Merges to `master` trigger stable releases
 - Clean build and test requirements before commits
+---
+
+**[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**

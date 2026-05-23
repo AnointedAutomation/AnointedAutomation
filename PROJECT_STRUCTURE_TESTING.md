@@ -283,3 +283,6 @@ Based on the .NET nature of the project:
 - Build: `~/.dotnet/dotnet build`
 - Test: `~/.dotnet/dotnet test`
 - Individual project testing: `~/.dotnet/dotnet test AnointedAutomation.{LibraryName}.Tests/`
+---
+
+**[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**
