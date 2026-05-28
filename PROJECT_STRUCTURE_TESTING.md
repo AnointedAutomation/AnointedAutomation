@@ -121,9 +121,40 @@ All test projects are organized under a "Tests" solution folder in the main .sln
 **Testing Framework:** Xunit (.NET 10.0)
 **Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
 
+### 7. AnointedAutomation.Objects.Tests
+**Test Files (100 tests total - Love as a principle-driven decision engine):**
+- `LoveTests.cs` - Abstract base behavior, exercised via a private `TestLove` double
+  - Love is abstract; the 1 Cor 13 character + helpers (IsPerfect, Completeness 0-17, Bears/Believes/
+    Hopes/Endures, GreaterLove, Abides, Describe, GreatestCommandment, Source defaults to God)
+  - Edge cases: null/empty/Unicode/very long parties
+- `SituationTests.cs` - The situation blackboard (named facts)
+  - Set/Is/Has, fluent chaining, unknown fact is not true, latest value wins, Unicode fact names
+  - Null fact name throws ArgumentNullException
+- `BehaviorTreeTests.cs` - The behavior-tree machinery
+  - Deed always succeeds with its action; Condition succeeds/fails on its predicate; Condition.Fact
+  - Sequence (AND) carries the last deed and fails on first failure; Selector (OR) returns first success
+  - Composition picks the matching branch else the fallback; null predicate/action throws
+  - Condition And/Or/Not composition: AND holds only when both; OR when either; NOT negates;
+    left-to-right chaining ((a AND b) OR c); AND+NOT combine; null guards
+- `AgapeTests.cs` - Decide(Situation) over agape's repertoire
+  - inNeed+iCanHelp -> meet the need (Luke 10:33-35); wronged -> forgive (incl. a non-biblical
+    betrayal); grieving -> mourn (Rom 12:15); rejoicing -> rejoice; enemy -> love (Matt 5:44)
+  - The six works of mercy (Theory, Matthew 25:35-36): hungry/thirsty/stranger/naked/sick/imprisoned
+  - Composed branch (Romans 12:20): hungry/thirsty enemy -> feed your enemy; non-enemy hungry still
+    gets the generic Matthew 25 feed (priority); enemy not in need -> loved plainly (Matt 5:44)
+  - Novel situation with no known facts -> patient & kind fallback (1 Cor 13:4); priority order;
+    same situation + different love => different deed; reusable across situations; null throws
+- `SacrificialLoveTests.cs` - Decide(Situation) for the greatest love (John 15:13)
+  - friendsLifeAtStake -> lay down one's life; otherwise falls through to agape's repertoire
+  - Greater deed than agape for the same situation; inherits perfect character; is-a Agape and Love
+
+**Testing Framework:** Xunit (.NET 10.0)
+**Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
+
 ### Missing Test Projects
 The following libraries do not have corresponding test projects:
-- **AnointedAutomation.Objects** - No test project found (pure DTOs/POCOs - no tests needed)
+- **AnointedAutomation.Objects** - Has a test project (AnointedAutomation.Objects.Tests) covering
+  the behavioral Love concept entity; the remaining types are pure DTOs/POCOs (no tests needed)
 - **AnointedAutomation.Enums** - No test project found (enum definitions - no tests needed)
 
 ## Test Patterns and Standards
@@ -140,15 +171,16 @@ The following libraries do not have corresponding test projects:
 
 ### Test Coverage
 
-**Overall Test Statistics (Updated 2026-03-28):**
-- **Total Tests:** 370 (All PASSING)
+**Overall Test Statistics (Updated 2026-05-28):**
+- **Total Tests:** 470 (All PASSING)
   - AnointedAutomation.Memory.Tests: 5 tests
   - AnointedAutomation.Logging.Tests: 49 tests (FULLY ENHANCED)
   - AnointedAutomation.APIMiddlewares.Tests: 113 tests (FULLY ENHANCED - +26 tests)
   - AnointedAutomation.Repository.Mongo.Tests: 69 tests (COMPREHENSIVE - 100% line coverage on async CRUD)
   - AnointedAutomation.Repository.MySql.Tests: 97 tests (ENHANCED - +30 tests including factory caching)
   - AnointedAutomation.Objects.API.Tests: 37 tests (comprehensive coverage)
-- **Improvement:** +56 tests from initial baseline (+17.8% increase from 314)
+  - AnointedAutomation.Objects.Tests: 100 tests (Love as a principle-driven decision engine)
+- **Improvement:** +156 tests from initial baseline (from 314)
 
 **CLAUDE_TESTING.md Compliance:**
 - **AnointedAutomation.Logging.Tests** - EXCEEDS STANDARDS (Success, Failure, Null/Edge scenarios)

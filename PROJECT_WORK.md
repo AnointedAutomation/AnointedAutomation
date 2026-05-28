@@ -2,6 +2,164 @@
 
 ## Current Tasks
 
+### Love Concept - Composed Repertoire Branch (Romans 12:20) - COMPLETED
+- **Description**: Added a composed-condition branch to Agape's repertoire using the new And/Or/Not: enemy AND (hungry OR thirsty) -> "Feed your enemy and give them drink; overcome evil with good" (Romans 12:20-21; Proverbs 25:21). Placed after wronged and before the generic Matthew 25 hungry/thirsty branches so a hungry/thirsty ENEMY gets the Romans 12:20 response, while a hungry non-enemy still gets the generic Matthew 25 feed.
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Files Modified:**
+- `AnointedAutomation.Objects/Concepts/Agape.cs` - Added the composed branch + FeedYourEnemy() deed.
+- `AnointedAutomation.Objects.Tests/AgapeTests.cs` - Added tests: hungry enemy, thirsty enemy, non-enemy-hungry priority, enemy-not-in-need.
+- `AnointedAutomation.Objects.Demo/Program.cs` - Added the "hungry enemy at your door" situation.
+- `PROJECT_STRUCTURE_CODE.md`, `PROJECT_STRUCTURE_TESTING.md`, `PROJECT_STRUCTURE_DICTIONARY.md` - Updated.
+
+**Build/Test Results:**
+- ✅ Solution build: 0 errors
+- ✅ AnointedAutomation.Objects.Tests: 100/100 passing (+4)
+- ✅ Solution total: 470 tests
+- ✅ Demo verified: hungry enemy -> Romans 12:20 (feed your enemy); plain hungry person -> Matthew 25:35 (generic feed)
+
+---
+
+### Love Concept - Condition AND/OR/NOT Composition - COMPLETED
+- **Description**: Added logical composition to Condition so behavior-tree branches can require combinations of facts. Fluent And(Condition)/And(string), Or(Condition)/Or(string), Not() instance + static Not(Condition); they combine the underlying Func<Situation,bool> predicates. Chains left-to-right ((a AND b) OR c). Demonstrated by refactoring Agape's inNeed+iCanHelp branch to Condition.Fact("inNeed").And("iCanHelp") (behavior-preserving).
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Files Modified:**
+- `AnointedAutomation.Objects/Concepts/Condition.cs` - Added And/Or/Not (with Condition + fact-name overloads, null guards).
+- `AnointedAutomation.Objects/Concepts/Agape.cs` - inNeed branch now uses .And("iCanHelp").
+- `AnointedAutomation.Objects.Tests/BehaviorTreeTests.cs` - Added And/Or/Not tests (chaining, AND+NOT, null guards).
+- `PROJECT_STRUCTURE_CODE.md`, `PROJECT_STRUCTURE_TESTING.md`, `PROJECT_STRUCTURE_DICTIONARY.md` - Updated.
+
+**Build/Test Results:**
+- ✅ Solution build: 0 errors
+- ✅ AnointedAutomation.Objects.Tests: 96/96 passing (+10)
+- ✅ Solution total: 466 tests
+
+---
+
+### Love Concept - Matthew 25 Works of Mercy - COMPLETED
+- **Description**: Added the six works of mercy from Matthew 25:35-36 (the Sheep and the Goats) to Agape's behavior-tree repertoire, so the decision engine responds to concrete needs: hungry->feed, thirsty->give drink, stranger->welcome, naked->clothe, sick->care for, imprisoned->visit. Each deed cites Matthew 25:35/36 with the Matthew 25:40 exhortation ("Whatever you did for one of the least of these, you did for Me."). Branches sit above the generic Good Samaritan branch so specific needs win.
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Files Modified:**
+- `AnointedAutomation.Objects/Concepts/Agape.cs` - 6 new Selector branches + 6 deed factory methods.
+- `AnointedAutomation.Objects.Tests/AgapeTests.cs` - Added a [Theory] covering all 6 works of mercy.
+- `AnointedAutomation.Objects.Demo/Program.cs` - Added a "hungry person at your door" situation.
+- `PROJECT_STRUCTURE_CODE.md`, `PROJECT_STRUCTURE_TESTING.md`, `PROJECT_STRUCTURE_DICTIONARY.md` - Updated.
+
+**Build/Test Results:**
+- ✅ Solution build: 0 errors
+- ✅ AnointedAutomation.Objects.Tests: 86/86 passing (+6)
+- ✅ Solution total: 456 tests
+- ✅ Demo verified: "A hungry person is at your door" -> Agape "Give them something to eat." [Matthew 25:35]
+
+---
+
+### Love Concept - Principle-Driven Decision Engine (Behavior Tree) - COMPLETED
+- **Description**: Reworked Love from hardcoded scenario->deed strings into a general decision engine. Per user direction ("we can't just add scenarios... think like video game logic"), Love now resolves ANY situation (including ones never named in Scripture) from its principles. Engine = behavior tree; actions = each love's built-in repertoire. `Respond(Scenario)` replaced by `Decide(Situation)`.
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Architecture:**
+- `Situation` = blackboard of arbitrary named boolean facts (Set/Is/Has) — the situational logic input.
+- Behavior tree: `BehaviorNode` (Tick), `BehaviorResult`, `Selector` (priority OR), `Sequence` (AND, carries the deed), `Condition` (Func<Situation,bool> + `Condition.Fact`), `Deed` (wraps a LoveAction).
+- `Love` is abstract: public `Decide(Situation)` lazily builds + walks the tree; protected abstract `BuildBehavior()` is each love's repertoire.
+- `Agape` repertoire (Selector): wronged->Forgive (Col 3:13; 1 Cor 13:5), inNeed+iCanHelp->meet need (Luke 10:33-35), grieving->mourn (Rom 12:15), rejoicing->rejoice, enemy->love (Matt 5:44), fallback->patient & kind (1 Cor 13:4). `SelfSeekingLove`->pass by (Luke 10:31-32). `SacrificialLove : Agape` prepends friendsLifeAtStake->lay down life (John 15:13), else falls through to agape's tree.
+
+**Files Created:** Concepts/Situation.cs, BehaviorNode.cs, BehaviorResult.cs, Selector.cs, Sequence.cs, Condition.cs, Deed.cs; Tests/SituationTests.cs, BehaviorTreeTests.cs.
+**Files Modified:** Concepts/Love.cs (Decide/BuildBehavior), Agape.cs, SelfSeekingLove.cs, SacrificialLove.cs; Tests/LoveTests.cs, AgapeTests.cs, SacrificialLoveTests.cs; Demo/Program.cs; PROJECT_STRUCTURE_CODE/TESTING/DICTIONARY.md.
+**Files Removed:** Concepts/Scenario.cs, Tests/ScenarioTests.cs (superseded by Situation + behavior tree).
+
+**Build/Test Results:**
+- ✅ Solution build: 0 errors
+- ✅ AnointedAutomation.Objects.Tests: 80/80 passing
+- ✅ Solution total: 450 tests
+- ✅ Demo verified: betrayal (not in Bible) -> Agape forgives; novel situation -> patient & kind fallback; same situation, different love, different deed.
+
+---
+
+### Love Concept - Runnable Demo - COMPLETED
+- **Description**: Added a standalone console demo that feeds a Good Samaritan scenario (predicates) through Agape/SelfSeekingLove/SacrificialLove and prints each LoveAction, then flips a condition to show the predicates re-evaluate live. Demonstrates the abstract Love as a "logic engine": conditions in, deed out.
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Files Created:**
+- `AnointedAutomation.Objects.Demo/AnointedAutomation.Objects.Demo.csproj` (Exe, net10.0, references Objects)
+- `AnointedAutomation.Objects.Demo/Program.cs`
+
+**Notes:**
+- Intentionally NOT added to AnointedAutomation.sln, so it does not affect the library build, CI, or NuGet publishing.
+- Run with: `dotnet run --project AnointedAutomation.Objects.Demo`
+
+---
+
+### SacrificialLove (John 15:13) - COMPLETED
+- **Description**: Added SacrificialLove, the greatest love ("Greater love has no one than this: to lay down one's life for one's friends." John 15:13). Modeled as `SacrificialLove : Agape` (inherits the perfect 1 Cor 13 character); Respond() lays down one's life when a friend's life is at stake, otherwise loves as agape does. Demonstrates "greater love": for the same met scenario, Agape shows mercy while SacrificialLove lays down its life.
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Files Created:**
+- `AnointedAutomation.Objects/Concepts/SacrificialLove.cs`
+- `AnointedAutomation.Objects.Tests/SacrificialLoveTests.cs` (9 tests)
+
+**Files Modified:**
+- `PROJECT_STRUCTURE_CODE.md`, `PROJECT_STRUCTURE_TESTING.md`, `PROJECT_STRUCTURE_DICTIONARY.md` - Documented SacrificialLove and updated counts.
+
+**Build/Test Results:**
+- ✅ Solution build: 0 errors
+- ✅ AnointedAutomation.Objects.Tests: 59/59 passing (+9)
+- ✅ Solution total: 429 tests
+
+---
+
+### Love Concept - Abstract, Behavioral Redesign - COMPLETED
+- **Description**: Reworked the Love concept from a concrete data POCO into a literal `abstract class`, because what love *does* differs in every situation. Love now declares `abstract LoveAction Respond(Scenario)`; concrete loves supply their own behavior. Demonstrated with the Good Samaritan parable (Luke 10:25-37): the same Scenario yields mercy from Agape and "passes by" from SelfSeekingLove (the priest/Levite). Scenarios are built from composable predicates (fluent When()/And()).
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Files Created:**
+- `AnointedAutomation.Objects/Concepts/Agape.cs` - Concrete perfect love; Respond() shows mercy when the scenario is met (Luke 10:33-37), waits patiently otherwise (1 Cor 13:4).
+- `AnointedAutomation.Objects/Concepts/SelfSeekingLove.cs` - Concrete contrast (the priest/Levite); Respond() "passes by on the other side" (Luke 10:31-32) even when conditions call for mercy.
+- `AnointedAutomation.Objects/Concepts/Scenario.cs` - A conceptual situation as composable predicates (System.Func<bool>); fluent When()/And(); IsMet() evaluates them live.
+- `AnointedAutomation.Objects/Concepts/LoveAction.cs` - The deed a love performs: acts, Deed, Virtue, Reference (Scripture), Exhortation.
+- `AnointedAutomation.Objects.Tests/ScenarioTests.cs` (13 tests), `AnointedAutomation.Objects.Tests/AgapeTests.cs` (8 tests).
+
+**Files Modified:**
+- `AnointedAutomation.Objects/Concepts/Love.cs` - Now `abstract`; protected constructors; added abstract Respond(Scenario); Agape() factory returns an Agape. 1 Cor 13 character + helpers unchanged.
+- `AnointedAutomation.Objects.Tests/LoveTests.cs` - Reworked to test the abstract base via a private `TestLove` double (29 tests).
+- `PROJECT_STRUCTURE_CODE.md`, `PROJECT_STRUCTURE_TESTING.md`, `PROJECT_STRUCTURE_DICTIONARY.md` - Documented the redesign and updated counts.
+
+**Build/Test Results:**
+- ✅ Solution build: 0 errors
+- ✅ AnointedAutomation.Objects.Tests: 50/50 passing (29 base + 13 Scenario + 8 Agape)
+- ✅ Solution total: 420 tests
+
+---
+
+### Love Concept Entity (Biblical Agape) - COMPLETED
+- **Description**: Modeled the abstract concept of Love as a concrete C# entity, the way a person is conceptualized as Matter + Energy. Decomposed love into its Biblical constituents (1 Corinthians 13:4-8), sourced in God (1 John 4:8) and directed Lover -> Beloved (Matthew 22:37-39), with a sacrificial dimension (John 3:16; John 15:13).
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-28
+
+**Files Created:**
+- `AnointedAutomation.Objects/Concepts/Love.cs` - The Love entity. Sixteen 1 Cor 13:4-8 characteristics as bool virtues/vices (lowercase per naming convention), plus Source/Lover/Beloved/Reference/Scripture/GreatestCommandment (PascalCase). Methods: `Agape()` factory (perfect pattern), `IsPerfect()`, `Completeness()` (0-17), `Bears()/Believes()/Hopes()/Endures()` (1 Cor 13:7), `GreaterLove()` (John 15:13), `Abides()` (1 Cor 13:13), `Describe()`. Every attribute/method cites its verse in XML docs.
+- `AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj` - New xUnit test project for the base Objects library (.NET 10.0; mirrors Objects.API.Tests, references AnointedAutomation.Objects).
+- `AnointedAutomation.Objects.Tests/LoveTests.cs` - 29 tests (Success, Failure, Edge: null/empty/Unicode/long parties).
+
+**Files Modified:**
+- `AnointedAutomation.sln` - Added AnointedAutomation.Objects.Tests under the Tests solution folder.
+- `PROJECT_STRUCTURE_CODE.md`, `PROJECT_STRUCTURE_TESTING.md`, `PROJECT_STRUCTURE_DICTIONARY.md` - Documented the new entity and test project; updated totals.
+
+**Build/Test Results:**
+- ✅ Solution build: 0 errors (1 pre-existing warning: GarbageCollection._disposed unused)
+- ✅ AnointedAutomation.Objects.Tests: 29/29 passing
+- ✅ Solution total: 399 tests (up from 370)
+
+---
+
 ### MySqlHelper and Middleware Test Coverage Enhancement - COMPLETED
 - **Description**: Added comprehensive edge case tests for MySqlHelper, EndpointAccessMiddleware, and InvalidEndpointTrackerMiddleware
 - **Status**: COMPLETED

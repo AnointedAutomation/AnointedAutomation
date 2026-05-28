@@ -92,6 +92,33 @@ All code files in the solution have been documented with XML documentation follo
   - Subscription.cs - Pause/resume/cancel lifecycle, usage tracking, status history
   - Purchase.cs - Order status and status history audit trail
 
+- Concepts/ - Love modeled as a principle-driven DECISION ENGINE (behavior tree), not hardcoded
+  scenario lookups. You feed in a situation (arbitrary facts) and a love returns the fitting deed,
+  even for situations Scripture never named.
+  - Love.cs - `abstract class Love` holding the shared *character* (the sixteen 1 Corinthians 13:4-8
+    bool virtues/vices, sourced in God 1 John 4:8, directed Lover -> Beloved Matthew 22:37-39, with a
+    sacrificial dimension John 3:16/John 15:13). Helpers: IsPerfect(), Completeness() (0-17),
+    Bears()/Believes()/Hopes()/Endures() (1 Cor 13:7), GreaterLove(), Abides(), Describe(), Agape()
+    factory. Public `LoveAction Decide(Situation)` lazily builds and walks the love's behavior tree;
+    each concrete love supplies its tree via the protected abstract `BuildBehavior()`.
+  - Agape.cs - Concrete perfect love. BuildBehavior() is a Selector repertoire of principle-responses:
+    wronged -> Forgive (Col 3:13; 1 Cor 13:5); a composed branch enemy AND (hungry OR thirsty) ->
+    feed your enemy / overcome evil with good (Romans 12:20-21); the six works of mercy from Matthew 25:35-36 — hungry
+    -> feed, thirsty -> give drink, stranger -> welcome, naked -> clothe, sick -> care for,
+    imprisoned -> visit (exhortation Matt 25:40); inNeed+iCanHelp -> meet the need (Luke 10:33-35);
+    grieving -> mourn with (Rom 12:15); rejoicing -> rejoice with; enemy -> love them (Matt 5:44);
+    fallback -> be patient and kind (1 Cor 13:4) for any unmatched/novel situation.
+  - SelfSeekingLove.cs - The priest/Levite; repertoire is a single deed: pass by (Luke 10:31-32).
+  - SacrificialLove.cs - `SacrificialLove : Agape`. BuildBehavior() prepends one branch
+    (friendsLifeAtStake -> lay down one's life, John 15:13) then falls through to agape's whole tree.
+  - Situation.cs - The decision input: a blackboard of named boolean facts (Set/Is/Has, fluent).
+    Facts are arbitrary strings, so any situation can be expressed.
+  - Behavior tree machinery: BehaviorNode (abstract Tick), BehaviorResult (succeeded + Action),
+    Selector (priority OR), Sequence (AND, carries the deed), Condition (Func<Situation,bool>, plus
+    Condition.Fact(name), composable with And()/Or()/Not() over conditions or fact names), Deed
+    (wraps a LoveAction).
+  - LoveAction.cs - The deed a love performs: acts, Deed, Virtue, Reference (Scripture), Exhortation.
+
 ### 5. AnointedAutomation.Logging
 - LogMessage.cs
   - Class and method documentation
