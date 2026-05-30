@@ -1,5 +1,5 @@
-// Copyright 2024 Anointed Automation, LLC. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me
-// Created by Alexander Fields
+// Copyright 2024 Anointed Automation, LLC. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
+// Stewarded by Alexander Fields
 
 using AnointedAutomation.Optimization.Logging;
 using AnointedAutomation.Repository.MySql;

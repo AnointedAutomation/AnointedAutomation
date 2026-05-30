@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me
+// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;

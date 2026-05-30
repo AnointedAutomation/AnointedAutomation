@@ -5,7 +5,7 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<PackageProjectUrl>https://github.com/AnointedAutomation/AnointedAutomation</PackageProjectUrl>
+		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
 		<Title>AnointedAutomation.Repository.Mongo</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>

@@ -3,8 +3,9 @@
 # PROJECT STRUCTURE OVERVIEW
 
 ## Architecture
-This is a .NET solution containing multiple NuGet package libraries developed by Anointed Automation.
+This is a .NET solution containing multiple NuGet package libraries developed by Anointed Automation, part of the [Anointed](https://anointed.company) family of ventures.
 
+**Anointed (umbrella):** [https://anointed.company](https://anointed.company)
 **GitHub Organization:** [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
 
 ## Technology Stack

@@ -4,6 +4,8 @@
 
 Welcome to the Anointed Automation repository! This repository contains our open-sourced .NET code, aimed at providing useful libraries and tools for the community.
 
+Part of the [Anointed](https://anointed.company) family of ventures.
+
 **GitHub Organization:** [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
 
 ### [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE_DICTIONARY.md)
@@ -67,3 +69,11 @@ For manual package publishing, use one of the provided scripts:
 - `publish-packages.bat` (Windows)
 
 See [PUBLISHING.md](PUBLISHING.md) for detailed instructions.
+
+## Contact
+
+- **Anointed (umbrella):** [https://anointed.company](https://anointed.company)
+- **Anointed Automation:** [https://anointedautomation.net](https://anointedautomation.net)
+- **GitHub:** [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
+
+Stewarded by Alexander Fields — [https://www.alexanderfields.me](https://www.alexanderfields.me)

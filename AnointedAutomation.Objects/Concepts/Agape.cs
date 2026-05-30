@@ -1,6 +1,6 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me on 2026-05-28 10:42:10
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-05-28 10:42:10
 // Edited by Alexander Fields https://www.alexanderfields.me 2026-05-28 12:05:18
-//Created by Alexander Fields
+//Stewarded by Alexander Fields
 
 namespace AnointedAutomation.Objects.Concepts
 {

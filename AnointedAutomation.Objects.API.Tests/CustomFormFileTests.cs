@@ -1,4 +1,4 @@
-// Copyright 2026 Anointed Automation, LLC. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me
+// Copyright 2026 Anointed Automation, LLC. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
 using System;
 using System.IO;
 using System.Text;

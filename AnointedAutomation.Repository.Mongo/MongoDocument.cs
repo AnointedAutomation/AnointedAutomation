@@ -1,5 +1,5 @@
 // Copyright 2026 Anointed Automation, LLC. All Rights Reserved.
-// Created by Alexander Fields https://www.alexanderfields.me
+// Stewarded by Alexander Fields https://www.alexanderfields.me
 
 using System;
 using MongoDB.Bson;

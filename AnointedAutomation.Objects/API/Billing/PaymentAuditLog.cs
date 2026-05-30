@@ -1,6 +1,6 @@
-// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me on 2024-01-16 19:19:01
+// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-01-16 19:19:01
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
-//Created by Alexander Fields
+//Stewarded by Alexander Fields
 
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;

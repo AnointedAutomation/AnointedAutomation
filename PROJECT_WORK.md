@@ -2,6 +2,26 @@
 
 ## Current Tasks
 
+### anointed.company Umbrella References + "Steward" Wording - COMPLETED
+- **Description**: Referenced the umbrella site `https://anointed.company` throughout the project wherever links appear (response object, docs, NuGet metadata), keeping the existing `anointedautomation.net` and GitHub source links unchanged. Also reworded self-attribution from "Created by / Creator" to "Stewarded by / Steward" everywhere (code headers, README footers, the `ResponseData.Links` label) so the work reads as stewardship, not a claim to be THE Creator.
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-05-30
+
+**Files Modified:**
+- `AnointedAutomation.Objects/API/ResponseData.cs` - Added `{ "Anointed", "https://anointed.company" }` (first) to the `Links` dict in both `ResponseData` and `ResponseData<T>`; renamed `Creator` link key → `Steward`; "created by" → "stewarded by" in the `Copyright` string and doc comments.
+- `AnointedAutomation.Objects.Tests/ResponseDataTests.cs` - NEW: 3 tests asserting the umbrella link is present in both response types and the automation link is retained.
+- `README.md` - Added "Part of the Anointed family" note + a `## Contact` section (the TOC already linked `#contact`).
+- 10 per-package `README.md` footers - Appended "Part of the [Anointed](https://anointed.company) family of ventures."
+- 8 `*.csproj` - Repointed `<PackageProjectUrl>` → `https://anointed.company`; `<RepositoryUrl>` kept on GitHub.
+- `PROJECT_STRUCTURE_OVERVIEW.md` - Added umbrella reference.
+- All `*.cs` headers + `*.md` - "Created by Alexander Fields" → "Stewarded by Alexander Fields" (94 .cs files + READMEs).
+
+**Build/Test Results:**
+- ✅ AnointedAutomation.Objects.Tests build: 0 errors, 0 warnings
+- ✅ ResponseDataTests: 3/3 passing
+
+---
+
 ### Love Concept - Composed Repertoire Branch (Romans 12:20) - COMPLETED
 - **Description**: Added a composed-condition branch to Agape's repertoire using the new And/Or/Not: enemy AND (hungry OR thirsty) -> "Feed your enemy and give them drink; overcome evil with good" (Romans 12:20-21; Proverbs 25:21). Placed after wronged and before the generic Matthew 25 hungry/thirsty branches so a hungry/thirsty ENEMY gets the Romans 12:20 response, while a hungry non-enemy still gets the generic Matthew 25 feed.
 - **Status**: ✅ COMPLETED
