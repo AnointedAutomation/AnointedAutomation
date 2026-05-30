@@ -1,6 +1,6 @@
-// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me on 2024-10-12 14:24:21
+// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-10-12 14:24:21
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
-//Created by Alexander Fields
+//Stewarded by Alexander Fields
 
 // =============================================================================
 // NAMING CONVENTION:
@@ -51,7 +51,7 @@ namespace AnointedAutomation.Objects
         /// <summary>
         /// Gets or sets the copyright and attribution information.
         /// </summary>
-        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net created by Alexander Fields https://www.alexanderfields.me";
+        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net stewarded by Alexander Fields https://www.alexanderfields.me";
         /// <summary>
         /// Gets or sets the response data payload.
         /// </summary>
@@ -61,13 +61,14 @@ namespace AnointedAutomation.Objects
         /// </summary>
         public object Error { get; set; }
         /// <summary>
-        /// Related Anointed family of sites and creator links.
+        /// Related Anointed family of sites and steward links.
         /// </summary>
         public System.Collections.Generic.Dictionary<string, string> Links { get; set; } = new()
         {
+            { "Anointed", "https://anointed.company" },
             { "Automation", "https://www.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
-            { "Creator", "https://www.alexanderfields.me" },
+            { "Steward", "https://www.alexanderfields.me" },
             { "GitHub", "https://github.com/AnointedAutomation" }
         };
         /// <summary>
@@ -105,19 +106,20 @@ namespace AnointedAutomation.Objects
         /// <summary>
         /// Gets or sets the copyright and attribution information.
         /// </summary>
-        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net created by Alexander Fields https://www.alexanderfields.me";
+        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net stewarded by Alexander Fields https://www.alexanderfields.me";
         /// <summary>
         /// Gets or sets the response data payload.
         /// </summary>
         public T Data { get; set; }
         /// <summary>
-        /// Related Anointed family of sites and creator links.
+        /// Related Anointed family of sites and steward links.
         /// </summary>
         public System.Collections.Generic.Dictionary<string, string> Links { get; set; } = new()
         {
+            { "Anointed", "https://anointed.company" },
             { "Automation", "https://www.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
-            { "Creator", "https://www.alexanderfields.me" },
+            { "Steward", "https://www.alexanderfields.me" },
             { "GitHub", "https://github.com/AnointedAutomation" }
         };
         /// <summary>

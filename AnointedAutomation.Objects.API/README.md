@@ -89,5 +89,6 @@ Copyright © 2023 Anointed Automation, LLC. All rights reserved.
 
 ## Author
 
-Created by Alexander Fields
+Stewarded by Alexander Fields
 GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
+Part of the [Anointed](https://anointed.company) family of ventures.

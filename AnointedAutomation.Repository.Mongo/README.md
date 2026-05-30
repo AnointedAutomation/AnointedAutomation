@@ -257,8 +257,10 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 
 ## Author
 
-Created by **Alexander Fields**
+Stewarded by **Alexander Fields**
 Copyright © 2023 Anointed Automation, LLC
 
 For inquiries, please contact [Anointed Automation](https://anointedautomation.net).
 GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
+
+Part of the [Anointed](https://anointed.company) family of ventures.

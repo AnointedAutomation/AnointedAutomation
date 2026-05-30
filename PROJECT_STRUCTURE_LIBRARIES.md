@@ -397,3 +397,6 @@ AnointedAutomation.Objects.Mongo
 6. **Versioning**: Libraries are at different version stages (0.0.4 to 0.0.13)
 7. **Documentation**: All classes, methods, and properties have complete XML documentation
 8. **Test Coverage**: Unit tests include XML documentation of test scenarios
+---
+
+**[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**

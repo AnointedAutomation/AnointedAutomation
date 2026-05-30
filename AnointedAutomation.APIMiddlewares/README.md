@@ -180,6 +180,8 @@ This project is copyrighted © 2024 Anointed Automation, LLC.
 
 ## Author
 
-Created by **Alexander Fields**
+Stewarded by **Alexander Fields**
 For inquiries, please contact [Anointed Automation](https://anointedautomation.net).
 GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
+
+Part of the [Anointed](https://anointed.company) family of ventures.

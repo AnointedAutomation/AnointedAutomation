@@ -39,10 +39,10 @@ This file serves as the index/directory for all PROJECT_STRUCTURE files in the A
 
 ### [PROJECT_STRUCTURE_TESTING.md](./PROJECT_STRUCTURE_TESTING.md) ✅
 - Test organization under "Tests" solution folder
-- MSTest framework configuration for .NET 8.0
-- Individual test project structures and test files
+- Xunit framework configuration for .NET 10.0
+- Individual test project structures and test files (7 test projects, 470 tests)
 - Test coverage patterns and testing strategies
-- Test file organization by library (Logging, Memory, APIMiddlewares, etc.)
+- Test file organization by library (Logging, Memory, APIMiddlewares, Repository.Mongo, Repository.MySql, Objects.API, Objects)
 - Unit test patterns and mock object usage
 
 ### [PROJECT_STRUCTURE_VISUAL.md](./PROJECT_STRUCTURE_VISUAL.md) ✅
@@ -68,3 +68,6 @@ Looking for information about:
 
 ## File Size Management
 Each PROJECT_STRUCTURE file is kept under 1000 lines for optimal reading performance. If a file grows too large, it will be split into more specific files.
+---
+
+**[← Back to Claude Documentation](/home/roku674/.claude/CLAUDE.md)**

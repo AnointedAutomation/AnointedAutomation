@@ -12,8 +12,16 @@ updates:
     labels:
       - "dependencies"
       - "automated pr"
-    
+
   # Enable version updates for GitHub Actions
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+      major:
+        update-types:
+          - major
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -23,3 +31,11 @@ updates:
     labels:
       - "dependencies"
       - "automated pr"
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+      major:
+        update-types:
+          - major
