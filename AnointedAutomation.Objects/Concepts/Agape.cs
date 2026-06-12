@@ -61,18 +61,18 @@ namespace AnointedAutomation.Objects.Concepts
         protected override BehaviorNode BuildBehavior()
         {
             return new Selector(
-                new Sequence(Condition.Fact("wronged"), new Deed(Forgive())),
-                new Sequence(Condition.Fact("enemy").And(Condition.Fact("hungry").Or("thirsty")), new Deed(FeedYourEnemy())),
-                new Sequence(Condition.Fact("hungry"), new Deed(Feed())),
-                new Sequence(Condition.Fact("thirsty"), new Deed(GiveDrink())),
-                new Sequence(Condition.Fact("stranger"), new Deed(Welcome())),
-                new Sequence(Condition.Fact("naked"), new Deed(Clothe())),
-                new Sequence(Condition.Fact("sick"), new Deed(CareForSick())),
-                new Sequence(Condition.Fact("imprisoned"), new Deed(Visit())),
-                new Sequence(Condition.Fact("inNeed").And("iCanHelp"), new Deed(MeetTheNeed())),
-                new Sequence(Condition.Fact("grieving"), new Deed(MournWith())),
-                new Sequence(Condition.Fact("rejoicing"), new Deed(RejoiceWith())),
-                new Sequence(Condition.Fact("enemy"), new Deed(LoveEnemy())),
+                new Sequence(Condition.For(new Grievance()), new Deed(Forgive())),
+                new Sequence(Condition.For(new Enmity()).And(Condition.For(new Hunger()).Or(new Thirst())), new Deed(FeedYourEnemy())),
+                new Sequence(Condition.For(new Hunger()), new Deed(Feed())),
+                new Sequence(Condition.For(new Thirst()), new Deed(GiveDrink())),
+                new Sequence(Condition.For(new Estrangement()), new Deed(Welcome())),
+                new Sequence(Condition.For(new Nakedness()), new Deed(Clothe())),
+                new Sequence(Condition.For(new Sickness()), new Deed(CareForSick())),
+                new Sequence(Condition.For(new Imprisonment()), new Deed(Visit())),
+                new Sequence(Condition.For(new Need()).And(new Means()), new Deed(MeetTheNeed())),
+                new Sequence(Condition.For(new Grief()), new Deed(MournWith())),
+                new Sequence(Condition.For(new Gladness()), new Deed(RejoiceWith())),
+                new Sequence(Condition.For(new Enmity()), new Deed(LoveEnemy())),
                 new Deed(BePatientAndKind()));
         }
 

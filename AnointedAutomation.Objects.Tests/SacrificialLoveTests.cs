@@ -15,7 +15,7 @@ namespace AnointedAutomation.Objects.Tests
             // Arrange (John 15:13)
             Love love = new SacrificialLove();
             Situation situation = new Situation("A friend's life is at stake; saving them costs my own.")
-                .Set("friendsLifeAtStake");
+                .With(new MortalPeril());
 
             // Act
             LoveAction action = love.Decide(situation);
@@ -33,8 +33,8 @@ namespace AnointedAutomation.Objects.Tests
             // Arrange — no ultimate sacrifice is needed, but a neighbor is in need.
             Love love = new SacrificialLove();
             Situation situation = new Situation("A stranger in need by the road.")
-                .Set("inNeed")
-                .Set("iCanHelp");
+                .With(new Need())
+                .With(new Means());
 
             // Act
             LoveAction action = love.Decide(situation);
@@ -48,7 +48,7 @@ namespace AnointedAutomation.Objects.Tests
         public void Decide_GreaterDeedThanAgape_ForSameSituation()
         {
             // Arrange — "greater love" (John 15:13): same situation, a greater deed.
-            Situation situation = new Situation("A friend's life is at stake.").Set("friendsLifeAtStake");
+            Situation situation = new Situation("A friend's life is at stake.").With(new MortalPeril());
             Love agape = new Agape();
             Love sacrificial = new SacrificialLove();
 

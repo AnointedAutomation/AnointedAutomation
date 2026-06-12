@@ -111,13 +111,61 @@ All code files in the solution have been documented with XML documentation follo
   - SelfSeekingLove.cs - The priest/Levite; repertoire is a single deed: pass by (Luke 10:31-32).
   - SacrificialLove.cs - `SacrificialLove : Agape`. BuildBehavior() prepends one branch
     (friendsLifeAtStake -> lay down one's life, John 15:13) then falls through to agape's whole tree.
-  - Situation.cs - The decision input: a blackboard of named boolean facts (Set/Is/Has, fluent).
-    Facts are arbitrary strings, so any situation can be expressed.
+  - Situation.cs - The decision input: the set of `Circumstance`s that hold (With/Has, fluent). No
+    strings: circumstances are first-class concepts. Any situation can be expressed, including novel
+    ones via `new Circumstance("...")`.
+  - Circumstance.cs / Circumstances.cs - A `Circumstance : Concept` is a state of the world love
+    responds to (no moral weight). Known ones are types (Hunger, Thirst, Estrangement, Nakedness,
+    Sickness, Imprisonment, Need, Means, Grievance, Enmity, Grief, Gladness, MortalPeril); novel ones
+    use the base type and match by name.
   - Behavior tree machinery: BehaviorNode (abstract Tick), BehaviorResult (succeeded + Action),
     Selector (priority OR), Sequence (AND, carries the deed), Condition (Func<Situation,bool>, plus
-    Condition.Fact(name), composable with And()/Or()/Not() over conditions or fact names), Deed
-    (wraps a LoveAction).
+    Condition.For(circumstance), composable with And()/Or()/Not() over conditions or circumstances),
+    Deed (wraps a LoveAction).
   - LoveAction.cs - The deed a love performs: acts, Deed, Virtue, Reference (Scripture), Exhortation.
+- Concepts/Reality/ - The divine grounding / reality engine (namespace stays
+  `AnointedAutomation.Objects.Concepts`; folder is organizational). God is not an object you call; He
+  is the grounding reality stands on. Built on the Ethiopian Orthodox Tewahedo (broadest) canon
+  (1 Enoch 72-82, Jubilees, 1 Meqabyan). Design spec:
+  `docs/superpowers/specs/2026-06-11-divine-grounding-reality-engine-design.md`.
+  - Reality.cs - The Universe: the one thing agents address. `Witness(Act[, Grounding])`
+    harmonizes a deed under God's whole character, bears it on its grounding, records it on the
+    tablets, and returns the resolution. State and truth are one call. `Reality.Revealed()` wires
+    the standard character (LoveFacet, Justice, Mercy, Order). The Father (grounding) is never an
+    object (Col 1:17; Heb 1:3).
+  - HeavenlyTablets.cs - The one record where state and truth are the same (Jubilees; 1 Enoch 81).
+    `Coherence()` starts 1.0 and decays multiplicatively as disorder is recorded (1 Enoch 80);
+    `Record()`, `History()`.
+  - Concept.cs - The root of the concept model: an idea as first-class code, not a string. Two kinds
+    descend from it: `MoralConcept` (bears on God's character) and `Circumstance` (a state of the
+    world). The type system distinguishes a sin from a situation.
+  - MoralConcept.cs - Abstract `MoralConcept : Concept`. Each concrete concept declares its `Name`,
+    `Scripture`, `Gravity` (None/Minor/Serious/Grave/Capital), and which facets it
+    `Upholds(DivineAttribute)` / `Violates(DivineAttribute)`. Morals/Virtues.cs and Morals/Vices.cs
+    hold the concept classes (Compassion, Protection, Forgiveness, SelfSacrifice, Healing, Atonement,
+    Pardon, CovenantFaithfulness, ObedienceToGod, ...; Murder/Defilement/Bloodshed/ChildSacrifice
+    [Capital], Oppression/Rebellion/Treachery [Grave], Theft/Unforgiveness [Serious], Rudeness/Envy
+    [Minor], ...), each with its Scripture, stance, and gravity.
+  - Gravity.cs - How heinous a wrong is (None..Capital), driving the disorder it unleashes; Scripture
+    grades sin (Matthew 23:23; John 19:11).
+  - Act.cs - A deed presented to reality, composed of the `MoralConcept`s it embodies and offends
+    (replaces the old string `Situation` for the Reality engine).
+  - DivineAttribute.cs - Abstract facet of God's character; `Read(Act)` aggregates the stances of the
+    deed's concepts (upheld -> +0.5, violated -> -0.5 from a 0.5 baseline). Facets no longer carry
+    string vocabulary; the moral vocabulary lives on the concepts.
+  - Justice.cs / Mercy.cs / Order.cs - Facets, now identity + name only (Romans 13:7; Luke 6:36;
+    Lam 3:23 + 1 Enoch 72-82).
+  - LoveFacet.cs - Love as a facet; adapter wrapping the existing `Love` (agape, 1 Cor 13 +
+    John 15:13). Leaves the `Love` hierarchy untouched.
+  - DivineCharacter.cs - All facets always live; `Harmonize(Act)` -> Resolution. Coherence =
+    mean of facets (so the cross can be full Justice AND full Mercy, not a veto); disorder = gravest
+    single offense.
+  - Resolution.cs - The response: Coherence + Disorder (clamped 0..1) + per-facet `Reading(name)` /
+    `Readings`. Not pass/fail.
+  - Grounding.cs - What an agent stands on (1 Meqabyan). `InGod()` keeps a deed's life; `InIdol(name)`
+    drifts it toward non-being via `Bear(Resolution)`.
+  - Word.cs - The mediator as a medium, not a gate (John 1:1-3; 14:6). `Speak(Act, Grounding)`
+    carries a deed into Reality and the truth back.
 
 ### 5. AnointedAutomation.Logging
 - LogMessage.cs
