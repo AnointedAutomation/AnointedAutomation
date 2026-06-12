@@ -1,6 +1,5 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-05-28 12:05:18
-// Edited by Alexander Fields https://www.alexanderfields.me 2026-05-28 12:05:18
-//Stewarded by Alexander Fields
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-11
+// Stewarded by Alexander Fields
 
 using Xunit;
 using AnointedAutomation.Objects.Concepts;
@@ -17,14 +16,11 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void Deed_AlwaysSucceeds_CarryingItsAction()
         {
-            // Arrange
             LoveAction action = Action("A");
             Deed deed = new Deed(action);
 
-            // Act
             BehaviorResult result = deed.Tick(new Situation());
 
-            // Assert
             Assert.True(result.succeeded);
             Assert.Same(action, result.Action);
         }
@@ -32,13 +28,10 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void Condition_PredicateTrue_Succeeds_WithNoAction()
         {
-            // Arrange
             Condition condition = new Condition(situation => true);
 
-            // Act
             BehaviorResult result = condition.Tick(new Situation());
 
-            // Assert
             Assert.True(result.succeeded);
             Assert.Null(result.Action);
         }
@@ -46,116 +39,104 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void Condition_PredicateFalse_Fails()
         {
-            // Arrange
             Condition condition = new Condition(situation => false);
 
-            // Assert
             Assert.False(condition.Tick(new Situation()).succeeded);
         }
 
         [Fact]
-        public void Condition_Fact_ReadsTheSituation()
+        public void Condition_For_ReadsTheSituation()
         {
-            // Arrange
-            Condition condition = Condition.Fact("inNeed");
+            Condition condition = Condition.For(new Need());
 
-            // Assert
-            Assert.True(condition.Tick(new Situation().Set("inNeed")).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Need())).succeeded);
             Assert.False(condition.Tick(new Situation()).succeeded);
         }
 
         [Fact]
         public void Condition_And_HoldsOnlyWhenBothHold()
         {
-            // Arrange (sick AND imprisoned)
-            Condition condition = Condition.Fact("sick").And("imprisoned");
+            // sick AND imprisoned
+            Condition condition = Condition.For(new Sickness()).And(new Imprisonment());
 
-            // Assert
-            Assert.True(condition.Tick(new Situation().Set("sick").Set("imprisoned")).succeeded);
-            Assert.False(condition.Tick(new Situation().Set("sick")).succeeded);
-            Assert.False(condition.Tick(new Situation().Set("imprisoned")).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Sickness()).With(new Imprisonment())).succeeded);
+            Assert.False(condition.Tick(new Situation().With(new Sickness())).succeeded);
+            Assert.False(condition.Tick(new Situation().With(new Imprisonment())).succeeded);
             Assert.False(condition.Tick(new Situation()).succeeded);
         }
 
         [Fact]
         public void Condition_And_AcceptsConditionOverload()
         {
-            // Arrange
-            Condition condition = Condition.Fact("a").And(Condition.Fact("b"));
+            Condition condition = Condition.For(new Circumstance("a")).And(Condition.For(new Circumstance("b")));
 
-            // Assert
-            Assert.True(condition.Tick(new Situation().Set("a").Set("b")).succeeded);
-            Assert.False(condition.Tick(new Situation().Set("a")).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Circumstance("a")).With(new Circumstance("b"))).succeeded);
+            Assert.False(condition.Tick(new Situation().With(new Circumstance("a"))).succeeded);
         }
 
         [Fact]
         public void Condition_Or_HoldsWhenEitherHolds()
         {
-            // Arrange (hungry OR thirsty)
-            Condition condition = Condition.Fact("hungry").Or("thirsty");
+            // hungry OR thirsty
+            Condition condition = Condition.For(new Hunger()).Or(new Thirst());
 
-            // Assert
-            Assert.True(condition.Tick(new Situation().Set("hungry")).succeeded);
-            Assert.True(condition.Tick(new Situation().Set("thirsty")).succeeded);
-            Assert.True(condition.Tick(new Situation().Set("hungry").Set("thirsty")).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Hunger())).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Thirst())).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Hunger()).With(new Thirst())).succeeded);
             Assert.False(condition.Tick(new Situation()).succeeded);
         }
 
         [Fact]
         public void Condition_Not_NegatesTheCondition()
         {
-            // Arrange (NOT an enemy)
-            Condition condition = Condition.Fact("enemy").Not();
+            // NOT an enemy
+            Condition condition = Condition.For(new Enmity()).Not();
 
-            // Assert
             Assert.True(condition.Tick(new Situation()).succeeded);
-            Assert.False(condition.Tick(new Situation().Set("enemy")).succeeded);
+            Assert.False(condition.Tick(new Situation().With(new Enmity())).succeeded);
         }
 
         [Fact]
         public void Condition_StaticNot_NegatesTheGivenCondition()
         {
-            // Arrange
-            Condition condition = Condition.Not(Condition.Fact("enemy"));
+            Condition condition = Condition.Not(Condition.For(new Enmity()));
 
-            // Assert
             Assert.True(condition.Tick(new Situation()).succeeded);
-            Assert.False(condition.Tick(new Situation().Set("enemy")).succeeded);
+            Assert.False(condition.Tick(new Situation().With(new Enmity())).succeeded);
         }
 
         [Fact]
         public void Condition_Composition_ChainsLeftToRight()
         {
-            // Arrange — (a AND b) OR c
-            Condition condition = Condition.Fact("a").And("b").Or("c");
+            // (a AND b) OR c
+            Condition condition = Condition.For(new Circumstance("a"))
+                .And(new Circumstance("b")).Or(new Circumstance("c"));
 
-            // Assert
-            Assert.True(condition.Tick(new Situation().Set("a").Set("b")).succeeded);
-            Assert.True(condition.Tick(new Situation().Set("c")).succeeded);
-            Assert.False(condition.Tick(new Situation().Set("a")).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Circumstance("a")).With(new Circumstance("b"))).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Circumstance("c"))).succeeded);
+            Assert.False(condition.Tick(new Situation().With(new Circumstance("a"))).succeeded);
         }
 
         [Fact]
         public void Condition_AndNot_Combine()
         {
-            // Arrange — sick AND NOT contagious
-            Condition condition = Condition.Fact("sick").And(Condition.Fact("contagious").Not());
+            // sick AND NOT contagious
+            Condition condition = Condition.For(new Sickness()).And(Condition.For(new Circumstance("contagious")).Not());
 
-            // Assert
-            Assert.True(condition.Tick(new Situation().Set("sick")).succeeded);
-            Assert.False(condition.Tick(new Situation().Set("sick").Set("contagious")).succeeded);
+            Assert.True(condition.Tick(new Situation().With(new Sickness())).succeeded);
+            Assert.False(condition.Tick(new Situation().With(new Sickness()).With(new Circumstance("contagious"))).succeeded);
         }
 
         [Fact]
         public void Condition_And_WithNullCondition_ThrowsArgumentNullException()
         {
-            Assert.Throws<System.ArgumentNullException>(() => Condition.Fact("a").And((Condition)null));
+            Assert.Throws<System.ArgumentNullException>(() => Condition.For(new Circumstance("a")).And((Condition)null));
         }
 
         [Fact]
         public void Condition_Or_WithNullCondition_ThrowsArgumentNullException()
         {
-            Assert.Throws<System.ArgumentNullException>(() => Condition.Fact("a").Or((Condition)null));
+            Assert.Throws<System.ArgumentNullException>(() => Condition.For(new Circumstance("a")).Or((Condition)null));
         }
 
         [Fact]
@@ -167,14 +148,11 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void Sequence_AllChildrenSucceed_CarriesLastDeed()
         {
-            // Arrange
             LoveAction action = Action("A");
             Sequence sequence = new Sequence(new Condition(situation => true), new Deed(action));
 
-            // Act
             BehaviorResult result = sequence.Tick(new Situation());
 
-            // Assert
             Assert.True(result.succeeded);
             Assert.Same(action, result.Action);
         }
@@ -182,27 +160,22 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void Sequence_AnyChildFails_Fails()
         {
-            // Arrange
             Sequence sequence = new Sequence(new Condition(situation => false), new Deed(Action("A")));
 
-            // Assert
             Assert.False(sequence.Tick(new Situation()).succeeded);
         }
 
         [Fact]
         public void Selector_ReturnsFirstChildThatSucceeds()
         {
-            // Arrange
             LoveAction first = Action("first");
             LoveAction fallback = Action("fallback");
             Selector selector = new Selector(
                 new Sequence(new Condition(situation => false), new Deed(first)),
                 new Deed(fallback));
 
-            // Act
             BehaviorResult result = selector.Tick(new Situation());
 
-            // Assert
             Assert.True(result.succeeded);
             Assert.Same(fallback, result.Action);
         }
@@ -210,27 +183,23 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void Selector_AllChildrenFail_Fails()
         {
-            // Arrange
             Selector selector = new Selector(
                 new Condition(situation => false),
                 new Condition(situation => false));
 
-            // Assert
             Assert.False(selector.Tick(new Situation()).succeeded);
         }
 
         [Fact]
         public void Composition_PicksMatchingBranch_ElseFallback()
         {
-            // Arrange
             LoveAction help = Action("help");
             LoveAction fallback = Action("fallback");
             Selector tree = new Selector(
-                new Sequence(Condition.Fact("inNeed"), new Deed(help)),
+                new Sequence(Condition.For(new Need()), new Deed(help)),
                 new Deed(fallback));
 
-            // Assert
-            Assert.Same(help, tree.Tick(new Situation().Set("inNeed")).Action);
+            Assert.Same(help, tree.Tick(new Situation().With(new Need())).Action);
             Assert.Same(fallback, tree.Tick(new Situation()).Action);
         }
 
@@ -249,21 +218,18 @@ namespace AnointedAutomation.Objects.Tests
         }
 
         [Fact]
-        public void Condition_Fact_WithNullName_ThrowsArgumentNullException()
+        public void Condition_For_WithNullCircumstance_ThrowsArgumentNullException()
         {
-            Assert.Throws<System.ArgumentNullException>(() => Condition.Fact(null));
+            Assert.Throws<System.ArgumentNullException>(() => Condition.For(null));
         }
 
         [Fact]
         public void Sequence_WithNoChildren_Succeeds_WithNoAction()
         {
-            // Arrange — a vacuous sequence (no children) succeeds, carrying no deed.
             Sequence sequence = new Sequence();
 
-            // Act
             BehaviorResult result = sequence.Tick(new Situation());
 
-            // Assert
             Assert.True(result.succeeded);
             Assert.Null(result.Action);
         }
@@ -271,10 +237,8 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void Selector_WithNoChildren_Fails()
         {
-            // Arrange — a selector with nothing to try fails.
             Selector selector = new Selector();
 
-            // Assert
             Assert.False(selector.Tick(new Situation()).succeeded);
         }
     }

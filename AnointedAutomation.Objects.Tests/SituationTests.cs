@@ -1,6 +1,5 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-05-28 12:05:18
-// Edited by Alexander Fields https://www.alexanderfields.me 2026-05-28 12:05:18
-//Stewarded by Alexander Fields
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-11
+// Stewarded by Alexander Fields
 
 using Xunit;
 using AnointedAutomation.Objects.Concepts;
@@ -10,146 +9,98 @@ namespace AnointedAutomation.Objects.Tests
     public class SituationTests
     {
         [Fact]
-        public void Set_ThenIs_ReturnsTrue()
+        public void With_ThenHas_ReturnsTrue()
         {
-            // Arrange
             Situation situation = new Situation();
 
-            // Act
-            situation.Set("inNeed");
+            situation.With(new Need());
 
-            // Assert
-            Assert.True(situation.Is("inNeed"));
+            Assert.True(situation.Has(new Need()));
         }
 
         [Fact]
-        public void Set_FalseValue_IsReturnsFalse()
+        public void Has_UnknownCircumstance_ReturnsFalse()
         {
-            // Arrange
+            // A circumstance never added simply does not hold.
             Situation situation = new Situation();
 
-            // Act
-            situation.Set("inNeed", false);
-
-            // Assert
-            Assert.False(situation.Is("inNeed"));
+            Assert.False(situation.Has(new Circumstance("neverHeardOfIt")));
         }
 
         [Fact]
-        public void Is_UnknownFact_ReturnsFalse()
+        public void With_ReturnsSameInstance_ForChaining()
         {
-            // Arrange
             Situation situation = new Situation();
 
-            // Assert — a fact never recorded simply does not hold
-            Assert.False(situation.Is("neverHeardOfIt"));
-        }
+            Situation chained = situation.With(new Circumstance("a")).With(new Circumstance("b"));
 
-        [Fact]
-        public void Has_RecordedFact_ReturnsTrue_EvenWhenFalse()
-        {
-            // Arrange
-            Situation situation = new Situation().Set("inNeed", false);
-
-            // Assert
-            Assert.True(situation.Has("inNeed"));
-            Assert.False(situation.Is("inNeed"));
-        }
-
-        [Fact]
-        public void Has_UnknownFact_ReturnsFalse()
-        {
-            // Arrange
-            Situation situation = new Situation();
-
-            // Assert
-            Assert.False(situation.Has("nope"));
-        }
-
-        [Fact]
-        public void Set_ReturnsSameInstance_ForChaining()
-        {
-            // Arrange
-            Situation situation = new Situation();
-
-            // Act
-            Situation chained = situation.Set("a").Set("b");
-
-            // Assert
             Assert.Same(situation, chained);
         }
 
         [Fact]
         public void Constructor_WithDescription_SetsDescription()
         {
-            // Act
             Situation situation = new Situation("A stranger lies beaten by the road.");
 
-            // Assert
             Assert.Equal("A stranger lies beaten by the road.", situation.Description);
         }
 
         [Fact]
-        public void Facts_ArePopulated_AfterSet()
+        public void Circumstances_ArePopulated_AfterWith()
         {
-            // Arrange
-            Situation situation = new Situation().Set("a").Set("b", false);
+            Situation situation = new Situation().With(new Circumstance("a")).With(new Circumstance("b"));
 
-            // Assert
-            Assert.Equal(2, situation.Facts.Count);
+            Assert.Equal(2, situation.Circumstances.Count);
+        }
+
+        [Fact]
+        public void ANamedCircumstance_MatchesANovelOneOfTheSameName()
+        {
+            // A typed circumstance and a directly-named one are the same state when they share a name.
+            Situation situation = new Situation().With(new Hunger());
+
+            Assert.True(situation.Has(new Circumstance("hungry")));
+        }
+
+        [Fact]
+        public void ANovelCircumstance_NeverNamedInScripture_Works()
+        {
+            // The world is open-ended; any circumstance can be expressed.
+            Situation situation = new Situation().With(new Circumstance("quantumComputerMalfunctioned"));
+
+            Assert.True(situation.Has(new Circumstance("quantumComputerMalfunctioned")));
         }
 
         // EDGE CASE TESTS - per CLAUDE_TESTING.md requirements
 
         [Fact]
-        public void Set_WithNullFact_ThrowsArgumentNullException()
+        public void With_WithNullCircumstance_ThrowsArgumentNullException()
         {
-            // Arrange
             Situation situation = new Situation();
 
-            // Assert
-            Assert.Throws<System.ArgumentNullException>(() => situation.Set(null));
+            Assert.Throws<System.ArgumentNullException>(() => situation.With(null));
         }
 
         [Fact]
-        public void Is_WithNullFact_ThrowsArgumentNullException()
+        public void Has_WithNullCircumstance_ThrowsArgumentNullException()
         {
-            // Arrange
             Situation situation = new Situation();
 
-            // Assert
-            Assert.Throws<System.ArgumentNullException>(() => situation.Is(null));
-        }
-
-        [Fact]
-        public void Has_WithNullFact_ThrowsArgumentNullException()
-        {
-            // Arrange
-            Situation situation = new Situation();
-
-            // Assert
             Assert.Throws<System.ArgumentNullException>(() => situation.Has(null));
         }
 
         [Fact]
-        public void Set_SameFactTwice_TakesLatestValue()
+        public void Circumstance_WithNullName_ThrowsArgumentNullException()
         {
-            // Arrange
-            Situation situation = new Situation().Set("inNeed", true).Set("inNeed", false);
-
-            // Assert
-            Assert.False(situation.Is("inNeed"));
-            Assert.Single(situation.Facts);
+            Assert.Throws<System.ArgumentNullException>(() => new Circumstance(null));
         }
 
         [Fact]
-        public void Set_WithUnicodeFactName_Works()
+        public void With_UnicodeCircumstanceName_Works()
         {
-            // Arrange
-            Situation situation = new Situation().Set("σε ανάγκη 需要");
+            Situation situation = new Situation().With(new Circumstance("σε ανάγκη 需要"));
 
-            // Assert
-            Assert.True(situation.Is("σε ανάγκη 需要"));
+            Assert.True(situation.Has(new Circumstance("σε ανάγκη 需要")));
         }
     }
 }

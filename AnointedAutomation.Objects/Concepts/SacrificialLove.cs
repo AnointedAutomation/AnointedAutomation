@@ -44,7 +44,7 @@ namespace AnointedAutomation.Objects.Concepts
         protected override BehaviorNode BuildBehavior()
         {
             return new Selector(
-                new Sequence(Condition.Fact("friendsLifeAtStake"), new Deed(LayDownLife())),
+                new Sequence(Condition.For(new MortalPeril()), new Deed(LayDownLife())),
                 base.BuildBehavior());
         }
 
