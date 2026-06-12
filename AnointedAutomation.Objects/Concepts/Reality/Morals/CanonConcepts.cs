@@ -227,6 +227,18 @@ namespace AnointedAutomation.Objects.Concepts
         public override string Scripture => "Exodus 20:8";
         public override Gravity Gravity => Gravity.Serious;
         public override bool Violates(DivineAttribute facet) => facet is Faithfulness;
+
+        // Context-sensitive: "it is lawful to do good on the Sabbath." (Matthew 12:11-12) A work of
+        // mercy on the Sabbath does not break it; the Lord of the Sabbath wills mercy, not legalism.
+        public override bool Violates(DivineAttribute facet, Act act)
+        {
+            if (act.InContextOf(new Circumstance("workOfMercy")))
+            {
+                return false;
+            }
+
+            return Violates(facet);
+        }
     }
 
     /// <summary>Misusing the name of God: taking the LORD's name in vain. "You shall not misuse the name of the LORD your God." (Exodus 20:7)</summary>

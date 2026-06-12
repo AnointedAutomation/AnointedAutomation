@@ -7,6 +7,7 @@ using AnointedAutomation.Objects.Concepts;
 namespace AnointedAutomation.Objects.Tests.Canon
 {
     // 1 Enoch (ETH) narrative oracle: the engine must return the verdict Scripture gives at each step.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class FirstEnochNarrativeTests
     {
         [Fact]

@@ -10,6 +10,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // Canon: ETH (Ethiopic-only; best-effort). This is the apocalyptic Ezra (the seven visions / dialogues
     // with the angel Uriel, the lament over Zion, the eagle vision, the man from the sea, and the
     // restoration of the lost scriptures), corresponding to 2 Esdras / 4 Ezra 3-14.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class SecondEzraNarrativeTests
     {
         [Fact]

@@ -69,8 +69,29 @@ namespace AnointedAutomation.Objects.Concepts
 
             double coherence = total / facets.Length;
             double disorder = Disorder(act);
+            double restoration = Restoration(act);
 
-            return new Resolution(coherence, disorder, readings);
+            return new Resolution(coherence, disorder, readings, restoration);
+        }
+
+        /// <summary>
+        /// How much a deed restores the order sin has broken: the strongest restorative concept it
+        /// carries (repentance, atonement, forgiveness, grace). 2 Chronicles 7:14; Romans 5:20.
+        /// </summary>
+        /// <param name="act">The deed being witnessed.</param>
+        /// <returns>The restoration it offers, from 0.0 to 1.0.</returns>
+        private static double Restoration(Act act)
+        {
+            double restoration = 0.0;
+            foreach (MoralConcept concept in act.Concepts)
+            {
+                if (concept.Restoration > restoration)
+                {
+                    restoration = concept.Restoration;
+                }
+            }
+
+            return restoration;
         }
 
         /// <summary>

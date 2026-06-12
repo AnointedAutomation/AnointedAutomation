@@ -15,6 +15,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // widows, the care of the poor, the sick, the prisoner, baptism, the Eucharist, and the discipline
     // that guards the flock from immorality and false teaching. These tests trace its load-bearing
     // events and teachings.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class FirstDominosNarrativeTests
     {
         [Fact]

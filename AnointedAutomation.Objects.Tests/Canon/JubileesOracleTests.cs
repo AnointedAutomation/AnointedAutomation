@@ -8,6 +8,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
 {
     // Oracle 13: Jubilees (Ethiopic-unique). The heavenly tablets hold law, history, and judgment as
     // one record, the source of the engine's HeavenlyTablets substrate.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class JubileesOracleTests
     {
         [Fact]

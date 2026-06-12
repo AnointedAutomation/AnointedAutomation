@@ -14,6 +14,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // the agape love-feast for the poor, the hours of prayer, visiting the sick, the burial of the dead, and the
     // ordered support of widows and virgins, all in a tone of ascetic self-discipline. It warns the faithful
     // against returning to idols and against the immorality and violence of the world.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class SecondDominosNarrativeTests
     {
         [Fact]

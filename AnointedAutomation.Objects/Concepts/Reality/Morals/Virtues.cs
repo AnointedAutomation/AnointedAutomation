@@ -60,6 +60,7 @@ namespace AnointedAutomation.Objects.Concepts
     {
         public override string Name => "Forgiveness";
         public override string Scripture => "Colossians 3:13";
+        public override double Restoration => 0.5;
         public override bool Upholds(DivineAttribute facet) => facet is LoveFacet || facet is Mercy;
     }
 
@@ -108,6 +109,7 @@ namespace AnointedAutomation.Objects.Concepts
     {
         public override string Name => "Atonement";
         public override string Scripture => "Romans 3:25";
+        public override double Restoration => 1.0;
         public override bool Upholds(DivineAttribute facet) => facet is Justice;
     }
 
@@ -148,6 +150,7 @@ namespace AnointedAutomation.Objects.Concepts
     {
         public override string Name => "Pardon";
         public override string Scripture => "Romans 5:8";
+        public override double Restoration => 0.5;
         public override bool Upholds(DivineAttribute facet) => facet is Mercy;
     }
 

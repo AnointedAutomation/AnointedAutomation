@@ -11,6 +11,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // the ordinance of holiness: love of God and neighbor, right worship, mercy to the penitent,
     // charity to the needy, care for the vulnerable, and the rebuke of the sins that break the
     // covenant. The engine must return the verdict Scripture gives at each commandment.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class TizazNarrativeTests
     {
         // The first and great commandment: love the Lord your God, ordained in Tizaz.

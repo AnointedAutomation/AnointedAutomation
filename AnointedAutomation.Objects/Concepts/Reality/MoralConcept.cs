@@ -82,5 +82,18 @@ namespace AnointedAutomation.Objects.Concepts
         {
             return Violates(facet);
         }
+
+        /// <summary>
+        /// How much this concept restores the order that sin has broken, from 0.0 (none) to 1.0 (full).
+        /// Most concepts restore nothing; repentance, atonement, forgiveness, and grace heal the
+        /// record (2 Chronicles 7:14; 1 John 1:9; Romans 5:20).
+        /// </summary>
+        public virtual double Restoration
+        {
+            get
+            {
+                return 0.0;
+            }
+        }
     }
 }

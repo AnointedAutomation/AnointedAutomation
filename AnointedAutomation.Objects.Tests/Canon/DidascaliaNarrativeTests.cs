@@ -10,6 +10,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // church order. It commands bishops and the faithful toward mercy to the penitent, care for the
     // poor, orphan and widow, just judgment, honoring the church, and away from harshness, division,
     // and the snares of the world. The engine must return the verdict Scripture gives at each step.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class DidascaliaNarrativeTests
     {
         [Fact]

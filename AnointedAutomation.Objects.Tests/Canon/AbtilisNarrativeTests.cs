@@ -11,6 +11,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // the Apostolic Canons (81/83 canons), paralleling Book VIII of the Apostolic Constitutions and the
     // Clementine Octateuch. It is church order: ordination, right worship, fasting, the discipline and
     // qualifications of clergy, care for the poor, and the rejection of simony, idolatry, and immorality.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class AbtilisNarrativeTests
     {
         [Fact]

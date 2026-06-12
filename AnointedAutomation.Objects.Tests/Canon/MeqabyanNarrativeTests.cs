@@ -10,6 +10,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // Scripture gives at each step. Canon tag: ETH (Ethiopic-only; best-effort).
     // These three books (1, 2, 3 Meqabyan) of the Ethiopian Orthodox Tewahedo canon are
     // distinct from the Greek Maccabees. Verses follow common ETH versification.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class MeqabyanNarrativeTests
     {
         [Fact]

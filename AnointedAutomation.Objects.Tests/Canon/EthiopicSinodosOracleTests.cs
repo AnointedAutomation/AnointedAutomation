@@ -10,6 +10,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // Gitsew, Abtilis, the two Books of the Covenant (Dominos), Clement, and Didascalia. These are
     // books of church order and apostolic teaching; their calling is holiness, love, justice, and
     // mercy to the penitent.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class EthiopicSinodosOracleTests
     {
         [Fact]

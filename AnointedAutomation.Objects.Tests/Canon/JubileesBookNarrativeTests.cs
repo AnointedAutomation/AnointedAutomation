@@ -9,6 +9,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // Jubilees narrative oracle: the engine must return the verdict Scripture gives at each step.
     // Jubilees retells Genesis through early Exodus as the angel of the presence dictates the heavenly
     // tablets to Moses on Sinai, with strong emphasis on the Sabbath, the calendar, and covenant law.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class JubileesBookNarrativeTests
     {
         [Fact]

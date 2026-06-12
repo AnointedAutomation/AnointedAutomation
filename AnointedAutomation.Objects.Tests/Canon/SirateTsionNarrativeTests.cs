@@ -12,6 +12,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // ordination of bishops, priests, and deacons, the order of worship and the Eucharist, the care
     // of the poor, widows, and orphans, baptism, and the disciplines that guard the Church from
     // false teaching and immorality. The tests below trace its load-bearing teachings and orders.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class SirateTsionNarrativeTests
     {
         [Fact]

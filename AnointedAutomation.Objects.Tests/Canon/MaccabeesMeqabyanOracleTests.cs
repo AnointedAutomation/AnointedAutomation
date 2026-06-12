@@ -7,6 +7,7 @@ using AnointedAutomation.Objects.Concepts;
 namespace AnointedAutomation.Objects.Tests.Canon
 {
     // Oracle 20 & 21: 1 Maccabees, and the Ethiopic Meqabyan (2 & 3 Maccabees of the Ethiopian canon).
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class MaccabeesMeqabyanOracleTests
     {
         [Fact]

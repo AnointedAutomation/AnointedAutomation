@@ -33,6 +33,25 @@ namespace AnointedAutomation.Objects.Concepts
             double coherence,
             double disorder,
             System.Collections.Generic.IReadOnlyDictionary<string, double> readings)
+            : this(coherence, disorder, readings, 0.0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Resolution"/> class carrying, in addition, how
+        /// much the deed restores the order it touches: repentance, atonement, and grace heal the
+        /// record they meet (2 Chronicles 7:14; 1 John 1:9; Romans 5:20, "where sin increased, grace
+        /// increased all the more").
+        /// </summary>
+        /// <param name="coherence">How well the act fits the grounding (its truth).</param>
+        /// <param name="disorder">How much disorder the act introduces into reality (Romans 8:20-22).</param>
+        /// <param name="readings">Each facet's reading of the act, keyed by facet name.</param>
+        /// <param name="restoration">How much the deed restores reality's order, from 0.0 to 1.0.</param>
+        public Resolution(
+            double coherence,
+            double disorder,
+            System.Collections.Generic.IReadOnlyDictionary<string, double> readings,
+            double restoration)
         {
             if (readings == null)
             {
@@ -41,7 +60,17 @@ namespace AnointedAutomation.Objects.Concepts
 
             Coherence = Clamp(coherence);
             Disorder = Clamp(disorder);
+            Restoration = Clamp(restoration);
             this.readings = readings;
+        }
+
+        /// <summary>
+        /// How much this deed restores the standing order of reality, from 0.0 (no restoration) to
+        /// 1.0 (full restoration). Repentance and atonement heal; a bare deed restores nothing.
+        /// </summary>
+        public double Restoration
+        {
+            get;
         }
 
         private readonly System.Collections.Generic.IReadOnlyDictionary<string, double> readings;

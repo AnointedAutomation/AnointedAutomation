@@ -76,6 +76,7 @@ namespace AnointedAutomation.Objects.Concepts
     {
         public override string Name => "Grace";
         public override string Scripture => "Ephesians 2:8";
+        public override double Restoration => 0.75;
         public override bool Upholds(DivineAttribute facet) => facet is LoveFacet || facet is Mercy;
     }
 

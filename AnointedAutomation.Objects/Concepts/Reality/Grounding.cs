@@ -66,6 +66,18 @@ namespace AnointedAutomation.Objects.Concepts
         }
 
         /// <summary>
+        /// Grounded in a divided heart, partly toward God and partly toward an idol: the lukewarm and
+        /// the double-minded. "How long will you waver between two opinions?" (1 Kings 18:21);
+        /// "a double-minded man, unstable in all he does" (James 1:8); "because you are lukewarm" (Revelation 3:16).
+        /// A deed on a divided foundation keeps part of its life and drifts part of the way.
+        /// </summary>
+        /// <returns>A divided grounding, between the living God and a dead idol.</returns>
+        public static Grounding Divided()
+        {
+            return new Grounding("a divided heart", false, 0.25);
+        }
+
+        /// <summary>
         /// Bears a deed on this foundation. What stands on the living God keeps its life unchanged;
         /// what stands on an idol loses life and gains disorder, because the foundation cannot hold.
         /// </summary>
@@ -90,7 +102,7 @@ namespace AnointedAutomation.Objects.Concepts
                 disorder = lifelessness;
             }
 
-            return new Resolution(coherence, disorder, deed.Readings);
+            return new Resolution(coherence, disorder, deed.Readings, deed.Restoration);
         }
     }
 }

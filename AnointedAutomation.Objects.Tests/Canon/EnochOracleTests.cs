@@ -8,6 +8,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
 {
     // Oracle 14: Enoch / 1 Enoch (Ethiopic-unique). The decreed cosmic order, its disordering by sin
     // (ch 80), and the judgment of the wicked.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class EnochOracleTests
     {
         [Fact]

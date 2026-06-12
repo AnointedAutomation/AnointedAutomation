@@ -12,6 +12,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // the study of Scripture and keeping of the commandments, the duties of husband and wife,
     // the offices and duties of the ministers, the care of widows, baptism, vows of virginity,
     // honor toward the martyrs and the faithful departed, and warnings against heresy. Best-effort.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class GitsewNarrativeTests
     {
         [Fact]

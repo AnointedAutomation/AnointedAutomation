@@ -8,6 +8,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
 {
     // Josephas son of Bengorion (Ethiopic Zëna Ayhud / Sefer Yosippon, canon tag ETH) narrative oracle:
     // the engine must return the verdict Scripture/the chronicle gives at each step. Best-effort, Ethiopic-only.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class JosephasNarrativeTests
     {
         [Fact]

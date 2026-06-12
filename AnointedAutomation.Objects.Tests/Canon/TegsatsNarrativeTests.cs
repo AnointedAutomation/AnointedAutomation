@@ -10,6 +10,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // a wisdom book of admonition and reproof, gathered with the Solomonic corpus. The engine
     // must return the verdict Scripture gives at each admonition: the wisdom of God and the
     // righteous deeds it commands read coherent, while the folly it reproves reads as sin.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class TegsatsNarrativeTests
     {
         [Fact]

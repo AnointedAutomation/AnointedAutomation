@@ -42,6 +42,18 @@ namespace AnointedAutomation.Objects.Concepts
         public override string Scripture => "Exodus 20:15";
         public override Gravity Gravity => Gravity.Serious;
         public override bool Violates(DivineAttribute facet) => facet is Justice;
+
+        // Context-sensitive: eating from a neighbour's field as you pass through, in real need, is a
+        // provision of the Law, not theft (Deuteronomy 23:24-25; the disciples plucking grain, Matthew 12:1).
+        public override bool Violates(DivineAttribute facet, Act act)
+        {
+            if (act.InContextOf(new Circumstance("direNeed")))
+            {
+                return false;
+            }
+
+            return Violates(facet);
+        }
     }
 
     /// <summary>Withholding what is due: defrauding the worker of wages. (James 5:4)</summary>

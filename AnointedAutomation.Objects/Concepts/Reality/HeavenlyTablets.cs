@@ -62,6 +62,7 @@ namespace AnointedAutomation.Objects.Concepts
             foreach (Resolution resolution in record)
             {
                 coherence = coherence * (1.0 - resolution.Disorder);
+                coherence = coherence + resolution.Restoration * (1.0 - coherence);
             }
 
             return coherence;

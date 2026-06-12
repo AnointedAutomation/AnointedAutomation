@@ -11,6 +11,7 @@ namespace AnointedAutomation.Objects.Tests.Canon
     // Canon: ETH (Ethiopic-only; best-effort). The work is framed as the secret teaching the
     // Lord gave to Peter, who delivers it to Clement; it retells creation, the watchers, the flood,
     // the patriarchs and the priestly line, and closes with exhortation and warning.
+    [Trait("Canon", "EthiopicNonLoadBearing")]
     public class ClementBookNarrativeTests
     {
         [Fact]
