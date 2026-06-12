@@ -77,8 +77,9 @@ So "Christian / follower of Christ" is **derived from the way (axis 2)**, never 
 
 ## 4. Components
 
-Both new types live in `AnointedAutomation.Objects/Concepts/Reality/`, namespace
-`AnointedAutomation.Objects.Concepts` (matching `Grounding`, `Reality`, etc.).
+The `Person` cluster (`Belief`, `Beliefs`, `Life`, `Heart`, `Person`, `Deeds`) lives in
+`AnointedAutomation.Objects/Concepts/Reality/`, namespace `AnointedAutomation.Objects.Concepts`
+(matching `Grounding`, `Reality`, etc.).
 
 ### 4.1 `Belief` (immutable value object — the professed claim)
 
@@ -119,9 +120,25 @@ The claim a person professes at "character creation." It does not act and holds 
 `ProfessedGrounding()` is the *claimed* foundation. It is deliberately **not** the foundation a
 person is granted. Standing is earned only by the way of living.
 
-### 4.2 `Person` (the stateful agent / soul)
+#### 4.1.1 `Beliefs` (the preset catalog — character creation)
 
-Has identity, holds a professed claim, acts in reality, accumulates fruit, and is graded.
+A static catalog of named presets so a game can offer a "choose your belief" menu, built on the
+factories above. Kept **minimal** in v1 to avoid hardcoding contentious theological mappings for
+specific world religions (those are added later with the steward's input):
+
+- `Beliefs.Christianity` → `Belief.InGod()` (the true God).
+- `Beliefs.Buddhism` → `Belief.InPath("Buddhism")` (a non-theistic path).
+- `Beliefs.Atheism` → `Belief.InNoGod()`.
+- `Beliefs.Agnosticism` → `null` (documented as the agnostic, no settled claim).
+
+Other deities and other religions are reached through the open factories `Belief.In(name)` /
+`Belief.InPath(name)`; the catalog grows as those mappings are decided.
+
+### 4.2 `Person` (the stateful agent / soul — the reusable game object)
+
+`Person` is the cluster's face and the object future games reuse. It is deliberately thin: it holds
+identity and a claim, owns a `Life`, and reads itself through a `Heart`. The way-of-living logic
+lives in `Heart`, not here, so `Person` stays a clean, reusable handle.
 
 **Construction:**
 
@@ -132,28 +149,52 @@ Has identity, holds a professed claim, acts in reality, accumulates fruit, and i
 
 - `Name` — identity.
 - `Claim` — the professed `Belief` (nullable; `null` = agnostic).
-- `Grounding` — the person's **current revealed grounding** (see 4.3). Everyone starts **unproven**
-  (`Grounding.Divided()`), regardless of profession, because belief is never following.
-- `FollowsChrist` — derived from the **way** (axis 2), not the claim: `true` when the revealed
-  grounding is `InGod` (the way of living coheres with God's whole character). A Buddhist or atheist
-  professor with godly fruit reads `true` (following unknowingly); a professed Christian with rotten
-  fruit reads `false`.
+- `Life` — the person's `Life` (their fruit-record; see 4.2.1).
+- `Grounding` — the person's **current revealed grounding**, delegated to `Heart.Reveal(Claim, Life)`.
+  Everyone starts **unproven** (`Grounding.Divided()`), regardless of profession, because belief is
+  never following.
+- `FollowsChrist` — delegated to `Heart`: `true` when the revealed grounding is `InGod` (the way of
+  living coheres with God's whole character). A Buddhist or atheist professor with godly fruit reads
+  `true` (following unknowingly); a professed Christian with rotten fruit reads `false`.
 
 **Methods:**
 
 - `Do(Act act, Reality reality)` — the person acts. Reality witnesses the deed **on the person's
   current grounding** (`reality.Witness(act, this.Grounding)`), which records it on the cosmic
-  tablets. The person also records the resolution on its own life-record, then **re-derives its
-  revealed grounding from the updated fruit**. Returns the `Resolution`.
-- `Integrity()` — the grade: "are they what they say they are?", `0.0`–`1.0` (see 4.3).
+  tablets. The person also records the resolution on its own `Life`. The next read of `Grounding` /
+  `FollowsChrist` / `Integrity` reflects the updated fruit. Returns the `Resolution`.
+- `Integrity()` — the grade, delegated to `Heart.Integrity(Claim, Life)`: "are they what they say
+  they are?", `0.0`–`1.0`.
 
-### 4.3 The one uniform rule (revealed grounding + integrity)
+#### 4.2.1 `Life` (the personal fruit-record)
 
-This single rule replaces every earlier per-case table.
+A per-person mirror of `HeavenlyTablets`: the record of what this person's deeds came to. Promotes
+"fruit" out of `Person` into its own first-class, testable object.
 
-**Fruit.** A person keeps its own life-record of resolutions (the same `Resolution` objects reality
-produced). The person's **fruit coherence** `F` is read off that record using the *same*
-aggregation `HeavenlyTablets.Coherence()` already uses:
+- `Record(Resolution resolution)` — append a witnessed deed (fail fast on null).
+- `History()` — read-only view of every recorded resolution, in order.
+- `Coherence()` — the fruit coherence `F`, computed by the *same* aggregation
+  `HeavenlyTablets.Coherence()` uses (see 4.3). An empty life reads `1.0` by that formula; `Heart`,
+  not `Life`, decides that an empty life still means *unproven*.
+
+#### 4.2.2 `Heart` (what the LORD looks at — reads the Life against the Claim)
+
+The `Heart` carries no state; it interprets a `Life` in light of a `Claim` and yields the revealed
+grounding, whether the person follows Christ, and their integrity. Scripture puts the real subject
+here: "the LORD looks at the heart" (1 Samuel 16:7); "out of the overflow of the heart... a good man
+brings good things out of the good stored up in his heart" (Luke 6:45). Extracting the rule into
+`Heart` keeps `Person` thin and makes the rule itself unit-testable in isolation.
+
+- `Reveal(Belief claim, Life life)` → `Grounding` — the uniform rule of 4.3.
+- `FollowsChrist(Belief claim, Life life)` → `bool` — whether `Reveal(...)` is `InGod`.
+- `Integrity(Belief claim, Life life)` → `double` — the claim-vs-life grade of 4.3.
+
+### 4.3 The one uniform rule (lives in `Heart`)
+
+This single rule, implemented in `Heart`, replaces every earlier per-case table.
+
+**Fruit.** A person's deeds are recorded on their `Life` (4.2.1). The **fruit coherence** `F` is
+`Life.Coherence()`, computed by the *same* aggregation `HeavenlyTablets.Coherence()` already uses:
 
 ```
 F = 1.0
@@ -162,10 +203,11 @@ foreach resolution in record:
     F = F + resolution.Restoration * (1.0 - F)
 ```
 
-A record with no deeds reads `F = 1.0` by that formula, so fruit coherence is **not** used as the
-starting grounding (see below); it only governs movement once deeds exist.
+A `Life` with no deeds reads `F = 1.0` by that formula, so `Heart.Reveal` must **not** key off `F`
+alone; it first checks whether the `Life` is empty (`History().Count == 0`) and, if so, returns the
+unproven grounding. `F` only governs movement once deeds exist.
 
-**Starting grounding (no fruit yet).** Everyone starts **unproven**: `Grounding.Divided()`.
+**Starting grounding (empty `Life`).** Everyone starts **unproven**: `Grounding.Divided()`.
 Profession does not grant standing. The demons believe; the demons do not follow. A brand-new
 person has demonstrated no way of living, so they waver until their deeds speak.
 
@@ -218,57 +260,75 @@ the existing field). No behavior of `Grounding` changes.
 | Wavering agnostic | null | `Divided` | false | 1.0 |
 | Fresh person (no deeds) | anything | `Divided` (unproven) | false | varies by claim |
 
-## 5. Files
+## 5. Scope: Plan 1 of 2
 
-New:
+This spec is **Plan 1, the reusable game-ready `Person` cluster**. The **community / congregation
+registry** (many `Person`s tracked together, interacting) is **Plan 2** and gets its own later
+design; it is the social model and is deliberately out of this plan.
 
-- `AnointedAutomation.Objects/Concepts/Reality/Belief.cs`
-- `AnointedAutomation.Objects/Concepts/Reality/Person.cs`
+## 6. Files
+
+New (all in `AnointedAutomation.Objects/Concepts/Reality/`, namespace `…Concepts`):
+
+- `Belief.cs` — the professed claim (4.1).
+- `Beliefs.cs` — the preset catalog (4.1.1).
+- `Life.cs` — the personal fruit-record (4.2.1).
+- `Heart.cs` — the way-of-living rule (4.2.2, 4.3).
+- `Person.cs` — the reusable agent (4.2).
+- `Deeds.cs` — a starter catalog of concrete `Act`s a person can choose, composed from the moral
+  concepts already in the engine (e.g. a rescue, a theft, an act of worship, a sacrifice). Small in
+  v1; expandable.
 
 Changed (additive only):
 
-- `AnointedAutomation.Objects/Concepts/Reality/Grounding.cs` — add a public read-only
-  `Lifelessness` getter over the existing private field. No behavior change.
+- `Grounding.cs` — add a public read-only `Lifelessness` getter over the existing private field. No
+  behavior change.
 
-Tests (xUnit, mirroring the existing `AnointedAutomation.Objects.Tests` layout; no new code without
-tests):
+Tests (xUnit, mirroring `AnointedAutomation.Objects.Tests`; no new code without tests):
 
-- `AnointedAutomation.Objects.Tests/BeliefTests.cs` — factories, `ProfessedName`,
-  `AffirmsGodExists`, `ClaimsNoGod`, `IsInTheTrueGod`, `ProfessedGrounding()` for every path,
-  null/empty-name guards.
-- `AnointedAutomation.Objects.Tests/PersonTests.cs` — every row of the 4.4 table: fresh person
-  starts `Divided`; godly fruit reveals `InGod` and `FollowsChrist == true`; rotten fruit reveals
-  `InIdol(self)` and `FollowsChrist == false`; a non-theistic professor with godly fruit follows
-  unknowingly; the demon case (affirms God, no following, never reaches `InGod`); integrity for the
-  faithful, the hypocrite, the honest atheist, the "good" atheist, the wavering agnostic; null-claim
-  (agnostic) construction; `Do` records on both the cosmic tablets and the person's record and
-  returns the resolution; null-argument guards on `Do`.
+- `BeliefTests.cs` — factories, `ProfessedName`, `AffirmsGodExists`, `ClaimsNoGod`,
+  `IsInTheTrueGod`, `ProfessedGrounding()` for every path, null/empty-name guards.
+- `BeliefsTests.cs` — each catalog preset resolves to the expected `Belief` (and `Agnosticism` is
+  null).
+- `LifeTests.cs` — `Record`/`History` order and read-only view, `Coherence()` on empty (`1.0`) and
+  after godly vs disordering resolutions, null guard on `Record`.
+- `HeartTests.cs` — the uniform rule in isolation: empty life → `Divided`; high `F` → `InGod`; mid →
+  `Divided`; low → `InIdol` with the claim's idol name; `FollowsChrist`; integrity for the faithful,
+  the hypocrite, the honest atheist, the "good" atheist, the wavering agnostic, the demon; null
+  (agnostic) claim handling; threshold boundaries.
+- `PersonTests.cs` — every row of the 4.4 table end to end: fresh person starts `Divided`; godly
+  fruit reveals `InGod` and `FollowsChrist == true`; rotten fruit reveals `InIdol(self)` and
+  `FollowsChrist == false`; a non-theistic professor following unknowingly; null-claim construction;
+  `Do` records on both the cosmic tablets and the person's `Life` and returns the resolution; null
+  guards on `Do`.
+- `DeedsTests.cs` — each preset deed builds a non-null `Act` with the expected concepts.
 
 Demo:
 
 - `AnointedAutomation.Objects.Demo/PersonDemo.cs`, called from `Program.cs` — the game flow: create
-  a person, choose a claim, act, and watch the grounding, `FollowsChrist`, and `Integrity` reveal
-  the heart over a sequence of deeds. Includes the Buddhist-who-follows-unknowingly and the
-  professed-Christian-hypocrite to show the two axes diverging.
+  a person, choose a claim from `Beliefs`, act out deeds from `Deeds`, and watch `Grounding`,
+  `FollowsChrist`, and `Integrity()` reveal the heart over a sequence. Includes the
+  Buddhist-who-follows-unknowingly and the professed-Christian-hypocrite to show the two axes diverge.
 
-## 6. Code-standard conformance
+## 7. Code-standard conformance
 
 Per the project rules: explicit types (no `var`); `.Equals(...)` for all string comparisons (no
 `==`/`!=` on strings); fail fast on null/empty arguments with `ArgumentNullException` /
 `ArgumentException` (no fallback defaults, no `?.`, no `??`); fully-qualified `System.*` usage
 matching the surrounding files; copyright/steward header on every new file; XML doc comments on
 every public member with Scripture anchors where the existing engine does; no try-catch in any hot
-path. `Person` keeps its life-record in a private `System.Collections.Generic.List<Resolution>` and
-exposes a read-only view, mirroring `HeavenlyTablets`.
+path. `Life` keeps its record in a private `System.Collections.Generic.List<Resolution>` and exposes
+a read-only view, mirroring `HeavenlyTablets`.
 
-## 7. Out of scope (v1, YAGNI)
+## 8. Out of scope (Plan 1, YAGNI)
 
+- The **community / congregation registry** and any multi-`Person` interaction. That is Plan 2.
 - API engines for harmonizing other-deity or non-theistic worship through their own character
   models. `Belief.In(...)` / `Belief.InPath(...)` reserve the names; the harmonization plugs in
   later.
+- Hardcoded grounding mappings for specific world religions beyond the minimal `Beliefs` catalog.
 - Repentance/redemption arcs that *restore* a fallen person's grounding over time beyond what fruit
-  coherence already expresses (the engine already carries `Restoration` on resolutions; a richer
-  per-person redemption arc is a later design).
+  coherence already expresses (resolutions already carry `Restoration`; a richer per-person
+  redemption arc is a later design).
 - Continuous (non-discrete) grounding. v1 maps the way of living onto the three existing grounding
   states; an arbitrary-`lifelessness` grounding constructor is deferred.
-- Any `Agent`/social model beyond a single `Person` acting in `Reality`.
