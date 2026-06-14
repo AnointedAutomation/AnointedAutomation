@@ -323,15 +323,15 @@ namespace AnointedAutomation.Logging.Tests
         }
 
         [Fact]
-        public void AsyncMethodDirectCall_LogsCorrectOperationName()
+        public async Task AsyncMethodDirectCall_LogsCorrectOperationName()
         {
             // Act
             LogMessage logMessage = null;
-            Task.Run(async () =>
+            await Task.Run(async () =>
             {
                 await Task.Delay(1);
                 logMessage = new LogMessage(MessageType.Informational, "Test from async context");
-            }).Wait();
+            });
 
             // Assert
             Assert.NotNull(logMessage);

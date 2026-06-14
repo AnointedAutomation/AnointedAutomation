@@ -50,7 +50,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests
             attemptInfo.Paths.Add(path); // Add the same path again
             
             // Assert
-            Assert.Equal(1, attemptInfo.Paths.Count);
+            Assert.Single(attemptInfo.Paths);
             Assert.Contains(path, attemptInfo.Paths);
         }
 

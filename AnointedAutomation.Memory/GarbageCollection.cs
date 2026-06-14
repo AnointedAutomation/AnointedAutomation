@@ -11,8 +11,6 @@ namespace AnointedAutomation.Optimization.Memory
     /// </summary>
     public class GarbageCollection
     {
-        private bool _disposed;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="GarbageCollection"/> class.
         /// </summary>
