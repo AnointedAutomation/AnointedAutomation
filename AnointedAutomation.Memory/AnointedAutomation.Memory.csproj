@@ -12,7 +12,7 @@
     <Copyright>Copyright © 2024 Anointed Automation, LLC All rights reserved.</Copyright>
     <Description>Basic things for memory management </Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <PackageTags>memory</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Memory</PackageReleaseNotes>
 	  <Authors>Anointed Automation LLC, Alexander Fields</Authors>
