@@ -21,29 +21,32 @@ namespace AnointedAutomation.Objects.Demo
 
             // A neighbor in need whom you have the means to help (the Good Samaritan principle).
             RunAllLoves(new Situation("A stranger lies beaten by the road; I have the means to help.")
-                .Set("inNeed")
-                .Set("iCanHelp"));
+                .With(new Need())
+                .With(new Means()));
 
             // A situation never named in Scripture: an online teammate betrays the group.
             RunAllLoves(new Situation("A teammate betrayed the group and ninja-looted the boss drop.")
-                .Set("wronged"));
+                .With(new Grievance()));
 
             // A work of mercy (Matthew 25:35): someone hungry before you.
             RunAllLoves(new Situation("A hungry person is at your door.")
-                .Set("hungry"));
+                .With(new Hunger()));
 
             // A composed condition (Romans 12:20): enemy AND (hungry OR thirsty).
             RunAllLoves(new Situation("An enemy who hates you is now hungry at your door.")
-                .Set("enemy")
-                .Set("hungry"));
+                .With(new Enmity())
+                .With(new Hunger()));
 
-            // A friend's life on the line — where sacrificial love goes further than the rest.
+            // A friend's life on the line, where sacrificial love goes further than the rest.
             RunAllLoves(new Situation("A friend's life is at stake; saving them would cost my own.")
-                .Set("friendsLifeAtStake"));
+                .With(new MortalPeril()));
 
             // A situation the engine has no specific branch for at all.
             RunAllLoves(new Situation("Something the Bible never described.")
-                .Set("quantumComputerMalfunctioned"));
+                .With(new Circumstance("quantumComputerMalfunctioned")));
+
+            Console.WriteLine();
+            RealityDemo.Run();
         }
 
         private static void RunAllLoves(Situation situation)

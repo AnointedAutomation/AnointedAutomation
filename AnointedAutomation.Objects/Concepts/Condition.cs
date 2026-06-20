@@ -1,12 +1,12 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-05-28 12:05:18
-// Edited by Alexander Fields https://www.alexanderfields.me 2026-05-28 12:05:18
-//Stewarded by Alexander Fields
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-11
+// Stewarded by Alexander Fields
 
 namespace AnointedAutomation.Objects.Concepts
 {
     /// <summary>
     /// A leaf node that tests the situation. It succeeds (producing no deed) when its predicate holds,
-    /// and fails otherwise. This is where arbitrary situational logic enters the tree.
+    /// and fails otherwise. This is where situational logic enters the tree, by reading the
+    /// <see cref="Circumstance"/>s that hold.
     /// </summary>
     public class Condition : BehaviorNode
     {
@@ -28,18 +28,18 @@ namespace AnointedAutomation.Objects.Concepts
         }
 
         /// <summary>
-        /// Creates a condition that holds when a named fact is true in the situation.
+        /// Creates a condition that holds when a given circumstance holds in the situation.
         /// </summary>
-        /// <param name="fact">The fact to test.</param>
-        /// <returns>A <see cref="Condition"/> over that fact.</returns>
-        public static Condition Fact(string fact)
+        /// <param name="circumstance">The circumstance to test for.</param>
+        /// <returns>A <see cref="Condition"/> over that circumstance.</returns>
+        public static Condition For(Circumstance circumstance)
         {
-            if (string.IsNullOrEmpty(fact))
+            if (circumstance == null)
             {
-                throw new System.ArgumentNullException(nameof(fact));
+                throw new System.ArgumentNullException(nameof(circumstance));
             }
 
-            return new Condition(situation => situation.Is(fact));
+            return new Condition(situation => situation.Has(circumstance));
         }
 
         /// <summary>
@@ -74,13 +74,13 @@ namespace AnointedAutomation.Objects.Concepts
         }
 
         /// <summary>
-        /// Combines this condition with a named fact using logical AND.
+        /// Combines this condition with a circumstance using logical AND.
         /// </summary>
-        /// <param name="fact">The fact to AND with this condition.</param>
-        /// <returns>A new <see cref="Condition"/> that holds when this condition holds and the fact is true.</returns>
-        public Condition And(string fact)
+        /// <param name="circumstance">The circumstance to AND with this condition.</param>
+        /// <returns>A new <see cref="Condition"/> that holds when this condition holds and the circumstance holds.</returns>
+        public Condition And(Circumstance circumstance)
         {
-            return And(Fact(fact));
+            return And(For(circumstance));
         }
 
         /// <summary>
@@ -100,13 +100,13 @@ namespace AnointedAutomation.Objects.Concepts
         }
 
         /// <summary>
-        /// Combines this condition with a named fact using logical OR.
+        /// Combines this condition with a circumstance using logical OR.
         /// </summary>
-        /// <param name="fact">The fact to OR with this condition.</param>
-        /// <returns>A new <see cref="Condition"/> that holds when this condition holds or the fact is true.</returns>
-        public Condition Or(string fact)
+        /// <param name="circumstance">The circumstance to OR with this condition.</param>
+        /// <returns>A new <see cref="Condition"/> that holds when this condition holds or the circumstance holds.</returns>
+        public Condition Or(Circumstance circumstance)
         {
-            return Or(Fact(fact));
+            return Or(For(circumstance));
         }
 
         /// <summary>
