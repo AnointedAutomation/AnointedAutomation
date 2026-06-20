@@ -10,7 +10,10 @@ on:
 jobs:
   publish-release:
     runs-on: ubuntu-latest
-    
+    permissions:
+      id-token: write   # required for NuGet Trusted Publishing (OIDC)
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -20,7 +23,9 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: |
+            8.0.x
+            10.0.x
 
       - name: Restore dependencies
         run: dotnet restore
@@ -85,10 +90,17 @@ jobs:
             echo "has_packages=true" >> $GITHUB_OUTPUT
           fi
 
+      - name: NuGet login (Trusted Publishing OIDC)
+        if: steps.check-pack.outputs.has_packages == 'true'
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: roku674
+
       - name: Push to NuGet.org
         if: steps.check-pack.outputs.has_packages == 'true'
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           echo "Publishing changed packages to NuGet.org..."
           for package in ./nupkgs/*.nupkg; do
