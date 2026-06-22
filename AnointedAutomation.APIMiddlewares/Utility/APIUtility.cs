@@ -33,10 +33,12 @@ namespace AnointedAutomation.APIMiddleware.Utility
 
                 if (string.IsNullOrEmpty(ipAddress))
                 {
-                    ipAddress = context.Connection.RemoteIpAddress.ToString();
+                    // Null-conditional: RemoteIpAddress is null for IP-less requests (DefaultHttpContext /
+                    // TestServer / some health checks). Mirrors the ActionExecutingContext overload below.
+                    ipAddress = context.Connection.RemoteIpAddress?.ToString();
                 }
 
-                if (ipAddress == "::1")
+                if (string.IsNullOrEmpty(ipAddress) || ipAddress == "::1")
                 {
                     IPBlacklistMiddleware.AddLog(
                         LogMessage.Critical(
