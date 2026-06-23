@@ -40,9 +40,10 @@ namespace AnointedAutomation.APIMiddleware.Utility
 
                 if (string.IsNullOrEmpty(ipAddress) || ipAddress == "::1")
                 {
+                    // Expected for IP-less requests (health checks / localhost / internal); not Critical.
                     IPBlacklistMiddleware.AddLog(
-                        LogMessage.Critical(
-                            $" There was a problem getting the IP Address from {context.ToString()}. It was assigned it an arbitrary 198.51.100.255"
+                        LogMessage.Warning(
+                            $"No client IP available from {context.ToString()} (no X-Forwarded-For, no RemoteIpAddress); using fallback 198.51.100.255"
                         )
                     );
                     return "198.51.100.255";
@@ -89,9 +90,10 @@ namespace AnointedAutomation.APIMiddleware.Utility
             // If still null or empty, or if localhost, return default IP
             if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("::1"))
             {
+                // Expected for IP-less requests (health checks / localhost / internal); not Critical.
                 IPBlacklistMiddleware.AddLog(
-                    LogMessage.Critical(
-                        $" There was a problem getting the IP Address from {context.ToString()}. It was assigned it an arbitrary 198.51.100.255"
+                    LogMessage.Warning(
+                        $"No client IP available from {context.ToString()} (no X-Forwarded-For, no RemoteIpAddress); using fallback 198.51.100.255"
                     )
                 );
                 return "198.51.100.255";
