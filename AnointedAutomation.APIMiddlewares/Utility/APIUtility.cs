@@ -38,12 +38,25 @@ namespace AnointedAutomation.APIMiddleware.Utility
                     ipAddress = context.Connection.RemoteIpAddress?.ToString();
                 }
 
-                if (string.IsNullOrEmpty(ipAddress) || ipAddress == "::1")
+                if (string.IsNullOrEmpty(ipAddress))
                 {
-                    // Expected for IP-less requests (health checks / localhost / internal); not Critical.
+                    // NULL/empty = no socket peer at all (no X-Forwarded-For and a null RemoteIpAddress).
+                    // Anomalous in production (Unix-socket fronting, a synthetic DefaultHttpContext, or an
+                    // in-memory TestServer) -> error-level so it is not silently lost.
+                    IPBlacklistMiddleware.AddLog(
+                        LogMessage.Critical(
+                            $"No client IP available from {context.ToString()} (no X-Forwarded-For, null RemoteIpAddress); using fallback 198.51.100.255"
+                        )
+                    );
+                    return "198.51.100.255";
+                }
+
+                if (ipAddress == "::1")
+                {
+                    // Localhost loopback = a real but local connection (dev / same-host health checks); benign.
                     IPBlacklistMiddleware.AddLog(
                         LogMessage.Warning(
-                            $"No client IP available from {context.ToString()} (no X-Forwarded-For, no RemoteIpAddress); using fallback 198.51.100.255"
+                            $"Localhost (::1) client IP from {context.ToString()}; using fallback 198.51.100.255"
                         )
                     );
                     return "198.51.100.255";
@@ -87,13 +100,23 @@ namespace AnointedAutomation.APIMiddleware.Utility
                 ipAddress = context.HttpContext.Connection.RemoteIpAddress?.ToString();
             }
 
-            // If still null or empty, or if localhost, return default IP
-            if (string.IsNullOrEmpty(ipAddress) || ipAddress.Equals("::1"))
+            // NULL/empty = no socket peer at all -> error-level (anomalous in production).
+            if (string.IsNullOrEmpty(ipAddress))
             {
-                // Expected for IP-less requests (health checks / localhost / internal); not Critical.
+                IPBlacklistMiddleware.AddLog(
+                    LogMessage.Critical(
+                        $"No client IP available from {context.ToString()} (no X-Forwarded-For, null RemoteIpAddress); using fallback 198.51.100.255"
+                    )
+                );
+                return "198.51.100.255";
+            }
+
+            // Localhost loopback = a real but local connection (dev / same-host health checks); benign.
+            if (ipAddress.Equals("::1"))
+            {
                 IPBlacklistMiddleware.AddLog(
                     LogMessage.Warning(
-                        $"No client IP available from {context.ToString()} (no X-Forwarded-For, no RemoteIpAddress); using fallback 198.51.100.255"
+                        $"Localhost (::1) client IP from {context.ToString()}; using fallback 198.51.100.255"
                     )
                 );
                 return "198.51.100.255";
