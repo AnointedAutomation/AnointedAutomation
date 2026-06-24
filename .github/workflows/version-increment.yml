@@ -41,6 +41,8 @@ jobs:
 
           # Define all project files and their directories to check
           declare -A PROJECTS=(
+            ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="AnointedAutomation.Algorithms"
+            ["AnointedAutomation.Imaging/AnointedAutomation.Imaging.csproj"]="AnointedAutomation.Imaging"
             ["AnointedAutomation.Enums/AnointedAutomation.Enums.csproj"]="AnointedAutomation.Enums"
             ["AnointedAutomation.Logging/AnointedAutomation.Logging.csproj"]="AnointedAutomation.Logging"
             ["AnointedAutomation.Memory/AnointedAutomation.Memory.csproj"]="AnointedAutomation.Memory"
