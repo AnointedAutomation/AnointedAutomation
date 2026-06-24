@@ -63,6 +63,12 @@ jobs:
     - name: Run Repository.MySql Tests
       run: dotnet test AnointedAutomation.Repository.MySql.Tests/AnointedAutomation.Repository.MySql.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
+    - name: Run Algorithms Tests
+      run: dotnet test AnointedAutomation.Algorithms.Tests/AnointedAutomation.Algorithms.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+    - name: Run Imaging Tests
+      run: dotnet test AnointedAutomation.Imaging.Tests/AnointedAutomation.Imaging.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
     - name: Publish Test Results
       if: always()
       uses: actions/upload-artifact@v7
