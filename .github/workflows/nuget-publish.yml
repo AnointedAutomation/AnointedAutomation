@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Full history for version tags
 
@@ -44,6 +44,8 @@ jobs:
           
           # Define packages to check
           declare -A PACKAGES=(
+            ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="anointedautomation.algorithms"
+            ["AnointedAutomation.Imaging/AnointedAutomation.Imaging.csproj"]="anointedautomation.imaging"
             ["AnointedAutomation.Enums/AnointedAutomation.Enums.csproj"]="anointedautomation.enums"
             ["AnointedAutomation.Logging/AnointedAutomation.Logging.csproj"]="anointedautomation.logging"
             ["AnointedAutomation.Memory/AnointedAutomation.Memory.csproj"]="anointedautomation.memory"

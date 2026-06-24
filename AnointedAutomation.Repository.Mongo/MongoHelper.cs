@@ -39,14 +39,10 @@ namespace AnointedAutomation.Repository.Mongo
             database = db;
         }
 
-        /// <summary>
-        /// Finalizer for the MongoHelper class.
-        /// Cleans up any remaining logs.
-        /// </summary>
-        ~MongoHelper()
-        {
-            ClearLogs();
-        }
+        // NOTE: no finalizer. `mongoLogs` is a STATIC shared buffer, so a per-instance
+        // finalizer calling ClearLogs() would wipe the global log buffer whenever the GC
+        // collected ANY MongoHelper instance (and there are no unmanaged resources to free).
+        // Call ClearLogs() explicitly when you actually want to reset the buffer.
 
         /// <summary>
         /// Event triggered when a log message is added.
