@@ -1,7 +1,9 @@
 // Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
 
+using System;
 using AnointedAutomation.Objects.Account;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
 using Newtonsoft.Json.Linq;
 
 namespace AnointedAutomation.Repository.Mongo
@@ -38,6 +40,24 @@ namespace AnointedAutomation.Repository.Mongo
 
                 _isRegistered = true;
             }
+        }
+
+        /// <summary>
+        /// OPT-IN (not auto-applied): registers the hybrid casing convention (value/enum/struct -> camelCase,
+        /// reference -> PascalCase) for types under <paramref name="namespacePrefix"/>. Publishing this package
+        /// changes NOTHING until a service calls this. Call ONCE at startup BEFORE <see cref="RegisterClassMaps"/>
+        /// / any Mongo use, and ONLY after that service's data has been migrated to hybrid keys — the convention
+        /// does not override explicit [BsonElement], so pure-casing [BsonElement] attributes must be removed for
+        /// it to take full effect.
+        /// </summary>
+        /// <param name="namespacePrefix">Restrict to a namespace (e.g. one API) to stage rollout. Default: all AnointedAutomation types.</param>
+        public static void RegisterHybridCasingConvention(string namespacePrefix = "AnointedAutomation")
+        {
+            ConventionPack pack = new ConventionPack { new HybridElementNameConvention() };
+            ConventionRegistry.Register(
+                "AnointedHybridElementName",
+                pack,
+                t => t.FullName != null && t.FullName.StartsWith(namespacePrefix, StringComparison.Ordinal));
         }
 
         private static void RegisterGlobalSerializers()
