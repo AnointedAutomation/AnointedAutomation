@@ -60,6 +60,24 @@ namespace AnointedAutomation.Repository.Mongo
                 t => t.FullName != null && t.FullName.StartsWith(namespacePrefix, StringComparison.Ordinal));
         }
 
+        /// <summary>
+        /// OPT-IN (not auto-applied): registers the snake_case element-name convention ("Anointed Styling":
+        /// structural Mongo keys snake_case) for types under <paramref name="namespacePrefix"/>. Publishing this
+        /// package changes NOTHING until a service calls this. Call ONCE at startup BEFORE
+        /// <see cref="RegisterClassMaps"/> / any Mongo use, and ONLY after that service's data has been migrated
+        /// to snake_case keys — the convention does not override explicit [BsonElement], so pure-casing
+        /// [BsonElement] attributes must be removed/snaked for it to take full effect.
+        /// </summary>
+        /// <param name="namespacePrefix">Restrict to a namespace (e.g. one API) to stage rollout. Default: all AnointedAutomation types.</param>
+        public static void RegisterSnakeCasingConvention(string namespacePrefix = "AnointedAutomation")
+        {
+            ConventionPack pack = new ConventionPack { new SnakeCaseElementNameConvention() };
+            ConventionRegistry.Register(
+                "AnointedSnakeElementName",
+                pack,
+                t => t.FullName != null && t.FullName.StartsWith(namespacePrefix, StringComparison.Ordinal));
+        }
+
         private static void RegisterGlobalSerializers()
         {
             // Register JObjectSerializer globally for all JObject properties
