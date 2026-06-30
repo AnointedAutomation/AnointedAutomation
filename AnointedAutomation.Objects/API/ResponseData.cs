@@ -118,9 +118,10 @@ namespace AnointedAutomation.Objects
         {
             { "Anointed", "https://anointed.company" },
             { "Automation", "https://www.anointedautomation.net" },
+			{ "AutomationAPI", "https://api.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
-            { "Steward", "https://www.alexanderfields.me" },
-            { "GitHub", "https://github.com/AnointedAutomation" }
+            { "GitHub", "https://github.com/AnointedAutomation" },
+			{ "Steward", "https://www.alexanderfields.me" }
         };
         /// <summary>
         /// Gets or sets the response message.
