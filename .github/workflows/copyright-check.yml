@@ -9,14 +9,18 @@ on:
     - cron: '0 2 1 * *'
   workflow_dispatch:  # Allow manual trigger for testing
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   copyright-update:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: write
       pull-requests: write
       actions: write
-    
+
     steps:
       - name: Checkout master branch
         uses: actions/checkout@v7
@@ -24,15 +28,15 @@ jobs:
           fetch-depth: 0  # Need full history for proper git attribution
           ref: master
           token: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Configure Git Identity
         run: |
           # Configure git with a safe default identity for the workflow
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           echo "Git identity configured for workflow operations"
-      
-      
+
+
       - name: Setup Copyright Adder
         run: |
           # Always download latest script, but preserve existing sources.txt
@@ -65,7 +69,7 @@ jobs:
           fi
 
           chmod +x CopyrightAdder/add_copyright_headers.sh
-      
+
       - name: Find all source files
         id: find-files
         run: |
@@ -156,7 +160,7 @@ jobs:
           echo "  Files updated: $FILES_UPDATED"
 
           echo "files_updated=$FILES_UPDATED" >> $GITHUB_ENV
-      
+
       - name: Check for changes
         id: check-changes
         run: |
@@ -178,7 +182,7 @@ jobs:
             echo "changes=false" >> $GITHUB_OUTPUT
             echo "All files have proper copyright headers."
           fi
-      
+
       - name: Create new branch for copyright headers
         if: steps.check-changes.outputs.changes == 'true'
         id: create-branch
@@ -202,7 +206,7 @@ jobs:
 
           # Push the new branch
           git push origin "${BRANCH_NAME}"
-      
+
       - name: Close existing copyright PRs
         if: steps.check-changes.outputs.changes == 'true'
         uses: actions/github-script@v9
@@ -283,7 +287,7 @@ jobs:
 
             ---
             *🤖 Generated automatically by the Monthly Copyright Update workflow*`;
-            
+
             const pr = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -299,9 +303,9 @@ jobs:
             // Output PR URL for notification purposes
             core.setOutput('pr_url', pr.data.html_url);
             core.setOutput('pr_number', pr.data.number);
-      
+
       - name: Clean up
         if: always()
-        run: |
+        run: |-
           rm -rf CopyrightAdder
           rm -f /tmp/files_to_process.txt

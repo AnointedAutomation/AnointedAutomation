@@ -4,12 +4,16 @@ name: Publish NuGet Packages
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   publish-release:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       id-token: write   # required for NuGet Trusted Publishing (OIDC)
       contents: read
@@ -41,7 +45,7 @@ jobs:
         run: |
           echo "Checking for version changes..."
           PACKAGES_TO_PUBLISH=""
-          
+
           # Define packages to check
           declare -A PACKAGES=(
             ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="anointedautomation.algorithms"
@@ -55,7 +59,7 @@ jobs:
             ["AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"]="anointedautomation.objects"
             ["AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"]="anointedautomation.objects.api"
           )
-          
+
           for PROJECT_PATH in "${!PACKAGES[@]}"; do
             PACKAGE_NAME="${PACKAGES[$PROJECT_PATH]}"
             
@@ -84,7 +88,7 @@ jobs:
             fi
             echo ""
           done
-          
+
           # Set output for next step
           if [ -z "$PACKAGES_TO_PUBLISH" ]; then
             echo "has_packages=false" >> $GITHUB_OUTPUT
