@@ -1,15 +1,19 @@
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40
+# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40
 # Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 name: Publish NuGet Packages
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   publish-release:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       id-token: write   # required for NuGet Trusted Publishing (OIDC)
       contents: read
@@ -27,6 +31,12 @@ jobs:
             8.0.x
             10.0.x
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
       - name: Restore dependencies
         run: dotnet restore
 
@@ -41,7 +51,7 @@ jobs:
         run: |
           echo "Checking for version changes..."
           PACKAGES_TO_PUBLISH=""
-          
+
           # Define packages to check
           declare -A PACKAGES=(
             ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="anointedautomation.algorithms"
@@ -55,7 +65,7 @@ jobs:
             ["AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"]="anointedautomation.objects"
             ["AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"]="anointedautomation.objects.api"
           )
-          
+
           for PROJECT_PATH in "${!PACKAGES[@]}"; do
             PACKAGE_NAME="${PACKAGES[$PROJECT_PATH]}"
             
@@ -84,7 +94,7 @@ jobs:
             fi
             echo ""
           done
-          
+
           # Set output for next step
           if [ -z "$PACKAGES_TO_PUBLISH" ]; then
             echo "has_packages=false" >> $GITHUB_OUTPUT

@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Created by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40
+# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40
 # Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 name: .NET Test
 
@@ -7,71 +7,87 @@ on:
     branches: ["master", "develop"]
   pull_request:
     branches: ["master", "develop"]
-    
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     if: github.event_name == 'push' || github.actor == 'dependabot[bot]'
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v7
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: '8.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.x'
 
-    - name: Install dependencies
-      run: dotnet restore
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
+      - name: Install dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
 
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: build
     if: github.event_name == 'push' || github.actor == 'dependabot[bot]'
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v7
+      - name: Checkout code
+        uses: actions/checkout@v7
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: '8.x'
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.x'
 
-    - name: Install dependencies
-      run: dotnet restore
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
+      - name: Install dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
 
-    - name: Run Logging Tests
-      run: dotnet test AnointedAutomation.Logging.Tests/AnointedAutomation.Logging.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run Logging Tests
+        run: dotnet test AnointedAutomation.Logging.Tests/AnointedAutomation.Logging.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
-    - name: Run Memory Tests
-      run: dotnet test AnointedAutomation.Memory.Tests/AnointedAutomation.Memory.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run Memory Tests
+        run: dotnet test AnointedAutomation.Memory.Tests/AnointedAutomation.Memory.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
-    - name: Run APIMiddlewares Tests
-      run: dotnet test AnointedAutomation.APIMiddlewares.Tests/AnointedAutomation.APIMiddlewares.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run APIMiddlewares Tests
+        run: dotnet test AnointedAutomation.APIMiddlewares.Tests/AnointedAutomation.APIMiddlewares.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
-    - name: Run Repository.Mongo Tests
-      run: dotnet test AnointedAutomation.Repository.Mongo.Tests/AnointedAutomation.Repository.Mongo.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run Repository.Mongo Tests
+        run: dotnet test AnointedAutomation.Repository.Mongo.Tests/AnointedAutomation.Repository.Mongo.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
-    - name: Run Repository.MySql Tests
-      run: dotnet test AnointedAutomation.Repository.MySql.Tests/AnointedAutomation.Repository.MySql.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run Repository.MySql Tests
+        run: dotnet test AnointedAutomation.Repository.MySql.Tests/AnointedAutomation.Repository.MySql.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
-    - name: Run Algorithms Tests
-      run: dotnet test AnointedAutomation.Algorithms.Tests/AnointedAutomation.Algorithms.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run Algorithms Tests
+        run: dotnet test AnointedAutomation.Algorithms.Tests/AnointedAutomation.Algorithms.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
-    - name: Run Imaging Tests
-      run: dotnet test AnointedAutomation.Imaging.Tests/AnointedAutomation.Imaging.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+      - name: Run Imaging Tests
+        run: dotnet test AnointedAutomation.Imaging.Tests/AnointedAutomation.Imaging.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
-    - name: Publish Test Results
-      if: always()
-      uses: actions/upload-artifact@v7
-      with:
-        name: test-results
-        path: '**/TestResults/*'
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: '**/TestResults/*'
