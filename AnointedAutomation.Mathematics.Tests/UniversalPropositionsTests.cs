@@ -26,6 +26,16 @@ namespace AnointedAutomation.Mathematics.Tests
             Assert.NotNull(UniversalPropositions.CollatzTerminates);
             Assert.NotNull(UniversalPropositions.GoldbachHolds);
             Assert.NotNull(UniversalPropositions.RiemannZerosOnCriticalLine);
+            Assert.NotNull(UniversalPropositions.SpecialRelativityHolds);
+            Assert.NotNull(UniversalPropositions.GravityIsSpacetimeCurvature);
+            Assert.NotNull(UniversalPropositions.MatterEnergyIsQuantized);
+            Assert.NotNull(UniversalPropositions.MatterComposedOfAtoms);
+            Assert.NotNull(UniversalPropositions.UniverseExpandedFromHotDenseState);
+            Assert.NotNull(UniversalPropositions.PopulationsEvolveByNaturalSelection);
+            Assert.NotNull(UniversalPropositions.DiseasesCausedByMicroorganisms);
+            Assert.NotNull(UniversalPropositions.OrganismsComposedOfCells);
+            Assert.NotNull(UniversalPropositions.LithosphereDividedIntoMovingPlates);
+            Assert.NotNull(UniversalPropositions.GasBehaviorArisesFromMolecularMotion);
         }
 
         [Fact]
@@ -46,6 +56,16 @@ namespace AnointedAutomation.Mathematics.Tests
             Assert.True(UniversalPropositions.EffectsHaveCauses.Standing);
             Assert.True(UniversalPropositions.EnergyConserved.Standing);
             Assert.True(UniversalPropositions.EntropyIncreases.Standing);
+            Assert.True(UniversalPropositions.SpecialRelativityHolds.Standing);
+            Assert.True(UniversalPropositions.GravityIsSpacetimeCurvature.Standing);
+            Assert.True(UniversalPropositions.MatterEnergyIsQuantized.Standing);
+            Assert.True(UniversalPropositions.MatterComposedOfAtoms.Standing);
+            Assert.True(UniversalPropositions.UniverseExpandedFromHotDenseState.Standing);
+            Assert.True(UniversalPropositions.PopulationsEvolveByNaturalSelection.Standing);
+            Assert.True(UniversalPropositions.DiseasesCausedByMicroorganisms.Standing);
+            Assert.True(UniversalPropositions.OrganismsComposedOfCells.Standing);
+            Assert.True(UniversalPropositions.LithosphereDividedIntoMovingPlates.Standing);
+            Assert.True(UniversalPropositions.GasBehaviorArisesFromMolecularMotion.Standing);
         }
 
         [Fact]
@@ -69,7 +89,7 @@ namespace AnointedAutomation.Mathematics.Tests
         [Fact]
         public void All_ContainsEveryDeclaredProposition()
         {
-            Assert.Equal(69, UniversalPropositions.All.Count);
+            Assert.Equal(79, UniversalPropositions.All.Count);
         }
     }
 }

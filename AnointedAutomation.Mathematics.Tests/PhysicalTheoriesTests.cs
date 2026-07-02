@@ -16,6 +16,16 @@ namespace AnointedAutomation.Mathematics.Tests
         {
             Assert.NotNull(PhysicalTheories.MassEnergyEquivalence);
             Assert.NotNull(PhysicalTheories.InvariantLightSpeed);
+            Assert.NotNull(PhysicalTheories.SpecialRelativity);
+            Assert.NotNull(PhysicalTheories.GeneralRelativity);
+            Assert.NotNull(PhysicalTheories.QuantumMechanics);
+            Assert.NotNull(PhysicalTheories.AtomicTheory);
+            Assert.NotNull(PhysicalTheories.BigBangCosmology);
+            Assert.NotNull(PhysicalTheories.EvolutionByNaturalSelection);
+            Assert.NotNull(PhysicalTheories.GermTheoryOfDisease);
+            Assert.NotNull(PhysicalTheories.CellTheory);
+            Assert.NotNull(PhysicalTheories.PlateTectonics);
+            Assert.NotNull(PhysicalTheories.KineticTheoryOfGases);
         }
 
         [Fact]
@@ -42,9 +52,20 @@ namespace AnointedAutomation.Mathematics.Tests
         }
 
         [Fact]
-        public void All_ContainsExactlyTwoTheories()
+        public void All_ContainsExactlyTwelveTheories()
         {
-            Assert.Equal(2, PhysicalTheories.All.Count);
+            Assert.Equal(12, PhysicalTheories.All.Count);
+        }
+
+        [Fact]
+        public void EveryTheory_IsIntraUniverseAtPointNineFive()
+        {
+            foreach (FoundationalClaim theory in PhysicalTheories.All)
+            {
+                Assert.Equal(EpistemicStatus.Theory, theory.Status);
+                Assert.Equal(LawDomain.IntraUniverse, theory.Domain);
+                Assert.Equal(0.95, theory.SurvivedFalsificationWeight);
+            }
         }
     }
 }

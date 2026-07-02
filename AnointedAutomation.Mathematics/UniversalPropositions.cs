@@ -92,6 +92,105 @@ namespace AnointedAutomation.Mathematics
             Testability.EmpiricallyTestable,
             true);
 
+        // Major theories
+
+        /// <summary>
+        /// The laws of physics are the same in all inertial frames and the speed of light is
+        /// invariant, so space and time measurements depend on relative motion.
+        /// </summary>
+        public static readonly Proposition SpecialRelativityHolds = new Proposition(
+            "SpecialRelativityHolds",
+            "The laws of physics are the same in all inertial frames and the speed of light is invariant, so space and time measurements depend on relative motion.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// Gravity is the curvature of spacetime by mass and energy.
+        /// </summary>
+        public static readonly Proposition GravityIsSpacetimeCurvature = new Proposition(
+            "GravityIsSpacetimeCurvature",
+            "Gravity is the curvature of spacetime by mass and energy.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// Matter and energy at the smallest scales behave as quantized states with probabilistic
+        /// outcomes.
+        /// </summary>
+        public static readonly Proposition MatterEnergyIsQuantized = new Proposition(
+            "MatterEnergyIsQuantized",
+            "Matter and energy at the smallest scales behave as quantized states with probabilistic outcomes.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// All matter is composed of atoms.
+        /// </summary>
+        public static readonly Proposition MatterComposedOfAtoms = new Proposition(
+            "MatterComposedOfAtoms",
+            "All matter is composed of atoms.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// The observable universe expanded from an extremely hot, dense early state roughly
+        /// 13.8 billion years ago.
+        /// </summary>
+        public static readonly Proposition UniverseExpandedFromHotDenseState = new Proposition(
+            "UniverseExpandedFromHotDenseState",
+            "The observable universe expanded from an extremely hot, dense early state roughly 13.8 billion years ago.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// Populations of organisms change across generations through heritable variation and
+        /// differential reproductive success.
+        /// </summary>
+        public static readonly Proposition PopulationsEvolveByNaturalSelection = new Proposition(
+            "PopulationsEvolveByNaturalSelection",
+            "Populations of organisms change across generations through heritable variation and differential reproductive success.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// Many diseases are caused by microorganisms.
+        /// </summary>
+        public static readonly Proposition DiseasesCausedByMicroorganisms = new Proposition(
+            "DiseasesCausedByMicroorganisms",
+            "Many diseases are caused by microorganisms.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// All living organisms are composed of cells, and all cells arise from pre-existing
+        /// cells.
+        /// </summary>
+        public static readonly Proposition OrganismsComposedOfCells = new Proposition(
+            "OrganismsComposedOfCells",
+            "All living organisms are composed of cells, and all cells arise from pre-existing cells.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// Earth's lithosphere is divided into plates whose motion produces continental drift,
+        /// earthquakes, and mountain building.
+        /// </summary>
+        public static readonly Proposition LithosphereDividedIntoMovingPlates = new Proposition(
+            "LithosphereDividedIntoMovingPlates",
+            "Earth's lithosphere is divided into plates whose motion produces continental drift, earthquakes, and mountain building.",
+            Testability.EmpiricallyTestable,
+            true);
+
+        /// <summary>
+        /// Gas pressure and temperature arise from the motion and collisions of large numbers of
+        /// molecules.
+        /// </summary>
+        public static readonly Proposition GasBehaviorArisesFromMolecularMotion = new Proposition(
+            "GasBehaviorArisesFromMolecularMotion",
+            "Gas pressure and temperature arise from the motion and collisions of large numbers of molecules.",
+            Testability.EmpiricallyTestable,
+            true);
+
         /// <summary>
         /// Every Collatz sequence, starting from any positive integer, eventually reaches one.
         /// </summary>
@@ -214,6 +313,18 @@ namespace AnointedAutomation.Mathematics
                 // Relativity (theory-backed)
                 MassEnergyEquivalent,
                 SpeedOfLightConstant,
+
+                // Major theories
+                SpecialRelativityHolds,
+                GravityIsSpacetimeCurvature,
+                MatterEnergyIsQuantized,
+                MatterComposedOfAtoms,
+                UniverseExpandedFromHotDenseState,
+                PopulationsEvolveByNaturalSelection,
+                DiseasesCausedByMicroorganisms,
+                OrganismsComposedOfCells,
+                LithosphereDividedIntoMovingPlates,
+                GasBehaviorArisesFromMolecularMotion,
 
                 // Mathematics conjectures
                 CollatzTerminates,
