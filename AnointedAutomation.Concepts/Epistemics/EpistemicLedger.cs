@@ -75,10 +75,14 @@ namespace AnointedAutomation.Concepts.Epistemics
                     if (foundation.Domain == LawDomain.IntraUniverse
                         && proposition.Testability == Testability.BeyondObservation)
                     {
-                        derivation.Add(new DerivationStep(
-                            foundation.Name,
-                            proposition.Name,
-                            "domain skip: intra-universe authority does not reach beyond observation"));
+                        if (foundation.AssertsProposition(proposition) || foundation.DeniesProposition(proposition))
+                        {
+                            derivation.Add(new DerivationStep(
+                                foundation.Name,
+                                proposition.Name,
+                                "domain skip: intra-universe authority does not reach beyond observation"));
+                        }
+
                         continue;
                     }
 

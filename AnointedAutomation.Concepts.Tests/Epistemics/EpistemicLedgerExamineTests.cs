@@ -100,11 +100,35 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
         {
             // Conservation of energy is proven inside the universe; it cannot rule on the origin
             // of the universe. The skip is recorded so neutrality is auditable.
+            FoundationalClaim causality = new FoundationalClaim(
+                "Causality",
+                "Within the universe, effects have causes.",
+                LawDomain.IntraUniverse,
+                new List<Proposition> { EffectsHaveCauses },
+                new List<Proposition>(),
+                0.99);
+            FoundationalClaim conservation = new FoundationalClaim(
+                "ConservationOfEnergy",
+                "Within the universe, energy is neither created nor destroyed.",
+                LawDomain.IntraUniverse,
+                new List<Proposition> { EnergyConserved },
+                new List<Proposition>(),
+                0.99);
+            FoundationalClaim conservationExtrapolation = new FoundationalClaim(
+                "ConservationExtrapolation",
+                "Extrapolation: conservation implies the total system needs no origin.",
+                LawDomain.IntraUniverse,
+                new List<Proposition>(),
+                new List<Proposition> { CreatedUniverse },
+                0.4);
+            EpistemicLedger ledger = new EpistemicLedger(
+                new List<FoundationalClaim> { causality, conservation, conservationExtrapolation });
+
             TheologicalClaim eternalMatter = new TheologicalClaim(
                 "The universe is eternal and uncaused.", "materialist cosmology", 0.9,
                 new List<Proposition>(), new List<Proposition> { CreatedUniverse });
 
-            Examination examination = NewLedger().Examine(eternalMatter);
+            Examination examination = ledger.Examine(eternalMatter);
 
             Assert.Equal(Verdict.Unfalsifiable, examination.Verdict);
             Assert.Contains(examination.Derivation,
