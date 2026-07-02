@@ -2,6 +2,37 @@
 
 ## Current Tasks
 
+### Concepts Package Migration + Theology Epistemics Engine + Mathematics Package - COMPLETED
+- **Description**: Migrated the concept modeling code (Love, Agape, SacrificialLove,
+  SelfSeekingLove, BehaviorNode/BehaviorResult, Situation/Circumstances, and the whole Reality
+  subtree: Reality, Concept, DivineCharacter, MoralConcept, HeavenlyTablets, Grounding,
+  Resolution, Morals) out of AnointedAutomation.Objects into a new package,
+  AnointedAutomation.Concepts (plus AnointedAutomation.Concepts.Tests), namespace
+  `AnointedAutomation.Concepts`. Built a new epistemics engine at
+  `AnointedAutomation.Concepts/Epistemics/` (namespace `AnointedAutomation.Concepts.Epistemics`):
+  Proposition, Testability, LawDomain, EpistemicStatus, FoundationalClaim, TheologicalClaim,
+  Verdict, DerivationStep, Examination, Tension, EpistemicLedger. It checks the consistency of
+  theological claims against foundational claims over a shared proposition vocabulary using
+  three-valued (bool?) standings, four-state verdicts (Consistent/Contradicts/Unfalsifiable/
+  Undetermined), domain-bounded laws (intra-universe laws never settle origin claims), tensions
+  between contradicting claims held as data rather than resolved away, and zero-weight foundations
+  that never count toward support. Also added a new AnointedAutomation.Mathematics package (plus
+  AnointedAutomation.Mathematics.Tests), referencing Concepts: curated catalogs
+  UniversalPropositions, UniversalLaws (Law status: NonContradiction, Identity, ExcludedMiddle,
+  Causality, ConservationOfEnergy, EntropyIncrease), PhysicalTheories (Theory status:
+  MassEnergyEquivalence, InvariantLightSpeed), and Conjectures (Conjecture status, weight 0.0:
+  Collatz, Goldbach, RiemannHypothesis). AnointedAutomation.Objects was bumped to 2.0.0 as a
+  breaking change reflecting the loss of the Concepts namespace. Both new packages were wired into
+  `.github/workflows/nuget-publish.yml`, `version-increment.yml`, `build-and-test.yml`, and
+  `publish-packages.sh`.
+- **Status**: ✅ COMPLETED
+- **Date**: 2026-07-02
+- **Spec**: `docs/superpowers/specs/2026-07-02-theology-engine-design.md`
+- **Plan**: `docs/superpowers/plans/2026-07-02-theology-engine.md`
+- **Documentation**: Updated PROJECT_STRUCTURE_DICTIONARY.md, PROJECT_STRUCTURE_CODE.md,
+  PROJECT_STRUCTURE_LIBRARIES.md, PROJECT_STRUCTURE_OVERVIEW.md, and PROJECT_STRUCTURE_TESTING.md
+  to reflect the new packages and the Objects 2.0.0 breaking change.
+
 ### Divine Grounding / Reality Engine - IN PROGRESS
 - **Description**: New model where God is not an object you call but the grounding reality stands on. One unified, fluid substrate: agents present a situation to `Reality`, God's whole character (Love, Justice, Mercy, Order) weighs it at once (all facets always live, none equal to God), and the deed is written onto the `HeavenlyTablets` (one record where state and truth are the same, from Jubilees + 1 Enoch 81). The response is coherence + disorder, not pass/fail: sin does not "fail," it disorders reality (1 Enoch 80). Grounding in God gives life; grounding in an idol drifts toward non-being (1 Meqabyan). Built on the Ethiopian Orthodox Tewahedo (broadest) canon, after reading 1 Enoch 72-82, Jubilees, and 1 Meqabyan directly. The keystone is the cross: full Justice AND full Mercy in one act (harmonization is mean coherence + gravest-offense disorder, deliberately not a veto). Love reuses the existing 1 Cor 13 engine via the `LoveFacet` adapter, leaving the `Love` hierarchy intact. Scripture is the regression oracle (`BiblicalOracleTests`): the acts of God read fully coherent and never disorder reality, sin always reads incoherent and disorders it, and scenarios never named in Scripture are judged by principle.
 - **Status**: 🔄 IN PROGRESS (core complete and green; tuning + review pending)
