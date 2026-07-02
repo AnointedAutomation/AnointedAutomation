@@ -25,8 +25,14 @@ The solution `AnointedAutomation.sln` contains the following project organizatio
 3. **AnointedAutomation.Repository.Mongo** (`AnointedAutomation.Repository.Mongo/`)
 4. **AnointedAutomation.Objects.API** (`AnointedAutomation.Objects.API/`)
 5. **AnointedAutomation.Memory** (`AnointedAutomation.Memory/`)
-6. **AnointedAutomation.Objects** (`AnointedAutomation.Objects/`)
+6. **AnointedAutomation.Objects** (`AnointedAutomation.Objects/`) - v2.0.0; breaking change: the
+   Concepts namespace (Love, Reality, etc.) was removed and migrated to AnointedAutomation.Concepts
 7. **AnointedAutomation.Objects.Mongo** (`AnointedAutomation.Objects.Mongo/`) - MongoDB-specific data models with BSON attributes
+8. **AnointedAutomation.Concepts** (`AnointedAutomation.Concepts/`) - concept modeling (Love, Reality)
+   migrated from Objects, plus a new Epistemics engine (`AnointedAutomation.Concepts.Epistemics`)
+9. **AnointedAutomation.Mathematics** (`AnointedAutomation.Mathematics/`) - curated mathematics and
+   physics claim catalogs (UniversalLaws, PhysicalTheories, Conjectures) that feed the Epistemics
+   engine; references AnointedAutomation.Concepts
 
 ### Test Projects
 All test projects are organized under a "Tests" solution folder:
@@ -34,6 +40,8 @@ All test projects are organized under a "Tests" solution folder:
 - **AnointedAutomation.Memory.Tests** (`AnointedAutomation.Memory.Tests/`)
 - **AnointedAutomation.APIMiddlewares.Tests** (`AnointedAutomation.APIMiddlewares.Tests/`)
 - **AnointedAutomation.Repository.Mongo.Tests** (`AnointedAutomation.Repository.Mongo.Tests/`)
+- **AnointedAutomation.Concepts.Tests** (`AnointedAutomation.Concepts.Tests/`)
+- **AnointedAutomation.Mathematics.Tests** (`AnointedAutomation.Mathematics.Tests/`)
 
 ### External Dependencies
 - **Google/** - Contains Google OAuth integration objects

@@ -22,7 +22,7 @@ This file serves as the index/directory for all PROJECT_STRUCTURE files in the A
 - Examples of documentation standards
 
 ### [PROJECT_STRUCTURE_LIBRARIES.md](./PROJECT_STRUCTURE_LIBRARIES.md) ✅
-- Individual library details for all 6 core .NET libraries
+- Individual library details for all 10 core .NET libraries
 - Dependencies, relationships, and version information
 - Public API surfaces and key classes for each library
 - NuGet package specifications and MIT licensing
@@ -40,9 +40,11 @@ This file serves as the index/directory for all PROJECT_STRUCTURE files in the A
 ### [PROJECT_STRUCTURE_TESTING.md](./PROJECT_STRUCTURE_TESTING.md) ✅
 - Test organization under "Tests" solution folder
 - Xunit framework configuration for .NET 10.0
-- Individual test project structures and test files (7 test projects, 470 tests)
+- Individual test project structures and test files (9 test projects; 470 tests pre-Concepts-migration,
+  plus AnointedAutomation.Concepts.Tests at approximately 1652 tests and AnointedAutomation.Mathematics.Tests
+  at approximately 25 tests, both figures approximate)
 - Test coverage patterns and testing strategies
-- Test file organization by library (Logging, Memory, APIMiddlewares, Repository.Mongo, Repository.MySql, Objects.API, Objects)
+- Test file organization by library (Logging, Memory, APIMiddlewares, Repository.Mongo, Repository.MySql, Objects.API, Objects, Concepts, Mathematics)
 - Unit test patterns and mock object usage
 
 ### [PROJECT_STRUCTURE_VISUAL.md](./PROJECT_STRUCTURE_VISUAL.md) ✅

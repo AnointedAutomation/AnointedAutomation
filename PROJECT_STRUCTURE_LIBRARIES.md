@@ -3,7 +3,7 @@
 # PROJECT STRUCTURE LIBRARIES
 
 ## Solution Overview
-The AnointedAutomation solution contains 8 core libraries targeting .NET 8.0, each focusing on specific functionality areas. All libraries are designed as NuGet packages with MIT licensing. All code is fully documented with XML documentation.
+The AnointedAutomation solution contains 10 core libraries targeting .NET 8.0/net10.0, each focusing on specific functionality areas. All libraries are designed as NuGet packages with MIT licensing. All code is fully documented with XML documentation.
 
 ## Library Details
 
@@ -232,12 +232,17 @@ The AnointedAutomation solution contains 8 core libraries targeting .NET 8.0, ea
 - Utility methods: `ConnectionStringBuilder()`, `GetIdFromObj<T>()`
 - Event system: `LogAdded`, `LogCleared` events
 
-### 6. AnointedAutomation.Objects v0.0.21
+### 6. AnointedAutomation.Objects v2.0.0
 
 **Purpose & Functionality:**
 - Core data models for general application development
 - Account management and billing system models
 - MongoDB and JSON serialization support
+
+**Breaking Change (2.0.0):** The Concepts namespace (Love, Agape, SacrificialLove, SelfSeekingLove,
+the behavior tree machinery, and the Reality subtree) was migrated out of this library into the new
+AnointedAutomation.Concepts package. Consumers referencing `AnointedAutomation.Objects.Concepts` must
+now reference AnointedAutomation.Concepts and use the `AnointedAutomation.Concepts` namespace instead.
 
 **Key Components:**
 
@@ -358,6 +363,41 @@ All billing models include complete XML documentation
 - Serialization: `JObjectSerializer` for JObject to BSON conversion
 - All classes inherit from base Objects and can be cast to base types
 
+### 9. AnointedAutomation.Concepts v1.0.0
+
+**Purpose & Functionality:**
+- Concept modeling classes migrated out of AnointedAutomation.Objects (Love, Agape, SacrificialLove,
+  SelfSeekingLove, the behavior tree machinery, Situation/Circumstances, and the Reality subtree)
+- A new epistemics engine (Epistemics/) that checks consistency of theological claims against
+  foundational claims over a shared proposition vocabulary
+- See PROJECT_STRUCTURE_CODE.md sections 4a for full class-level detail and the design spec at
+  `docs/superpowers/specs/2026-07-02-theology-engine-design.md`
+
+**Key Namespaces:**
+- `AnointedAutomation.Concepts` - Love/Agape/Reality concept model
+- `AnointedAutomation.Concepts.Epistemics` - Proposition, Testability, LawDomain, EpistemicStatus,
+  FoundationalClaim, TheologicalClaim, Verdict, DerivationStep, Examination, Tension, EpistemicLedger
+
+**Dependencies:**
+- **Internal:** None (foundational for Concepts/Mathematics)
+- **External:** .NET 10.0 (net10.0) framework only
+
+### 10. AnointedAutomation.Mathematics v1.0.0
+
+**Purpose & Functionality:**
+- Curated catalogs of foundational and theological claims drawn from mathematics and physics, for use
+  with the AnointedAutomation.Concepts.Epistemics engine
+- `UniversalPropositions` - shared proposition vocabulary
+- `UniversalLaws` - Law status claims (NonContradiction, Identity, ExcludedMiddle, Causality,
+  ConservationOfEnergy, EntropyIncrease)
+- `PhysicalTheories` - Theory status claims (MassEnergyEquivalence, InvariantLightSpeed)
+- `Conjectures` - Conjecture status claims at zero weight (Collatz, Goldbach, RiemannHypothesis)
+
+**Dependencies:**
+- **Internal:**
+  - AnointedAutomation.Concepts (Epistemics engine types)
+- **External:** .NET 10.0 (net10.0) framework only
+
 ## Inter-Library Dependencies
 
 ```
@@ -385,6 +425,12 @@ AnointedAutomation.Objects.API
 
 AnointedAutomation.Objects.Mongo
 └── AnointedAutomation.Objects (base models)
+
+AnointedAutomation.Concepts
+└── (no internal dependencies)
+
+AnointedAutomation.Mathematics
+└── AnointedAutomation.Concepts (Epistemics engine types)
 ```
 
 ## Key Architectural Notes

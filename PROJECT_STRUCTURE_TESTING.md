@@ -122,7 +122,22 @@ All test projects are organized under a "Tests" solution folder in the main .sln
 **Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
 
 ### 7. AnointedAutomation.Objects.Tests
-**Test Files (100 tests total - Love as a principle-driven decision engine):**
+The Love/Reality behavioral tests previously documented here (LoveTests, SituationTests,
+BehaviorTreeTests, AgapeTests, SacrificialLoveTests) moved with the Concepts namespace into
+AnointedAutomation.Concepts.Tests (see section 8 below). What remains in
+AnointedAutomation.Objects.Tests is:
+- `ResponseDataTests.cs` - Tests for the generic `ResponseData` response wrapper
+
+**Testing Framework:** Xunit (.NET 10.0)
+**Test Coverage:** Data model only; no behavioral logic remains in this project after the Concepts
+migration.
+
+### 8. AnointedAutomation.Concepts.Tests
+Covers both the migrated concept modeling classes and the new Epistemics engine. Approximately 1652
+tests (this figure is as reported at migration time and has not been independently re-counted file by
+file in this pass; treat it as approximate).
+
+**Concept modeling test files (migrated from AnointedAutomation.Objects.Tests):**
 - `LoveTests.cs` - Abstract base behavior, exercised via a private `TestLove` double
   - Love is abstract; the 1 Cor 13 character + helpers (IsPerfect, Completeness 0-17, Bears/Believes/
     Hopes/Endures, GreaterLove, Abides, Describe, GreatestCommandment, Source defaults to God)
@@ -147,14 +162,38 @@ All test projects are organized under a "Tests" solution folder in the main .sln
 - `SacrificialLoveTests.cs` - Decide(Situation) for the greatest love (John 15:13)
   - friendsLifeAtStake -> lay down one's life; otherwise falls through to agape's repertoire
   - Greater deed than agape for the same situation; inherits perfect character; is-a Agape and Love
+- Also present: `RedemptiveArcTests.cs`, `MercyTests.cs`, `HeavenlyTabletsTests.cs`,
+  `MoralConceptTests.cs`, `FaithfulnessTests.cs`, `GroundingTests.cs`, `DivineCharacterTests.cs`,
+  `GravityTests.cs`, `JusticeTests.cs`, `LoveFacetTests.cs`, `RealityTests.cs`, `ResolutionTests.cs`,
+  `WordTests.cs`, plus an extensive `Canon/` subfolder with per-book narrative and oracle tests
+  covering the broadened Ethiopian Orthodox Tewahedo canon.
+
+**Epistemics test files (Epistemics/ subfolder):**
+- `PropositionTests.cs`, `FoundationalClaimTests.cs`, `TheologicalClaimTests.cs`,
+  `ExaminationTests.cs`, `TensionTests.cs`, `EpistemicLedgerAdmitTests.cs`,
+  `EpistemicLedgerExamineTests.cs`, `WorkedExampleTests.cs` - cover the Proposition vocabulary,
+  three-valued (bool?) claim standings, four-state verdicts (Consistent/Contradicts/Unfalsifiable/
+  Undetermined), domain-bounded laws, tensions between contradicting claims, and zero-weight
+  foundations never counting as support. Design spec:
+  `docs/superpowers/specs/2026-07-02-theology-engine-design.md`.
+
+**Testing Framework:** Xunit (.NET 10.0)
+**Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
+
+### 9. AnointedAutomation.Mathematics.Tests
+Approximately 25 tests (approximate; not independently re-counted file by file in this pass) across:
+- `UniversalPropositionsTests.cs` - the shared proposition vocabulary catalog
+- `UniversalLawsTests.cs` - Law status claims (NonContradiction, Identity, ExcludedMiddle, Causality,
+  ConservationOfEnergy, EntropyIncrease)
+- `PhysicalTheoriesTests.cs` - Theory status claims (MassEnergyEquivalence, InvariantLightSpeed)
+- `ConjecturesTests.cs` - Conjecture status claims at zero weight (Collatz, Goldbach,
+  RiemannHypothesis), verifying an unproven conjecture never counts as support
 
 **Testing Framework:** Xunit (.NET 10.0)
 **Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
 
 ### Missing Test Projects
 The following libraries do not have corresponding test projects:
-- **AnointedAutomation.Objects** - Has a test project (AnointedAutomation.Objects.Tests) covering
-  the behavioral Love concept entity; the remaining types are pure DTOs/POCOs (no tests needed)
 - **AnointedAutomation.Enums** - No test project found (enum definitions - no tests needed)
 
 ## Test Patterns and Standards
@@ -171,7 +210,7 @@ The following libraries do not have corresponding test projects:
 
 ### Test Coverage
 
-**Overall Test Statistics (Updated 2026-05-28):**
+**Overall Test Statistics (Updated 2026-05-28, pre-Concepts-migration):**
 - **Total Tests:** 470 (All PASSING)
   - AnointedAutomation.Memory.Tests: 5 tests
   - AnointedAutomation.Logging.Tests: 49 tests (FULLY ENHANCED)
@@ -181,6 +220,13 @@ The following libraries do not have corresponding test projects:
   - AnointedAutomation.Objects.API.Tests: 37 tests (comprehensive coverage)
   - AnointedAutomation.Objects.Tests: 100 tests (Love as a principle-driven decision engine)
 - **Improvement:** +156 tests from initial baseline (from 314)
+
+**Post-Concepts-migration (2026-07-02):** The 100 Love-related tests moved out of
+AnointedAutomation.Objects.Tests into the new AnointedAutomation.Concepts.Tests project, which grew
+substantially further with the Canon narrative/oracle suites and the new Epistemics engine tests
+(approximately 1652 tests total, approximate). AnointedAutomation.Objects.Tests now covers only
+ResponseData. A new AnointedAutomation.Mathematics.Tests project was also added (approximately 25
+tests). See sections 7-9 above for the current breakdown.
 
 **CLAUDE_TESTING.md Compliance:**
 - **AnointedAutomation.Logging.Tests** - EXCEEDS STANDARDS (Success, Failure, Null/Edge scenarios)
@@ -211,7 +257,8 @@ The following libraries do not have corresponding test projects:
   - AnointedAutomation.Memory (1 test file, 5 tests - appropriate for simple GC wrapper)
 
 - **No Tests Required (Data Models Only):**
-  - AnointedAutomation.Objects (pure DTOs/POCOs)
+  - AnointedAutomation.Objects (pure DTOs/POCOs; Concepts namespace migrated to
+    AnointedAutomation.Concepts, which has its own comprehensive Concepts.Tests project)
   - AnointedAutomation.Enums (enum definitions)
 
 ## Testing Gaps and Recommendations
@@ -301,7 +348,8 @@ The following libraries do not have corresponding test projects:
    - **Coverage Improvement:** MySqlHelperFactory branch coverage improved from 50% to 100%
 
 ### Design Decisions
-1. **AnointedAutomation.Objects** - No tests needed (pure data models/DTOs with no behavioral logic)
+1. **AnointedAutomation.Objects** - No tests needed (pure data models/DTOs with no behavioral logic,
+   now that the behavioral Concepts namespace has moved to AnointedAutomation.Concepts)
 2. **AnointedAutomation.Enums** - No tests needed (enum definitions with no behavioral logic)
 3. **Middleware tests** - Existing coverage appropriate for complexity level
 
