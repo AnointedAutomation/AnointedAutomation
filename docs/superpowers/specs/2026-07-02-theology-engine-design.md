@@ -162,3 +162,13 @@ Unit tests written alongside the code (house rule: code without tests is incompl
 
 Natural-language parsing, JSON claim loading, persistence (Mongo repository), any graph
 store. All can bolt on later without changing the core types.
+
+## Amendment (2026-07-02)
+
+Implemented with packaging changes decided mid-execution: the engine lives in the dedicated
+package `AnointedAutomation.Concepts` under `AnointedAutomation.Concepts/Epistemics/`
+(namespace `AnointedAutomation.Concepts.Epistemics`), not inside AnointedAutomation.Objects.
+All prior concept code (Love, Reality, etc.) migrated to the same package; curated catalogs of
+laws, theories, and conjectures ship separately in `AnointedAutomation.Mathematics`. An
+`EpistemicStatus` (Law, Theory, Conjecture) was added to `FoundationalClaim`, and the support
+check ignores foundations with zero survived-falsification weight.
