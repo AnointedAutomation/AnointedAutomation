@@ -1,7 +1,7 @@
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-07-02
 // Stewarded by Alexander Fields
 
-namespace AnointedAutomation.Objects.Concepts.Epistemics
+namespace AnointedAutomation.Concepts.Epistemics
 {
     /// <summary>
     /// Where a foundational claim has authority. This boundary is what keeps the engine neutral: a

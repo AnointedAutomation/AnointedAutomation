@@ -3,9 +3,9 @@
 
 using System.Collections.Generic;
 using Xunit;
-using AnointedAutomation.Objects.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Epistemics;
 
-namespace AnointedAutomation.Objects.Tests.Epistemics
+namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
     public class TheologicalClaimTests
     {

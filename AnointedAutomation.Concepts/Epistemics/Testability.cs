@@ -1,7 +1,7 @@
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-07-02
 // Stewarded by Alexander Fields
 
-namespace AnointedAutomation.Objects.Concepts.Epistemics
+namespace AnointedAutomation.Concepts.Epistemics
 {
     /// <summary>
     /// Whether a proposition can, even in principle, be tested from inside the universe. This

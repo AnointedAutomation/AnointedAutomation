@@ -55,6 +55,7 @@ jobs:
             ["AnointedAutomation.Repository.MySql/AnointedAutomation.Repository.MySql.csproj"]="AnointedAutomation.Repository.MySql"
             ["AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"]="AnointedAutomation.Objects"
             ["AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"]="AnointedAutomation.Objects.API"
+            ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="AnointedAutomation.Concepts"
           )
 
           VERSIONS_UPDATED=0

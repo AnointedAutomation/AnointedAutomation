@@ -1,7 +1,7 @@
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-07-02
 // Stewarded by Alexander Fields
 
-namespace AnointedAutomation.Objects.Concepts.Epistemics
+namespace AnointedAutomation.Concepts.Epistemics
 {
     /// <summary>
     /// One entry in the shared vocabulary through which claims interact. The engine does not parse

@@ -2,9 +2,9 @@
 // Stewarded by Alexander Fields
 
 using Xunit;
-using AnointedAutomation.Objects.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Epistemics;
 
-namespace AnointedAutomation.Objects.Tests.Epistemics
+namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
     public class PropositionTests
     {
