@@ -38,6 +38,35 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
         }
 
         [Fact]
+        public void FoundationalClaim_ExistingConstructor_DefaultsToLawStatus()
+        {
+            FoundationalClaim causality = new FoundationalClaim(
+                "Causality",
+                "Within the universe, effects have causes.",
+                LawDomain.IntraUniverse,
+                new List<Proposition> { Causality() },
+                new List<Proposition>(),
+                0.99);
+
+            Assert.Equal(EpistemicStatus.Law, causality.Status);
+        }
+
+        [Fact]
+        public void FoundationalClaim_CanBeConstructedAsAConjecture()
+        {
+            FoundationalClaim collatz = new FoundationalClaim(
+                "CollatzConjecture",
+                "Every positive integer eventually reaches 1 under the Collatz map.",
+                LawDomain.Unrestricted,
+                new List<Proposition> { Causality() },
+                new List<Proposition>(),
+                0.0,
+                EpistemicStatus.Conjecture);
+
+            Assert.Equal(EpistemicStatus.Conjecture, collatz.Status);
+        }
+
+        [Fact]
         public void FoundationalClaim_ThrowsOnWeightOutOfRange()
         {
             Assert.Throws<System.ArgumentOutOfRangeException>(() => new FoundationalClaim(

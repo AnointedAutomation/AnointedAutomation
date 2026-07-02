@@ -27,6 +27,28 @@ namespace AnointedAutomation.Concepts.Epistemics
             System.Collections.Generic.IEnumerable<Proposition> asserts,
             System.Collections.Generic.IEnumerable<Proposition> denies,
             double survivedFalsificationWeight)
+            : this(name, statement, domain, asserts, denies, survivedFalsificationWeight, EpistemicStatus.Law)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FoundationalClaim"/> class.
+        /// </summary>
+        /// <param name="name">Unique name, e.g. "ConservationOfEnergy".</param>
+        /// <param name="statement">The claim in plain words.</param>
+        /// <param name="domain">Where the claim has authority.</param>
+        /// <param name="asserts">Propositions the claim asserts.</param>
+        /// <param name="denies">Propositions the claim denies.</param>
+        /// <param name="survivedFalsificationWeight">How much testing it has survived, 0.0 to 1.0.</param>
+        /// <param name="status">How settled the claim is.</param>
+        public FoundationalClaim(
+            string name,
+            string statement,
+            LawDomain domain,
+            System.Collections.Generic.IEnumerable<Proposition> asserts,
+            System.Collections.Generic.IEnumerable<Proposition> denies,
+            double survivedFalsificationWeight,
+            EpistemicStatus status)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -73,6 +95,7 @@ namespace AnointedAutomation.Concepts.Epistemics
             Asserts = assertList;
             Denies = denyList;
             SurvivedFalsificationWeight = survivedFalsificationWeight;
+            Status = status;
         }
 
         /// <summary>
@@ -132,6 +155,14 @@ namespace AnointedAutomation.Concepts.Epistemics
         /// specialness, is why it functions as bedrock.
         /// </summary>
         public double SurvivedFalsificationWeight
+        {
+            get;
+        }
+
+        /// <summary>
+        /// How settled this claim is: bedrock law, contested theory, or unproven conjecture.
+        /// </summary>
+        public EpistemicStatus Status
         {
             get;
         }
