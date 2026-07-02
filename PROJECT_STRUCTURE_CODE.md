@@ -139,10 +139,17 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with
 foundational and theological claims drawn from mathematics and physics. UniversalPropositions.cs
-defines the shared proposition vocabulary used by the catalogs below. UniversalLaws.cs catalogs laws
-with Law status (NonContradiction, Identity, ExcludedMiddle, Causality, ConservationOfEnergy,
-EntropyIncrease). PhysicalTheories.cs catalogs well-established theories with Theory status
-(MassEnergyEquivalence, InvariantLightSpeed). Conjectures.cs catalogs open mathematical conjectures
+defines the shared proposition vocabulary (79 propositions) used by the catalogs below.
+UniversalLaws.cs (with partial files UniversalLaws.Physics.cs and UniversalLaws.Chemistry.cs)
+catalogs 64 laws with Law status: the logic laws (NonContradiction, Identity, ExcludedMiddle,
+domain Unrestricted) plus the established laws of physics, chemistry, and astronomy (Newton's
+laws, Kepler's laws, thermodynamics, conservation laws, Maxwell-era electromagnetism, optics
+and radiation, fluids, gas laws, and the classical chemistry laws), weighted 0.99 for exact
+laws and 0.9 for idealizations (Ohm, Hooke, ideal-gas family). PhysicalTheories.cs catalogs
+12 well-established theories with Theory status at weight 0.95 (special and general relativity,
+quantum mechanics, atomic theory, Big Bang cosmology, evolution by natural selection, germ
+theory, cell theory, plate tectonics, kinetic theory of gases, MassEnergyEquivalence,
+InvariantLightSpeed). Conjectures.cs catalogs open mathematical conjectures
 with Conjecture status and zero weight (Collatz, Goldbach, RiemannHypothesis), so an unproven
 conjecture never counts as support for or against a claim. See
 `docs/superpowers/specs/2026-07-02-theology-engine-design.md` for how these catalogs plug into the
