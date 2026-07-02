@@ -160,5 +160,99 @@ namespace AnointedAutomation.Concepts.Epistemics
                 "no applicable foundational claim bears on it"));
             return new Examination(claim, Verdict.Undetermined, claim.Confidence, derivation);
         }
+
+        /// <summary>
+        /// All recorded tensions between admitted claims. A tension is a contradiction held as
+        /// data: both claims stand, source-tagged, and the disagreement is queryable.
+        /// </summary>
+        public System.Collections.Generic.IReadOnlyList<Tension> Tensions
+        {
+            get
+            {
+                return tensions;
+            }
+        }
+
+        /// <summary>
+        /// Examines a claim, records any tensions with already admitted claims, stores the claim,
+        /// and returns the examination. Peer collisions create tensions; they never change the
+        /// verdict, because a disagreement between two theories falsifies neither.
+        /// </summary>
+        /// <param name="claim">The claim to admit.</param>
+        /// <returns>The examination the claim received.</returns>
+        public Examination Admit(TheologicalClaim claim)
+        {
+            Examination examination = Examine(claim);
+
+            System.Collections.Generic.List<Proposition> touched =
+                new System.Collections.Generic.List<Proposition>(claim.Asserts);
+            touched.AddRange(claim.Denies);
+            foreach (TheologicalClaim peer in admitted)
+            {
+                foreach (Proposition proposition in touched)
+                {
+                    bool collision =
+                        (claim.AssertsProposition(proposition) && peer.DeniesProposition(proposition))
+                        || (claim.DeniesProposition(proposition) && peer.AssertsProposition(proposition));
+                    if (collision)
+                    {
+                        tensions.Add(new Tension(peer, claim, proposition));
+                    }
+                }
+            }
+
+            admitted.Add(claim);
+            return examination;
+        }
+
+        /// <summary>
+        /// Admitted claims that assert or deny the given proposition.
+        /// </summary>
+        /// <param name="proposition">The proposition to query.</param>
+        /// <returns>The claims touching it, in admission order.</returns>
+        public System.Collections.Generic.IReadOnlyList<TheologicalClaim> ClaimsAbout(Proposition proposition)
+        {
+            if (proposition == null)
+            {
+                throw new System.ArgumentNullException(nameof(proposition));
+            }
+
+            System.Collections.Generic.List<TheologicalClaim> matches =
+                new System.Collections.Generic.List<TheologicalClaim>();
+            foreach (TheologicalClaim claim in admitted)
+            {
+                if (claim.AssertsProposition(proposition) || claim.DeniesProposition(proposition))
+                {
+                    matches.Add(claim);
+                }
+            }
+
+            return matches;
+        }
+
+        /// <summary>
+        /// Admitted claims from the given source, compared ordinally.
+        /// </summary>
+        /// <param name="source">The source to query, e.g. "Genesis 1:1".</param>
+        /// <returns>The claims from that source, in admission order.</returns>
+        public System.Collections.Generic.IReadOnlyList<TheologicalClaim> ClaimsFrom(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                throw new System.ArgumentException("A source is required.", nameof(source));
+            }
+
+            System.Collections.Generic.List<TheologicalClaim> matches =
+                new System.Collections.Generic.List<TheologicalClaim>();
+            foreach (TheologicalClaim claim in admitted)
+            {
+                if (claim.Source.Equals(source, System.StringComparison.Ordinal))
+                {
+                    matches.Add(claim);
+                }
+            }
+
+            return matches;
+        }
     }
 }
