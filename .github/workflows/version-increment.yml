@@ -113,9 +113,15 @@ jobs:
               MINOR="${VERSION_PARTS[1]}"
               PATCH="${VERSION_PARTS[2]}"
 
-              # Increment patch version
-              NEW_PATCH=$((PATCH + 1))
-              NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+              # Increment patch version, rolling into minor at 9 (x.y.9 -> x.(y+1).0).
+              # The major version is never touched by automation.
+              if [ "$PATCH" -ge 9 ]; then
+                NEW_MINOR=$((MINOR + 1))
+                NEW_VERSION="${MAJOR}.${NEW_MINOR}.0"
+              else
+                NEW_PATCH=$((PATCH + 1))
+                NEW_VERSION="${MAJOR}.${MINOR}.${NEW_PATCH}"
+              fi
 
               echo "  ✓ New version: $NEW_VERSION"
 
