@@ -2166,3 +2166,33 @@ Mark the theology engine implementation as completed with today's date. Do NOT s
 git add PROJECT_STRUCTURE_DICTIONARY.md PROJECT_STRUCTURE_CODE.md
 git commit -m "Document epistemics engine"
 ```
+
+---
+
+## Amendment (2026-07-02, mid-execution)
+
+User decisions during execution changed the packaging architecture. Binding overrides:
+
+- The epistemics engine lives in a new package `AnointedAutomation.Concepts` (done, commit e120727). Wherever Tasks 4 to 8 say `AnointedAutomation.Objects/Concepts/Epistemics/` read `AnointedAutomation.Concepts/Epistemics/`; namespace `AnointedAutomation.Concepts.Epistemics`; tests in `AnointedAutomation.Concepts.Tests/Epistemics/`, namespace `AnointedAutomation.Concepts.Tests.Epistemics`. Test command: `dotnet test AnointedAutomation.Concepts.Tests/AnointedAutomation.Concepts.Tests.csproj`.
+- Execution order: Tasks 5, 6, 7, 8, then 10, 11, 12, then 9 (docs last, covering everything).
+
+### Task 10: Migrate all remaining concepts from Objects to Concepts
+
+Move `AnointedAutomation.Objects/Concepts/` (everything: Love, Agape, SacrificialLove, SelfSeekingLove, LoveAction, Deed, Situation, Circumstance(s), Condition, Selector, Sequence, BehaviorNode, BehaviorResult, and the whole `Reality/` subtree including `Morals/`) into `AnointedAutomation.Concepts/`, preserving subfolder structure (`AnointedAutomation.Concepts/Love.cs` etc. at package root mirroring current layout under `Concepts/`). Namespace `AnointedAutomation.Objects.Concepts` becomes `AnointedAutomation.Concepts`. Move the matching test files (`MoralConceptTests.cs`, `Canon/` concept tests, and any other test file whose usings reference `AnointedAutomation.Objects.Concepts`) from `AnointedAutomation.Objects.Tests` to `AnointedAutomation.Concepts.Tests`, updating namespaces and usings. Update ALL references across the solution (`grep -rn "Objects.Concepts" --include=*.cs`). If Objects.Demo or Objects.API reference concept types, add a ProjectReference to `AnointedAutomation.Concepts` where needed. Breaking change: bump `AnointedAutomation.Objects` csproj Version major (2.0.0) and `AnointedAutomation.Concepts` stays 1.0.0 (unreleased). Whole solution must build with 0 errors; all tests pass. One commit: `Move concepts into Concepts package`.
+
+### Task 11: EpistemicStatus
+
+Add `AnointedAutomation.Concepts/Epistemics/EpistemicStatus.cs`: `public enum EpistemicStatus { Law, Theory, Conjecture }` with XML docs explaining the split (Law: survived so much falsification it functions as bedrock; Theory: well supported, still contested at the edges; Conjecture: asserted and unproven, standing null, e.g. the Collatz conjecture). Add a `EpistemicStatus Status` property to `FoundationalClaim` via a new constructor parameter (after `survivedFalsificationWeight`), keeping the existing constructor overload which defaults to `EpistemicStatus.Law` for backward compatibility within this branch. TDD, tests in `FoundationalClaimTests`. Commit: `Add epistemic status`.
+
+### Task 12: AnointedAutomation.Mathematics package
+
+New project `AnointedAutomation.Mathematics` (+ `AnointedAutomation.Mathematics.Tests`), modeled on the Concepts csproj (Version 1.0.0, Description mentioning curated laws, theories, and conjectures of mathematics and physics; PackageTags `mathematics laws epistemics`; README.md). ProjectReference to `AnointedAutomation.Concepts`. Wire into sln and ALL NuGet runners (nuget-publish.yml PACKAGES, version-increment.yml PROJECTS, publish-packages.sh PACKAGES, build-and-test.yml test step), exactly as done for Concepts in commit e120727.
+
+Contents, namespace `AnointedAutomation.Mathematics`:
+- `UniversalPropositions.cs`: static class exposing the shared `Proposition` instances the catalogs use (NonContradiction, Identity, ExcludedMiddle, EffectsHaveCauses, EnergyConserved, EntropyIncreases, MassEnergyEquivalent, SpeedOfLightConstant, CollatzTerminates, GoldbachHolds, RiemannZerosOnCriticalLine), each with correct `Testability` (logic and intra-universe physics: `EmpiricallyTestable`; nothing here is `BeyondObservation`) and standing (`true` for laws' propositions, `null` for conjectures').
+- `UniversalLaws.cs`: static class with static readonly `FoundationalClaim` members and an `All` read-only list. Entries (status `Law`): NonContradiction (Unrestricted, 1.0), Identity (Unrestricted, 1.0), ExcludedMiddle (Unrestricted, 0.98), Causality (IntraUniverse, 0.99), ConservationOfEnergy (IntraUniverse, 0.99), EntropyIncrease (IntraUniverse, 0.99).
+- `PhysicalTheories.cs`: static class, status `Theory`: MassEnergyEquivalence (IntraUniverse, 0.95), InvariantLightSpeed (IntraUniverse, 0.95). Plus `All`.
+- `Conjectures.cs`: static class, status `Conjecture`, weight 0.0 (survived no proof), propositions standing null: Collatz, Goldbach, RiemannHypothesis. Plus `All`.
+- Tests: every catalog member non-null, correct domain/status/weight ranges, `All` counts, laws usable to construct an `EpistemicLedger` that examines a claim; a conjecture-backed claim examines as `Undetermined` not `Consistent` (weight 0.0 must never support); no duplicate proposition names across `UniversalPropositions`.
+
+Commit: `Add mathematics package with law catalog`.
