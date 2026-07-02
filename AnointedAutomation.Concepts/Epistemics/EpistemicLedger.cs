@@ -136,6 +136,13 @@ namespace AnointedAutomation.Concepts.Epistemics
                         continue;
                     }
 
+                    // A foundational claim with zero survived-falsification weight (an unproven
+                    // conjecture) has no strength to lend; agreement with it is not support.
+                    if (foundation.SurvivedFalsificationWeight == 0.0)
+                    {
+                        continue;
+                    }
+
                     bool support =
                         (claim.AssertsProposition(proposition) && foundation.AssertsProposition(proposition))
                         || (claim.DeniesProposition(proposition) && foundation.DeniesProposition(proposition));

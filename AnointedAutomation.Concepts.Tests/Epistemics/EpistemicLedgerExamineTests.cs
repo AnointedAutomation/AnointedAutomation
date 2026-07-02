@@ -185,6 +185,34 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
         }
 
         [Fact]
+        public void Examine_ClaimAssertingWhatAZeroWeightConjectureAsserts_IsUndetermined()
+        {
+            // A conjecture that has survived no falsification has no strength to lend. Agreement
+            // with it is not support: the honest verdict is undetermined, not consistent.
+            Proposition collatzTerminates = new Proposition(
+                "CollatzTerminates",
+                "Every positive integer reaches 1 under the Collatz process.",
+                Testability.EmpiricallyTestable);
+            FoundationalClaim collatzConjecture = new FoundationalClaim(
+                "CollatzConjecture",
+                "Every positive integer reaches 1 under the Collatz process.",
+                LawDomain.IntraUniverse,
+                new List<Proposition> { collatzTerminates },
+                new List<Proposition>(),
+                0.0,
+                EpistemicStatus.Conjecture);
+            EpistemicLedger ledger = new EpistemicLedger(new List<FoundationalClaim> { collatzConjecture });
+            TheologicalClaim claim = new TheologicalClaim(
+                "The Collatz process always reaches 1.", "test", 0.9,
+                new List<Proposition> { collatzTerminates }, new List<Proposition>());
+
+            Examination examination = ledger.Examine(claim);
+
+            Assert.Equal(Verdict.Undetermined, examination.Verdict);
+            Assert.Null(examination.Standing);
+        }
+
+        [Fact]
         public void Ledger_ThrowsOnDuplicateFoundationalNames()
         {
             FoundationalClaim a = new FoundationalClaim(

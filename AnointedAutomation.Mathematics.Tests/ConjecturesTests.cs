@@ -38,14 +38,18 @@ namespace AnointedAutomation.Mathematics.Tests
         [Fact]
         public void ConjectureBackedClaim_ExaminesAsUndeterminedNotConsistent()
         {
-            // A ledger built only from the bedrock laws: a conjecture's zero survived-falsification
-            // weight means it is never admitted as authority, so a claim resting on it can never
-            // be examined as Consistent.
-            EpistemicLedger ledger = new EpistemicLedger(UniversalLaws.All);
+            // A ledger built from the bedrock laws plus the conjectures: a conjecture's zero
+            // survived-falsification weight means it has no strength to lend, so a claim resting
+            // on it can never be examined as Consistent, even though the conjecture is present
+            // and agrees with the claim.
+            System.Collections.Generic.List<FoundationalClaim> foundations =
+                new System.Collections.Generic.List<FoundationalClaim>(UniversalLaws.All);
+            foundations.AddRange(Conjectures.All);
+            EpistemicLedger ledger = new EpistemicLedger(foundations);
             TheologicalClaim claim = new TheologicalClaim(
                 "Every Collatz sequence reaches one.",
-                "number theory",
-                0.5,
+                "test",
+                0.9,
                 new System.Collections.Generic.List<Proposition> { UniversalPropositions.CollatzTerminates },
                 new System.Collections.Generic.List<Proposition>());
 
