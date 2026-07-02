@@ -26,7 +26,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
@@ -53,7 +53,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
@@ -84,6 +84,12 @@ jobs:
 
       - name: Run Imaging Tests
         run: dotnet test AnointedAutomation.Imaging.Tests/AnointedAutomation.Imaging.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      - name: Run Concepts Tests
+        run: dotnet test AnointedAutomation.Concepts.Tests/AnointedAutomation.Concepts.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      - name: Run Mathematics Tests
+        run: dotnet test AnointedAutomation.Mathematics.Tests/AnointedAutomation.Mathematics.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Publish Test Results
         if: always()

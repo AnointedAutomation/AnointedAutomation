@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+		<Title>AnointedAutomation.Concepts</Title>
+		<Company>Anointed Automation LLC - Alexander Fields</Company>
+		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
+		<Description>Abstract concept modeling and epistemics engine - AnointedAutomation.Concepts</Description>
+		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
+		<Version>1.0.0</Version>
+		<PackageTags>concepts epistemics</PackageTags>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Concepts</PackageReleaseNotes>
+		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="/" />
+	</ItemGroup>
+
+</Project>

@@ -92,80 +92,68 @@ All code files in the solution have been documented with XML documentation follo
   - Subscription.cs - Pause/resume/cancel lifecycle, usage tracking, status history
   - Purchase.cs - Order status and status history audit trail
 
-- Concepts/ - Love modeled as a principle-driven DECISION ENGINE (behavior tree), not hardcoded
-  scenario lookups. You feed in a situation (arbitrary facts) and a love returns the fitting deed,
-  even for situations Scripture never named.
-  - Love.cs - `abstract class Love` holding the shared *character* (the sixteen 1 Corinthians 13:4-8
-    bool virtues/vices, sourced in God 1 John 4:8, directed Lover -> Beloved Matthew 22:37-39, with a
-    sacrificial dimension John 3:16/John 15:13). Helpers: IsPerfect(), Completeness() (0-17),
-    Bears()/Believes()/Hopes()/Endures() (1 Cor 13:7), GreaterLove(), Abides(), Describe(), Agape()
-    factory. Public `LoveAction Decide(Situation)` lazily builds and walks the love's behavior tree;
-    each concrete love supplies its tree via the protected abstract `BuildBehavior()`.
-  - Agape.cs - Concrete perfect love. BuildBehavior() is a Selector repertoire of principle-responses:
-    wronged -> Forgive (Col 3:13; 1 Cor 13:5); a composed branch enemy AND (hungry OR thirsty) ->
-    feed your enemy / overcome evil with good (Romans 12:20-21); the six works of mercy from Matthew 25:35-36 — hungry
-    -> feed, thirsty -> give drink, stranger -> welcome, naked -> clothe, sick -> care for,
-    imprisoned -> visit (exhortation Matt 25:40); inNeed+iCanHelp -> meet the need (Luke 10:33-35);
-    grieving -> mourn with (Rom 12:15); rejoicing -> rejoice with; enemy -> love them (Matt 5:44);
-    fallback -> be patient and kind (1 Cor 13:4) for any unmatched/novel situation.
-  - SelfSeekingLove.cs - The priest/Levite; repertoire is a single deed: pass by (Luke 10:31-32).
-  - SacrificialLove.cs - `SacrificialLove : Agape`. BuildBehavior() prepends one branch
-    (friendsLifeAtStake -> lay down one's life, John 15:13) then falls through to agape's whole tree.
-  - Situation.cs - The decision input: the set of `Circumstance`s that hold (With/Has, fluent). No
-    strings: circumstances are first-class concepts. Any situation can be expressed, including novel
-    ones via `new Circumstance("...")`.
-  - Circumstance.cs / Circumstances.cs - A `Circumstance : Concept` is a state of the world love
-    responds to (no moral weight). Known ones are types (Hunger, Thirst, Estrangement, Nakedness,
-    Sickness, Imprisonment, Need, Means, Grievance, Enmity, Grief, Gladness, MortalPeril); novel ones
-    use the base type and match by name.
-  - Behavior tree machinery: BehaviorNode (abstract Tick), BehaviorResult (succeeded + Action),
-    Selector (priority OR), Sequence (AND, carries the deed), Condition (Func<Situation,bool>, plus
-    Condition.For(circumstance), composable with And()/Or()/Not() over conditions or circumstances),
-    Deed (wraps a LoveAction).
-  - LoveAction.cs - The deed a love performs: acts, Deed, Virtue, Reference (Scripture), Exhortation.
-- Concepts/Reality/ - The divine grounding / reality engine (namespace stays
-  `AnointedAutomation.Objects.Concepts`; folder is organizational). God is not an object you call; He
-  is the grounding reality stands on. Built on the Ethiopian Orthodox Tewahedo (broadest) canon
-  (1 Enoch 72-82, Jubilees, 1 Meqabyan). Design spec:
+NOTE: as of the migration below, the Concepts namespace (Love/Agape/Situation/Circumstances and the
+Reality subtree) no longer lives in AnointedAutomation.Objects. It moved into the new
+AnointedAutomation.Concepts package (see section 4a). AnointedAutomation.Objects was bumped to
+2.0.0 as a breaking change reflecting the loss of that namespace.
+
+### 4a. AnointedAutomation.Concepts (new package, moved out of Objects)
+Namespace `AnointedAutomation.Concepts`. Two areas live here: the original concept modeling classes
+(Love, the Reality subtree) migrated from Objects, and a brand new epistemics engine.
+
+- Concept modeling (Love, Reality): Love modeled as a principle-driven DECISION ENGINE (behavior
+  tree), not hardcoded scenario lookups. You feed in a situation (arbitrary facts) and a love returns
+  the fitting deed, even for situations Scripture never named. Love.cs holds the shared character (the
+  sixteen 1 Corinthians 13:4-8 bool virtues/vices, sourced in God 1 John 4:8, directed Lover to Beloved
+  Matthew 22:37-39, with a sacrificial dimension John 3:16/John 15:13), with helpers IsPerfect(),
+  Completeness() (0-17), Bears()/Believes()/Hopes()/Endures() (1 Cor 13:7), GreaterLove(), Abides(),
+  Describe(), and an Agape() factory; the public `LoveAction Decide(Situation)` lazily builds and walks
+  the love's behavior tree via the protected abstract `BuildBehavior()`. Agape.cs is the concrete
+  perfect love (a Selector repertoire covering forgiveness, feeding an enemy, the six works of mercy
+  from Matthew 25, meeting need, mourning, rejoicing, and a fallback of patience and kindness).
+  SelfSeekingLove.cs is the priest/Levite (a single pass-by deed, Luke 10:31-32). SacrificialLove.cs
+  extends Agape with one prepended branch (friendsLifeAtStake, John 15:13). Situation.cs,
+  Circumstance.cs, and Circumstances.cs supply the decision input as first-class concepts rather than
+  strings, and BehaviorNode/BehaviorResult/Selector/Sequence/Condition/Deed provide the underlying
+  behavior tree machinery. LoveAction.cs is the deed a love performs (acts, Deed, Virtue, Reference,
+  Exhortation). The Reality/ subfolder is the divine grounding and reality engine: Reality.cs (the one
+  thing agents address, `Witness(Act[, Grounding])`), HeavenlyTablets.cs (the one record where state
+  and truth are the same), Concept.cs (root of the concept model), MoralConcept.cs plus
+  Reality/Morals/Virtues.cs and Reality/Morals/Vices.cs (the concrete moral concepts and their
+  gravity), Gravity.cs, Act.cs, DivineAttribute.cs, Justice.cs/Mercy.cs/Order.cs, LoveFacet.cs,
+  DivineCharacter.cs, Resolution.cs, Grounding.cs, and Word.cs. Design spec for this subtree:
   `docs/superpowers/specs/2026-06-11-divine-grounding-reality-engine-design.md`.
-  - Reality.cs - The Universe: the one thing agents address. `Witness(Act[, Grounding])`
-    harmonizes a deed under God's whole character, bears it on its grounding, records it on the
-    tablets, and returns the resolution. State and truth are one call. `Reality.Revealed()` wires
-    the standard character (LoveFacet, Justice, Mercy, Order). The Father (grounding) is never an
-    object (Col 1:17; Heb 1:3).
-  - HeavenlyTablets.cs - The one record where state and truth are the same (Jubilees; 1 Enoch 81).
-    `Coherence()` starts 1.0 and decays multiplicatively as disorder is recorded (1 Enoch 80);
-    `Record()`, `History()`.
-  - Concept.cs - The root of the concept model: an idea as first-class code, not a string. Two kinds
-    descend from it: `MoralConcept` (bears on God's character) and `Circumstance` (a state of the
-    world). The type system distinguishes a sin from a situation.
-  - MoralConcept.cs - Abstract `MoralConcept : Concept`. Each concrete concept declares its `Name`,
-    `Scripture`, `Gravity` (None/Minor/Serious/Grave/Capital), and which facets it
-    `Upholds(DivineAttribute)` / `Violates(DivineAttribute)`. Morals/Virtues.cs and Morals/Vices.cs
-    hold the concept classes (Compassion, Protection, Forgiveness, SelfSacrifice, Healing, Atonement,
-    Pardon, CovenantFaithfulness, ObedienceToGod, ...; Murder/Defilement/Bloodshed/ChildSacrifice
-    [Capital], Oppression/Rebellion/Treachery [Grave], Theft/Unforgiveness [Serious], Rudeness/Envy
-    [Minor], ...), each with its Scripture, stance, and gravity.
-  - Gravity.cs - How heinous a wrong is (None..Capital), driving the disorder it unleashes; Scripture
-    grades sin (Matthew 23:23; John 19:11).
-  - Act.cs - A deed presented to reality, composed of the `MoralConcept`s it embodies and offends
-    (replaces the old string `Situation` for the Reality engine).
-  - DivineAttribute.cs - Abstract facet of God's character; `Read(Act)` aggregates the stances of the
-    deed's concepts (upheld -> +0.5, violated -> -0.5 from a 0.5 baseline). Facets no longer carry
-    string vocabulary; the moral vocabulary lives on the concepts.
-  - Justice.cs / Mercy.cs / Order.cs - Facets, now identity + name only (Romans 13:7; Luke 6:36;
-    Lam 3:23 + 1 Enoch 72-82).
-  - LoveFacet.cs - Love as a facet; adapter wrapping the existing `Love` (agape, 1 Cor 13 +
-    John 15:13). Leaves the `Love` hierarchy untouched.
-  - DivineCharacter.cs - All facets always live; `Harmonize(Act)` -> Resolution. Coherence =
-    mean of facets (so the cross can be full Justice AND full Mercy, not a veto); disorder = gravest
-    single offense.
-  - Resolution.cs - The response: Coherence + Disorder (clamped 0..1) + per-facet `Reading(name)` /
-    `Readings`. Not pass/fail.
-  - Grounding.cs - What an agent stands on (1 Meqabyan). `InGod()` keeps a deed's life; `InIdol(name)`
-    drifts it toward non-being via `Bear(Resolution)`.
-  - Word.cs - The mediator as a medium, not a gate (John 1:1-3; 14:6). `Speak(Act, Grounding)`
-    carries a deed into Reality and the truth back.
+
+- Epistemics engine (Epistemics/, namespace `AnointedAutomation.Concepts.Epistemics`): a new engine
+  that checks the consistency of theological claims against foundational claims over a shared
+  proposition vocabulary. Proposition.cs defines the shared vocabulary; Testability.cs and
+  LawDomain.cs classify claims (law domains are bounded so intra-universe laws never settle origin
+  claims); FoundationalClaim.cs and TheologicalClaim.cs hold three-valued (bool?) standings on
+  propositions; EpistemicStatus.cs and Verdict.cs carry the four-state verdict
+  (Consistent/Contradicts/Unfalsifiable/Undetermined); DerivationStep.cs and Examination.cs record how
+  a verdict was reached; Tension.cs holds contradicting claims as data rather than resolving them
+  away; EpistemicLedger.cs is the aggregate that admits claims, runs examinations, and tracks tensions,
+  treating zero-weight foundations as never counting toward support. Full design spec:
+  `docs/superpowers/specs/2026-07-02-theology-engine-design.md`.
+
+### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
+Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with
+foundational and theological claims drawn from mathematics and physics. UniversalPropositions.cs
+defines the shared proposition vocabulary (79 propositions) used by the catalogs below.
+UniversalLaws.cs (with partial files UniversalLaws.Physics.cs and UniversalLaws.Chemistry.cs)
+catalogs 64 laws with Law status: the logic laws (NonContradiction, Identity, ExcludedMiddle,
+domain Unrestricted) plus the established laws of physics, chemistry, and astronomy (Newton's
+laws, Kepler's laws, thermodynamics, conservation laws, Maxwell-era electromagnetism, optics
+and radiation, fluids, gas laws, and the classical chemistry laws), weighted 0.99 for exact
+laws and 0.9 for idealizations (Ohm, Hooke, ideal-gas family). PhysicalTheories.cs catalogs
+12 well-established theories with Theory status at weight 0.95 (special and general relativity,
+quantum mechanics, atomic theory, Big Bang cosmology, evolution by natural selection, germ
+theory, cell theory, plate tectonics, kinetic theory of gases, MassEnergyEquivalence,
+InvariantLightSpeed). Conjectures.cs catalogs open mathematical conjectures
+with Conjecture status and zero weight (Collatz, Goldbach, RiemannHypothesis), so an unproven
+conjecture never counts as support for or against a claim. See
+`docs/superpowers/specs/2026-07-02-theology-engine-design.md` for how these catalogs plug into the
+epistemics engine.
 
 ### 5. AnointedAutomation.Logging
 - LogMessage.cs
