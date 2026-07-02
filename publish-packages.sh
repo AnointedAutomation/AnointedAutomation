@@ -58,6 +58,7 @@ declare -A PACKAGES=(
     ["AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"]="anointedautomation.objects"
     ["AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"]="anointedautomation.objects.api"
     ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="anointedautomation.concepts"
+    ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="anointedautomation.mathematics"
 )
 
 # Clean previous builds

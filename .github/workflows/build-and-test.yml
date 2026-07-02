@@ -88,6 +88,9 @@ jobs:
       - name: Run Concepts Tests
         run: dotnet test AnointedAutomation.Concepts.Tests/AnointedAutomation.Concepts.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
+      - name: Run Mathematics Tests
+        run: dotnet test AnointedAutomation.Mathematics.Tests/AnointedAutomation.Mathematics.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
       - name: Publish Test Results
         if: always()
         uses: actions/upload-artifact@v7
