@@ -69,7 +69,7 @@ namespace AnointedAutomation.Mathematics.Tests
         [Fact]
         public void All_ContainsEveryDeclaredProposition()
         {
-            Assert.Equal(11, UniversalPropositions.All.Count);
+            Assert.Equal(69, UniversalPropositions.All.Count);
         }
     }
 }

@@ -74,9 +74,21 @@ namespace AnointedAutomation.Mathematics.Tests
         }
 
         [Fact]
-        public void All_ContainsExactlySixLaws()
+        public void All_ContainsExactlySixtyFourLaws()
         {
-            Assert.Equal(6, UniversalLaws.All.Count);
+            Assert.Equal(64, UniversalLaws.All.Count);
+        }
+
+        [Fact]
+        public void EveryLaw_HasIntraUniverseOrUnrestrictedDomainAndWeightWithinRange()
+        {
+            foreach (FoundationalClaim law in UniversalLaws.All)
+            {
+                Assert.Equal(EpistemicStatus.Law, law.Status);
+                Assert.True(
+                    law.Domain.Equals(LawDomain.IntraUniverse) || law.Domain.Equals(LawDomain.Unrestricted));
+                Assert.InRange(law.SurvivedFalsificationWeight, 0.9, 1.0);
+            }
         }
 
         [Fact]

@@ -12,8 +12,10 @@ namespace AnointedAutomation.Mathematics
     /// bedrock laws and well supported theories, and honestly null for the propositions behind
     /// unproven conjectures.
     /// </summary>
-    public static class UniversalPropositions
+    public static partial class UniversalPropositions
     {
+        // Logic
+
         /// <summary>
         /// A statement and its negation cannot both be true at the same time and in the same sense.
         /// </summary>
@@ -41,6 +43,8 @@ namespace AnointedAutomation.Mathematics
             Testability.EmpiricallyTestable,
             true);
 
+        // Mechanics (causality)
+
         /// <summary>
         /// Every effect has a cause.
         /// </summary>
@@ -49,6 +53,8 @@ namespace AnointedAutomation.Mathematics
             "Every effect has a cause.",
             Testability.EmpiricallyTestable,
             true);
+
+        // Conservation
 
         /// <summary>
         /// Within a closed system, energy is neither created nor destroyed.
@@ -111,22 +117,109 @@ namespace AnointedAutomation.Mathematics
             Testability.EmpiricallyTestable);
 
         /// <summary>
-        /// Every proposition declared by this catalog, in declaration order.
+        /// Every proposition declared by this catalog, in declaration order. Built in an explicit
+        /// static constructor, rather than a field initializer, so it runs after every field
+        /// initializer across all partial declarations of this class, regardless of file order.
         /// </summary>
-        public static readonly System.Collections.Generic.IReadOnlyList<Proposition> All =
-            new System.Collections.Generic.List<Proposition>
+        public static readonly System.Collections.Generic.IReadOnlyList<Proposition> All;
+
+        static UniversalPropositions()
+        {
+            All = new System.Collections.Generic.List<Proposition>
             {
+                // Logic
                 NonContradiction,
                 Identity,
                 ExcludedMiddle,
+
+                // Mechanics
                 EffectsHaveCauses,
+                NewtonsFirstLaw,
+                NewtonsSecondLaw,
+                ActionHasEqualOppositeReaction,
+                SpringForceProportionalToDisplacement,
+                ViscousDragProportionalToVelocity,
+
+                // Gravitation and astronomy
+                MassesAttractInverseSquareToDistance,
+                PlanetaryOrbitsAreElliptical,
+                OrbitsSweepEqualAreas,
+                OrbitalPeriodSquaredProportionalToAxisCubed,
+
+                // Conservation
                 EnergyConserved,
+                MomentumConserved,
+                AngularMomentumConserved,
+                MassConserved,
+
+                // Thermodynamics
                 EntropyIncreases,
+                ThermalEquilibriumIsTransitive,
+                EntropyVanishesAtAbsoluteZero,
+
+                // Electromagnetism
+                ElectrostaticForceInverseSquareToDistance,
+                ElectricFluxProportionalToEnclosedCharge,
+                MagneticFluxThroughClosedSurfaceIsZero,
+                ChangingMagneticFluxInducesEmf,
+                CirculatingMagneticFieldRelatesToCurrentAndFlux,
+                InducedCurrentOpposesFluxChange,
+                MagneticFieldCalculableFromSteadyCurrentGeometry,
+                CurrentProportionalToVoltage,
+                CurrentIntoNodeEqualsCurrentOut,
+                VoltageAroundLoopSumsToZero,
+                EmissivityEqualsAbsorptivityAtEquilibrium,
+                HeatProportionalToCurrentSquared,
+                InternalEnergyIndependentOfVolumeForIdealGas,
+                MagneticSusceptibilityInverseToTemperature,
+
+                // Optics and radiation
+                RefractionRatioEqualsIndexRatio,
+                AngleOfIncidenceEqualsAngleOfReflection,
+                RadiationIntensityInverseSquareToDistance,
+                PolarizedLightIntensityFollowsCosineSquared,
+                BlackBodyRadiationProportionalToFourthPowerOfTemperature,
+                BlackBodyPeakWavelengthInverseToTemperature,
+                BlackBodyRadiationSpectrumDescribedByPlancksLaw,
+                LightAbsorbanceProportionalToConcentrationAndPathLength,
+
+                // Fluids
+                PressureTransmittedUndiminishedInEnclosedFluid,
+                BuoyantForceEqualsWeightOfDisplacedFluid,
+                FluidSpeedIncreaseAccompaniesPressureDecrease,
+                FluidEffluxSpeedRelatesToHeight,
+
+                // Gas laws
+                GasPressureInverseToVolume,
+                GasVolumeProportionalToTemperature,
+                GasPressureProportionalToTemperature,
+                EqualGasVolumesContainEqualMolecules,
+                IdealGasLawHolds,
+                TotalPressureEqualsSumOfPartialPressures,
+                EffusionRateInverseToSquareRootOfMolarMass,
+                DissolvedGasProportionalToPartialPressure,
+                SolutionVaporPressureProportionalToMoleFraction,
+
+                // Chemistry
+                CompoundElementRatiosAreFixed,
+                MultipleCompoundMassRatiosAreSmallWholeNumbers,
+                ReciprocalElementMassRatiosAreSimplyRelated,
+                ReactionEnthalpyIndependentOfPathway,
+                ElectrolysisMassProportionalToCharge,
+                ReactionRateProportionalToConcentrationProduct,
+                DiffusiveFluxProportionalToConcentrationGradient,
+                ConcentrationChangeRateProportionalToSecondDerivative,
+                HeatFluxProportionalToTemperatureGradient,
+
+                // Relativity (theory-backed)
                 MassEnergyEquivalent,
                 SpeedOfLightConstant,
+
+                // Mathematics conjectures
                 CollatzTerminates,
                 GoldbachHolds,
                 RiemannZerosOnCriticalLine
             };
+        }
     }
 }

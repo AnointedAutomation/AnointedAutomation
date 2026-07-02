@@ -12,7 +12,7 @@ namespace AnointedAutomation.Mathematics
     /// <see cref="EpistemicLedger"/>. Includes the laws of logic, which apply without restriction,
     /// and the intra-universe physical laws of causality, conservation of energy, and entropy.
     /// </summary>
-    public static class UniversalLaws
+    public static partial class UniversalLaws
     {
         /// <summary>
         /// The law of non-contradiction: a statement and its negation cannot both be true.
@@ -88,16 +88,100 @@ namespace AnointedAutomation.Mathematics
             EpistemicStatus.Law);
 
         /// <summary>
-        /// Every law declared by this catalog, in declaration order.
+        /// Every law declared by this catalog, in declaration order. Built in an explicit static
+        /// constructor, rather than a field initializer, so it runs after every field initializer
+        /// across all partial declarations of this class, regardless of file order.
         /// </summary>
-        public static readonly IReadOnlyList<FoundationalClaim> All = new List<FoundationalClaim>
+        public static readonly IReadOnlyList<FoundationalClaim> All;
+
+        static UniversalLaws()
         {
+            All = new List<FoundationalClaim>
+        {
+            // Logic
             NonContradiction,
             Identity,
             ExcludedMiddle,
+
+            // Mechanics
             Causality,
+            NewtonsFirstLaw,
+            NewtonsSecondLaw,
+            NewtonsThirdLaw,
+            HookesLaw,
+            StokesLaw,
+
+            // Gravitation and astronomy
+            NewtonsLawOfUniversalGravitation,
+            KeplersFirstLaw,
+            KeplersSecondLaw,
+            KeplersThirdLaw,
+
+            // Conservation
             ConservationOfEnergy,
-            EntropyIncrease
+            ConservationOfMomentum,
+            ConservationOfAngularMomentum,
+            ConservationOfMass,
+
+            // Thermodynamics
+            EntropyIncrease,
+            ZerothLawOfThermodynamics,
+            ThirdLawOfThermodynamics,
+
+            // Electromagnetism
+            CoulombsLaw,
+            GausssLawElectric,
+            GausssLawMagnetism,
+            FaradaysLawOfInduction,
+            AmperesCircuitalLaw,
+            LenzsLaw,
+            BiotSavartLaw,
+            OhmsLaw,
+            KirchhoffsCurrentLaw,
+            KirchhoffsVoltageLaw,
+            KirchhoffsLawOfThermalRadiation,
+            JoulesFirstLaw,
+            JoulesSecondLaw,
+            CuriesLaw,
+
+            // Optics and radiation
+            SnellsLaw,
+            LawOfReflection,
+            InverseSquareLawOfRadiation,
+            MalussLaw,
+            StefanBoltzmannLaw,
+            WiensDisplacementLaw,
+            PlancksLawOfBlackBodyRadiation,
+            BeerLambertLaw,
+
+            // Fluids
+            PascalsLaw,
+            ArchimedesPrinciple,
+            BernoullisPrinciple,
+            TorricellisLaw,
+
+            // Gas laws
+            BoylesLaw,
+            CharlessLaw,
+            GayLussacsLaw,
+            AvogadrosLaw,
+            IdealGasLaw,
+            DaltonsLawOfPartialPressures,
+            GrahamsLawOfEffusion,
+            HenrysLaw,
+            RaoultsLaw,
+
+            // Chemistry
+            LawOfDefiniteProportions,
+            LawOfMultipleProportions,
+            LawOfReciprocalProportions,
+            HesssLaw,
+            FaradaysLawsOfElectrolysis,
+            LawOfMassAction,
+            FicksFirstLawOfDiffusion,
+            FicksSecondLawOfDiffusion,
+            FouriersLawOfHeatConduction
         };
+        }
     }
 }
