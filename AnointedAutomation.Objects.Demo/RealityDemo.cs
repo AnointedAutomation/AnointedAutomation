@@ -2,7 +2,7 @@
 // Stewarded by Alexander Fields
 
 using System;
-using AnointedAutomation.Objects.Concepts;
+using AnointedAutomation.Concepts;
 
 namespace AnointedAutomation.Objects.Demo
 {

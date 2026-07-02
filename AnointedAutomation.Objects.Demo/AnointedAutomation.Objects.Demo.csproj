@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
+    <ProjectReference Include="..\AnointedAutomation.Concepts\AnointedAutomation.Concepts.csproj" />
   </ItemGroup>
 
 </Project>
