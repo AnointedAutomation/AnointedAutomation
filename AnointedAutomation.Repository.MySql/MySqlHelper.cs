@@ -216,6 +216,97 @@ namespace AnointedAutomation.Repository.MySql
         }
 
         /// <summary>
+        /// Gets the first entity matching the predicate, or null if none matches.
+        /// </summary>
+        public async Task<T> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate) where T : class
+        {
+            return await Database.Set<T>().FirstOrDefaultAsync(predicate);
+        }
+
+        /// <summary>
+        /// Gets a page of entities: filter (optional), order by a key, then skip/take.
+        /// </summary>
+        public async Task<List<T>> GetPagedAsync<T, TKey>(Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> orderBy, bool descending, int skip, int take) where T : class
+        {
+            IQueryable<T> query = Database.Set<T>();
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+            query = descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+            return await query.Skip(skip).Take(take).ToListAsync();
+        }
+
+        /// <summary>
+        /// Gets entities (optionally filtered) ordered by a key.
+        /// </summary>
+        public async Task<List<T>> GetOrderedAsync<T, TKey>(Expression<Func<T, TKey>> orderBy, bool descending, Expression<Func<T, bool>> predicate = null) where T : class
+        {
+            IQueryable<T> query = Database.Set<T>();
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+            query = descending ? query.OrderByDescending(orderBy) : query.OrderBy(orderBy);
+            return await query.ToListAsync();
+        }
+
+        /// <summary>
+        /// Projects matching entities to a smaller shape, selecting only what you need.
+        /// </summary>
+        public async Task<List<TResult>> SelectAsync<T, TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TResult>> selector) where T : class
+        {
+            IQueryable<T> query = Database.Set<T>();
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+            return await query.Select(selector).ToListAsync();
+        }
+
+        /// <summary>
+        /// Returns true if any entity exists (optionally matching the predicate).
+        /// </summary>
+        public async Task<bool> AnyAsync<T>(Expression<Func<T, bool>> predicate = null) where T : class
+        {
+            if (predicate == null)
+            {
+                return await Database.Set<T>().AnyAsync();
+            }
+            return await Database.Set<T>().AnyAsync(predicate);
+        }
+
+        /// <summary>
+        /// Executes a raw, parameterized non-query SQL statement (INSERT/UPDATE/DELETE/DDL).
+        /// </summary>
+        public async Task<int> ExecuteRawSqlAsync(string sql, params object[] parameters)
+        {
+            return await Database.Database.ExecuteSqlRawAsync(sql, parameters);
+        }
+
+        /// <summary>
+        /// Runs the supplied work inside a single database transaction, committing on success and
+        /// rolling back if it throws.
+        /// </summary>
+        public async Task ExecuteInTransactionAsync(Func<Task> action)
+        {
+            using (Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction transaction =
+                await Database.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await action();
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
         /// Creates a new DbContext for MySQL.
         /// </summary>
         public DbContext CreateDbContext(string connectionString)

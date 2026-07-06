@@ -3,6 +3,7 @@
 using AnointedAutomation.Optimization.Logging;
 
 //Stewarded by Alexander Fields
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -325,6 +326,211 @@ namespace AnointedAutomation.Repository.Mongo
         )
         {
             return await GetCollection<T>(collectionName).UpdateOneAsync(filter, document);
+        }
+
+        // ---- Standard read queries (additive) ------------------------------
+
+        /// <summary>
+        /// Gets a single document by its <c>_id</c>. An ObjectId hex string is matched as an ObjectId;
+        /// any other string is matched as-is, so this works for both ObjectId and string keys.
+        /// </summary>
+        /// <typeparam name="T">The type of document to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="id">The document's <c>_id</c> value.</param>
+        /// <returns>The matching document, or the type default (null) if none matches.</returns>
+        public async Task<T> GetByIdAsync<T>(string collectionName, string id)
+        {
+            FilterDefinition<T> filter = ObjectId.TryParse(id, out ObjectId objectId)
+                ? Builders<T>.Filter.Eq("_id", objectId)
+                : Builders<T>.Filter.Eq("_id", id);
+            return await GetCollection<T>(collectionName).Find(filter).FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Gets the first document matching the filter, or the type default (null) if none matches.
+        /// </summary>
+        /// <typeparam name="T">The type of document to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <returns>The first matching document, or null.</returns>
+        public async Task<T> GetSingleAsync<T>(string collectionName, FilterDefinition<T> filter)
+        {
+            return await GetCollection<T>(collectionName).Find(filter).FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Counts documents matching the filter WITHOUT loading them. Pass
+        /// <see cref="FilterDefinition{T}.Empty"/> to count the whole collection.
+        /// </summary>
+        /// <typeparam name="T">The type of document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <returns>The number of matching documents.</returns>
+        public async Task<long> CountAsync<T>(string collectionName, FilterDefinition<T> filter)
+        {
+            return await GetCollection<T>(collectionName).CountDocumentsAsync(filter);
+        }
+
+        /// <summary>
+        /// Returns true if at least one document matches the filter (stops at the first match).
+        /// </summary>
+        /// <typeparam name="T">The type of document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <returns>True if any document matches; otherwise false.</returns>
+        public async Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter)
+        {
+            long count = await GetCollection<T>(collectionName)
+                .CountDocumentsAsync(filter, new CountOptions { Limit = 1 });
+            return count > 0;
+        }
+
+        /// <summary>
+        /// Gets a page of documents matching the filter, applying an optional sort then skip/limit.
+        /// </summary>
+        /// <typeparam name="T">The type of documents to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="skip">The number of documents to skip (offset).</param>
+        /// <param name="limit">The maximum number of documents to return.</param>
+        /// <returns>The page of matching documents.</returns>
+        public async Task<List<T>> GetPagedAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int skip, int limit)
+        {
+            IFindFluent<T, T> find = GetCollection<T>(collectionName).Find(filter);
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Skip(skip).Limit(limit).ToListAsync();
+        }
+
+        /// <summary>
+        /// Gets documents matching the filter, projected to a smaller shape (fetch only needed fields).
+        /// </summary>
+        /// <typeparam name="T">The source document type.</typeparam>
+        /// <typeparam name="TProjection">The projected result type.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="projection">The projection definition.</param>
+        /// <returns>The projected results.</returns>
+        public async Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection)
+        {
+            return await GetCollection<T>(collectionName).Find(filter).Project(projection).ToListAsync();
+        }
+
+        /// <summary>
+        /// Runs an aggregation pipeline on the collection and returns the results.
+        /// </summary>
+        /// <typeparam name="T">The source document type.</typeparam>
+        /// <typeparam name="TResult">The pipeline result type.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="pipeline">The aggregation pipeline.</param>
+        /// <returns>The pipeline results.</returns>
+        public async Task<List<TResult>> AggregateAsync<T, TResult>(string collectionName, PipelineDefinition<T, TResult> pipeline)
+        {
+            return await (await GetCollection<T>(collectionName).AggregateAsync(pipeline)).ToListAsync();
+        }
+
+        /// <summary>
+        /// Gets the distinct values of a field across documents matching the filter.
+        /// </summary>
+        /// <typeparam name="T">The source document type.</typeparam>
+        /// <typeparam name="TField">The field value type.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="field">The field to read distinct values from.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <returns>The distinct field values.</returns>
+        public async Task<List<TField>> DistinctAsync<T, TField>(string collectionName, FieldDefinition<T, TField> field, FilterDefinition<T> filter)
+        {
+            return await (await GetCollection<T>(collectionName).DistinctAsync(field, filter)).ToListAsync();
+        }
+
+        // ---- Standard write queries (additive) -----------------------------
+
+        /// <summary>
+        /// Inserts many documents in a single round trip.
+        /// </summary>
+        /// <typeparam name="T">The type of documents to insert.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="documents">The documents to insert.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task CreateManyAsync<T>(string collectionName, IEnumerable<T> documents)
+        {
+            await GetCollection<T>(collectionName).InsertManyAsync(documents);
+        }
+
+        /// <summary>
+        /// Applies an update to EVERY document matching the filter.
+        /// </summary>
+        /// <typeparam name="T">The type of document to update.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match documents to update.</param>
+        /// <param name="update">The update definition.</param>
+        /// <returns>The result of the update operation.</returns>
+        public async Task<UpdateResult> UpdateManyAsync<T>(string collectionName, FilterDefinition<T> filter, UpdateDefinition<T> update)
+        {
+            return await GetCollection<T>(collectionName).UpdateManyAsync(filter, update);
+        }
+
+        /// <summary>
+        /// Updates the single document matching the filter, inserting it if none exists (upsert).
+        /// </summary>
+        /// <typeparam name="T">The type of document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match the document.</param>
+        /// <param name="update">The update definition (applied on both update and insert).</param>
+        /// <returns>The result of the upsert operation.</returns>
+        public async Task<UpdateResult> UpsertAsync<T>(string collectionName, FilterDefinition<T> filter, UpdateDefinition<T> update)
+        {
+            return await GetCollection<T>(collectionName)
+                .UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
+        }
+
+        /// <summary>
+        /// Deletes EVERY document matching the filter.
+        /// </summary>
+        /// <typeparam name="T">The type of document to delete.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match documents for deletion.</param>
+        /// <returns>The result of the delete operation.</returns>
+        public async Task<DeleteResult> DeleteManyAsync<T>(string collectionName, FilterDefinition<T> filter)
+        {
+            return await GetCollection<T>(collectionName).DeleteManyAsync(filter);
+        }
+
+        /// <summary>
+        /// Atomically finds one document matching the filter and applies an update, optionally
+        /// upserting. Returns the document after the update by default.
+        /// </summary>
+        /// <typeparam name="T">The type of document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match the document.</param>
+        /// <param name="update">The update definition.</param>
+        /// <param name="returnUpdated">True to return the post-update document; false for the pre-update document.</param>
+        /// <param name="upsert">True to insert the document when none matches.</param>
+        /// <returns>The matched document (before or after the update), or null.</returns>
+        public async Task<T> FindOneAndUpdateAsync<T>(string collectionName, FilterDefinition<T> filter, UpdateDefinition<T> update, bool returnUpdated = true, bool upsert = false)
+        {
+            FindOneAndUpdateOptions<T> options = new FindOneAndUpdateOptions<T>
+            {
+                ReturnDocument = returnUpdated ? ReturnDocument.After : ReturnDocument.Before,
+                IsUpsert = upsert
+            };
+            return await GetCollection<T>(collectionName).FindOneAndUpdateAsync(filter, update, options);
+        }
+
+        /// <summary>
+        /// Atomically finds one document matching the filter and deletes it, returning the deleted
+        /// document (or the type default/null if none matched).
+        /// </summary>
+        /// <typeparam name="T">The type of document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match the document.</param>
+        /// <returns>The deleted document, or null.</returns>
+        public async Task<T> FindOneAndDeleteAsync<T>(string collectionName, FilterDefinition<T> filter)
+        {
+            return await GetCollection<T>(collectionName).FindOneAndDeleteAsync(filter);
         }
 
         /// <summary>
