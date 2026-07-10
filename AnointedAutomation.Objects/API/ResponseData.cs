@@ -45,6 +45,10 @@ namespace AnointedAutomation.Objects
         /// </summary>
         public string[] Anointed { get; set; } = new[] { "Jesus is King", "Jesus is Messiah" };
         /// <summary>
+        /// Atheism declaration.
+        /// </summary>
+        public string atheism { get; set; } = "satanism";
+        /// <summary>
         /// Automation signature (hex encoded "Jesus is King").
         /// </summary>
         public string Automation { get; set; } = "0x4A65737573206973204B696E67";
