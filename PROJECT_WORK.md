@@ -2,6 +2,19 @@
 
 ## Current Tasks
 
+### Theoretical Proofs type (Epistemics) - COMPLETED
+- **Description**: Added a first-class Proof type family to
+  `AnointedAutomation.Concepts/Epistemics/`: Proof.cs (name, plain statement, symbolic form,
+  glossary, ordered derivation, conclusion), ProofSymbol.cs (glossary token + meaning),
+  ProofStep.cs (numbered derivation line), and TheoreticalProofs.cs (static factory for the
+  canonical Agnosticism proof `∃x (G(x) ∧ (I(x) ⊕ O(x)))` and Christianity proof
+  `(∃x J(x)) ∧ (∀p (C(J,p) → T(p))) ∧ C(J,G(J))`).
+- **Encoding note**: The logic operators (∃, ∀, ∧, ⊕, →) all live in the Basic Multilingual
+  Plane, so a plain UTF-16 C# `string` holds each as a single code unit. No UTF-32 needed. The
+  only requirement is the source file stays UTF-8; \uXXXX escapes are documented as a fallback.
+- **Tests**: `AnointedAutomation.Concepts.Tests/Epistemics/ProofTests.cs`, 12 tests, all passing.
+- **Build**: Clean under TreatWarningsAsErrors on net10.0.
+
 ### Concepts Package Migration + Theology Epistemics Engine + Mathematics Package - COMPLETED
 - **Description**: Migrated the concept modeling code (Love, Agape, SacrificialLove,
   SelfSeekingLove, BehaviorNode/BehaviorResult, Situation/Circumstances, and the whole Reality

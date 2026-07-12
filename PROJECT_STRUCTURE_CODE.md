@@ -135,6 +135,11 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   away; EpistemicLedger.cs is the aggregate that admits claims, runs examinations, and tracks tensions,
   treating zero-weight foundations as never counting toward support. Full design spec:
   `docs/superpowers/specs/2026-07-02-theology-engine-design.md`.
+  Proof.cs, ProofSymbol.cs and ProofStep.cs model theoretical proofs stated in first-order logic:
+  a Proof carries a plain statement, a symbolic form (∃, ∀, ∧, ⊕, → live in the BMP, so a plain
+  UTF-16 string holds them, no UTF-32 needed), a glossary of ProofSymbol tokens, and an ordered
+  ProofStep derivation. TheoreticalProofs.cs is a static factory exposing the canonical Agnosticism
+  and Christianity proofs.
 
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with

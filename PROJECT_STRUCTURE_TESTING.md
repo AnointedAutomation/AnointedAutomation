@@ -176,6 +176,9 @@ file in this pass; treat it as approximate).
   Undetermined), domain-bounded laws, tensions between contradicting claims, and zero-weight
   foundations never counting as support. Design spec:
   `docs/superpowers/specs/2026-07-02-theology-engine-design.md`.
+- `ProofTests.cs` - covers the Proof / ProofSymbol / ProofStep types and the canonical
+  Agnosticism and Christianity proofs, including that the logic glyphs (∃, ∀, ∧, ⊕, →) round-trip
+  in an ordinary UTF-16 string and that \uXXXX escapes equal the raw glyphs (12 tests).
 
 **Testing Framework:** Xunit (.NET 10.0)
 **Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
