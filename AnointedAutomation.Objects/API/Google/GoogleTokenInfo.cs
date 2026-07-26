@@ -4,7 +4,7 @@
 
 using Newtonsoft.Json;
 
-namespace Google.Integrations
+namespace AnointedAutomation.Objects.Google
 {
     /// <summary>
     /// Represents Google OAuth token information and user details.
@@ -22,12 +22,6 @@ namespace Google.Integrations
         /// Gets or sets the type of token (usually "Bearer").
         /// </summary>
         public string tokenType { get; set; }
-
-        [JsonProperty("expires_in")]
-        /// <summary>
-        /// Gets or sets the token expiration time in seconds.
-        /// </summary>
-        public long expiresIn { get; set; }
 
         [JsonProperty("id_token")]
         /// <summary>
