@@ -4,7 +4,7 @@
 
 using Newtonsoft.Json;
 
-namespace Google.Integrations
+namespace AnointedAutomation.Objects.Google
 {
     //* JsonProperty(PropertyName = "name") attribute used here
     //* to map json property name with object property name

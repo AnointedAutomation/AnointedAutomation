@@ -97,5 +97,54 @@ namespace AnointedAutomation.Repository.MySql
         /// <param name="predicate">The filter expression, or null to count all.</param>
         /// <returns>The count of matching entities.</returns>
         Task<int> CountAsync(Expression<Func<T, bool>> predicate = null);
+
+        // ---- Standard read queries (additive) ------------------------------
+
+        /// <summary>
+        /// Gets a page of entities: filter (optional), order by a key, then skip/take.
+        /// </summary>
+        /// <typeparam name="TKey">The ordering key type.</typeparam>
+        /// <param name="predicate">The filter expression, or null for no filter.</param>
+        /// <param name="orderBy">The key selector to order by.</param>
+        /// <param name="descending">True to order descending; false for ascending.</param>
+        /// <param name="skip">The number of entities to skip (offset).</param>
+        /// <param name="take">The maximum number of entities to return.</param>
+        /// <returns>The requested page of entities.</returns>
+        Task<IEnumerable<T>> GetPagedAsync<TKey>(Expression<Func<T, bool>> predicate, Expression<Func<T, TKey>> orderBy, bool descending, int skip, int take);
+
+        /// <summary>
+        /// Gets entities (optionally filtered) ordered by a key.
+        /// </summary>
+        /// <typeparam name="TKey">The ordering key type.</typeparam>
+        /// <param name="orderBy">The key selector to order by.</param>
+        /// <param name="descending">True to order descending; false for ascending.</param>
+        /// <param name="predicate">The filter expression, or null for no filter.</param>
+        /// <returns>The ordered entities.</returns>
+        Task<IEnumerable<T>> GetOrderedAsync<TKey>(Expression<Func<T, TKey>> orderBy, bool descending, Expression<Func<T, bool>> predicate = null);
+
+        /// <summary>
+        /// Projects matching entities to a smaller shape, selecting only what you need.
+        /// </summary>
+        /// <typeparam name="TResult">The projected result type.</typeparam>
+        /// <param name="predicate">The filter expression, or null for no filter.</param>
+        /// <param name="selector">The projection selector.</param>
+        /// <returns>The projected results.</returns>
+        Task<IEnumerable<TResult>> SelectAsync<TResult>(Expression<Func<T, bool>> predicate, Expression<Func<T, TResult>> selector);
+
+        /// <summary>
+        /// Returns true if any entity exists (optionally matching the predicate).
+        /// </summary>
+        /// <param name="predicate">The filter expression, or null to test for any row.</param>
+        /// <returns>True if any matching entity exists.</returns>
+        Task<bool> AnyAsync(Expression<Func<T, bool>> predicate = null);
+
+        // ---- Standard write queries (additive) -----------------------------
+
+        /// <summary>
+        /// Updates multiple entities in a single SaveChanges call.
+        /// </summary>
+        /// <param name="entities">The entities with updated values.</param>
+        /// <returns>The number of state entries written to the database.</returns>
+        Task<int> UpdateRangeAsync(IEnumerable<T> entities);
     }
 }

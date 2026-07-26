@@ -4,6 +4,7 @@
 
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using AnointedAutomation.Objects.Google;
 
 namespace AnointedAutomation.Objects.Account
 {
@@ -67,7 +68,6 @@ namespace AnointedAutomation.Objects.Account
             this.Username = username;
             this.Token = token;
             this.tokenExpiration = tokenExpiration;
-            //this.GoogleObjects = googleObjects;
         }
 
         /// <summary>
@@ -135,6 +135,14 @@ namespace AnointedAutomation.Objects.Account
         /// Gets or sets the date of the user's last activity.
         /// </summary>
         public System.DateTime lastActiveDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user's Google identity (token info and profile) for users who
+        /// signed in with Google. Null for non-Google users. Replaces the legacy practice of
+        /// storing Google keys inside <see cref="Meta"/>.
+        /// </summary>
+        [DataMember]
+        public GoogleObjects Google { get; set; }
 
         /// <summary>
         /// This will most likely be a big json

@@ -45,6 +45,10 @@ namespace AnointedAutomation.Objects
         /// </summary>
         public string[] Anointed { get; set; } = new[] { "Jesus is King", "Jesus is Messiah" };
         /// <summary>
+        /// Atheism declaration.
+        /// </summary>
+        public string atheism { get; set; } = "satanism";
+        /// <summary>
         /// Automation signature (hex encoded "Jesus is King").
         /// </summary>
         public string Automation { get; set; } = "0x4A65737573206973204B696E67";
@@ -68,8 +72,10 @@ namespace AnointedAutomation.Objects
             { "Anointed", "https://anointed.company" },
             { "Automation", "https://www.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
-            { "Steward", "https://www.alexanderfields.me" },
-            { "GitHub", "https://github.com/AnointedAutomation" }
+			{ "GitHub", "https://github.com/AnointedAutomation" },
+			{ "Online Shopping", "https://www.mart.club" },
+			{ "Steward", "https://www.alexanderfields.me" },
+			{ "VR Mall", "https://mallmart.online" }
         };
         /// <summary>
         /// Gets or sets the response message.

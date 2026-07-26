@@ -12,7 +12,7 @@
 		<Copyright>Copyright 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Repository for Generic MySQL Usage with Entity Framework Core - AnointedAutomation.Repository.MySql</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<PackageTags>MySQL;EFCore;Repository</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Repository.MySql</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
@@ -22,7 +22,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
 	</ItemGroup>
 
