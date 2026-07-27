@@ -85,6 +85,73 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         }
 
         [Fact]
+        public async Task ReplaceByIdAsync_ReplacesMatchingDocument()
+        {
+            string coll = NewCollection();
+            TestDoc doc = new TestDoc { Id = ObjectId.GenerateNewId().ToString(), Name = "before", Value = 1 };
+            await _helper.CreateDocumentAsync(coll, doc);
+
+            ReplaceOneResult result = await _helper.ReplaceByIdAsync(coll, doc.Id,
+                new TestDoc { Id = doc.Id, Name = "after", Value = 2 });
+
+            Assert.Equal(1, result.ModifiedCount);
+            TestDoc reloaded = await _helper.GetByIdAsync<TestDoc>(coll, doc.Id);
+            Assert.Equal("after", reloaded.Name);
+            Assert.Equal(2, reloaded.Value);
+        }
+
+        [Fact]
+        public async Task UpdateByIdAsync_UpdatesMatchingDocument()
+        {
+            string coll = NewCollection();
+            TestDoc doc = new TestDoc { Id = ObjectId.GenerateNewId().ToString(), Name = "n", Value = 1 };
+            await _helper.CreateDocumentAsync(coll, doc);
+
+            UpdateResult result = await _helper.UpdateByIdAsync(coll, doc.Id,
+                Builders<TestDoc>.Update.Set(d => d.Value, 99));
+
+            Assert.Equal(1, result.ModifiedCount);
+            TestDoc reloaded = await _helper.GetByIdAsync<TestDoc>(coll, doc.Id);
+            Assert.Equal(99, reloaded.Value);
+        }
+
+        [Fact]
+        public async Task DeleteByIdAsync_DeletesMatchingDocument()
+        {
+            string coll = NewCollection();
+            TestDoc doc = new TestDoc { Id = ObjectId.GenerateNewId().ToString(), Name = "n", Value = 1 };
+            await _helper.CreateDocumentAsync(coll, doc);
+
+            DeleteResult result = await _helper.DeleteByIdAsync<TestDoc>(coll, doc.Id);
+
+            Assert.Equal(1, result.DeletedCount);
+            Assert.Null(await _helper.GetByIdAsync<TestDoc>(coll, doc.Id));
+        }
+
+        [Fact]
+        public async Task ExpressionOverloads_MatchByPredicate()
+        {
+            string coll = await SeedAsync(NewCollection(),
+                new TestDoc { Name = "x", Value = 1 },
+                new TestDoc { Name = "x", Value = 2 },
+                new TestDoc { Name = "y", Value = 3 });
+
+            TestDoc single = await _helper.GetSingleAsync<TestDoc>(coll, d => d.Name == "y");
+            Assert.Equal(3, single.Value);
+
+            List<TestDoc> xs = await _helper.GetFilteredDocumentsAsync<TestDoc>(coll, d => d.Name == "x");
+            Assert.Equal(2, xs.Count);
+
+            Assert.Equal(2, await _helper.CountAsync<TestDoc>(coll, d => d.Name == "x"));
+            Assert.True(await _helper.ExistsAsync<TestDoc>(coll, d => d.Value == 3));
+            Assert.False(await _helper.ExistsAsync<TestDoc>(coll, d => d.Value == 999));
+
+            DeleteResult del = await _helper.DeleteDocumentAsync<TestDoc>(coll, d => d.Name == "y");
+            Assert.Equal(1, del.DeletedCount);
+            Assert.False(await _helper.ExistsAsync<TestDoc>(coll, d => d.Name == "y"));
+        }
+
+        [Fact]
         public async Task GetByIdAsync_UnknownId_ReturnsNull()
         {
             string coll = NewCollection();
