@@ -112,6 +112,16 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The result of the update operation.</returns>
         Task<UpdateResult> UpdateDocumentAsync<T>(string collectionName, FilterDefinition<T> filter, UpdateDefinition<T> updateDefinition);
 
+        /// <summary>
+        /// Gets a typed handle to a collection by name, for callers that need the raw
+        /// <see cref="IMongoCollection{T}"/> (e.g. to build their own queries) rather than one of the
+        /// higher-level helper methods. The collection is not created until first written to.
+        /// </summary>
+        /// <typeparam name="T">The type of documents in the collection.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <returns>The typed MongoDB collection.</returns>
+        IMongoCollection<T> GetCollection<T>(string collectionName);
+
         // ---- Standard read queries (additive) ------------------------------
 
         /// <summary>
