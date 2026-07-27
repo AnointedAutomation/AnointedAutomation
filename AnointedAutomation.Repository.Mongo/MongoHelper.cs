@@ -549,7 +549,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <typeparam name="T">The type of documents in the collection.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>The MongoDB collection.</returns>
-        public IMongoCollection<T> GetCollection<T>(string collectionName)
+        private IMongoCollection<T> GetCollection<T>(string collectionName)
         {
             return database.GetCollection<T>(collectionName);
         }

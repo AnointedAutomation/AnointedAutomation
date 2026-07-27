@@ -72,20 +72,6 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         }
 
         [Fact]
-        public async Task GetCollection_ReturnsUsableTypedCollection()
-        {
-            string coll = NewCollection();
-            IMongoCollection<TestDoc> collection = _helper.GetCollection<TestDoc>(coll);
-
-            Assert.NotNull(collection);
-            Assert.Equal(coll, collection.CollectionNamespace.CollectionName);
-
-            await collection.InsertOneAsync(new TestDoc { Name = "direct", Value = 7 });
-            long count = await collection.CountDocumentsAsync(Builders<TestDoc>.Filter.Eq(d => d.Name, "direct"));
-            Assert.Equal(1, count);
-        }
-
-        [Fact]
         public async Task GetByIdAsync_ReturnsMatchingDocument()
         {
             string coll = NewCollection();
