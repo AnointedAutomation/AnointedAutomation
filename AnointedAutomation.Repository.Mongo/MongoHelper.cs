@@ -5,8 +5,10 @@ using AnointedAutomation.Optimization.Logging;
 //Stewarded by Alexander Fields
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -531,6 +533,87 @@ namespace AnointedAutomation.Repository.Mongo
         public async Task<T> FindOneAndDeleteAsync<T>(string collectionName, FilterDefinition<T> filter)
         {
             return await GetCollection<T>(collectionName).FindOneAndDeleteAsync(filter);
+        }
+
+        // ---- Convenience: write-by-id (additive) ---------------------------
+
+        /// <summary>
+        /// Builds an <c>_id</c> equality filter using the same rule as <see cref="GetByIdAsync{T}"/>:
+        /// an ObjectId hex string is matched as an ObjectId, any other string is matched as-is.
+        /// </summary>
+        private static FilterDefinition<T> IdFilter<T>(string id)
+        {
+            return ObjectId.TryParse(id, out ObjectId objectId)
+                ? Builders<T>.Filter.Eq("_id", objectId)
+                : Builders<T>.Filter.Eq("_id", id);
+        }
+
+        /// <summary>
+        /// Replaces the document whose <c>_id</c> equals <paramref name="id"/> (ObjectId- or string-key safe).
+        /// </summary>
+        public async Task<ReplaceOneResult> ReplaceByIdAsync<T>(string collectionName, string id, T document)
+        {
+            return await GetCollection<T>(collectionName).ReplaceOneAsync(IdFilter<T>(id), document);
+        }
+
+        /// <summary>
+        /// Updates the document whose <c>_id</c> equals <paramref name="id"/> (ObjectId- or string-key safe).
+        /// </summary>
+        public async Task<UpdateResult> UpdateByIdAsync<T>(string collectionName, string id, UpdateDefinition<T> update)
+        {
+            return await GetCollection<T>(collectionName).UpdateOneAsync(IdFilter<T>(id), update);
+        }
+
+        /// <summary>
+        /// Deletes the document whose <c>_id</c> equals <paramref name="id"/> (ObjectId- or string-key safe).
+        /// </summary>
+        public async Task<DeleteResult> DeleteByIdAsync<T>(string collectionName, string id)
+        {
+            return await GetCollection<T>(collectionName).DeleteOneAsync(IdFilter<T>(id));
+        }
+
+        // ---- Convenience: expression-predicate overloads (additive) --------
+
+        /// <summary>
+        /// Gets the first document matching the predicate, or the type default (null) if none matches.
+        /// </summary>
+        public async Task<T> GetSingleAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
+        {
+            return await GetCollection<T>(collectionName).Find(predicate).FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Gets documents matching the predicate.
+        /// </summary>
+        public async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
+        {
+            return await GetCollection<T>(collectionName).Find(predicate).ToListAsync();
+        }
+
+        /// <summary>
+        /// Deletes a single document matching the predicate.
+        /// </summary>
+        public async Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
+        {
+            return await GetCollection<T>(collectionName).DeleteOneAsync(predicate);
+        }
+
+        /// <summary>
+        /// Counts documents matching the predicate.
+        /// </summary>
+        public async Task<long> CountAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
+        {
+            return await GetCollection<T>(collectionName).CountDocumentsAsync(predicate);
+        }
+
+        /// <summary>
+        /// Returns true if at least one document matches the predicate (stops at the first match).
+        /// </summary>
+        public async Task<bool> ExistsAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
+        {
+            long count = await GetCollection<T>(collectionName)
+                .CountDocumentsAsync(predicate, new CountOptions { Limit = 1 });
+            return count > 0;
         }
 
         /// <summary>

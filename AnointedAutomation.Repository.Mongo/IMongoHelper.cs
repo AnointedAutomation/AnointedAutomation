@@ -3,7 +3,9 @@
 //Stewarded by Alexander Fields
 
 using MongoDB.Driver;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace AnointedAutomation.Repository.Mongo
@@ -259,5 +261,93 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="filter">The filter to match the document.</param>
         /// <returns>The deleted document, or null.</returns>
         Task<T> FindOneAndDeleteAsync<T>(string collectionName, FilterDefinition<T> filter);
+
+        // ---- Convenience: write-by-id (additive) ---------------------------
+
+        /// <summary>
+        /// Replaces the document whose <c>_id</c> equals <paramref name="id"/>. An ObjectId hex string is
+        /// matched as an ObjectId; any other string is matched as-is, so this works for both ObjectId and
+        /// string keys (mirrors <see cref="GetByIdAsync{T}"/>).
+        /// </summary>
+        /// <typeparam name="T">The type of document to replace.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="id">The document's <c>_id</c> value.</param>
+        /// <param name="document">The new document.</param>
+        /// <returns>The result of the replace operation.</returns>
+        Task<ReplaceOneResult> ReplaceByIdAsync<T>(string collectionName, string id, T document);
+
+        /// <summary>
+        /// Updates the document whose <c>_id</c> equals <paramref name="id"/>. Id matching follows
+        /// <see cref="GetByIdAsync{T}"/> (ObjectId hex matched as ObjectId, otherwise matched as-is).
+        /// </summary>
+        /// <typeparam name="T">The type of document to update.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="id">The document's <c>_id</c> value.</param>
+        /// <param name="update">The update definition.</param>
+        /// <returns>The result of the update operation.</returns>
+        Task<UpdateResult> UpdateByIdAsync<T>(string collectionName, string id, UpdateDefinition<T> update);
+
+        /// <summary>
+        /// Deletes the document whose <c>_id</c> equals <paramref name="id"/>. Id matching follows
+        /// <see cref="GetByIdAsync{T}"/> (ObjectId hex matched as ObjectId, otherwise matched as-is).
+        /// </summary>
+        /// <typeparam name="T">The type of document to delete.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="id">The document's <c>_id</c> value.</param>
+        /// <returns>The result of the delete operation.</returns>
+        Task<DeleteResult> DeleteByIdAsync<T>(string collectionName, string id);
+
+        // ---- Convenience: expression-predicate overloads (additive) --------
+
+        /// <summary>
+        /// Gets the first document matching the predicate, or the type default (null) if none matches.
+        /// Convenience overload so callers can pass <c>x =&gt; x.Field == value</c> instead of building a
+        /// <see cref="FilterDefinition{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of document to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="predicate">The match predicate.</param>
+        /// <returns>The first matching document, or null.</returns>
+        Task<T> GetSingleAsync<T>(string collectionName, Expression<Func<T, bool>> predicate);
+
+        /// <summary>
+        /// Gets documents matching the predicate. Convenience overload over the
+        /// <see cref="FilterDefinition{T}"/> version.
+        /// </summary>
+        /// <typeparam name="T">The type of documents to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="predicate">The match predicate.</param>
+        /// <returns>A list of matching documents.</returns>
+        Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, Expression<Func<T, bool>> predicate);
+
+        /// <summary>
+        /// Deletes a single document matching the predicate. Convenience overload over the
+        /// <see cref="FilterDefinition{T}"/> version.
+        /// </summary>
+        /// <typeparam name="T">The type of document to delete.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="predicate">The match predicate.</param>
+        /// <returns>The result of the delete operation.</returns>
+        Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, Expression<Func<T, bool>> predicate);
+
+        /// <summary>
+        /// Counts documents matching the predicate. Convenience overload over the
+        /// <see cref="FilterDefinition{T}"/> version.
+        /// </summary>
+        /// <typeparam name="T">The type of document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="predicate">The match predicate.</param>
+        /// <returns>The number of matching documents.</returns>
+        Task<long> CountAsync<T>(string collectionName, Expression<Func<T, bool>> predicate);
+
+        /// <summary>
+        /// Returns true if at least one document matches the predicate. Convenience overload over the
+        /// <see cref="FilterDefinition{T}"/> version.
+        /// </summary>
+        /// <typeparam name="T">The type of document.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="predicate">The match predicate.</param>
+        /// <returns>True if any document matches; otherwise false.</returns>
+        Task<bool> ExistsAsync<T>(string collectionName, Expression<Func<T, bool>> predicate);
     }
 }
