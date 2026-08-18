@@ -349,5 +349,26 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="predicate">The match predicate.</param>
         /// <returns>True if any document matches; otherwise false.</returns>
         Task<bool> ExistsAsync<T>(string collectionName, Expression<Func<T, bool>> predicate);
+
+        // ---- Index management (additive) -----------------------------------
+
+        /// <summary>
+        /// Ensures the index described by the spec exists on the collection. Uses a deterministic
+        /// index name (see <see cref="MongoIndexSpec.ResolveName"/>) so repeated calls with the same
+        /// spec are idempotent.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="spec">The index specification.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task EnsureIndexAsync(string collectionName, MongoIndexSpec spec);
+
+        /// <summary>
+        /// Ensures every index in the sequence exists on the collection. Convenience over calling
+        /// <see cref="EnsureIndexAsync"/> per spec.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="specs">The index specifications.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task EnsureIndexesAsync(string collectionName, IEnumerable<MongoIndexSpec> specs);
     }
 }
