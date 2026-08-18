@@ -616,6 +616,70 @@ namespace AnointedAutomation.Repository.Mongo
             return count > 0;
         }
 
+        // ---- Index management (additive) -----------------------------------
+
+        /// <summary>
+        /// Ensures the index described by the spec exists on the collection. The index is created
+        /// with the deterministic name from <see cref="MongoIndexSpec.ResolveName"/>, so calling this
+        /// repeatedly with the same spec is idempotent (MongoDB treats creating an identical index
+        /// as a no-op).
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="spec">The index specification.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="collectionName"/> is null or whitespace.</exception>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="spec"/> is null.</exception>
+        public async Task EnsureIndexAsync(string collectionName, MongoIndexSpec spec)
+        {
+            if (string.IsNullOrWhiteSpace(collectionName))
+            {
+                throw new ArgumentException("Collection name is required.", nameof(collectionName));
+            }
+            if (spec == null)
+            {
+                throw new ArgumentNullException(nameof(spec));
+            }
+
+            IndexKeysDefinitionBuilder<BsonDocument> keysBuilder = Builders<BsonDocument>.IndexKeys;
+            IndexKeysDefinition<BsonDocument> keys = null;
+            foreach (MongoIndexKey key in spec.Keys)
+            {
+                IndexKeysDefinition<BsonDocument> next = key.Descending
+                    ? keysBuilder.Descending(key.Field)
+                    : keysBuilder.Ascending(key.Field);
+                keys = keys == null ? next : keysBuilder.Combine(keys, next);
+            }
+
+            CreateIndexOptions options = new CreateIndexOptions
+            {
+                Name = spec.ResolveName(),
+                Unique = spec.Unique,
+                ExpireAfter = spec.ExpireAfter
+            };
+            CreateIndexModel<BsonDocument> model = new CreateIndexModel<BsonDocument>(keys, options);
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(collectionName);
+            await collection.Indexes.CreateOneAsync(model);
+        }
+
+        /// <summary>
+        /// Ensures every index in the sequence exists on the collection.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="specs">The index specifications.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="specs"/> is null.</exception>
+        public async Task EnsureIndexesAsync(string collectionName, IEnumerable<MongoIndexSpec> specs)
+        {
+            if (specs == null)
+            {
+                throw new ArgumentNullException(nameof(specs));
+            }
+            foreach (MongoIndexSpec spec in specs)
+            {
+                await EnsureIndexAsync(collectionName, spec);
+            }
+        }
+
         /// <summary>
         /// Adds a log message to the MongoDB operation logs.
         /// </summary>
