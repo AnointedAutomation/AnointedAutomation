@@ -664,3 +664,11 @@ No open GitHub issues assigned.
 ---
 
 **[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**
+
+### Generic primitives for Website backend refactor (2026-08-18)
+
+Repository.Mongo 1.1.0: MongoRepository<TDoc> base, BsonMap.ToPlain/ToDictionary,
+MongoIndexSpec/MongoIndexKey + IMongoHelper.EnsureIndexAsync/EnsureIndexesAsync (first index
+API in the package, idempotent, TTL). Objects.API 1.1.0: GraphQlEnvelope.Read never-throw
+GraphQL response parser with UserErrors/FirstError/Succeeded/Payload. Commit a13c343 on
+develop, PR #189 to master. 46 new tests, whole solution green.

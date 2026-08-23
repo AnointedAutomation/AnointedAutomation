@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Repository for Generic Mongo Usage - AnointedAutomation.Repository.Mongo</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.1.0</Version>
+		<Version>1.1.1</Version>
 		<PackageTags>Mongo</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Repository.Logging</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
@@ -28,8 +28,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
-		<PackageReference Include="MongoDB.Bson" Version="3.10.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="3.10.0" />
+		<PackageReference Include="MongoDB.Bson" Version="3.11.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.11.0" />
 	  <PackageReference Include="MongoDB.Libmongocrypt" Version="1.12.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>

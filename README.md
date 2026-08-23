@@ -70,6 +70,17 @@ For manual package publishing, use one of the provided scripts:
 
 See [PUBLISHING.md](PUBLISHING.md) for detailed instructions.
 
+## Support This Project
+
+These libraries are free and open source. The best way to support the work is to shop with us:
+
+- **Christian items:** [https://store.anointed.company](https://store.anointed.company)
+- **Everything else:** [https://www.mart.club](https://www.mart.club)
+
+Every purchase helps fund continued development and maintenance of these packages.
+
+See [SUPPORT.md](SUPPORT.md) for help and support options.
+
 ## Contact
 
 - **Anointed (umbrella):** [https://anointed.company](https://anointed.company)
