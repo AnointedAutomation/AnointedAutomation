@@ -120,3 +120,10 @@ MIT License - Copyright © 2023 Anointed Automation, LLC
 
 Stewarded by Alexander Fields - https://www.alexanderfields.me
 GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
+
+## Support This Project
+
+This library is free and open source. The best way to support the work is to shop with us:
+
+- **Christian items:** [https://store.anointed.company](https://store.anointed.company)
+- **Everything else:** [https://www.mart.club](https://www.mart.club)

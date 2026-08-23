@@ -22,3 +22,10 @@ QrMatrix matrix = QrEncoder.Encode("https://shop.app/@anointedattire", QrErrorCo
 ## License
 
 MIT © Anointed Automation, LLC.
+
+## Support This Project
+
+This library is free and open source. The best way to support the work is to shop with us:
+
+- **Christian items:** [https://store.anointed.company](https://store.anointed.company)
+- **Everything else:** [https://www.mart.club](https://www.mart.club)
