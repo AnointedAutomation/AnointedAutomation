@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Abstract concept modeling and epistemics engine - AnointedAutomation.Concepts</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<PackageTags>concepts epistemics</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Concepts</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
