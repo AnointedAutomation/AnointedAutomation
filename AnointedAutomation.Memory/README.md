@@ -1,6 +1,6 @@
 # AnointedAutomation.Memory
 
-A small .NET utility for on-demand garbage collection. It forces a full collection, waits for finalizers, and then tries to hand unused memory back to the operating system, which is useful for long-running services after a memory-heavy job.
+A small .NET utility for on-demand garbage collection. It forces a full collection, waits for finalizers, and then tries to hand unused memory back to the operating system, which is useful for long running services after a memory heavy job.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory)
 
@@ -60,7 +60,7 @@ Keep a reference to the `Timer` for as long as it should run.
 ## Best practices
 
 - Use sparingly. A forced full collection pauses the application and usually is not needed; the .NET GC tunes itself well.
-- Best suited to the moment right after a large, short-lived allocation spike.
+- Best suited to the moment right after a large, short lived allocation spike.
 - Measure before and after (for example with `GC.GetTotalMemory` or `dotnet-counters`) to confirm it helps your workload.
 
 ## Related packages

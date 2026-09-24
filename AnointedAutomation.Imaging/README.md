@@ -1,6 +1,6 @@
 # AnointedAutomation.Imaging
 
-Image generation utilities for the AnointedAutomation suite. It renders QR codes produced by AnointedAutomation.Algorithms to SVG or PNG using only the .NET base class library, so there is no third-party or native image dependency.
+Image generation utilities for the AnointedAutomation suite. It renders QR codes produced by AnointedAutomation.Algorithms to SVG or PNG using only the .NET base class library, so there is no third party or native image dependency.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging)
 
@@ -36,7 +36,7 @@ Namespace: `AnointedAutomation.Imaging.QrCode`
 | Member | Returns | Description |
 |---|---|---|
 | `QrRenderer.ToSvg(QrMatrix matrix, int moduleSize = 8, int quietZone = 4)` | `string` | An SVG document with a white background and one black `rect` per dark module, drawn with `shape-rendering="crispEdges"`. |
-| `QrRenderer.ToPng(QrMatrix matrix, int moduleSize = 8, int quietZone = 4)` | `byte[]` | An 8-bit grayscale PNG, compressed with the BCL `ZLibStream`. |
+| `QrRenderer.ToPng(QrMatrix matrix, int moduleSize = 8, int quietZone = 4)` | `byte[]` | An 8 bit grayscale PNG, compressed with the BCL `ZLibStream`. |
 
 Parameters:
 

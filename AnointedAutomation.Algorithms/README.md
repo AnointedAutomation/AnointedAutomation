@@ -1,6 +1,6 @@
 # AnointedAutomation.Algorithms
 
-Reusable, dependency-free algorithms for the AnointedAutomation suite. Today it ships a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction, for developers who need QR codes without pulling in a native or third-party imaging library.
+Reusable algorithms with no dependencies for the AnointedAutomation suite. Today it ships a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction, for developers who need QR codes without pulling in a native or third party imaging library.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms)
 
@@ -51,7 +51,7 @@ What `Encode` does for you:
 - Finder, timing and alignment patterns, plus format and version information (BCH coded).
 - Automatic mask selection using the four ISO/IEC 18004 penalty rules.
 
-Galois-field arithmetic, the Reed-Solomon encoder, mask scoring and the version tables are internal implementation details, not public API.
+Galois field arithmetic, the Reed-Solomon encoder, mask scoring and the version tables are internal implementation details, not public API.
 
 ## Capacity and errors
 

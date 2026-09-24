@@ -1,6 +1,6 @@
 # AnointedAutomation.Concepts
 
-Models abstract, Biblically grounded concepts as first-class .NET types: love as a behavior tree that decides what to do in a situation, a moral "reality" that reads acts against facets of God's character, and an epistemics engine that checks claims for consistency against foundational laws. It is for developers building faith-oriented apps, games, moderation tools, or teaching material who want these ideas as testable code instead of prose.
+Models abstract, Biblically grounded concepts as first class .NET types: love as a behavior tree that decides what to do in a situation, a moral "reality" that reads acts against facets of God's character, and an epistemics engine that checks claims for consistency against foundational laws. It is for developers building faith oriented apps, games, moderation tools, or teaching material who want these ideas as testable code instead of prose.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts)
 
@@ -120,8 +120,8 @@ The ledger maps the consistency of claims without deciding theology. Contradicti
 
 | Type | Description |
 |---|---|
-| `Proposition` | A named entry in the shared vocabulary, with `Testability` and a three-valued `bool? Standing`. Equal by name. |
-| `FoundationalClaim` | A measuring-stick claim: `Name`, `Statement`, `Domain`, `Asserts`, `Denies`, `Falsifiable`, `SurvivedFalsificationWeight` (0.0 to 1.0), `Status`. |
+| `Proposition` | A named entry in the shared vocabulary, with `Testability` and a three valued `bool? Standing`. Equal by name. |
+| `FoundationalClaim` | A measuring stick claim: `Name`, `Statement`, `Domain`, `Asserts`, `Denies`, `Falsifiable`, `SurvivedFalsificationWeight` (0.0 to 1.0), `Status`. |
 | `TheologicalClaim` | A claim from a tradition: `Statement`, `Source`, `Confidence`, `Asserts`, `Denies`. |
 | `EpistemicLedger` | The engine. `Examine(claim)` (pure), `Admit(claim)` (examines, stores, records tensions), `Tensions`, `ClaimsAbout(Proposition)`, `ClaimsFrom(string source)`. |
 | `Examination` | `Claim`, `Verdict`, `Standing`, `Confidence`, `Derivation`. |
@@ -129,10 +129,10 @@ The ledger maps the consistency of claims without deciding theology. Contradicti
 | `Tension` | Two admitted claims that disagree on a `Proposition`: `First`, `Second`, `Proposition`. |
 | `Verdict` | `Consistent`, `Contradicts`, `Unfalsifiable`, `Undetermined`. |
 | `EpistemicStatus` | `Law`, `Theory`, `Conjecture`. |
-| `LawDomain` | `IntraUniverse`, `Unrestricted`. Intra-universe laws never rule on propositions beyond observation. |
+| `LawDomain` | `IntraUniverse`, `Unrestricted`. Intra universe laws never rule on propositions beyond observation. |
 | `Testability` | `EmpiricallyTestable`, `BeyondObservation`. |
 | `Proof`, `ProofStep`, `ProofSymbol` | A symbolic proof with glossary and numbered steps. |
-| `TheoreticalProofs` | Built-in proofs: `Agnosticism()` and `Christianity()`. |
+| `TheoreticalProofs` | Built in proofs: `Agnosticism()` and `Christianity()`. |
 
 ```csharp
 using System;
@@ -163,7 +163,7 @@ Console.WriteLine(genesis.Standing == null); // True: honestly unknown, never gu
 Console.WriteLine(ledger.Tensions.Count); // 1: the two claims disagree, and both stand
 ```
 
-For a ready-made set of foundational claims (64 laws, 12 theories and 3 conjectures), see [AnointedAutomation.Mathematics](https://www.nuget.org/packages/AnointedAutomation.Mathematics).
+For a ready made set of foundational claims (64 laws, 12 theories and 3 conjectures), see [AnointedAutomation.Mathematics](https://www.nuget.org/packages/AnointedAutomation.Mathematics).
 
 ## Related packages
 

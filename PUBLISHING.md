@@ -30,7 +30,7 @@ published from it.
    version on NuGet.org. Unchanged packages are skipped.
 
 Publishing uses [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (OIDC
-through `NuGet/login`), so no long-lived API key is stored in the repository secrets.
+through `NuGet/login`), so no long lived API key is stored in the repository secrets.
 
 ## Bumping a version by hand
 
@@ -49,7 +49,7 @@ automation leaves a version alone once it differs from `master`.
    ```
 
    `Directory.Build.props` adds the shared settings (XML documentation file, repository metadata) to every
-   non-test project automatically.
+   project except the tests automatically.
 2. Add the project to the package lists in `version-increment.yml`, `nuget-publish.yml` and
    `publish-packages.sh`.
 3. Add a row to the package table in `README.md` and to the list above.

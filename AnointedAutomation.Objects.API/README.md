@@ -1,6 +1,6 @@
 # AnointedAutomation.Objects.API
 
-ASP.NET Core companions to [AnointedAutomation.Objects](https://www.nuget.org/packages/AnointedAutomation.Objects): an in-memory `IFormFile`, the shared hybrid-casing `System.Text.Json` convention used by AnointedAutomation APIs, and a never-throwing GraphQL response reader.
+ASP.NET Core companions to [AnointedAutomation.Objects](https://www.nuget.org/packages/AnointedAutomation.Objects): an in memory `IFormFile`, the shared hybrid casing `System.Text.Json` convention used by AnointedAutomation APIs, and a never throwing GraphQL response reader.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.API.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects.API) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Objects.API.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects.API)
 
@@ -41,17 +41,17 @@ All types are in the `AnointedAutomation.Objects.API` namespace.
 
 | Type | Description |
 |---|---|
-| `JsonCasingConvention` | `static void Configure(JsonSerializerOptions options)` adds the convention to existing options; `static JsonSerializerOptions Options` is a ready-made, reusable instance for serializing outside the MVC/minimal API pipeline. |
+| `JsonCasingConvention` | `static void Configure(JsonSerializerOptions options)` adds the convention to existing options; `static JsonSerializerOptions Options` is a ready made, reusable instance for serializing outside the MVC/minimal API pipeline. |
 | `CustomFormFile` | `IFormFile` backed by a `byte[]`. Constructor `(string fileName, byte[] content)`; properties `FileName`, `Content`, `Length`, `ContentType` (always `application/octet-stream`), `Name` (always `file`), `ContentDisposition`, `Headers`; methods `CopyTo`, `CopyToAsync`, `OpenReadStream`. |
 | `GraphQlEnvelope` | `static GraphQlResult Read(string body)` parses a GraphQL HTTP response body. Never throws: empty or invalid bodies become transport errors. |
-| `GraphQlResult` | `Data` (`JsonElement`), `HasData`, `TransportErrors`, `Errors`, and per-mutation helpers `Payload(field)`, `UserErrors(field)`, `FirstError(field)`, `Succeeded(field)`. |
-| `GraphQlError` | One top-level error: `Message`, plus raw JSON `Path` and `Extensions` (or null). |
+| `GraphQlResult` | `Data` (`JsonElement`), `HasData`, `TransportErrors`, `Errors`, and per mutation helpers `Payload(field)`, `UserErrors(field)`, `FirstError(field)`, `Succeeded(field)`. |
+| `GraphQlError` | One top level error: `Message`, plus raw JSON `Path` and `Extensions` (or null). |
 
 ## JSON casing rules
 
 `JsonCasingConvention` makes the wire casing match the AnointedAutomation model convention while your C# stays PascalCase:
 
-- Classes: value-type members (`int`, `bool`, `DateTime`, enums, and their nullables) are camelCase; reference-type members (strings, objects, arrays) are PascalCase.
+- Classes: value type members (`int`, `bool`, `DateTime`, enums, and their nullables) are camelCase; reference type members (strings, objects, arrays) are PascalCase.
 - Structs: every member is camelCase.
 - Enums serialize as camelCase strings (integers are still accepted on input).
 - A member with `[JsonPropertyName]` keeps its explicit name, and anonymous types are left untouched.
@@ -89,7 +89,7 @@ if (!result.Succeeded("productUpdate"))
 }
 ```
 
-`FirstError` returns the first top-level error if any, otherwise the first `data.{field}.userErrors[].message`, otherwise null. The shape matches the Shopify Admin GraphQL API, but nothing here is Shopify-specific.
+`FirstError` returns the first top level error if any, otherwise the first `data.{field}.userErrors[].message`, otherwise null. The shape matches the Shopify Admin GraphQL API, but nothing here is Shopify specific.
 
 ## Building a form file in memory
 

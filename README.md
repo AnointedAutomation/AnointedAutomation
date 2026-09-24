@@ -3,7 +3,7 @@
 [![Build and Test](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE)
 
-Open-source .NET libraries from [Anointed Automation](https://anointedautomation.net), published on
+Open source .NET libraries from [Anointed Automation](https://anointedautomation.net), published on
 [NuGet.org](https://www.nuget.org/profiles/roku674). Every package targets **.NET 10**, is MIT licensed, and
 ships its own README and XML IntelliSense docs.
 
@@ -21,7 +21,7 @@ Part of the [Anointed](https://anointed.company) family of ventures.
 | [AnointedAutomation.APIMiddlewares](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.APIMiddlewares) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.APIMiddlewares.svg)](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares) | ASP.NET Core middleware: API key auth and an IP blacklist |
 | [AnointedAutomation.Repository.Mongo](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Repository.Mongo) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.Mongo.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo) | Generic MongoDB repository |
 | [AnointedAutomation.Repository.MySql](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Repository.MySql) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.MySql.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql) | Generic MySQL repository over EF Core |
-| [AnointedAutomation.Algorithms](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Algorithms) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms) | Dependency-free algorithms, including an ISO/IEC 18004 QR encoder |
+| [AnointedAutomation.Algorithms](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Algorithms) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms) | No dependencies algorithms, including an ISO/IEC 18004 QR encoder |
 | [AnointedAutomation.Imaging](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Imaging) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging) | Render QR codes to SVG and PNG with no image library |
 | [AnointedAutomation.Concepts](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Concepts) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts) | Abstract concept modeling and an epistemics engine |
 | [AnointedAutomation.Mathematics](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Mathematics) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Mathematics.svg)](https://www.nuget.org/packages/AnointedAutomation.Mathematics) | Catalog of mathematical and physical laws, theories and conjectures |
@@ -68,7 +68,7 @@ Requires the .NET 10 SDK.
 ## Releases
 
 - Work lands on `develop`; releases are cut by merging `develop` into `master`.
-- Opening a pull request to `master` auto-increments the version of every package whose code changed.
+- Opening a pull request to `master` auto increments the version of every package whose code changed.
 - Merging to `master` publishes each package whose version is newer than the one on NuGet.org.
 
 See [PUBLISHING.md](./PUBLISHING.md) for details.
@@ -99,4 +99,4 @@ See [SUPPORT.md](./SUPPORT.md) for help and support options.
 - **Anointed Automation:** [https://anointedautomation.net](https://anointedautomation.net)
 - **GitHub:** [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
 
-Stewarded by Alexander Fields — [https://www.alexanderfields.me](https://www.alexanderfields.me)
+Stewarded by Alexander Fields: [https://www.alexanderfields.me](https://www.alexanderfields.me)

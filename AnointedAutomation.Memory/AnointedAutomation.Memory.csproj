@@ -10,7 +10,7 @@
     <Title>AnointedAutomation.Memory</Title>
     <Company>Anointed Automation LLC - Alexander Fields</Company>
     <Copyright>Copyright © 2024 Anointed Automation, LLC All rights reserved.</Copyright>
-    <Description>On-demand garbage collection helper that forces a full collection and tries to return unused memory to the operating system.</Description>
+    <Description>On demand garbage collection helper that forces a full collection and tries to return unused memory to the operating system.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>1.0.3</Version>
     <PackageTags>memory;garbage-collection;gc;performance;optimization</PackageTags>

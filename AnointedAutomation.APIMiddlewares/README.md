@@ -1,6 +1,6 @@
 # AnointedAutomation.APIMiddlewares
 
-Drop-in ASP.NET Core middleware and filters for protecting small APIs: API key authentication, an in-memory IP blacklist, automatic banning of clients that probe for endpoints that do not exist, and optional garbage collection when the API has been idle.
+ASP.NET Core middleware and filters for protecting small APIs: API key authentication, an in memory IP blacklist, automatic banning of clients that probe for endpoints that do not exist, and optional garbage collection when the API has been idle.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.APIMiddlewares.svg)](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.APIMiddlewares.svg)](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares)
 
@@ -56,9 +56,9 @@ Note the namespace: the code lives in `AnointedAutomation.APIMiddleware` (singul
 |---|---|
 | `ApiKeyAuthMiddleware` | Constructor `(RequestDelegate next, string headerName, string expectedKey, string protectedPathPrefix)`. Requests whose path starts with the prefix must send the header with the exact key or get `401`. Uses `CryptographicOperations.FixedTimeEquals`. Also exposes `static bool IsAuthorized(string presentedKey, byte[] expectedKey)`. The prefix must start with `/`. |
 | `IPBlacklistMiddleware` | Returns `403` for any client IP in `IPBlacklist`. Also owns the shared middleware log buffer: `static AddLog(LogMessage)`, `static GetLogs()`, `static ClearLogs()`, and the static events `LogAdded` and `LogCleared`. |
-| `InvalidEndpointTrackerMiddleware` | Returns `403` for blacklisted IPs. After the rest of the pipeline runs, records a failed attempt for an empty-bodied `404` (except `/`), a `401` or a `403`. An IP is banned after 10 failed attempts, or immediately if it requests a path ending in `.env`. Attempt counts and logs reset every 24 hours. `static ClearFailedAttempts()` resets counts. |
-| `AttemptInfo` | Per-IP attempt record: `int Count`, `HashSet<string> Paths`. |
-| `EndpointAccessMiddleware` | Constructor `(RequestDelegate next, TimeSpan? timeout, bool cleanMem = false)`. Records the last access time per path. When `cleanMem` is true, a one-minute timer runs `AnointedAutomation.Optimization.Memory.GarbageCollection.PerformGarbageCollection` once every endpoint has been idle longer than `timeout`. `static bool HasBeenHitRecently(string path)` reports whether a path was hit in the last 5 minutes. |
+| `InvalidEndpointTrackerMiddleware` | Returns `403` for blacklisted IPs. After the rest of the pipeline runs, records a failed attempt for a `404` with an empty body (except `/`), a `401` or a `403`. An IP is banned after 10 failed attempts, or immediately if it requests a path ending in `.env`. Attempt counts and logs reset every 24 hours. `static ClearFailedAttempts()` resets counts. |
+| `AttemptInfo` | Attempt record for one IP: `int Count`, `HashSet<string> Paths`. |
+| `EndpointAccessMiddleware` | Constructor `(RequestDelegate next, TimeSpan? timeout, bool cleanMem = false)`. Records the last access time per path. When `cleanMem` is true, a one minute timer runs `AnointedAutomation.Optimization.Memory.GarbageCollection.PerformGarbageCollection` once every endpoint has been idle longer than `timeout`. `static bool HasBeenHitRecently(string path)` reports whether a path was hit in the last 5 minutes. |
 
 ### Filters (`AnointedAutomation.APIMiddleware.Filters`)
 
@@ -70,7 +70,7 @@ Note the namespace: the code lives in `AnointedAutomation.APIMiddleware` (singul
 
 | Type | What it does |
 |---|---|
-| `IPBlacklist` | Static in-memory blacklist: `AddBannedIP(string ip, string reason)`, `RemoveBannedIP(string ip)`, `IsIPBlocked(string ipAddress)`, `GetBlockReason(string ipAddress)`, `ClearBlacklist()`, and the events `IPBanned` (`EventHandler<BannedIP>`) and `IPUnbanned` (`EventHandler<string>`). |
+| `IPBlacklist` | Static in memory blacklist: `AddBannedIP(string ip, string reason)`, `RemoveBannedIP(string ip)`, `IsIPBlocked(string ipAddress)`, `GetBlockReason(string ipAddress)`, `ClearBlacklist()`, and the events `IPBanned` (`EventHandler<BannedIP>`) and `IPUnbanned` (`EventHandler<string>`). |
 | `BannedIP` | `_id`, `Ipv4`, `Ipv6`, `Reason`. Handy as a persistence shape for bans. |
 
 ### Utility (`AnointedAutomation.APIMiddleware.Utility`)
@@ -125,7 +125,7 @@ IPBlacklistMiddleware.LogAdded += (sender, e) =>
 IPBlacklistMiddleware.AddLog(LogMessage.Warning("Suspicious activity detected."));
 ```
 
-Note that `IPBlacklistMiddleware.ClearLogs()` and `IPBlacklist.ClearBlacklist()` also remove every event subscriber, and `InvalidEndpointTrackerMiddleware` calls `ClearLogs()` during its 24-hour reset, so re-subscribe to `IPBlacklistMiddleware.LogAdded` if you rely on it long-term.
+Note that `IPBlacklistMiddleware.ClearLogs()` and `IPBlacklist.ClearBlacklist()` also remove every event subscriber, and `InvalidEndpointTrackerMiddleware` calls `ClearLogs()` during its 24 hour reset, so resubscribe to `IPBlacklistMiddleware.LogAdded` if you rely on it long term.
 
 ## Notes
 

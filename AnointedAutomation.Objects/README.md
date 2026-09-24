@@ -1,6 +1,6 @@
 # AnointedAutomation.Objects
 
-Plain C# models shared across AnointedAutomation services: user accounts and profiles, billing and payment records, Google sign-in payloads, and standard API response envelopes. The classes carry no database attributes, so the same types work with MongoDB, SQL or plain JSON.
+Plain C# models shared across AnointedAutomation services: user accounts and profiles, billing and payment records, Google sign in payloads, and standard API response envelopes. The classes carry no database attributes, so the same types work with MongoDB, SQL or plain JSON.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Objects.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects)
 
@@ -62,14 +62,14 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `User` | Account record: `UserId`, `Email`, `Username`, `Password`, `Role`, `Profile`, `Token`, `tokenExpiration`, `emailConfirmed`, `IPAddresses`, `Friends`, `FriendId`, `BlockedUsers`, `isBanned`, `banned`, `BannedReason`, `createdDate`, `lastActiveDate`, `timeOnline`, `Google`, `Meta`, and account deletion fields (`deletionDate`, `DeletionConfirmationCode`, `deletionConfirmationExpiration`). |
 | `Profile` | Extends `Billing.Contact` (`FirstName`, `MiddleName`, `LastName`, `dob`, `number`) with a Newtonsoft `JObject AccountSettings`. |
 | `Credentials` | Login payload: `Email`, `Password`, `Token`, `GoogleToken`. |
-| `IPInfo` | Per-IP login history: `IpAddress`, `firstLogin`, `lastLogin`, `loginCount`, `timeOnline`. |
+| `IPInfo` | Login history for one IP: `IpAddress`, `firstLogin`, `lastLogin`, `loginCount`, `timeOnline`. |
 
 ### Billing (`AnointedAutomation.Objects.Billing`)
 
 | Type | Description |
 |---|---|
 | `Purchase` | Order with addresses, `Item` (`Product`), discounts, tax, tip, `total`, `TransactionId`, `OrderStatus` (`TransactionStatus`) and a `StatusHistory`; `UpdateOrderStatus(newStatus, changedBy, reason)` records each change. |
-| `Subscription` | Extends `Purchase` with `Status` (`SubscriptionStatus`), billing period, trial, pause/cancel dates, per-metric `Usage`, and lifecycle methods `Pause`, `Resume`, `Cancel`, `Renew`, `UpdateStatus`, `IsUsable`, `IsTrialing`, `CalculateNextBillingDate`, `GetDaysRemaining`, `AddUsageMetric`, `UpdateUsage`, `IsOverUsageLimit`. |
+| `Subscription` | Extends `Purchase` with `Status` (`SubscriptionStatus`), billing period, trial, pause/cancel dates, per metric `Usage`, and lifecycle methods `Pause`, `Resume`, `Cancel`, `Renew`, `UpdateStatus`, `IsUsable`, `IsTrialing`, `CalculateNextBillingDate`, `GetDaysRemaining`, `AddUsageMetric`, `UpdateUsage`, `IsOverUsageLimit`. |
 | `SubscriptionUsage` | Metered usage: `Limit`, `Used`, `Remaining`, `UsagePercentage`, `IsOverLimit`, `IsNearLimit`, `IncrementUsage`, `DecrementUsage`, `ResetForNewPeriod`. |
 | `StatusHistoryEntry` | One status transition: `PreviousStatus`, `NewStatus`, `ChangedBy`, `Reason`, `Timestamp`. |
 | `Bill` | A customer's billing record: `AdressBilling`, `Orders`, `PaymentTypesOnFile`, `Purchases`, `Refunds`, `Subscriptions`. |
@@ -77,7 +77,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `Address`, `Contact` | Postal address and person/contact details. |
 | `CreditCard` | Card details with `IsValid`, `IsExpired`, `ValidateLuhn`, static `DetectCardType` (`CardType`), static `MaskCardNumber`, `GetDisplayString` and `ToSecureObject` (strips sensitive data). |
 | `PaymentCredentials`, `PayeeInfo` | Payment method on file (`CreditCard`, `PayeeInfo`, `paymentType`). |
-| `PaymentIntent`, `PaymentCustomer`, `PaymentMethodToken`, `Refund`, `Dispute` | Provider-agnostic payment records, each tagged with a `PaymentProvider` and the provider's own id. Amounts are `long` minor units. |
+| `PaymentIntent`, `PaymentCustomer`, `PaymentMethodToken`, `Refund`, `Dispute` | Provider agnostic payment records, each tagged with a `PaymentProvider` and the provider's own id. Amounts are `long` minor units. |
 | `WebhookEvent` | A received provider webhook (`Provider`, `EventType`, `RawPayload`, `IsProcessed`, `ProcessingError`, `Signature`). |
 | `PaymentAuditLog` | Request/response audit record for a provider call; `SetRequestBody` and `SetResponseBody` pass bodies through the static `MaskSensitiveData`, and `CalculateDuration` fills `DurationMs`. |
 | `DisputeStatus` | Enum of dispute states. |
@@ -87,7 +87,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | Type | Description |
 |---|---|
 | `GoogleObjects` | Holds `GoogleTokenInfo` and `UserProfile`; stored on `User.Google`. |
-| `GoogleTokenInfo` | Google token response and token-info fields, mapped with `[JsonProperty]` to Google's snake_case names. |
+| `GoogleTokenInfo` | Google token response and token info fields, mapped with `[JsonProperty]` to Google's snake_case names. |
 | `UserProfile` | Google user info (`id`, `email`, `verifiedEmail`, `name`, `givenName`, `familyName`, `picture`, `locale`, `hd`, ...). |
 
 ## Naming convention

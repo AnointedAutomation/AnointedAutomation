@@ -1,6 +1,6 @@
 # AnointedAutomation.Repository.Mongo
 
-A thin, testable wrapper over the official MongoDB .NET driver. `IMongoHelper` gives you collection-name-based CRUD, paging, projection, aggregation and index management; `MongoRepository<TDoc>` is a base class for per-collection repositories; and the BSON helpers register class maps and casing conventions for the [AnointedAutomation.Objects](https://www.nuget.org/packages/AnointedAutomation.Objects) models.
+A thin, testable wrapper over the official MongoDB .NET driver. `IMongoHelper` gives you collection name based CRUD, paging, projection, aggregation and index management; `MongoRepository<TDoc>` is a base class for per collection repositories; and the BSON helpers register class maps and casing conventions for the [AnointedAutomation.Objects](https://www.nuget.org/packages/AnointedAutomation.Objects) models.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.Mongo.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Repository.Mongo.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo)
 
@@ -68,7 +68,7 @@ All types are in the `AnointedAutomation.Repository.Mongo` namespace.
 |---|---|
 | `new MongoHelper(string dbName, string connectionString)` | Connects and sets `database`. (Does not set `dbName`.) |
 | `IMongoHelperFactory.Create(string dbName, string connectionString)` | `MongoHelperFactory` returns one cached `IMongoHelper` per connection string and database, with `database` and `dbName` set. |
-| `MongoHelper.ConnectionStringBuilder(username, password, cluster, region)` | Builds `mongodb+srv://user:pass@{cluster}.{region}.mongodb.net/?retryWrites=true&w=majority`, URL-encoding the password. |
+| `MongoHelper.ConnectionStringBuilder(username, password, cluster, region)` | Builds `mongodb+srv://user:pass@{cluster}.{region}.mongodb.net/?retryWrites=true&w=majority`, URL encoding the password. |
 | `MongoHelper.MongoHelperConnector(IMongoHelper, dbName, username, password, cluster, region)` | Builds the connection string, connects, tests the connection and sets `dbName`. |
 | `IMongoHelper.TestConnection()` | Returns the collection names, or null (and logs an error) if the connection fails. |
 
@@ -85,7 +85,7 @@ Every method takes the collection name as its first argument.
 | Indexes | `EnsureIndexAsync(string, MongoIndexSpec)`, `EnsureIndexesAsync(string, IEnumerable<MongoIndexSpec>)` |
 
 - Filters are `FilterDefinition<T>`. `GetSingleAsync`, `GetFilteredDocumentsAsync`, `DeleteDocumentAsync`, `CountAsync` and `ExistsAsync` also accept an `Expression<Func<T, bool>>`.
-- The `...ByIdAsync` methods treat a 24-character hex id as an `ObjectId` and any other string as a plain string `_id`.
+- The `...ByIdAsync` methods treat a 24 character hex id as an `ObjectId` and any other string as a plain string `_id`.
 - `GetAllDocumentsAsync` loads the whole collection; prefer `GetPagedAsync`, `CountAsync` or `AggregateAsync` for large collections.
 
 ### Repository base
@@ -107,18 +107,18 @@ Every method takes the collection name as its first argument.
 
 | Type | Description |
 |---|---|
-| `BsonClassMapRegistrar.RegisterClassMaps()` | Idempotent, thread-safe. Registers `JObjectSerializer` for every Newtonsoft `JObject` and maps `AnointedAutomation.Objects.Account.User` with `UserId` as `_id` and extra elements ignored. |
+| `BsonClassMapRegistrar.RegisterClassMaps()` | Idempotent, thread safe. Registers `JObjectSerializer` for every Newtonsoft `JObject` and maps `AnointedAutomation.Objects.Account.User` with `UserId` as `_id` and extra elements ignored. |
 | `BsonClassMapRegistrar.RegisterDerivedUser<T>()` | Registers a class derived from `User`. Call after `RegisterClassMaps()`. |
-| `BsonClassMapRegistrar.RegisterHybridCasingConvention(string namespacePrefix = "AnointedAutomation")` | Opt-in. Registers `HybridElementNameConvention` for types under the prefix. |
-| `BsonClassMapRegistrar.RegisterSnakeCasingConvention(string namespacePrefix = "AnointedAutomation")` | Opt-in. Registers `SnakeCaseElementNameConvention` (for example `LineItems` becomes `line_items`). |
-| `HybridElementNameConvention` | Value-type, enum and struct members become camelCase, reference-type members PascalCase. Matches `JsonCasingConvention` in [AnointedAutomation.Objects.API](https://www.nuget.org/packages/AnointedAutomation.Objects.API). |
+| `BsonClassMapRegistrar.RegisterHybridCasingConvention(string namespacePrefix = "AnointedAutomation")` | Opt in. Registers `HybridElementNameConvention` for types under the prefix. |
+| `BsonClassMapRegistrar.RegisterSnakeCasingConvention(string namespacePrefix = "AnointedAutomation")` | Opt in. Registers `SnakeCaseElementNameConvention` (for example `LineItems` becomes `line_items`). |
+| `HybridElementNameConvention` | Value type, enum and struct members become camelCase, reference type members PascalCase. Matches `JsonCasingConvention` in [AnointedAutomation.Objects.API](https://www.nuget.org/packages/AnointedAutomation.Objects.API). |
 | `SnakeCaseElementNameConvention` | snake_case element names; `static string ToSnake(string)` is public. |
 | `JObjectSerializer` | BSON serializer for Newtonsoft `JObject`. |
 | `BsonMap` | `ToPlain(BsonValue)` and `ToDictionary(BsonDocument)` convert BSON into plain dictionaries, lists and CLR scalars (ObjectId becomes its hex string). |
 
 ## Casing conventions
 
-Both conventions are opt-in, so installing or upgrading the package changes nothing on its own. Register one once at startup, before `RegisterClassMaps()` and before any Mongo call, and only after your stored data uses the matching key casing:
+Both conventions are opt in, so installing or upgrading the package changes nothing on its own. Register one once at startup, before `RegisterClassMaps()` and before any Mongo call, and only after your stored data uses the matching key casing:
 
 ```csharp
 using AnointedAutomation.Repository.Mongo;

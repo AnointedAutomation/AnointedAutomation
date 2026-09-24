@@ -10,7 +10,7 @@
 		<Title>AnointedAutomation.Objects</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Plain POCO models for user accounts, billing and payments, Google sign-in, and standard API response envelopes.</Description>
+		<Description>Plain POCO models for user accounts, billing and payments, Google sign in, and standard API response envelopes.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>2.1.2</Version>
 		<PackageTags>models;poco;dto;billing;payments;user;response;anointedautomation</PackageTags>
