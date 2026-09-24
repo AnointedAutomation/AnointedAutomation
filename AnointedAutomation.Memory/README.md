@@ -1,69 +1,76 @@
 # AnointedAutomation.Memory
 
-A .NET library providing memory management utilities for optimizing application performance through controlled garbage collection.
+A small .NET utility for on-demand garbage collection. It forces a full collection, waits for finalizers, and then tries to hand unused memory back to the operating system, which is useful for long-running services after a memory-heavy job.
 
-## Overview
-
-The AnointedAutomation.Memory library offers utilities to manage and optimize memory usage in .NET applications. It provides controlled garbage collection mechanisms to help return unused memory to the operating system.
+[![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory)
 
 ## Installation
-
-Install via NuGet:
 
 ```bash
 dotnet add package AnointedAutomation.Memory
 ```
 
-## Usage
+- Target framework: `net10.0`
+- Dependencies: none
 
-### GarbageCollection Class
+Note that the namespace is `AnointedAutomation.Optimization.Memory`, not the package id.
 
-The `GarbageCollection` class provides methods to perform manual garbage collection and attempt to return unused memory to the operating system.
+## Quick start
 
 ```csharp
 using AnointedAutomation.Optimization.Memory;
 
-// Create a new instance
-var gc = new GarbageCollection();
+GarbageCollection gc = new GarbageCollection();
 
-// Perform garbage collection
+// After a large import, export, or batch job:
 gc.PerformGarbageCollection(null);
 ```
 
-### Key Features
+## API overview
 
-- **Manual Garbage Collection**: Triggers garbage collection on demand
-- **Memory Return to OS**: Attempts to return unused memory back to the operating system
-- **No-GC Region Management**: Uses .NET's no-GC region feature to optimize memory return
+Namespace: `AnointedAutomation.Optimization.Memory`
 
-### How It Works
+| Member | Description |
+|---|---|
+| `GarbageCollection()` | Creates an instance. The class holds no state. |
+| `void PerformGarbageCollection(object state)` | Runs `GC.Collect()`, then `GC.WaitForPendingFinalizers()`, then attempts to return unused memory to the OS. `state` is unused. |
 
-1. **Garbage Collection**: Calls `GC.Collect()` and waits for pending finalizers
-2. **Memory Assessment**: Checks total memory usage
-3. **No-GC Region**: Attempts to create a no-GC region to facilitate memory return
-4. **Memory Release**: Ends the no-GC region, triggering memory return to the OS
+How the memory return works:
 
-## Best Practices
+1. Reads the current managed heap size with `GC.GetTotalMemory(false)`.
+2. If it is greater than zero, calls `GC.TryStartNoGCRegion` with that size.
+3. If the region starts, immediately calls `GC.EndNoGCRegion()`.
+4. An `InvalidOperationException` from this step is swallowed, so the call never fails on it.
 
-- Use sparingly - manual garbage collection can impact performance
-- Best suited for scenarios where large amounts of memory need to be released
-- Consider using after completing memory-intensive operations
-- Monitor application performance when implementing manual GC
+## Running on a timer
 
-## Requirements
+`PerformGarbageCollection` takes an `object state` parameter so it matches the `TimerCallback` delegate and can be scheduled directly:
 
-- .NET Standard 2.0 or higher
-- Compatible with .NET Core 2.0+ and .NET Framework 4.6.1+
+```csharp
+using System;
+using System.Threading;
+using AnointedAutomation.Optimization.Memory;
+
+GarbageCollection gc = new GarbageCollection();
+Timer timer = new Timer(gc.PerformGarbageCollection, null, TimeSpan.FromMinutes(5), TimeSpan.FromMinutes(30));
+```
+
+Keep a reference to the `Timer` for as long as it should run.
+
+## Best practices
+
+- Use sparingly. A forced full collection pauses the application and usually is not needed; the .NET GC tunes itself well.
+- Best suited to the moment right after a large, short-lived allocation spike.
+- Measure before and after (for example with `GC.GetTotalMemory` or `dotnet-counters`) to confirm it helps your workload.
+
+## Related packages
+
+- [AnointedAutomation.APIMiddlewares](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares): ASP.NET Core middlewares that depend on this package.
 
 ## License
 
-Copyright © 2023 Anointed Automation, LLC. All rights reserved.
-
-## Author
-
-Stewarded by Alexander Fields
-GitHub: [https://github.com/AnointedAutomation](https://github.com/AnointedAutomation)
-Part of the [Anointed](https://anointed.company) family of ventures.
+MIT. See [LICENSE](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE).
+Copyright © Anointed Automation, LLC. Stewarded by Alexander Fields.
 
 ## Support This Project
 
@@ -71,3 +78,5 @@ This library is free and open source. The best way to support the work is to sho
 
 - **Christian items:** [https://store.anointed.company](https://store.anointed.company)
 - **Everything else:** [https://www.mart.club](https://www.mart.club)
+
+Found a bug or have a request? Open an issue: [https://github.com/AnointedAutomation/AnointedAutomation/issues](https://github.com/AnointedAutomation/AnointedAutomation/issues)

@@ -10,10 +10,10 @@
 		<Title>AnointedAutomation.Algorithms</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Reusable algorithms for AnointedAutomation packages. Includes a dependency-free QR code encoder (ISO/IEC 18004): Galois-field arithmetic, Reed-Solomon error correction, and matrix construction.</Description>
+		<Description>Dependency-free algorithms for .NET, starting with a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction and automatic version and mask selection.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.0.1</Version>
-		<PackageTags>algorithms;qr;qrcode;reed-solomon;galois;iso18004</PackageTags>
+		<PackageTags>algorithms;qrcode;qr;qr-encoder;reed-solomon;galois-field;iso18004</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Algorithms</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>

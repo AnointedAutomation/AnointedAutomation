@@ -10,10 +10,10 @@
 		<Title>AnointedAutomation.Mathematics</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Curated catalog of laws, theories, and conjectures of mathematics and physics, modeled through the epistemics engine - AnointedAutomation.Mathematics</Description>
+		<Description>A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.0.1</Version>
-		<PackageTags>mathematics laws epistemics</PackageTags>
+		<PackageTags>mathematics;physics;chemistry;scientific-laws;conjectures;epistemics</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Mathematics</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
