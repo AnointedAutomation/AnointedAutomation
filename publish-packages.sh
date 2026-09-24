@@ -51,10 +51,12 @@ get_version() {
 declare -A PACKAGES=(
     ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="anointedautomation.algorithms"
     ["AnointedAutomation.Imaging/AnointedAutomation.Imaging.csproj"]="anointedautomation.imaging"
+    ["AnointedAutomation.Enums/AnointedAutomation.Enums.csproj"]="anointedautomation.enums"
     ["AnointedAutomation.Logging/AnointedAutomation.Logging.csproj"]="anointedautomation.logging"
     ["AnointedAutomation.Memory/AnointedAutomation.Memory.csproj"]="anointedautomation.memory"
     ["AnointedAutomation.APIMiddlewares/AnointedAutomation.APIMiddlewares.csproj"]="anointedautomation.apimiddlewares"
     ["AnointedAutomation.Repository.Mongo/AnointedAutomation.Repository.Mongo.csproj"]="anointedautomation.repository.mongo"
+    ["AnointedAutomation.Repository.MySql/AnointedAutomation.Repository.MySql.csproj"]="anointedautomation.repository.mysql"
     ["AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"]="anointedautomation.objects"
     ["AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"]="anointedautomation.objects.api"
     ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="anointedautomation.concepts"
