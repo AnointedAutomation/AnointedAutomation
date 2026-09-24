@@ -14,7 +14,7 @@
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.1.1</Version>
 		<PackageTags>mongodb;mongo;repository;bson;database;nosql;anointedautomation</PackageTags>
-		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Repository.Logging</PackageReleaseNotes>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Repository.Mongo</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

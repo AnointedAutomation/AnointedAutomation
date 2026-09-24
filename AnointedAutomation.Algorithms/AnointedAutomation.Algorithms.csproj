@@ -14,7 +14,7 @@
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.0.1</Version>
 		<PackageTags>algorithms;qrcode;qr;qr-encoder;reed-solomon;galois-field;iso18004</PackageTags>
-		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Algorithms</PackageReleaseNotes>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Algorithms</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

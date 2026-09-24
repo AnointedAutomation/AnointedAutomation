@@ -14,7 +14,7 @@
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.0.2</Version>
 		<PackageTags>concepts;epistemics;theology;christian;behavior-tree;logic;modeling</PackageTags>
-		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Concepts</PackageReleaseNotes>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Concepts</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

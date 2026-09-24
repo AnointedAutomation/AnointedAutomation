@@ -12,7 +12,7 @@
 // a field follow the hybrid rule, drop its pure-casing [BsonElement]. Intentional non-casing mappings
 // (snake_case external-API fields like "fulfillment_channel", "_id", deliberate renames) are preserved
 // by the guard below regardless. Register once at startup (before any class map is built) via
-// BsonClassMapRegistrar.RegisterClassMaps().
+// BsonClassMapRegistrar.RegisterHybridCasingConvention().
 
 using System;
 using MongoDB.Bson.Serialization;
