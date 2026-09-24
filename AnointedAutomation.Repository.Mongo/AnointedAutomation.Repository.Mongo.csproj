@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.1.1</Version>
+		<Version>1.1.2</Version>
 		<PackageTags>mongodb;mongo;repository;bson;database;nosql;anointedautomation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Repository.Mongo</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

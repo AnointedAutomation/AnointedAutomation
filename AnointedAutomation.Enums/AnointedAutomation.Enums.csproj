@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Shared enumerations for AnointedAutomation packages: payment types, providers, transaction and subscription statuses, payment operations, card types, webhook events, and moderation categories.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<PackageTags>enums;payments;transaction-status;subscription-status;webhooks;card-type</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Enums</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

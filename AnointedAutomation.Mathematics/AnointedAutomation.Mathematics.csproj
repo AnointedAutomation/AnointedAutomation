@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<PackageTags>mathematics;physics;chemistry;scientific-laws;conjectures;epistemics</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Mathematics</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

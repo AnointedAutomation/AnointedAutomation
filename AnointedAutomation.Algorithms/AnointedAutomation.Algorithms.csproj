@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Algorithms for .NET with no dependencies, starting with a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction and automatic version and mask selection.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<PackageTags>algorithms;qrcode;qr;qr-encoder;reed-solomon;galois-field;iso18004</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Algorithms</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

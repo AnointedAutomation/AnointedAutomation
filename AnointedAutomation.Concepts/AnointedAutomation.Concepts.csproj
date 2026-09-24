@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 		<PackageTags>concepts;epistemics;theology;christian;behavior-tree;logic;modeling</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Concepts</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>

@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>ASP.NET Core helpers: an in memory IFormFile, a hybrid casing System.Text.Json naming convention, and a GraphQL response envelope reader.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.1.1</Version>
+		<Version>1.1.2</Version>
 		<PackageTags>aspnetcore;formfile;iformfile;system-text-json;json;graphql;anointedautomation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Objects.API</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
