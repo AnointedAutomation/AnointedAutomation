@@ -7,7 +7,7 @@ namespace AnointedAutomation.Concepts
     /// The facet of God's character that renders to each what is due. "Render to all what is due
     /// them." (Romans 13:7); "He is the Rock, his works are perfect, and all his ways are just."
     /// (Deuteronomy 32:4). Which acts embody or offend Justice is declared by the moral concepts
-    /// themselves (see <see cref="MoralConcept.Upholds"/> / <see cref="MoralConcept.Violates"/>).
+    /// themselves (see <see cref="MoralConcept.Upholds(DivineAttribute)"/> / <see cref="MoralConcept.Violates(DivineAttribute)"/>).
     /// </summary>
     public class Justice : DivineAttribute
     {

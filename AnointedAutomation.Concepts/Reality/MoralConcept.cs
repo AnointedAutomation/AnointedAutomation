@@ -7,7 +7,7 @@ namespace AnointedAutomation.Concepts
     /// A moral concept modeled as abstract code rather than a magic string. Each concrete concept
     /// (Compassion, Murder, Sacrifice, Obedience, Idolatry, ...) is a first-class entity that knows
     /// its own name, the Scripture it answers to, and how it bears on the facets of God's character:
-    /// which facets it embodies (<see cref="Upholds"/>) and which it offends (<see cref="Violates"/>).
+    /// which facets it embodies (<see cref="Upholds(DivineAttribute)"/>) and which it offends (<see cref="Violates(DivineAttribute)"/>).
     /// This puts the moral nature of an act on the concept itself, once, instead of scattering it
     /// across string lists inside each facet.
     /// </summary>
