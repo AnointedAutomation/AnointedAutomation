@@ -10,11 +10,11 @@
 		<Title>AnointedAutomation.Objects</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Standardization for Objects - AnointedAutomation.Objects</Description>
+		<Description>Plain POCO models for user accounts, billing and payments, Google sign in, and standard API response envelopes.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>2.1.2</Version>
-		<PackageTags>objects</PackageTags>
-		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Objects</PackageReleaseNotes>
+		<Version>2.1.3</Version>
+		<PackageTags>models;poco;dto;billing;payments;user;response;anointedautomation</PackageTags>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Objects</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

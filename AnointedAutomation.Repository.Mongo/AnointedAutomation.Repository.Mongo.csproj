@@ -10,11 +10,11 @@
 		<Title>AnointedAutomation.Repository.Mongo</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Repository for Generic Mongo Usage - AnointedAutomation.Repository.Mongo</Description>
+		<Description>A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.1.1</Version>
-		<PackageTags>Mongo</PackageTags>
-		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Repository.Logging</PackageReleaseNotes>
+		<Version>1.1.2</Version>
+		<PackageTags>mongodb;mongo;repository;bson;database;nosql;anointedautomation</PackageTags>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Repository.Mongo</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -28,8 +28,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
-		<PackageReference Include="MongoDB.Bson" Version="3.11.1" />
-	  <PackageReference Include="MongoDB.Driver" Version="3.11.1" />
+		<PackageReference Include="MongoDB.Bson" Version="3.12.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.12.0" />
 	  <PackageReference Include="MongoDB.Libmongocrypt" Version="1.12.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>

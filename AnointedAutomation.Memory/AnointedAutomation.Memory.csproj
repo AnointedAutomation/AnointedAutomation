@@ -10,11 +10,11 @@
     <Title>AnointedAutomation.Memory</Title>
     <Company>Anointed Automation LLC - Alexander Fields</Company>
     <Copyright>Copyright © 2024 Anointed Automation, LLC All rights reserved.</Copyright>
-    <Description>Basic things for memory management </Description>
+    <Description>On demand garbage collection helper that forces a full collection and tries to return unused memory to the operating system.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.3</Version>
-    <PackageTags>memory</PackageTags>
-    <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Memory</PackageReleaseNotes>
+    <Version>1.0.4</Version>
+    <PackageTags>memory;garbage-collection;gc;performance;optimization</PackageTags>
+    <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Memory</PackageReleaseNotes>
 	  <Authors>Anointed Automation LLC, Alexander Fields</Authors>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>

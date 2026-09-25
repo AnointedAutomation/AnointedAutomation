@@ -10,11 +10,11 @@
 		<Title>AnointedAutomation.Imaging</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Image generation utilities for AnointedAutomation packages. Renders QR codes (from AnointedAutomation.Algorithms) to SVG and PNG with no third-party image dependency.</Description>
+		<Description>Renders QR codes from AnointedAutomation.Algorithms to SVG and PNG using only the .NET base class library, with no third party image dependency.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.1</Version>
-		<PackageTags>imaging;qr;qrcode;png;svg</PackageTags>
-		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/pkgs/nuget/AnointedAutomation.Imaging</PackageReleaseNotes>
+		<Version>1.0.2</Version>
+		<PackageTags>imaging;qrcode;qr;svg;png;image-generation</PackageTags>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Imaging</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
