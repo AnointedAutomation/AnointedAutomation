@@ -42,6 +42,7 @@ All types are in the `AnointedAutomation.Objects.API` namespace.
 | Type | Description |
 |---|---|
 | `JsonCasingConvention` | `static void Configure(JsonSerializerOptions options)` adds the convention to existing options; `static JsonSerializerOptions Options` is a ready made, reusable instance for serializing outside the MVC/minimal API pipeline. |
+| `UtcDateTimeJsonConverter` | `JsonConverter<DateTime>` registered by `JsonCasingConvention.Configure`. Writes every `DateTime` as UTC ending in `Z` (Unspecified is treated as UTC, Local is converted); reading is unchanged. `static DateTime ToUtc(DateTime value)` applies the same rule. |
 | `CustomFormFile` | `IFormFile` backed by a `byte[]`. Constructor `(string fileName, byte[] content)`; properties `FileName`, `Content`, `Length`, `ContentType` (always `application/octet-stream`), `Name` (always `file`), `ContentDisposition`, `Headers`; methods `CopyTo`, `CopyToAsync`, `OpenReadStream`. |
 | `GraphQlEnvelope` | `static GraphQlResult Read(string body)` parses a GraphQL HTTP response body. Never throws: empty or invalid bodies become transport errors. |
 | `GraphQlResult` | `Data` (`JsonElement`), `HasData`, `TransportErrors`, `Errors`, and per mutation helpers `Payload(field)`, `UserErrors(field)`, `FirstError(field)`, `Succeeded(field)`. |
@@ -55,6 +56,7 @@ All types are in the `AnointedAutomation.Objects.API` namespace.
 - Structs: every member is camelCase.
 - Enums serialize as camelCase strings (integers are still accepted on input).
 - A member with `[JsonPropertyName]` keeps its explicit name, and anonymous types are left untouched.
+- Every `DateTime` is written as UTC ending in `Z`, so browsers never read it as local time. A value with `Kind` Unspecified is treated as UTC and a Local one is converted. Reading keeps the default parsing.
 
 ```csharp
 using System.Text.Json;
