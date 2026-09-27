@@ -43,6 +43,7 @@ All types are in the `AnointedAutomation.Objects.API` namespace.
 |---|---|
 | `JsonCasingConvention` | `static void Configure(JsonSerializerOptions options)` adds the convention to existing options; `static JsonSerializerOptions Options` is a ready made, reusable instance for serializing outside the MVC/minimal API pipeline. |
 | `UtcDateTimeJsonConverter` | `JsonConverter<DateTime>` registered by `JsonCasingConvention.Configure`. Writes every `DateTime` as UTC ending in `Z` (Unspecified is treated as UTC, Local is converted); reading is unchanged. `static DateTime ToUtc(DateTime value)` applies the same rule. |
+| `PageResponse<T>` | One page of a paged list: `IReadOnlyList<T> Items`, `long Total`, `int Page`, `int PageSize`, plus a constructor taking all four. Serializes as `{"Items":[...],"total":n,"page":n,"pageSize":n}`. |
 | `CustomFormFile` | `IFormFile` backed by a `byte[]`. Constructor `(string fileName, byte[] content)`; properties `FileName`, `Content`, `Length`, `ContentType` (always `application/octet-stream`), `Name` (always `file`), `ContentDisposition`, `Headers`; methods `CopyTo`, `CopyToAsync`, `OpenReadStream`. |
 | `GraphQlEnvelope` | `static GraphQlResult Read(string body)` parses a GraphQL HTTP response body. Never throws: empty or invalid bodies become transport errors. |
 | `GraphQlResult` | `Data` (`JsonElement`), `HasData`, `TransportErrors`, `Errors`, and per mutation helpers `Payload(field)`, `UserErrors(field)`, `FirstError(field)`, `Succeeded(field)`. |
