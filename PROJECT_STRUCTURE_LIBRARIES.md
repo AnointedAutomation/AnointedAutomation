@@ -189,9 +189,9 @@ The AnointedAutomation solution contains 10 core libraries targeting .NET 8.0/ne
   - Includes `[BsonIgnoreExtraElements]` for forward compatibility
   - Inherit from this for any MongoDB-persisted entity
 
-- `AuditableMongoDocument` - Base class with audit timestamps
-  - Extends `MongoDocument` with `createdAt` and `updatedAt` properties (DateTime = value type = camelCase)
-  - Use for entities requiring creation/modification tracking
+- `CreatedMongoDocument` / `TimestampedMongoDocument` / `HistoriedMongoDocument` - Timestamp hierarchy
+  - `CreatedAt` (append-only), then `UpdatedAt` (mutable), then a capped `UpdateHistory` of `UpdateStamp`
+  - Stamped by `CreatedMongoRepository<TDoc>` / `TimestampedMongoRepository<TDoc>` / `HistoriedMongoRepository<TDoc>`
 
 - `IMongoHelper` - Interface defining MongoDB operations
   - Defines standard CRUD operations
@@ -226,7 +226,7 @@ The AnointedAutomation solution contains 10 core libraries targeting .NET 8.0/ne
   - MongoDB.Libmongocrypt (1.12.0)
 
 **Public API Surface:**
-- Base classes: `MongoDocument`, `AuditableMongoDocument`
+- Base classes: `MongoDocument`, `CreatedMongoDocument`, `TimestampedMongoDocument`, `HistoriedMongoDocument`
 - CRUD operations: `CreateDocumentAsync<T>()`, `GetAllDocumentsAsync<T>()`, `UpdateDocumentAsync<T>()`, `DeleteDocumentAsync<T>()`
 - Connection management: `CreateMongoDbInstance()`, `TestConnection()`
 - Utility methods: `ConnectionStringBuilder()`, `GetIdFromObj<T>()`
