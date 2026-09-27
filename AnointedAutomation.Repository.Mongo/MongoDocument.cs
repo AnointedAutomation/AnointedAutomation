@@ -25,10 +25,13 @@ namespace AnointedAutomation.Repository.Mongo
     public abstract class MongoDocument
     {
         /// <summary>
-        /// MongoDB ObjectId as string.
+        /// MongoDB ObjectId as string. An empty id is left out of the document, so Mongo generates one on insert
+        /// instead of rejecting "" as an invalid ObjectId.
         /// </summary>
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [BsonDefaultValue("")]
+        [BsonIgnoreIfDefault]
         public string Id { get; set; } = string.Empty;
     }
 
