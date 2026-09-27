@@ -1,8 +1,10 @@
 // Copyright © Anointed Automation, Ltd., 2025. All Rights Reserved.
 
 // =============================================================================
-// NAMING: C# properties are PascalCase. The wire casing (value types camelCase,
-// reference types PascalCase) comes from JsonCasingConvention, not the C# names.
+// NAMING CONVENTION:
+// This codebase follows a specific property naming pattern:
+//   - Value types (structs): lowercase (e.g., bool success, int statusCode)
+//   - Reference types (objects): PascalCase (e.g., string Message, object Data)
 // =============================================================================
 
 using System;
@@ -17,42 +19,43 @@ namespace AnointedAutomation.Objects
     public class PaginatedResponse<T>
     {
         /// <summary>
-        /// The data items for this page
-        /// </summary>
-        public IReadOnlyList<T> Data { get; set; }
-
-        /// <summary>
         /// The current page number (1-based)
         /// </summary>
-        public int CurrentPage { get; set; }
+        public int currentPage { get; set; }
 
         /// <summary>
-        /// The number of items per page
+        /// The data items for this page
         /// </summary>
-        public int PageSize { get; set; }
-
-        /// <summary>
-        /// The total number of items across all pages
-        /// </summary>
-        public long TotalItems { get; set; }
-
-        /// <summary>
-        /// The total number of pages (0 when the page size is 0)
-        /// </summary>
-        public int TotalPages { get; set; }
+        public List<T> Data { get; set; }
 
         /// <summary>
         /// Whether there is a next page available
         /// </summary>
-        public bool HasNextPage => CurrentPage < TotalPages;
+        public bool hasNextPage => currentPage < totalPages;
 
         /// <summary>
         /// Whether there is a previous page available
         /// </summary>
-        public bool HasPreviousPage => CurrentPage > 1;
+        public bool hasPreviousPage => currentPage > 1;
 
         /// <summary>
-        /// Creates an empty paginated response
+        /// The number of items per page
+        /// </summary>
+        public int pageSize { get; set; }
+
+        /// <summary>
+        /// The total number of items across all pages
+        /// </summary>
+        public long totalItems { get; set; }
+
+        /// <summary>
+        /// The total number of pages
+        /// </summary>
+        public int totalPages { get; set; }
+
+
+        /// <summary>
+        /// Creates a new paginated response
         /// </summary>
         public PaginatedResponse()
         {
@@ -60,19 +63,19 @@ namespace AnointedAutomation.Objects
         }
 
         /// <summary>
-        /// Creates a new paginated response with data; TotalPages is computed from the counts
+        /// Creates a new paginated response with data
         /// </summary>
         /// <param name="data">The data items for this page</param>
         /// <param name="currentPage">The current page number</param>
         /// <param name="pageSize">The number of items per page</param>
         /// <param name="totalItems">The total number of items</param>
-        public PaginatedResponse(IReadOnlyList<T> data, int currentPage, int pageSize, long totalItems)
+        public PaginatedResponse(List<T> data, int currentPage, int pageSize, long totalItems)
         {
             Data = data ?? new List<T>();
-            CurrentPage = currentPage;
-            PageSize = pageSize;
-            TotalItems = totalItems;
-            TotalPages = pageSize > 0 ? (int)Math.Ceiling(totalItems / (double)pageSize) : 0;
+            this.currentPage = currentPage;
+            this.pageSize = pageSize;
+            this.totalItems = totalItems;
+            this.totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
         }
     }
 }
