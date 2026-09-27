@@ -5,7 +5,7 @@ using Xunit;
 namespace AnointedAutomation.Repository.Mongo.Tests
 {
     /// <summary>
-    /// Tests for the MongoDocument and AuditableMongoDocument classes.
+    /// Tests for MongoDocument and the timestamp document hierarchy.
     /// </summary>
     public class MongoDocumentTests
     {
@@ -17,12 +17,17 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             public string Name { get; set; }
         }
 
-        /// <summary>
-        /// Concrete implementation of AuditableMongoDocument for testing.
-        /// </summary>
-        private class TestAuditableDocument : AuditableMongoDocument
+        private class TestCreatedDocument : CreatedMongoDocument
+        {
+        }
+
+        private class TestTimestampedDocument : TimestampedMongoDocument
         {
             public string Description { get; set; }
+        }
+
+        private class TestHistoriedDocument : HistoriedMongoDocument
+        {
         }
 
         #region MongoDocument Tests
@@ -81,117 +86,60 @@ namespace AnointedAutomation.Repository.Mongo.Tests
 
         #endregion
 
-        #region AuditableMongoDocument Tests
+        #region Timestamp hierarchy Tests
 
         [Fact]
-        public void AuditableMongoDocument_InheritsFromMongoDocument()
+        public void Hierarchy_EachLevelExtendsThePreviousOne()
         {
-            // Arrange & Act
-            TestAuditableDocument doc = new TestAuditableDocument();
-
-            // Assert
-            Assert.IsAssignableFrom<MongoDocument>(doc);
+            Assert.IsAssignableFrom<MongoDocument>(new TestCreatedDocument());
+            Assert.IsAssignableFrom<CreatedMongoDocument>(new TestTimestampedDocument());
+            Assert.IsAssignableFrom<TimestampedMongoDocument>(new TestHistoriedDocument());
         }
 
         [Fact]
-        public void AuditableMongoDocument_CreatedAt_DefaultsToDefaultDateTime()
+        public void TimestampedDocument_Timestamps_DefaultToDefaultDateTime()
         {
-            // Arrange & Act
-            TestAuditableDocument doc = new TestAuditableDocument();
+            TestTimestampedDocument doc = new TestTimestampedDocument();
 
-            // Assert
-            Assert.Equal(default(DateTime), doc.createdAt);
+            Assert.Equal(default(DateTime), doc.CreatedAt);
+            Assert.Equal(default(DateTime), doc.UpdatedAt);
         }
 
         [Fact]
-        public void AuditableMongoDocument_CreatedAt_CanBeSet()
+        public void TimestampedDocument_Timestamps_CanBeSet()
         {
-            // Arrange
-            TestAuditableDocument doc = new TestAuditableDocument();
-            DateTime expectedDate = new DateTime(2026, 3, 28, 12, 0, 0, DateTimeKind.Utc);
+            DateTime created = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            DateTime updated = new DateTime(2026, 3, 28, 0, 0, 0, DateTimeKind.Utc);
+            TestTimestampedDocument doc = new TestTimestampedDocument
+            {
+                Id = "audit-doc-id",
+                Description = "Test Description",
+                CreatedAt = created,
+                UpdatedAt = updated,
+            };
 
-            // Act
-            doc.createdAt = expectedDate;
-
-            // Assert
-            Assert.Equal(expectedDate, doc.createdAt);
-        }
-
-        [Fact]
-        public void AuditableMongoDocument_UpdatedAt_DefaultsToDefaultDateTime()
-        {
-            // Arrange & Act
-            TestAuditableDocument doc = new TestAuditableDocument();
-
-            // Assert
-            Assert.Equal(default(DateTime), doc.updatedAt);
-        }
-
-        [Fact]
-        public void AuditableMongoDocument_UpdatedAt_CanBeSet()
-        {
-            // Arrange
-            TestAuditableDocument doc = new TestAuditableDocument();
-            DateTime expectedDate = new DateTime(2026, 3, 28, 14, 30, 0, DateTimeKind.Utc);
-
-            // Act
-            doc.updatedAt = expectedDate;
-
-            // Assert
-            Assert.Equal(expectedDate, doc.updatedAt);
-        }
-
-        [Fact]
-        public void AuditableMongoDocument_Id_CanBeSetIndependentOfTimestamps()
-        {
-            // Arrange
-            TestAuditableDocument doc = new TestAuditableDocument();
-            string expectedId = "507f1f77bcf86cd799439012";
-            DateTime createdDate = DateTime.UtcNow.AddDays(-1);
-            DateTime updatedDate = DateTime.UtcNow;
-
-            // Act
-            doc.Id = expectedId;
-            doc.createdAt = createdDate;
-            doc.updatedAt = updatedDate;
-
-            // Assert
-            Assert.Equal(expectedId, doc.Id);
-            Assert.Equal(createdDate, doc.createdAt);
-            Assert.Equal(updatedDate, doc.updatedAt);
-        }
-
-        [Fact]
-        public void AuditableMongoDocument_AdditionalProperties_Work()
-        {
-            // Arrange
-            TestAuditableDocument doc = new TestAuditableDocument();
-
-            // Act
-            doc.Id = "audit-doc-id";
-            doc.Description = "Test Description";
-            doc.createdAt = DateTime.UtcNow;
-            doc.updatedAt = DateTime.UtcNow;
-
-            // Assert
             Assert.Equal("audit-doc-id", doc.Id);
-            Assert.Equal("Test Description", doc.Description);
+            Assert.Equal(created, doc.CreatedAt);
+            Assert.Equal(updated, doc.UpdatedAt);
         }
 
         [Fact]
-        public void AuditableMongoDocument_UpdatedAt_CanBeNewerThanCreatedAt()
+        public void HistoriedDocument_UpdateHistory_StartsEmptyNotNull()
         {
-            // Arrange
-            TestAuditableDocument doc = new TestAuditableDocument();
-            DateTime createdDate = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            DateTime updatedDate = new DateTime(2026, 3, 28, 0, 0, 0, DateTimeKind.Utc);
+            TestHistoriedDocument doc = new TestHistoriedDocument();
 
-            // Act
-            doc.createdAt = createdDate;
-            doc.updatedAt = updatedDate;
+            Assert.NotNull(doc.UpdateHistory);
+            Assert.Empty(doc.UpdateHistory);
+        }
 
-            // Assert
-            Assert.True(doc.updatedAt > doc.createdAt);
+        [Fact]
+        public void UpdateStamp_Defaults_AreEmptyNotNull()
+        {
+            UpdateStamp stamp = new UpdateStamp();
+
+            Assert.Equal(string.Empty, stamp.By);
+            Assert.NotNull(stamp.Fields);
+            Assert.Empty(stamp.Fields);
         }
 
         #endregion

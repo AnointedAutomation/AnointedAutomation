@@ -56,6 +56,9 @@ namespace AnointedAutomation.Objects.API
             // bodies that send enum ints keep working).
             options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 
+            // Every DateTime goes out as UTC with a 'Z', so browsers never read it as local time.
+            options.Converters.Add(new UtcDateTimeJsonConverter());
+
             DefaultJsonTypeInfoResolver resolver =
                 options.TypeInfoResolver as DefaultJsonTypeInfoResolver ?? new DefaultJsonTypeInfoResolver();
             resolver.Modifiers.Add(ApplyConvention);
