@@ -33,6 +33,26 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         #region MongoDocument Tests
 
         [Fact]
+        public void MongoDocument_EmptyId_IsLeftOutOfTheBsonDocument()
+        {
+            TestMongoDocument doc = new TestMongoDocument { Name = "n" };
+
+            MongoDB.Bson.BsonDocument bson = MongoDB.Bson.BsonExtensionMethods.ToBsonDocument(doc);
+
+            Assert.False(bson.Contains("_id"));
+        }
+
+        [Fact]
+        public void MongoDocument_SetId_IsWrittenAsObjectId()
+        {
+            TestMongoDocument doc = new TestMongoDocument { Id = "507f1f77bcf86cd799439011" };
+
+            MongoDB.Bson.BsonDocument bson = MongoDB.Bson.BsonExtensionMethods.ToBsonDocument(doc);
+
+            Assert.Equal(MongoDB.Bson.BsonType.ObjectId, bson["_id"].BsonType);
+        }
+
+        [Fact]
         public void MongoDocument_Id_DefaultsToEmptyString()
         {
             // Arrange & Act
