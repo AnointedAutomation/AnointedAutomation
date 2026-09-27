@@ -70,7 +70,8 @@ All test projects are organized under a "Tests" solution folder in the main .sln
 - `MongoHelperFactoryTests.cs` - Tests for factory caching behavior
 - `BsonClassMapRegistrarTests.cs` - Tests for BSON class map registration
 - `JObjectSerializerTests.cs` - Tests for JObject serialization
-- `MongoDocumentTests.cs` - Tests for MongoDocument and AuditableMongoDocument classes
+- `MongoDocumentTests.cs` - Tests for MongoDocument and the timestamp document hierarchy
+- `TimestampedMongoRepositoriesTests.cs` - Tests for the stamping repositories
 
 **Testing Framework:** Xunit (.NET 10.0)
 **Test Coverage:** EXCELLENT - 100% line coverage on MongoHelper async CRUD operations, 90% branch coverage

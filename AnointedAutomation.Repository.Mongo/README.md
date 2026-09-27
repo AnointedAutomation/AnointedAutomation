@@ -94,7 +94,15 @@ Every method takes the collection name as its first argument.
 |---|---|
 | `MongoRepository<TDoc>` | Abstract base with constructor `(IMongoHelper mongo, string collectionName)` and protected `Mongo` / `CollectionName`. Public methods: `GetByIdAsync`, `GetSingleAsync`, `GetFilteredAsync`, `GetAllAsync`, `GetPagedAsync`, `CountAsync`, `ExistsAsync`, `CreateAsync`, `UpsertAsync`, `ReplaceByIdAsync`, `UpdateByIdAsync`, `DeleteByIdAsync`, `DeleteManyAsync`. |
 | `MongoDocument` | Abstract base with `string Id` mapped as `[BsonId]` / ObjectId, and `[BsonIgnoreExtraElements]`. |
-| `AuditableMongoDocument` | Adds `DateTime createdAt` and `updatedAt`. You set these yourself. |
+| `CreatedMongoDocument` | Adds `DateTime CreatedAt` (UTC). For append-only records. |
+| `TimestampedMongoDocument` | Adds `DateTime UpdatedAt` (UTC), equal to `CreatedAt` on insert. For mutable records. |
+| `HistoriedMongoDocument` | Adds `List<UpdateStamp> UpdateHistory`, the newest changes capped by the repository. |
+| `UpdateStamp` | One change: `DateTime At`, `string By` (user id, `system` or a job name), `List<string> Fields`. |
+| `CreatedMongoRepository<TDoc>` | `CreateAsync` stamps `CreatedAt`. Override `UtcNow` for a fixed clock in tests. |
+| `TimestampedMongoRepository<TDoc>` | Also stamps `UpdatedAt` on create, `UpdateByIdAsync`, `UpsertAsync` (plus `CreatedAt` on insert) and `ReplaceByIdAsync`. Your update must not set either field itself. |
+| `HistoriedMongoRepository<TDoc>` | Also pushes an `UpdateStamp` on every write, keeping the newest `UpdateHistoryLimit` (default 50). Overloads taking `(string by, params string[] fields)` record who changed what; the plain ones record `system`. |
+
+Property names are PascalCase with no `[BsonElement]` overrides, so element names follow the registered naming convention (`HybridElementNameConvention` stores `createdAt`, `updatedAt`, `UpdateHistory`). Skip the write entirely when nothing changed; every write counts as a change.
 
 ### Indexes
 

@@ -127,7 +127,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         /// <param name="document">The document to create.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
-        public Task CreateAsync(TDoc document)
+        public virtual Task CreateAsync(TDoc document)
         {
             return Mongo.CreateDocumentAsync(CollectionName, document);
         }
@@ -138,7 +138,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="filter">The match predicate.</param>
         /// <param name="update">The update definition (applied on both update and insert).</param>
         /// <returns>The result of the upsert operation.</returns>
-        public Task<UpdateResult> UpsertAsync(Expression<Func<TDoc, bool>> filter, UpdateDefinition<TDoc> update)
+        public virtual Task<UpdateResult> UpsertAsync(Expression<Func<TDoc, bool>> filter, UpdateDefinition<TDoc> update)
         {
             return Mongo.UpsertAsync(CollectionName, Builders<TDoc>.Filter.Where(filter), update);
         }
@@ -149,7 +149,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="id">The document's <c>_id</c> value.</param>
         /// <param name="document">The new document.</param>
         /// <returns>The result of the replace operation.</returns>
-        public Task<ReplaceOneResult> ReplaceByIdAsync(string id, TDoc document)
+        public virtual Task<ReplaceOneResult> ReplaceByIdAsync(string id, TDoc document)
         {
             return Mongo.ReplaceByIdAsync(CollectionName, id, document);
         }
@@ -160,7 +160,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="id">The document's <c>_id</c> value.</param>
         /// <param name="update">The update definition.</param>
         /// <returns>The result of the update operation.</returns>
-        public Task<UpdateResult> UpdateByIdAsync(string id, UpdateDefinition<TDoc> update)
+        public virtual Task<UpdateResult> UpdateByIdAsync(string id, UpdateDefinition<TDoc> update)
         {
             return Mongo.UpdateByIdAsync(CollectionName, id, update);
         }

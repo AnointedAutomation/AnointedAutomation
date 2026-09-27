@@ -174,7 +174,9 @@ epistemics engine.
 ### 6. AnointedAutomation.Repository.Mongo
 - MongoDocument.cs
   - Base class for MongoDB documents (`MongoDocument`)
-  - Auditable base class with timestamps (`AuditableMongoDocument`)
+  - Timestamp hierarchy (`CreatedMongoDocument`, `TimestampedMongoDocument`, `HistoriedMongoDocument`, `UpdateStamp`)
+- TimestampedMongoRepositories.cs
+  - Stamping repositories (`CreatedMongoRepository`, `TimestampedMongoRepository`, `HistoriedMongoRepository`)
   - BSON attribute configuration for ObjectId handling
   - Full XML documentation
 
