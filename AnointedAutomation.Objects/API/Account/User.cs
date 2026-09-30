@@ -145,6 +145,17 @@ namespace AnointedAutomation.Objects.Account
         public GoogleObjects Google { get; set; }
 
         /// <summary>
+        /// Gets or sets the user's unified external identities (Google, Microsoft, Apple, Facebook,
+        /// Shopify) grouped under one <see cref="Account.Sso"/> object. Null for accounts with no
+        /// linked external identity, and for documents written before this field existed (they
+        /// deserialize with null). ADDED alongside the legacy <see cref="Google"/> field and the
+        /// <c>Meta</c> ShopifyCustomerId key; those keep being written for back-compat and are not
+        /// removed here.
+        /// </summary>
+        [DataMember]
+        public Sso Sso { get; set; }
+
+        /// <summary>
         /// This will most likely be a big json
         /// </summary>
         [DataMember]
