@@ -3,7 +3,7 @@
 # PROJECT STRUCTURE LIBRARIES
 
 ## Solution Overview
-The AnointedAutomation solution contains 10 core libraries targeting .NET 8.0/net10.0, each focusing on specific functionality areas. All libraries are designed as NuGet packages with MIT licensing. All code is fully documented with XML documentation.
+The AnointedAutomation solution contains 11 core libraries targeting .NET 8.0/net10.0, each focusing on specific functionality areas. All libraries are designed as NuGet packages with MIT licensing. All code is fully documented with XML documentation.
 
 ## Library Details
 
@@ -398,6 +398,24 @@ All billing models include complete XML documentation
   - AnointedAutomation.Concepts (Epistemics engine types)
 - **External:** .NET 10.0 (net10.0) framework only
 
+### 11. AnointedAutomation.Optimization v1.0.0
+
+**Purpose & Functionality:**
+- Reusable optimization/utility helpers ported from the legacy roku674/Optimization repo, modernized
+  to net10.0 with nullable reference types
+- `Utility` - DataTable/DataReader to list mapping, CSV writers/readers, base64 encode/decode, random
+  string generation, chunking (`ToChunks`), jagged-array conversion, substring helpers, recursive delete
+- `ChunkDataReader` - in-memory `IDataReader` over a list of rows
+- `JsonFlattener` - flattens nested JSON to an underscore-keyed dictionary (dependency-free System.Text.Json)
+- `Roman` - integer to/from Roman numerals with overline groups for large numbers
+- `FileManagement` / `FileComparator` - idempotent file/directory helpers and byte-for-byte compare
+- `JsonElementExtensions` - null-safe strict/coercing accessors over `System.Text.Json.JsonElement`
+- `BsonMap` - null-safe strict/coercing accessors over MongoDB `BsonDocument` / `BsonValue`
+
+**Dependencies:**
+- **Internal:** none
+- **External:** MongoDB.Bson (used only by the `BsonMap` accessors); otherwise net10.0 framework only
+
 ## Inter-Library Dependencies
 
 ```
@@ -431,6 +449,9 @@ AnointedAutomation.Concepts
 
 AnointedAutomation.Mathematics
 └── AnointedAutomation.Concepts (Epistemics engine types)
+
+AnointedAutomation.Optimization
+└── (no internal dependencies; external MongoDB.Bson only)
 ```
 
 ## Key Architectural Notes
