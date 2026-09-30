@@ -57,6 +57,7 @@ jobs:
             ["AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"]="AnointedAutomation.Objects.API"
             ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="AnointedAutomation.Concepts"
             ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="AnointedAutomation.Mathematics"
+            ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="AnointedAutomation.Optimization"
           )
 
           VERSIONS_UPDATED=0
