@@ -93,5 +93,6 @@ This library is free and open source. The best way to support the work is to sho
 
 - **Christian items:** [https://store.anointed.company](https://store.anointed.company)
 - **Everything else:** [https://www.mart.club](https://www.mart.club)
+- **Pets:** [https://www.animaldander.com](https://www.animaldander.com)
 
 Found a bug or have a request? Open an issue: [https://github.com/AnointedAutomation/AnointedAutomation/issues](https://github.com/AnointedAutomation/AnointedAutomation/issues)
