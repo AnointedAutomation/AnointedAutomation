@@ -10,9 +10,9 @@
 		<Title>AnointedAutomation.Objects</Title>
 		<Company>Anointed Automation LLC - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
-		<Description>Plain POCO models for user accounts, billing and payments, Google sign in, and standard API response envelopes.</Description>
+		<Description>Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>2.1.5</Version>
+		<Version>2.2.0</Version>
 		<PackageTags>models;poco;dto;billing;payments;user;response;anointedautomation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Objects</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
@@ -31,6 +31,8 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Enums\AnointedAutomation.Enums.csproj" />
+		<ProjectReference Include="..\AnointedAutomation.Shopify\AnointedAutomation.Shopify.csproj" />
+		<ProjectReference Include="..\AnointedAutomation.Serialization\AnointedAutomation.Serialization.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

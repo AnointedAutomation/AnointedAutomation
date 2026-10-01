@@ -1,5 +1,7 @@
 # AnointedAutomation.Repository.Mongo
 
+Jesus is King ✝️
+
 A thin, testable wrapper over the official MongoDB .NET driver. `IMongoHelper` gives you collection name based CRUD, paging, projection, aggregation and index management; `MongoRepository<TDoc>` is a base class for per collection repositories; and the BSON helpers register class maps and casing conventions for the [AnointedAutomation.Objects](https://www.nuget.org/packages/AnointedAutomation.Objects) models.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.Mongo.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Repository.Mongo.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo)
@@ -199,3 +201,12 @@ This library is free and open source. The best way to support the work is to sho
 - **Everything else:** [https://www.mart.club](https://www.mart.club)
 
 Found a bug or have a request? Open an issue at [https://github.com/AnointedAutomation/AnointedAutomation/issues](https://github.com/AnointedAutomation/AnointedAutomation/issues).
+
+
+## 1.3.0 additions
+
+- `AnointedAutomation.Repository.Mongo.Bson.HybridCasing.Register(namespacePrefix, denyList, registerClassMaps, toleranceAssemblies, ignoreExtraElements)`: one idempotent bootstrap that registers the hybrid convention, runs your class maps, then applies IgnoreExtraElements to everything else, in that order.
+- `Bson.BsonToleranceRegistrar.RegisterIgnoreExtraElements(assemblies, namespacePrefix)`.
+- `Bson.LenientStringSerializer`: reads Int32/Int64/Double legacy values as strings.
+- `AnointedAutomation.Repository.Mongo.Bson.BsonValueExtensions`: lenient, never-throwing BsonDocument/BsonValue readers.
+- The casing conventions now delegate to `AnointedAutomation.Serialization.Naming.NamingRules`.

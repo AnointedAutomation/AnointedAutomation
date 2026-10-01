@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Vendor-neutral GraphQL response envelope reader. Consolidates the duplicated top-level errors[]
 // checks and data.{mutation}.userErrors[] parsers that were hand-rolled across consuming apps

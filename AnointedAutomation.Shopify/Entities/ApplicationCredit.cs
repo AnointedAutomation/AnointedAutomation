@@ -1,0 +1,30 @@
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Derived from ShopifySharp (https://github.com/nozzlegear/ShopifySharp), Copyright (c) 2015 Joshua Harms, MIT License.
+// Adapted by Anointed Automation, LLC. See THIRD-PARTY-NOTICES.md.
+using Newtonsoft.Json;
+
+namespace AnointedAutomation.Shopify;
+
+/// <summary>
+/// An object representing Shopify's ApplicationCredit object, which can be used to offer credits for payments made via the Application Charge, Recurring Application Charge, and Usage Charge APIs.
+/// </summary>
+public class ApplicationCredit: ShopifyObject
+{
+    /// <summary>
+    /// The description of the application credit.
+    /// </summary>
+    [JsonProperty("description")]
+    public string Description { get; set; }
+
+    /// <summary>
+    /// The amount refunded by the application credit.
+    /// </summary>
+    [JsonProperty("amount")]
+    public decimal? Amount { get; set; }
+
+    /// <summary>
+    /// States whether or not the application credit is a test transaction. Valid values are true or null.
+    /// </summary>
+    [JsonProperty("test")]
+    public bool? Test { get; set; }
+}

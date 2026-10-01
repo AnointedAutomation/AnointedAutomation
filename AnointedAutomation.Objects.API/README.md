@@ -1,5 +1,7 @@
 # AnointedAutomation.Objects.API
 
+Jesus is King ✝️
+
 ASP.NET Core companions to [AnointedAutomation.Objects](https://www.nuget.org/packages/AnointedAutomation.Objects): an in memory `IFormFile`, the shared hybrid casing `System.Text.Json` convention used by AnointedAutomation APIs, and a never throwing GraphQL response reader.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.API.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects.API) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Objects.API.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects.API)
@@ -133,3 +135,8 @@ This library is free and open source. The best way to support the work is to sho
 - **Everything else:** [https://www.mart.club](https://www.mart.club)
 
 Found a bug or have a request? Open an issue at [https://github.com/AnointedAutomation/AnointedAutomation/issues](https://github.com/AnointedAutomation/AnointedAutomation/issues).
+
+
+## Moved to AnointedAutomation.Serialization (1.3.0)
+
+`JsonCasingConvention` and `UtcDateTimeJsonConverter` now live in `AnointedAutomation.Serialization.SystemTextJson`. The types in this package are thin delegating shims kept so existing code compiles unchanged; prefer the Serialization types (and `AnointedJson.ConfigureApi`) in new code.

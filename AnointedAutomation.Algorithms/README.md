@@ -1,5 +1,7 @@
 # AnointedAutomation.Algorithms
 
+Jesus is King ✝️
+
 Reusable algorithms with no dependencies for the AnointedAutomation suite. Today it ships a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction, for developers who need QR codes without pulling in a native or third party imaging library.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms)

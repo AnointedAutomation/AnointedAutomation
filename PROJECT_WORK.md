@@ -2,6 +2,13 @@
 
 ## Current Tasks
 
+### Serialization consolidation, stage 1 (2026-09-30) - COMPLETED (uncommitted)
+- New package `AnointedAutomation.Serialization` 1.0.0 (+ `.Tests`): `Naming.NamingRules`, `SystemTextJson` (JsonCasingConvention, UtcDateTimeJsonConverter, JsonPresets, AnointedJson.ConfigureApi), `Newtonsoft` (TolerantEnumConverter, StringOrBoolConverter, DateFormatConverter, NullOnErrorConverter), `Json` (JsonElementExtensions superset, ResponseJson).
+- Objects.API 1.3.0: JsonCasingConvention/UtcDateTimeJsonConverter are delegating shims (not [Obsolete], consumers use TreatWarningsAsErrors).
+- Repository.Mongo 1.3.0: conventions delegate to NamingRules; new namespace `AnointedAutomation.Repository.Mongo.Bson` (BsonValueExtensions, HybridCasing, BsonToleranceRegistrar, LenientStringSerializer).
+- Shopify 1.0.0: ShopifyGid, ShopifyMoney; converters moved to Serialization except FalseToNullConverter. Objects 2.2.0: Apple types on TolerantEnumConverter; `Objects.Apple.StringOrBoolConverter` kept as an empty subclass.
+- Workflows + publish-packages.sh: Serialization added; publish order Serialization, Shopify, Objects, Repository.Mongo, Objects.API.
+
 ### Theoretical Proofs type (Epistemics) - COMPLETED
 - **Description**: Added a first-class Proof type family to
   `AnointedAutomation.Concepts/Epistemics/`: Proof.cs (name, plain statement, symbolic form,

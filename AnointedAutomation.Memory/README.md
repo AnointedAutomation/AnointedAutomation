@@ -1,5 +1,7 @@
 # AnointedAutomation.Memory
 
+Jesus is King ✝️
+
 A small .NET utility for on-demand garbage collection. It forces a full collection, waits for finalizers, and then tries to hand unused memory back to the operating system, which is useful for long running services after a memory heavy job.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory)

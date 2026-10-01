@@ -1,3 +1,4 @@
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Copyright 2026 Anointed Automation, LLC. All Rights Reserved.
 // Coded by Alexander Fields https://www.alexanderfields.me
 // Standardization primitive (#2 of the 2026-07-30 backend duplication audit): typed, null-safe

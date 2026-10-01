@@ -1,5 +1,7 @@
 # AnointedAutomation.Objects
 
+Jesus is King ✝️
+
 Plain C# models shared across AnointedAutomation services: user accounts and profiles, billing and payment records, Google sign in payloads, and standard API response envelopes. The classes carry no database attributes, so the same types work with MongoDB, SQL or plain JSON.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Objects.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects)

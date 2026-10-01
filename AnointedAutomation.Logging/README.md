@@ -1,5 +1,7 @@
 # AnointedAutomation.Logging
 
+Jesus is King ✝️
+
 A small log message model with no dependencies for .NET. `LogMessage` captures the message, severity, timestamp, program name and calling method, and raises a static event every time one is created so you can route logs wherever you like.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Logging.svg)](https://www.nuget.org/packages/AnointedAutomation.Logging) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Logging.svg)](https://www.nuget.org/packages/AnointedAutomation.Logging)

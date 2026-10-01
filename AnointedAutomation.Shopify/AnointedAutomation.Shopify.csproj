@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+    <Title>AnointedAutomation.Shopify</Title>
+    <Company>Anointed Automation LLC - Alexander Fields</Company>
+    <Copyright>Copyright © 2026 Anointed Automation, LLC. Portions Copyright (c) 2015 Joshua Harms (ShopifySharp, MIT).</Copyright>
+    <Description>Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.</Description>
+    <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
+    <Version>1.0.0</Version>
+    <PackageTags>shopify;rest;models;poco;dto;newtonsoft;anointedautomation</PackageTags>
+    <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Shopify</PackageReleaseNotes>
+    <Authors>Anointed Automation LLC, Alexander Fields</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AnointedAutomation.Serialization\AnointedAutomation.Serialization.csproj" />
+  </ItemGroup>
+
+</Project>

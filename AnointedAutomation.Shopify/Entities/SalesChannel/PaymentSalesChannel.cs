@@ -1,0 +1,37 @@
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Derived from ShopifySharp (https://github.com/nozzlegear/ShopifySharp), Copyright (c) 2015 Joshua Harms, MIT License.
+// Adapted by Anointed Automation, LLC. See THIRD-PARTY-NOTICES.md.
+using System;
+using Newtonsoft.Json;
+
+namespace AnointedAutomation.Shopify;
+
+public class PaymentSalesChannel: ShopifyObject
+{
+    [JsonProperty("unique_token")]
+    public string UniqueToken { get; set; }
+
+    [JsonProperty("payment_processing_error_message")]
+    public object PaymentProcessingErrorMessage { get; set; }
+
+    [JsonProperty("next_action")]
+    public NextAction NextAction { get; set; }
+
+    [JsonProperty("fraudulent")]
+    public bool Fraudulent { get; set; }
+
+    [JsonProperty("transaction")]
+    public Transaction Transaction { get; set; }
+
+    [JsonProperty("credit_card")]
+    public PaymentCreditCard CreditCard { get; set; }
+
+    [JsonProperty("checkout")]
+    public CheckoutSalesChannel Checkout { get; set; }
+}
+
+public class NextAction
+{
+    [JsonProperty("redirect_url")]
+    public Uri RedirectUrl { get; set; }
+}

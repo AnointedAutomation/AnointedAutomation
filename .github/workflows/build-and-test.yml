@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40
+# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40 Jesus is King ✝️
 # Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 name: .NET Test
 
@@ -93,6 +93,12 @@ jobs:
 
       - name: Run Optimization Tests
         run: dotnet test AnointedAutomation.Optimization.Tests/AnointedAutomation.Optimization.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      - name: Run Shopify Tests
+        run: dotnet test AnointedAutomation.Shopify.Tests/AnointedAutomation.Shopify.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
+      - name: Run Serialization Tests
+        run: dotnet test AnointedAutomation.Serialization.Tests/AnointedAutomation.Serialization.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
       - name: Publish Test Results
         if: always()

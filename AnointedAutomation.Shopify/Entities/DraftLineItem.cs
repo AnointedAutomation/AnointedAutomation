@@ -1,0 +1,21 @@
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Derived from ShopifySharp (https://github.com/nozzlegear/ShopifySharp), Copyright (c) 2015 Joshua Harms, MIT License.
+// Adapted by Anointed Automation, LLC. See THIRD-PARTY-NOTICES.md.
+using Newtonsoft.Json;
+
+namespace AnointedAutomation.Shopify;
+
+public class DraftLineItem : LineItem 
+{
+    /// <summary>
+    ///  Indicates if this is a product variant line item, or a custom line item. If set to true indicates a custom line item. If set to false indicates a product variant line item. This is a read only field.
+    /// </summary>
+    [JsonProperty("custom")]
+    public bool? Custom { get; set; }
+
+    /// <summary>
+    /// Discount which will be applied to the line item or the overall order. 
+    /// </summary>
+    [JsonProperty("applied_discount")]
+    public AppliedDiscount AppliedDiscount { get; set; }
+}

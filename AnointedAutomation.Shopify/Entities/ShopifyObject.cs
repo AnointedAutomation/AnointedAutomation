@@ -1,0 +1,25 @@
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Derived from ShopifySharp (https://github.com/nozzlegear/ShopifySharp), Copyright (c) 2015 Joshua Harms, MIT License.
+// Adapted by Anointed Automation, LLC. See THIRD-PARTY-NOTICES.md.
+using Newtonsoft.Json;
+
+namespace AnointedAutomation.Shopify;
+
+public abstract class ShopifyObject
+{
+    /// <summary>
+    /// The object's unique id.
+    /// </summary>
+    /// <remarks>
+    /// Some object ids are longer than the max int32 value. Using long instead.
+    /// Marked as nullable due to issues I've run into when trying to create a resource. If Id is present when creating, 
+    /// Shopify will try to find that resource. By default it's set to 0 when not null, so the resource won't exist and 
+    /// Shopify will return a 404 Not Found. This is most obvious when creating a customer with a <see cref="Address"/> 
+    /// and the <see cref="Address"/> Id set to 0.
+    /// </remarks>
+    [JsonProperty("id")]
+    public long? Id { get; set; }
+
+    [JsonProperty("admin_graphql_api_id")]
+    public string AdminGraphQLAPIId { get; set; }
+}

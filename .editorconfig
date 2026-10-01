@@ -7,3 +7,8 @@ root = true
 # naming-style analyzer is turned off here even if code-style enforcement is
 # enabled later (EnforceCodeStyleInBuild).
 dotnet_diagnostic.IDE1006.severity = none
+
+# File header standard (owner directive 2026-09-30). Every source file starts with this line.
+# Severity is suggestion so TreatWarningsAsErrors builds are not broken by older dated headers.
+file_header_template = Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+dotnet_diagnostic.IDE0073.severity = suggestion

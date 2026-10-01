@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40
+# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40 Jesus is King ✝️
 # Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 name: Publish NuGet Packages
 
@@ -67,6 +67,8 @@ jobs:
             ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="anointedautomation.concepts"
             ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="anointedautomation.mathematics"
             ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="anointedautomation.optimization"
+            ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="anointedautomation.shopify"
+            ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="anointedautomation.serialization"
           )
 
           for PROJECT_PATH in "${!PACKAGES[@]}"; do
@@ -118,7 +120,18 @@ jobs:
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           echo "Publishing changed packages to NuGet.org..."
+          # Dependency order first (a package must never land before what it depends on), then the rest.
+          shopt -s nocaseglob
+          ORDERED=""
+          for pattern in "AnointedAutomation.Serialization.[0-9]*.nupkg" "AnointedAutomation.Shopify.[0-9]*.nupkg" "AnointedAutomation.Objects.[0-9]*.nupkg" "AnointedAutomation.Repository.Mongo.[0-9]*.nupkg" "AnointedAutomation.Objects.API.[0-9]*.nupkg"; do
+            for package in ./nupkgs/$pattern; do
+              if [ -f "$package" ]; then ORDERED="$ORDERED $package"; fi
+            done
+          done
           for package in ./nupkgs/*.nupkg; do
+            case " $ORDERED " in *" $package "*) ;; *) ORDERED="$ORDERED $package" ;; esac
+          done
+          for package in $ORDERED; do
             if [ -f "$package" ]; then
               echo "Publishing $package..."
               dotnet nuget push "$package" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate || {

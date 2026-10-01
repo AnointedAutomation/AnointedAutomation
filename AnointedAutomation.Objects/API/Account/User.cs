@@ -1,10 +1,9 @@
-// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-01-16 19:19:01
+// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-01-16 19:19:01 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 //Stewarded by Alexander Fields
 
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using AnointedAutomation.Objects.Google;
 
 namespace AnointedAutomation.Objects.Account
 {
@@ -137,12 +136,15 @@ namespace AnointedAutomation.Objects.Account
         public System.DateTime lastActiveDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the user's Google identity (token info and profile) for users who
-        /// signed in with Google. Null for non-Google users. Replaces the legacy practice of
-        /// storing Google keys inside <see cref="Meta"/>.
+        /// Gets or sets the user's unified external identities (Google, Microsoft, Apple, Facebook,
+        /// Shopify), each holding that provider's OWN real object. Null for accounts with no linked
+        /// external identity, and for documents written before this field existed (they deserialize with
+        /// null). This is the canonical home for Google (the old top-level <c>Google</c> field is gone)
+        /// and for the Shopify customer link (the <c>Meta</c> ShopifyCustomerId key remains only as a
+        /// back-compat mirror).
         /// </summary>
         [DataMember]
-        public GoogleObjects Google { get; set; }
+        public SSO SSO { get; set; }
 
         /// <summary>
         /// This will most likely be a big json

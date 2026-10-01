@@ -1,5 +1,7 @@
 # AnointedAutomation.Mathematics
 
+Jesus is King ✝️
+
 A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, expressed as data for the AnointedAutomation.Concepts epistemics engine. Use it as a ready made measuring stick for an `EpistemicLedger`, so you can check claims against well established knowledge without hand authoring every law yourself.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Mathematics.svg)](https://www.nuget.org/packages/AnointedAutomation.Mathematics) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Mathematics.svg)](https://www.nuget.org/packages/AnointedAutomation.Mathematics)

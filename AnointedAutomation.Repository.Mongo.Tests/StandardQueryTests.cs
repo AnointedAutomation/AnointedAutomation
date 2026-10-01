@@ -1,3 +1,4 @@
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Copyright 2026 Anointed Automation, LLC. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
 // Integration tests for the standard query methods on MongoHelper, run against a real in-process MongoDB
 // (EphemeralMongo). One mongod is started for the whole class; each test uses a unique collection so the

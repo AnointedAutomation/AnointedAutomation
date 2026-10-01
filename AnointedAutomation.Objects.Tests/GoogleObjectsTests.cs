@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-07-26
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-07-26 Jesus is King ✝️
 //Stewarded by Alexander Fields
 
 using AnointedAutomation.Objects.Account;
@@ -49,30 +49,34 @@ namespace AnointedAutomation.Objects.Tests
         }
 
         [Fact]
-        public void User_RoundTripsGoogleProperty()
+        public void User_RoundTripsGoogleUnderSSO()
         {
             User user = new User
             {
                 Email = "user@example.com",
-                Google = new GoogleObjects(
-                    new GoogleTokenInfo { sub = "google-123", email = "user@example.com" },
-                    new UserProfile { id = "google-123", picture = "https://pic.example/x.png" })
+                SSO = new SSO
+                {
+                    Google = new GoogleObjects(
+                        new GoogleTokenInfo { sub = "google-123", email = "user@example.com" },
+                        new UserProfile { id = "google-123", picture = "https://pic.example/x.png" })
+                }
             };
 
             string json = JsonConvert.SerializeObject(user);
             User restored = JsonConvert.DeserializeObject<User>(json);
 
-            Assert.NotNull(restored.Google);
-            Assert.Equal("google-123", restored.Google.GoogleTokenInfo.sub);
-            Assert.Equal("https://pic.example/x.png", restored.Google.UserProfile.picture);
+            Assert.NotNull(restored.SSO);
+            Assert.NotNull(restored.SSO.Google);
+            Assert.Equal("google-123", restored.SSO.Google.GoogleTokenInfo.sub);
+            Assert.Equal("https://pic.example/x.png", restored.SSO.Google.UserProfile.picture);
         }
 
         [Fact]
-        public void User_WithoutGoogle_HasNullGoogle()
+        public void User_WithoutSSO_HasNullSSO()
         {
             User user = new User { Email = "plain@example.com" };
 
-            Assert.Null(user.Google);
+            Assert.Null(user.SSO);
         }
     }
 }
