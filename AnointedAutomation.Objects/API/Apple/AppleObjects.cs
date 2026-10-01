@@ -1,16 +1,15 @@
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
 //Stewarded by Alexander Fields
 
-using Newtonsoft.Json;
-
 namespace AnointedAutomation.Objects.Apple
 {
     /// <summary>
-    /// The real Sign in with Apple identity for a user who signed in with Apple, holding the ACTUAL
-    /// claims Apple returns in the id_token plus the first-consent name (which Apple sends only ONCE, on
-    /// the first authorization, and never inside the token). This is the object stored at
-    /// <c>User.SSO.Apple</c>. The stable link key is <see cref="sub"/>. Mirrors the structure style of
-    /// <see cref="AnointedAutomation.Objects.Google.GoogleObjects"/>.
+    /// The real Sign in with Apple identity for a user who signed in with Apple. Mirrors the
+    /// container-of-objects shape of <see cref="AnointedAutomation.Objects.Google.GoogleObjects"/>: a
+    /// validated token-claim object (<see cref="AppleTokenInfo"/>) plus the human profile object
+    /// (<see cref="AppleUserProfile"/>) carrying the first-consent name Apple sends only ONCE (never in
+    /// the token). This is the object stored at <c>User.SSO.Apple</c>; the stable link key is
+    /// <see cref="AppleTokenInfo.sub"/>.
     /// </summary>
     public class AppleObjects
     {
@@ -21,40 +20,24 @@ namespace AnointedAutomation.Objects.Apple
         {
         }
 
-        /// <summary>Apple's stable subject id (the durable link key).</summary>
-        [JsonProperty("sub")]
-        public string sub { get; set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppleObjects"/> class with specified parts.
+        /// </summary>
+        /// <param name="tokenInfo">The validated id_token claim set.</param>
+        /// <param name="userProfile">The first-consent human profile (name / email).</param>
+        public AppleObjects(AppleTokenInfo tokenInfo, AppleUserProfile userProfile)
+        {
+            TokenInfo = tokenInfo ?? new AppleTokenInfo();
+            UserProfile = userProfile ?? new AppleUserProfile();
+        }
 
-        /// <summary>The email Apple reports (may be a private relay address).</summary>
-        [JsonProperty("email")]
-        public string email { get; set; }
+        /// <summary>Gets or sets the validated Apple id_token claim set.</summary>
+        public AppleTokenInfo TokenInfo { get; set; }
 
-        /// <summary>Whether Apple has verified the email. Apple sends this as a string ("true"/"false").</summary>
-        [JsonProperty("email_verified")]
-        public string emailVerified { get; set; }
-
-        /// <summary>Whether the email is an Apple private-relay address. Apple sends this as a string.</summary>
-        [JsonProperty("is_private_email")]
-        public string isPrivateEmail { get; set; }
-
-        /// <summary>Apple's real-user status signal (0 unsupported, 1 unknown, 2 likely real).</summary>
-        [JsonProperty("real_user_status")]
-        public string realUserStatus { get; set; }
-
-        /// <summary>The auth_time claim (seconds since epoch, as Apple sends it).</summary>
-        [JsonProperty("auth_time")]
-        public string authTime { get; set; }
-
-        /// <summary>The first (given) name, captured only on the FIRST authorization; blank thereafter.</summary>
-        [JsonProperty("firstName")]
-        public string firstName { get; set; }
-
-        /// <summary>The last (family) name, captured only on the FIRST authorization; blank thereafter.</summary>
-        [JsonProperty("lastName")]
-        public string lastName { get; set; }
+        /// <summary>Gets or sets the first-consent human profile (name only present on first authorization).</summary>
+        public AppleUserProfile UserProfile { get; set; }
 
         /// <summary>When this identity was first linked to the user.</summary>
-        [JsonProperty("linkedAt")]
         public System.DateTime? linkedAt { get; set; }
     }
 }

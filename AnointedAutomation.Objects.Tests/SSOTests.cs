@@ -12,7 +12,7 @@ using Xunit;
 
 namespace AnointedAutomation.Objects.Tests
 {
-    public class SsoTests
+    public class SSOTests
     {
         [Fact]
         public void SSO_ProviderSlotsDefaultToNull()
@@ -32,17 +32,17 @@ namespace AnointedAutomation.Objects.Tests
             SSO sso = new SSO
             {
                 Google = new GoogleObjects(new GoogleTokenInfo { sub = "g-tok" }, new UserProfile { id = "g-1", name = "G" }),
-                Microsoft = new MicrosoftObjects { oid = "ms-oid", name = "M" },
-                Apple = new AppleObjects { sub = "apple-sub", firstName = "A" },
-                Facebook = new FacebookObjects { id = "fb-id", name = "F" },
-                Shopify = new ShopifyObjects { customerId = 123456, email = "s@x.com" }
+                Microsoft = new MicrosoftObjects(new MicrosoftTokenInfo { oid = "ms-oid" }, new MicrosoftUserProfile { name = "M" }),
+                Apple = new AppleObjects(new AppleTokenInfo { sub = "apple-sub" }, new AppleUserProfile { firstName = "A" }),
+                Facebook = new FacebookObjects(new FacebookTokenInfo { appScopedId = "fb-id" }, new FacebookUserProfile { id = "fb-id", name = "F" }),
+                Shopify = new ShopifyObjects(new ShopifyCustomer { customerId = 123456, email = "s@x.com" })
             };
 
             Assert.Equal("g-1", sso.Google.UserProfile.id);
-            Assert.Equal("ms-oid", sso.Microsoft.oid);
-            Assert.Equal("apple-sub", sso.Apple.sub);
-            Assert.Equal("fb-id", sso.Facebook.id);
-            Assert.Equal(123456, sso.Shopify.customerId);
+            Assert.Equal("ms-oid", sso.Microsoft.TokenInfo.oid);
+            Assert.Equal("apple-sub", sso.Apple.TokenInfo.sub);
+            Assert.Equal("fb-id", sso.Facebook.UserProfile.id);
+            Assert.Equal(123456, sso.Shopify.Customer.customerId);
         }
 
         [Fact]
@@ -63,8 +63,8 @@ namespace AnointedAutomation.Objects.Tests
         [Fact]
         public void ShopifyObjects_ZeroCustomerIdMeansNotLinked()
         {
-            ShopifyObjects shopify = new ShopifyObjects();
-            Assert.Equal(0, shopify.customerId);
+            ShopifyObjects shopify = new ShopifyObjects(new ShopifyCustomer());
+            Assert.Equal(0, shopify.Customer.customerId);
         }
     }
 }
