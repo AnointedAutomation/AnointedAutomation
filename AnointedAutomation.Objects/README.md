@@ -61,7 +61,9 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 
 | Type | Description |
 |---|---|
-| `User` | Account record: `UserId`, `Email`, `Username`, `Password`, `Role`, `Profile`, `Token`, `tokenExpiration`, `emailConfirmed`, `IPAddresses`, `Friends`, `FriendId`, `BlockedUsers`, `isBanned`, `banned`, `BannedReason`, `createdDate`, `lastActiveDate`, `timeOnline`, `Google`, `Meta`, and account deletion fields (`deletionDate`, `DeletionConfirmationCode`, `deletionConfirmationExpiration`). |
+| `User` | Account record: `UserId`, `Email` (mirrors the primary `Emails` entry), `Emails`, `Username`, `Password`, `Role`, `Profile`, `Token`, `tokenExpiration`, `emailConfirmed`, `IPAddresses`, `Friends`, `FriendId`, `BlockedUsers`, `isBanned`, `banned`, `BannedReason`, `createdDate`, `lastActiveDate`, `timeOnline`, `Google`, `Meta`, and account deletion fields (`deletionDate`, `DeletionConfirmationCode`, `deletionConfirmationExpiration`). |
+| `UserEmail` | One address on a user: `Address` (lower-cased, trimmed), `Verified`, `VerifiedAt`, `IsPrimary`, `Source`, `AddedAt`. |
+| `UserEmailSource` | Enum: `Unknown` (0), `Manual`, `Signup`, `Google`, `Microsoft`, `Apple`, `Facebook`, `Shopify`, `Merge`, `Admin`. |
 | `Profile` | Extends `Billing.Contact` (`FirstName`, `MiddleName`, `LastName`, `dob`, `number`) with a Newtonsoft `JObject AccountSettings`. |
 | `Credentials` | Login payload: `Email`, `Password`, `Token`, `GoogleToken`. |
 | `IPInfo` | Login history for one IP: `IpAddress`, `firstLogin`, `lastLogin`, `loginCount`, `timeOnline`. |
