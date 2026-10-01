@@ -94,10 +94,19 @@ namespace AnointedAutomation.Objects.Account
         public System.DateTime createdDate { get; set; }
 
         /// <summary>
-        /// email serves as their login name
+        /// email serves as their login name. Mirrors the <see cref="UserEmail.Address"/> of the
+        /// <see cref="Emails"/> entry whose <see cref="UserEmail.IsPrimary"/> is true (kept for back-compat).
         /// </summary>
         [DataMember]
         public string Email { get; set; }
+
+        /// <summary>
+        /// Gets or sets every email address on the account. Exactly one entry is primary when the list is
+        /// non-empty, and <see cref="Email"/> mirrors it. Null on documents written before this field existed;
+        /// treat null as empty.
+        /// </summary>
+        [DataMember]
+        public List<UserEmail> Emails { get; set; }
 
         [DataMember]
         /// <summary>
