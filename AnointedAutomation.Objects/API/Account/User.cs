@@ -1,5 +1,5 @@
 // Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-01-16 19:19:01 Jesus is King ✝️
-// Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
+// Edited by Alexander Fields https://www.alexanderfields.me 2026-10-01
 //Stewarded by Alexander Fields
 
 using System.Collections.Generic;
@@ -20,7 +20,13 @@ namespace AnointedAutomation.Objects.Account
         { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="User"/> class with specified properties.
+        /// Initializes a new instance of the <see cref="User"/> class with a subset of properties.
+        /// Kept for source and binary compatibility; prefer the full constructor, which applies no defaults.
+        /// This overload applies these defaults: a <c>default</c> <paramref name="banned"/> becomes 1900-01-01,
+        /// a <c>default</c> <paramref name="createdDate"/> or <paramref name="lastActiveDate"/> becomes
+        /// <see cref="System.DateTime.UtcNow"/>, a null <paramref name="ipAddresses"/> becomes an empty list, and a
+        /// null <paramref name="profile"/> becomes a new <see cref="Account.Profile"/>. A null
+        /// <paramref name="password"/> is assigned as passed (SSO-only accounts have none).
         /// </summary>
         /// <param name="banned">Date when the ban is lifted.</param>
         /// <param name="createdDate">Date when the user account was created.</param>
@@ -28,7 +34,7 @@ namespace AnointedAutomation.Objects.Account
         /// <param name="emailConfirmed">Whether the email has been confirmed.</param>
         /// <param name="ipAddresses">List of IP addresses associated with this user.</param>
         /// <param name="lastActiveDate">Date of last user activity.</param>
-        /// <param name="password">User's password.</param>
+        /// <param name="password">User's password; null for SSO-only accounts.</param>
         /// <param name="profile">User's profile information.</param>
         /// <param name="role">User's role in the system.</param>
         /// <param name="timeOnline">Total time user has spent online.</param>
@@ -54,12 +60,12 @@ namespace AnointedAutomation.Objects.Account
         )
         {
             this.banned = banned != default ? banned : new System.DateTime(1900, 1, 1);
-            this.createdDate = createdDate != default ? createdDate : System.DateTime.Now;
+            this.createdDate = createdDate != default ? createdDate : System.DateTime.UtcNow;
             this.Email = email;
             this.emailConfirmed = emailConfirmed;
             this.IPAddresses = ipAddresses ?? new List<IPInfo>();
-            this.lastActiveDate = lastActiveDate != default ? lastActiveDate : System.DateTime.Now;
-            this.Password = password ?? throw new System.ArgumentNullException(nameof(password));
+            this.lastActiveDate = lastActiveDate != default ? lastActiveDate : System.DateTime.UtcNow;
+            this.Password = password;
             this.Profile = profile ?? new Profile();
             this.Role = role;
             this.timeOnline = timeOnline;
@@ -67,6 +73,91 @@ namespace AnointedAutomation.Objects.Account
             this.Username = username;
             this.Token = token;
             this.tokenExpiration = tokenExpiration;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="User"/> class setting EVERY settable property.
+        /// Each value is assigned exactly as passed: no defaults, no clock reads, no null checks.
+        /// Parameters follow the property declaration order, which is also the BSON element order.
+        /// </summary>
+        /// <param name="banned">Date when the ban is lifted (in the past when not banned).</param>
+        /// <param name="bannedReason">Reason for the ban; null when not banned.</param>
+        /// <param name="blockedUsers">User IDs this user has blocked.</param>
+        /// <param name="createdDate">Date when the user account was created.</param>
+        /// <param name="email">Login email; mirrors the primary <paramref name="emails"/> entry.</param>
+        /// <param name="emails">Every email address on the account.</param>
+        /// <param name="emailConfirmed">Whether the email has been confirmed.</param>
+        /// <param name="friendId">Unique 6-character friend ID.</param>
+        /// <param name="friends">Friend IDs this user has added.</param>
+        /// <param name="ipAddresses">IP addresses associated with this user.</param>
+        /// <param name="isBanned">Whether the user is currently banned.</param>
+        /// <param name="lastActiveDate">Date of last user activity.</param>
+        /// <param name="sso">Linked external identities; null when none are linked.</param>
+        /// <param name="meta">Free-form metadata, usually JSON.</param>
+        /// <param name="password">User's password; null for SSO-only accounts.</param>
+        /// <param name="profile">User's profile information.</param>
+        /// <param name="role">User's role in the system.</param>
+        /// <param name="timeOnline">Total time user has spent online.</param>
+        /// <param name="token">Authentication token.</param>
+        /// <param name="tokenExpiration">Expiration date of the authentication token.</param>
+        /// <param name="userId">Unique identifier for the user.</param>
+        /// <param name="username">User's display name.</param>
+        /// <param name="deletionDate">Date when the account is scheduled for deletion.</param>
+        /// <param name="deletionConfirmationCode">6-digit deletion confirmation code.</param>
+        /// <param name="deletionConfirmationExpiration">Expiration of the deletion confirmation code.</param>
+        public User(
+            System.DateTime banned,
+            string bannedReason,
+            List<string> blockedUsers,
+            System.DateTime createdDate,
+            string email,
+            List<UserEmail> emails,
+            bool emailConfirmed,
+            string friendId,
+            List<string> friends,
+            List<IPInfo> ipAddresses,
+            bool isBanned,
+            System.DateTime lastActiveDate,
+            SSO sso,
+            string meta,
+            string password,
+            Profile profile,
+            string role,
+            System.TimeSpan timeOnline,
+            string token,
+            System.DateTime tokenExpiration,
+            string userId,
+            string username,
+            System.DateTime deletionDate,
+            string deletionConfirmationCode,
+            System.DateTime deletionConfirmationExpiration
+        )
+        {
+            this.banned = banned;
+            this.BannedReason = bannedReason;
+            this.BlockedUsers = blockedUsers;
+            this.createdDate = createdDate;
+            this.Email = email;
+            this.Emails = emails;
+            this.emailConfirmed = emailConfirmed;
+            this.FriendId = friendId;
+            this.Friends = friends;
+            this.IPAddresses = ipAddresses;
+            this.isBanned = isBanned;
+            this.lastActiveDate = lastActiveDate;
+            this.SSO = sso;
+            this.Meta = meta;
+            this.Password = password;
+            this.Profile = profile;
+            this.Role = role;
+            this.timeOnline = timeOnline;
+            this.Token = token;
+            this.tokenExpiration = tokenExpiration;
+            this.UserId = userId;
+            this.Username = username;
+            this.deletionDate = deletionDate;
+            this.DeletionConfirmationCode = deletionConfirmationCode;
+            this.deletionConfirmationExpiration = deletionConfirmationExpiration;
         }
 
         /// <summary>
