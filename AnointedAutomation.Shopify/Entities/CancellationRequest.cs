@@ -1,0 +1,18 @@
+// Derived from ShopifySharp (https://github.com/nozzlegear/ShopifySharp), Copyright (c) 2015 Joshua Harms, MIT License.
+// Adapted by Anointed Automation, LLC. See THIRD-PARTY-NOTICES.md.
+using Newtonsoft.Json;
+
+namespace AnointedAutomation.Shopify;
+
+/// <summary>
+/// An object representing a Shopify fulfillment cancellation request.
+/// </summary>
+public class CancellationRequest
+{
+    /// <summary>
+    /// An optional reason for the cancellation request.
+    /// </summary>
+    [JsonProperty("message")]
+    public string Message { get; set; }
+
+}

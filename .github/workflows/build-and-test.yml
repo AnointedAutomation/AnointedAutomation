@@ -94,6 +94,9 @@ jobs:
       - name: Run Optimization Tests
         run: dotnet test AnointedAutomation.Optimization.Tests/AnointedAutomation.Optimization.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
 
+      - name: Run Shopify Tests
+        run: dotnet test AnointedAutomation.Shopify.Tests/AnointedAutomation.Shopify.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"
+
       - name: Publish Test Results
         if: always()
         uses: actions/upload-artifact@v7

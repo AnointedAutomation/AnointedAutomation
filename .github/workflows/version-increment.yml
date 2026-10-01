@@ -58,6 +58,7 @@ jobs:
             ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="AnointedAutomation.Concepts"
             ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="AnointedAutomation.Mathematics"
             ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="AnointedAutomation.Optimization"
+            ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="AnointedAutomation.Shopify"
           )
 
           VERSIONS_UPDATED=0

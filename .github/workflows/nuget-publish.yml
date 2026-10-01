@@ -67,6 +67,7 @@ jobs:
             ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="anointedautomation.concepts"
             ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="anointedautomation.mathematics"
             ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="anointedautomation.optimization"
+            ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="anointedautomation.shopify"
           )
 
           for PROJECT_PATH in "${!PACKAGES[@]}"; do
