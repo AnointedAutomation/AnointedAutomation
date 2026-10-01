@@ -243,7 +243,7 @@
         "PaymentIntent",
         "Subscription"
       ],
-      "notes": "User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; User.Email mirrors the IsPrimary entry."
+      "notes": "User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry."
     },
     {
       "id": "AnointedAutomation.Objects.API",

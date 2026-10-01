@@ -20,6 +20,21 @@ namespace AnointedAutomation.Objects.Tests
             Assert.False(email.IsPrimary);
             Assert.Equal(UserEmailSource.Unknown, email.Source);
             Assert.Equal(default(DateTime), email.AddedAt);
+            Assert.Null(email.ShopifyCustomerId);
+            Assert.Null(email.ShopifyLinkedAt);
+        }
+
+        [Fact]
+        public void UserEmail_ShopifyLink_JsonRoundTrip()
+        {
+            DateTime linked = new DateTime(2026, 10, 1, 13, 0, 0, DateTimeKind.Utc);
+            UserEmail email = new UserEmail { Address = "a@example.com", ShopifyCustomerId = 7712345678901L, ShopifyLinkedAt = linked };
+
+            UserEmail back = JsonConvert.DeserializeObject<UserEmail>(JsonConvert.SerializeObject(email));
+
+            Assert.Equal(7712345678901L, back.ShopifyCustomerId);
+            Assert.Equal(linked, back.ShopifyLinkedAt);
+            Assert.Null(JsonConvert.DeserializeObject<UserEmail>("{\"Address\":\"a@example.com\"}").ShopifyCustomerId);
         }
 
         [Fact]
