@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-10-17
+# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-10-17 Jesus is King ✝️
 name: Auto-Increment Version on PR
 
 on:
@@ -59,6 +59,7 @@ jobs:
             ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="AnointedAutomation.Mathematics"
             ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="AnointedAutomation.Optimization"
             ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="AnointedAutomation.Shopify"
+            ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="AnointedAutomation.Serialization"
           )
 
           VERSIONS_UPDATED=0

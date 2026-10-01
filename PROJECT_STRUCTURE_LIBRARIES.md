@@ -416,6 +416,14 @@ All billing models include complete XML documentation
 - **Internal:** none
 - **External:** MongoDB.Bson (used only by the `BsonMap` accessors); otherwise net10.0 framework only
 
+### 12. AnointedAutomation.Serialization v1.0.0
+- **Dependencies**: Newtonsoft.Json 13.0.4 (System.Text.Json in-box). No MongoDB, no Objects.
+- `Naming/NamingRules.cs`: ToCamel (first char), ToCamelJson (STJ acronym-aware), ToPascal, ToSnake, IsCamelMember, ToHybrid, IsPureCasingVariant. Single source for the JSON and Mongo casing conventions.
+- `SystemTextJson/`: JsonCasingConvention, UtcDateTimeJsonConverter (moved from Objects.API), JsonPresets (read-only option sets), AnointedJson.ConfigureApi.
+- `Newtonsoft/`: TolerantEnumConverter, StringOrBoolConverter, DateFormatConverter, NullOnErrorConverter.
+- `Json/`: JsonElementExtensions (lenient never-throwing readers), ResponseJson.
+- Consumers: Shopify, Objects, Objects.API, Repository.Mongo. Repository.Mongo 1.3.0 adds namespace `AnointedAutomation.Repository.Mongo.Bson` (BsonValueExtensions, HybridCasing, BsonToleranceRegistrar, LenientStringSerializer); Shopify adds ShopifyGid and ShopifyMoney.
+
 ## Inter-Library Dependencies
 
 ```

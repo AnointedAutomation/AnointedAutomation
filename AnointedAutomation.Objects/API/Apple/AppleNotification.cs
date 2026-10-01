@@ -1,8 +1,9 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //Stewarded by Alexander Fields
 
 using System;
 using System.Runtime.Serialization;
+using AnointedAutomation.Serialization.Newtonsoft;
 using Newtonsoft.Json;
 
 namespace AnointedAutomation.Objects.Apple
@@ -52,7 +53,7 @@ namespace AnointedAutomation.Objects.Apple
     {
         /// <summary>What happened.</summary>
         [JsonProperty("type")]
-        [JsonConverter(typeof(AppleNotificationEventTypeConverter))]
+        [JsonConverter(typeof(TolerantEnumConverter))]
         public AppleNotificationEventType Type { get; set; }
 
         /// <summary>Apple's team-scoped user id, the same <c>sub</c> as the identity token.</summary>
@@ -78,7 +79,8 @@ namespace AnointedAutomation.Objects.Apple
     /// </summary>
     public enum AppleNotificationEventType
     {
-        /// <summary>An event type this library does not recognize.</summary>
+        /// <summary>An event type this library does not recognize (any unrecognized wire string reads as this).</summary>
+        [EnumMember(Value = "unknown")]
         Unknown = 0,
 
         /// <summary>The user stopped forwarding mail from the private relay address.</summary>
@@ -96,72 +98,5 @@ namespace AnointedAutomation.Objects.Apple
         /// <summary>The user deleted their Apple account.</summary>
         [EnumMember(Value = "account-delete")]
         AccountDelete = 4
-    }
-
-    /// <summary>
-    /// Maps Apple's event type strings to <see cref="AppleNotificationEventType"/> and back. An unrecognized
-    /// string reads as <see cref="AppleNotificationEventType.Unknown"/> instead of throwing, so a new Apple
-    /// event type never breaks parsing.
-    /// </summary>
-    public class AppleNotificationEventTypeConverter : JsonConverter
-    {
-        /// <inheritdoc />
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(AppleNotificationEventType);
-        }
-
-        /// <inheritdoc />
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType != JsonToken.String)
-            {
-                return AppleNotificationEventType.Unknown;
-            }
-
-            return FromWire((string)reader.Value);
-        }
-
-        /// <inheritdoc />
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            writer.WriteValue(ToWire((AppleNotificationEventType)value));
-        }
-
-        /// <summary>Apple's wire string to the enum; Unknown for anything unrecognized.</summary>
-        public static AppleNotificationEventType FromWire(string value)
-        {
-            switch (value)
-            {
-                case "email-disabled":
-                    return AppleNotificationEventType.EmailDisabled;
-                case "email-enabled":
-                    return AppleNotificationEventType.EmailEnabled;
-                case "consent-revoked":
-                    return AppleNotificationEventType.ConsentRevoked;
-                case "account-delete":
-                    return AppleNotificationEventType.AccountDelete;
-                default:
-                    return AppleNotificationEventType.Unknown;
-            }
-        }
-
-        /// <summary>The enum to Apple's wire string; "unknown" for Unknown.</summary>
-        public static string ToWire(AppleNotificationEventType value)
-        {
-            switch (value)
-            {
-                case AppleNotificationEventType.EmailDisabled:
-                    return "email-disabled";
-                case AppleNotificationEventType.EmailEnabled:
-                    return "email-enabled";
-                case AppleNotificationEventType.ConsentRevoked:
-                    return "consent-revoked";
-                case AppleNotificationEventType.AccountDelete:
-                    return "account-delete";
-                default:
-                    return "unknown";
-            }
-        }
     }
 }

@@ -1,6 +1,6 @@
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40
-# Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 #!/bin/bash
+# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40 Jesus is King ✝️
+# Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 
 # Manual NuGet Package Publisher
 # NOTE: Automatic publishing happens via GitHub Actions when merging to master with version changes
@@ -62,6 +62,7 @@ declare -A PACKAGES=(
     ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="anointedautomation.concepts"
     ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="anointedautomation.mathematics"
     ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="anointedautomation.shopify"
+    ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="anointedautomation.serialization"
 )
 
 # Clean previous builds
@@ -110,7 +111,19 @@ echo
 PUBLISHED_COUNT=0
 SKIPPED_COUNT=0
 
+# Dependency order first (Serialization, Shopify, Objects, Repository.Mongo, Objects.API), then the rest.
+ORDERED_PROJECTS=(
+    "AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"
+    "AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"
+    "AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"
+    "AnointedAutomation.Repository.Mongo/AnointedAutomation.Repository.Mongo.csproj"
+    "AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"
+)
 for PROJECT_PATH in "${!PACKAGES[@]}"; do
+    case " ${ORDERED_PROJECTS[*]} " in *" $PROJECT_PATH "*) ;; *) ORDERED_PROJECTS+=("$PROJECT_PATH") ;; esac
+done
+
+for PROJECT_PATH in "${ORDERED_PROJECTS[@]}"; do
     PACKAGE_NAME="${PACKAGES[$PROJECT_PATH]}"
     
     echo -e "Checking ${CYAN}$PACKAGE_NAME${NC}..."

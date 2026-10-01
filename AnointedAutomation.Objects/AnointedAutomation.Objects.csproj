@@ -32,6 +32,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Enums\AnointedAutomation.Enums.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Shopify\AnointedAutomation.Shopify.csproj" />
+		<ProjectReference Include="..\AnointedAutomation.Serialization\AnointedAutomation.Serialization.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

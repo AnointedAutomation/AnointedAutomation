@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Hybrid element-name convention for MongoDB serialization. Mirrors the API's System.Text.Json
 // JsonCasingConvention so the DB and the JSON wire follow the SAME rule while C# code keeps idiomatic
@@ -15,6 +15,7 @@
 // BsonClassMapRegistrar.RegisterHybridCasingConvention().
 
 using System;
+using AnointedAutomation.Serialization.Naming;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
@@ -32,23 +33,12 @@ namespace AnointedAutomation.Repository.Mongo
             string current = memberMap.ElementName;
 
             // Only re-case pure casing variants; preserve snake_case / renamed / "_id" mappings.
-            if (!string.Equals(current, memberName, StringComparison.Ordinal)
-                && !string.Equals(current, ToCamel(memberName), StringComparison.Ordinal)
-                && !string.Equals(current, ToPascal(memberName), StringComparison.Ordinal))
+            if (!NamingRules.IsPureCasingVariant(current, memberName))
             {
                 return;
             }
 
-            Type memberType = Nullable.GetUnderlyingType(memberMap.MemberType) ?? memberMap.MemberType;
-            bool declaringIsStruct = memberMap.ClassMap.ClassType.IsValueType;
-            bool camel = declaringIsStruct || memberType.IsValueType; // enums are value types
-            memberMap.SetElementName(camel ? ToCamel(memberName) : ToPascal(memberName));
+            memberMap.SetElementName(NamingRules.ToHybrid(memberName, memberMap.ClassMap.ClassType, memberMap.MemberType, CamelStyle.FirstChar));
         }
-
-        private static string ToCamel(string n) =>
-            string.IsNullOrEmpty(n) || char.IsLower(n[0]) ? n : char.ToLowerInvariant(n[0]) + n.Substring(1);
-
-        private static string ToPascal(string n) =>
-            string.IsNullOrEmpty(n) || char.IsUpper(n[0]) ? n : char.ToUpperInvariant(n[0]) + n.Substring(1);
     }
 }

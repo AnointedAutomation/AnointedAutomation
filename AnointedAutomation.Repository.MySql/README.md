@@ -1,5 +1,7 @@
 # AnointedAutomation.Repository.MySql
 
+Jesus is King ✝️
+
 A generic repository and helper for MySQL on Entity Framework Core (Pomelo provider). `GenericRepository<T>` wraps any `DbContext` with async CRUD, paging, ordering and projection, and `MySqlHelper` adds connection testing, raw SQL, transactions and a log buffer, following the same style as [AnointedAutomation.Repository.Mongo](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo).
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.MySql.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Repository.MySql.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql)

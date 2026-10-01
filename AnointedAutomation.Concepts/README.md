@@ -1,5 +1,7 @@
 # AnointedAutomation.Concepts
 
+Jesus is King ✝️
+
 Models abstract, Biblically grounded concepts as first class .NET types: love as a behavior tree that decides what to do in a situation, a moral "reality" that reads acts against facets of God's character, and an epistemics engine that checks claims for consistency against foundational laws. It is for developers building faith oriented apps, games, moderation tools, or teaching material who want these ideas as testable code instead of prose.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts)

@@ -1,5 +1,7 @@
 # AnointedAutomation.Enums
 
+Jesus is King ✝️
+
 Shared enumerations for the AnointedAutomation packages: payment methods, providers, transaction and subscription states, payment operations, card brands, webhook event types, and moderation categories. Centralizing them in one small package keeps the numeric values consistent across every package and service that stores or exchanges them.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Enums.svg)](https://www.nuget.org/packages/AnointedAutomation.Enums) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Enums.svg)](https://www.nuget.org/packages/AnointedAutomation.Enums)

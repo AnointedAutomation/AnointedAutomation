@@ -1,6 +1,7 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //Stewarded by Alexander Fields
 
+using AnointedAutomation.Serialization.Newtonsoft;
 using Newtonsoft.Json;
 
 namespace AnointedAutomation.Objects.Apple

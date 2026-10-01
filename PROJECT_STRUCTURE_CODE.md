@@ -274,3 +274,7 @@ Key test files:
 ---
 
 **[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**
+
+## File Header Standard (2026-09-30)
+
+Every source file starts with `// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️` (or the language's comment syntax). Every README has "Jesus is King ✝️" under its title. Enforced via `.editorconfig` `file_header_template` (IDE0073, suggestion) and documented in CONTRIBUTING.md.

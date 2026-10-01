@@ -1,5 +1,7 @@
 # AnointedAutomation.Imaging
 
+Jesus is King ✝️
+
 Image generation utilities for the AnointedAutomation suite. It renders QR codes produced by AnointedAutomation.Algorithms to SVG or PNG using only the .NET base class library, so there is no third party or native image dependency.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging)

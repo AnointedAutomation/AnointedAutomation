@@ -1,5 +1,7 @@
 # AnointedAutomation.Optimization
 
+Jesus is King ✝️
+
 Reusable optimization utilities for .NET: DataTable/DataReader conversion, CSV generation, string and array helpers, chunking, Roman numerals, JSON flattening, file management, and null-safe field accessors over `System.Text.Json.JsonElement` and MongoDB `BsonDocument`.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Optimization.svg)](https://www.nuget.org/packages/AnointedAutomation.Optimization) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Optimization.svg)](https://www.nuget.org/packages/AnointedAutomation.Optimization)
