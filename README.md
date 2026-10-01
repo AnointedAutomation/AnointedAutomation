@@ -11,6 +11,8 @@ ships its own README and XML IntelliSense docs.
 
 Part of the [Anointed](https://anointed.company) family of ventures.
 
+**For AI assistants:** see [llms.txt](llms.txt) (index), [llms.md](llms.md) (guide with code samples) and [llms.json](llms.json) (structured package data).
+
 ## Packages
 
 | Package | NuGet | What it does |
