@@ -42,6 +42,21 @@ namespace AnointedAutomation.Objects.Account
         public UserEmailSource Source { get; set; }
 
         /// <summary>
+        /// Gets or sets the id of the Shopify customer record this address maps to, or null when no Shopify
+        /// customer is known for it. One account may hold several addresses, each linked to its own Shopify
+        /// customer. Stored as <c>shopifyCustomerId</c> under the hybrid casing (value type, camelCase).
+        /// </summary>
+        [DataMember]
+        public long? ShopifyCustomerId { get; set; }
+
+        /// <summary>
+        /// Gets or sets when <see cref="ShopifyCustomerId"/> was linked, or null when it never was. Stored as
+        /// <c>shopifyLinkedAt</c> under the hybrid casing.
+        /// </summary>
+        [DataMember]
+        public System.DateTime? ShopifyLinkedAt { get; set; }
+
+        /// <summary>
         /// Gets or sets when the address was added to the account.
         /// </summary>
         [DataMember]

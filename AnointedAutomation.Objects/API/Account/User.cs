@@ -103,7 +103,8 @@ namespace AnointedAutomation.Objects.Account
         /// <summary>
         /// Gets or sets every email address on the account. Exactly one entry is primary when the list is
         /// non-empty, and <see cref="Email"/> mirrors it. Null on documents written before this field existed;
-        /// treat null as empty.
+        /// treat null as empty. Declared DIRECTLY after <see cref="Email"/> on purpose: the BSON class map
+        /// writes elements in declaration order, so the stored document keeps Emails right under Email.
         /// </summary>
         [DataMember]
         public List<UserEmail> Emails { get; set; }

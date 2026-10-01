@@ -191,14 +191,14 @@ GarbageCollection gc = new GarbageCollection();
 gc.PerformGarbageCollection(null);
 ```
 
-### AnointedAutomation.Objects 2.3.0
+### AnointedAutomation.Objects 2.3.1
 
 Shared account, billing and response models so APIs and clients agree on shape. Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.
 
 - Depends on: NuGet Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Enums, AnointedAutomation.Shopify, AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Objects`, `AnointedAutomation.Objects.Account`, `AnointedAutomation.Objects.Billing`, `AnointedAutomation.Objects.Common`, `AnointedAutomation.Objects.Google`, `AnointedAutomation.Objects.Apple`
 - Key types: `User`, `UserEmail`, `UserEmailSource`, `Profile`, `SSO`, `ResponseData`, `PaginatedResponse<T>`, `PaymentIntent`, `Subscription`
-- Notes: User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource); User.Email mirrors the IsPrimary entry.
+- Notes: User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Objects (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Objects/README.md)
 
 ```bash

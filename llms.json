@@ -208,7 +208,7 @@
     },
     {
       "id": "AnointedAutomation.Objects",
-      "version": "2.3.0",
+      "version": "2.3.1",
       "targetFramework": "net10.0",
       "description": "Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Objects",
@@ -243,7 +243,7 @@
         "PaymentIntent",
         "Subscription"
       ],
-      "notes": "User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource); User.Email mirrors the IsPrimary entry."
+      "notes": "User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry."
     },
     {
       "id": "AnointedAutomation.Objects.API",
