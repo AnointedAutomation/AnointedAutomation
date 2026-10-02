@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
 		<Description>Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>2.4.0</Version>
+		<Version>2.4.1</Version>
 		<PackageTags>models;poco;dto;billing;payments;user;response;anointedautomation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/AnointedAutomation.Objects</PackageReleaseNotes>
 		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
