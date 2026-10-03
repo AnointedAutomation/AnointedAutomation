@@ -37,6 +37,17 @@ namespace AnointedAutomation.Concepts
         private readonly DivineCharacter character;
 
         /// <summary>
+        /// Gets the whole character of God this reality is grounded in (added in 1.1.0).
+        /// </summary>
+        public DivineCharacter Character
+        {
+            get
+            {
+                return character;
+            }
+        }
+
+        /// <summary>
         /// The one record of all that reality has witnessed, and the source of its standing order
         /// (Revelation 20:12; Malachi 3:16).
         /// </summary>
@@ -82,6 +93,45 @@ namespace AnointedAutomation.Concepts
             Resolution borne = grounding.Bear(resolution);
             Tablets.Record(borne);
             return borne;
+        }
+
+        /// <summary>
+        /// Witnesses a deed under the full triadic rule (added in 1.1.0): reality coheres for an act
+        /// only when it is grounded in the Father, conformed to the Word, and empowered by the Spirit.
+        /// Coherence is the product of the three factors (<see cref="Triad.Product"/>): the
+        /// grounding's <see cref="Grounding.Life"/>, the act's conformity to God's character as the
+        /// Word expresses it (Hebrews 1:3, "the exact representation of his being"), and the Spirit's
+        /// <see cref="Presence.Empowerment"/>. Any one factor at zero leaves no coherence at all.
+        /// Disorder and restoration are read exactly as in the two-argument overload, which is kept
+        /// unchanged for backward compatibility.
+        /// </summary>
+        /// <param name="act">The deed reality witnesses.</param>
+        /// <param name="grounding">What the acting agent is grounded in.</param>
+        /// <param name="presence">Whether the Holy Spirit empowers the work.</param>
+        /// <returns>The resolution as ground, Word, and Spirit together sustain it.</returns>
+        public Resolution Witness(Act act, Grounding grounding, Presence presence)
+        {
+            if (act == null)
+            {
+                throw new System.ArgumentNullException(nameof(act));
+            }
+
+            if (grounding == null)
+            {
+                throw new System.ArgumentNullException(nameof(grounding));
+            }
+
+            if (presence == null)
+            {
+                throw new System.ArgumentNullException(nameof(presence));
+            }
+
+            Resolution conformed = character.Harmonize(act);
+            double coherence = Triad.Product(grounding.Life, conformed.Coherence, presence.Empowerment);
+            double disorder = grounding.Bear(conformed).Disorder;
+            Resolution completed = new Resolution(coherence, disorder, conformed.Readings, conformed.Restoration);
+            Tablets.Record(completed);
+            return completed;
         }
 
         /// <summary>

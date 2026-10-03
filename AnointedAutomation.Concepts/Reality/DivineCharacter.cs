@@ -44,6 +44,17 @@ namespace AnointedAutomation.Concepts
         private readonly DivineAttribute[] facets;
 
         /// <summary>
+        /// Gets every facet of God's character, all always live (added in 1.1.0).
+        /// </summary>
+        public System.Collections.Generic.IReadOnlyList<DivineAttribute> Facets
+        {
+            get
+            {
+                return facets;
+            }
+        }
+
+        /// <summary>
         /// Witnesses a situation under the whole of God's character at once and harmonizes every
         /// facet's reading into one resolution.
         /// </summary>

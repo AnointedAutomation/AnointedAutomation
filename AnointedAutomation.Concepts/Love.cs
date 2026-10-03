@@ -33,6 +33,7 @@ namespace AnointedAutomation.Concepts
         /// </summary>
         protected Love()
         {
+            Bond = new Bond().Commit(ConstructedCommitment);
         }
 
         /// <summary>
@@ -45,6 +46,69 @@ namespace AnointedAutomation.Concepts
         {
             Lover = lover;
             Beloved = beloved;
+            Bond = new Bond().Commit(ConstructedCommitment);
+        }
+
+        /// <summary>
+        /// The reason recorded when a love is constructed: a concrete love is built as a choice already
+        /// made, so existing loves keep acting exactly as before (added in 1.1.0).
+        /// </summary>
+        public const string ConstructedCommitment = "Chosen when this love was made: we love because he first loved us (1 John 4:19).";
+
+        /// <summary>
+        /// Gets the bond: love itself, the third member of the triad lover x beloved x love
+        /// (Augustine, De Trinitate VIII-IX), carrying the commitment gate (added in 1.1.0).
+        /// </summary>
+        public Bond Bond
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Commits the will to this love (Deuteronomy 30:19; Joshua 24:15). Added in 1.1.0.
+        /// </summary>
+        /// <param name="reason">Why the will chooses.</param>
+        /// <returns>This love.</returns>
+        public Love Commit(string reason)
+        {
+            Bond.Commit(reason);
+            return this;
+        }
+
+        /// <summary>
+        /// Withdraws the will from this love. A withdrawn love cannot act until it is chosen again, no
+        /// matter its feelings. Added in 1.1.0.
+        /// </summary>
+        /// <param name="reason">Why the will withdraws.</param>
+        /// <returns>This love.</returns>
+        public Love Withdraw(string reason)
+        {
+            Bond.Withdraw(reason);
+            return this;
+        }
+
+        /// <summary>
+        /// Whether this love exists as a whole triad: a named lover, a named beloved, and a committed
+        /// bond. Any one missing means no love is instantiated (added in 1.1.0).
+        /// </summary>
+        /// <returns><c>true</c> when the triad is complete and the gate is open.</returns>
+        public bool Exists()
+        {
+            return !string.IsNullOrEmpty(Lover)
+                && !string.IsNullOrEmpty(Beloved)
+                && Triad.Exists(Lover, Beloved, Bond)
+                && Bond.IsCommitted;
+        }
+
+        /// <summary>
+        /// Whether this love is complete: perfect agape (<see cref="IsPerfect"/>) that exists as a whole
+        /// triad and is shared toward a third (condilectio, Richard of St. Victor, De Trinitate III).
+        /// Added in 1.1.0.
+        /// </summary>
+        /// <returns><c>true</c> when this love is perfect, committed, and shared.</returns>
+        public bool IsComplete()
+        {
+            return IsPerfect() && Exists() && Bond.IsCondilectio(Lover, Beloved);
         }
 
         /// <summary>
@@ -251,9 +315,12 @@ namespace AnointedAutomation.Concepts
 
         /// <summary>
         /// Decides what this love does in a concrete <see cref="Situation"/> by walking its behavior
-        /// tree (its built-in repertoire). Because love acts differently in every situation — and
-        /// because different kinds of love act differently in the same situation (Luke 10:31-35) —
-        /// each concrete love supplies its own tree via <see cref="BuildBehavior"/>.
+        /// tree (its built-in repertoire). Since 1.1.0 the commitment gate comes first: a love whose
+        /// <see cref="Bond"/> is not committed returns a not-acting <see cref="LoveAction"/> citing
+        /// Deuteronomy 30:19 and Joshua 24:15. Every love is committed when constructed, so existing
+        /// behavior is unchanged until <see cref="Withdraw(string)"/> is called.
+        /// Because love acts differently in every situation, and because different kinds of love act
+        /// differently in the same situation (Luke 10:31-35), each concrete love supplies its own tree via <see cref="BuildBehavior"/>.
         /// </summary>
         /// <param name="situation">The situation to respond to.</param>
         /// <returns>The <see cref="LoveAction"/> this love takes.</returns>
@@ -262,6 +329,16 @@ namespace AnointedAutomation.Concepts
             if (situation == null)
             {
                 throw new System.ArgumentNullException(nameof(situation));
+            }
+
+            if (!Bond.IsCommitted)
+            {
+                return new LoveAction(
+                    false,
+                    "Do not act: the will has not chosen this love, so it cannot act, whatever it feels.",
+                    "uncommitted (commitment gate is 0)",
+                    "Deuteronomy 30:19; Joshua 24:15",
+                    "Choose for yourselves this day whom you will serve.");
             }
 
             if (behavior == null)

@@ -370,6 +370,9 @@ All billing models include complete XML documentation
   SelfSeekingLove, the behavior tree machinery, Situation/Circumstances, and the Reality subtree)
 - A new epistemics engine (Epistemics/) that checks consistency of theological claims against
   foundational claims over a shared proposition vocabulary
+- 1.1.0: Trinity (one essence, three distinct Persons, undivided works), Presence (Holy Spirit),
+  the triadic coherence rule (ground x Word x Spirit), the love triad (Lover x Beloved x Bond) with a
+  binary commitment gate and condilectio, and Creed.ToJson()/Creed.ToPrompt() (AI constitution)
 - See PROJECT_STRUCTURE_CODE.md sections 4a for full class-level detail and the design spec at
   `docs/superpowers/specs/2026-07-02-theology-engine-design.md`
 

@@ -51,5 +51,24 @@ namespace AnointedAutomation.Concepts
 
             return reality.Witness(act, grounding);
         }
+
+        /// <summary>
+        /// Carries a deed into reality under the full triadic rule (added in 1.1.0): grounded, spoken
+        /// through this Word, and completed by the Spirit's presence. See
+        /// <see cref="Reality.Witness(Act, Grounding, Presence)"/>.
+        /// </summary>
+        /// <param name="act">The deed the agent presents.</param>
+        /// <param name="grounding">What the agent is grounded in.</param>
+        /// <param name="presence">Whether the Holy Spirit empowers the work.</param>
+        /// <returns>The resolution reality gives back.</returns>
+        public Resolution Speak(Act act, Grounding grounding, Presence presence)
+        {
+            if (act == null)
+            {
+                throw new System.ArgumentNullException(nameof(act));
+            }
+
+            return reality.Witness(act, grounding, presence);
+        }
     }
 }
