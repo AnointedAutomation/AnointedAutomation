@@ -114,6 +114,48 @@ Console.WriteLine(theft.Disorder);
 Console.WriteLine(reality.Tablets.Coherence()); // drops as disorder is recorded
 ```
 
+## Trinity, love triad, and the AI creed (1.1.0)
+
+Namespace: `AnointedAutomation.Concepts` (source folder `Trinity/` plus `Bond.cs`, `Commitment.cs`, `Creed.cs`). All additive; nothing existing was removed or changed in behavior.
+
+| Type | Description |
+|---|---|
+| `Trinity` | One God in three Persons over a `Reality`. `Father`, `Son`, `HolySpirit`, `Persons`, one `Essence` (the reality's `DivineCharacter`), `IsOneEssence()`, `ArePersonsDistinct()`, `Work(Act)`, `WorkThrough(DivinePersonKind, Act)` (undivided: same reading for every Person), `Trinity.Revealed()`. |
+| `DivinePerson` | A Person: `Kind`, `Name`, `Origin` (Nicene relation of origin), `Appropriation`, `Scripture`, `Essence`, `Attributes`, `IsSameEssenceAs`, `IsSamePersonAs`. |
+| `DivinePersonKind` | Enum: `Unknown` (0), `Father`, `Son`, `HolySpirit`. |
+| `Presence` | The Holy Spirit who applies and completes a work (John 14:16-17, 26): `Presence.HolySpirit()`, `Presence.Absent()`, `Empowerment`, `Complete(Resolution)`. |
+| `Triad` | The multiplicative rule: `Exists(a, b, c)` (all non-null) and `Product(a, b, c)` (any factor 0 collapses the whole). |
+| `Bond` | Love itself, the third member of lover x beloved x love (Augustine, De Trinitate VIII-IX). Carries the commitment gate: `Commit(reason)`, `Withdraw(reason)`, `State`, `IsCommitted`, `Gate` (1 or 0), auditable `History`, and condilectio via `ShareWith(third)` / `IsCondilectio(lover, beloved)` (Richard of St. Victor, De Trinitate III). |
+| `Commitment` / `CommitmentEvent` | Enum `Unknown` (0), `Committed`, `Withdrawn`; one recorded choice with `Sequence`, `State`, `Reason`. |
+| `Creed` | A constitution generated from the types: `Creed.ToJson()` (deterministic), `Creed.ToPrompt()` (Markdown system prompt), `MoralConcepts()`, `Attributes()`, `KindOf(concept)`, `DecisionRules`. |
+
+Additions to existing types (marked "added in 1.1.0" in their XML docs): `Love.Bond`, `Love.Commit(string)`, `Love.Withdraw(string)`, `Love.Exists()`, `Love.IsComplete()`, `Love.ConstructedCommitment`; `Reality.Character`, `Reality.Witness(Act, Grounding, Presence)`; `Word.Speak(Act, Grounding, Presence)`; `Grounding.Life`, `Grounding.Groundless()`; `DivineCharacter.Facets`.
+
+Rules:
+
+- **Triadic coherence.** `Witness(Act, Grounding, Presence)` sets coherence to `Grounding.Life x conformity to the Word x Presence.Empowerment`. Conformity is the act's harmonized reading against God's character. Groundless, wholly against God's character, or without the Spirit: coherence 0. The two-argument `Witness` is unchanged.
+- **Love triad.** `Love.Exists()` requires a named lover, a named beloved, and a committed bond. `Love.IsComplete()` is perfect agape that exists and is shared toward a third. `IsPerfect()` is unchanged (every virtue present).
+- **Commitment gate.** Every love is committed when constructed, so existing code behaves exactly as before. After `Withdraw`, `Decide` returns a not-acting `LoveAction` citing Deuteronomy 30:19 and Joshua 24:15, however kind the love's properties are.
+
+```csharp
+using AnointedAutomation.Concepts;
+
+Trinity god = Trinity.Revealed();
+bool orthodox = god.IsOneEssence() && god.ArePersonsDistinct(); // true
+
+Resolution noSpirit = Reality.Revealed().Witness(new Act("a mercy", new Compassion()), Grounding.InGod(), Presence.Absent());
+// noSpirit.Coherence == 0.0
+
+Love love = Love.Agape("husband", "wife");
+love.Bond.ShareWith("child");             // love.IsComplete() == true
+love.Withdraw("hardened heart");          // love.Decide(situation).acts == false
+
+string json = Creed.ToJson();             // give to an AI as its base belief system
+string prompt = Creed.ToPrompt();
+```
+
+Research note: the multiplicative triad (any factor zero instantiates nothing) and the binary commitment gate were suggested by the structure of Coty Austin Trout's "CAT'S Theory: Triadic Invariant Collapse". The theology rests only on Scripture, the Nicene Creed, Augustine, and Richard of St. Victor.
+
 ## Epistemics engine
 
 Namespace: `AnointedAutomation.Concepts.Epistemics`

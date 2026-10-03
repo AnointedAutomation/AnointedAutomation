@@ -66,6 +66,29 @@ namespace AnointedAutomation.Concepts
         }
 
         /// <summary>
+        /// Grounded in nothing at all: the house built on sand, which fell with a great crash
+        /// (Matthew 7:26-27). Its <see cref="Life"/> is zero, so under the triadic rule a deed on it
+        /// coheres not at all (added in 1.1.0).
+        /// </summary>
+        /// <returns>A groundless foundation.</returns>
+        public static Grounding Groundless()
+        {
+            return new Grounding("nothing", false, 1.0);
+        }
+
+        /// <summary>
+        /// Gets how much life this foundation gives, from 0.0 (none) to 1.0 (the living God). This is
+        /// the Father's factor in the triadic rule (added in 1.1.0).
+        /// </summary>
+        public double Life
+        {
+            get
+            {
+                return 1.0 - lifelessness;
+            }
+        }
+
+        /// <summary>
         /// Grounded in a divided heart, partly toward God and partly toward an idol: the lukewarm and
         /// the double-minded. "How long will you waver between two opinions?" (1 Kings 18:21);
         /// "a double-minded man, unstable in all he does" (James 1:8); "because you are lukewarm" (Revelation 3:16).

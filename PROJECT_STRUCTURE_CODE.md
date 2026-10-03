@@ -124,6 +124,20 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   DivineCharacter.cs, Resolution.cs, Grounding.cs, and Word.cs. Design spec for this subtree:
   `docs/superpowers/specs/2026-06-11-divine-grounding-reality-engine-design.md`.
 
+- Trinity, love triad, and creed (1.1.0, additive): Trinity/ holds Trinity.cs (one God in three
+  Persons over a Reality: one shared Essence instance = Reality.Character, three distinct
+  DivinePerson objects, undivided Work/WorkThrough), DivinePerson.cs, DivinePersonKind.cs (Unknown=0),
+  Presence.cs (the Holy Spirit factor, binary), and Triad.cs (Exists/Product: any factor zero collapses
+  the whole). Reality.Witness(Act, Grounding, Presence) and Word.Speak(Act, Grounding, Presence) apply
+  the triadic rule coherence = Grounding.Life x harmonized conformity x Presence.Empowerment; the old
+  overloads are unchanged. Bond.cs (love itself; commitment gate Commit/Withdraw with auditable
+  History of CommitmentEvent; condilectio via ShareWith/IsCondilectio), Commitment.cs (Unknown=0,
+  Committed, Withdrawn), CommitmentEvent.cs. Love gained Bond, Commit, Withdraw, Exists, IsComplete;
+  constructed loves are committed so legacy Decide behavior is unchanged, and a withdrawn love's Decide
+  returns acts=false (Deuteronomy 30:19; Joshua 24:15). Creed.cs reflects over the assembly to emit
+  a deterministic JSON constitution (ToJson) and a Markdown system prompt (ToPrompt). Tests:
+  TriadTests, TrinityTests, PresenceTests, BondTests, LoveTriadTests, CreedTests.
+
 - Epistemics engine (Epistemics/, namespace `AnointedAutomation.Concepts.Epistemics`): a new engine
   that checks the consistency of theological claims against foundational claims over a shared
   proposition vocabulary. Proposition.cs defines the shared vocabulary; Testability.cs and

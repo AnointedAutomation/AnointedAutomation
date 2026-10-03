@@ -67,7 +67,7 @@
     },
     {
       "id": "AnointedAutomation.Concepts",
-      "version": "1.0.4",
+      "version": "1.1.0",
       "targetFramework": "net10.0",
       "description": "Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts",
@@ -86,10 +86,15 @@
         "LoveAction",
         "Situation",
         "MoralConcept",
+        "Trinity",
+        "DivinePerson",
+        "Presence",
+        "Bond",
+        "Creed",
         "EpistemicLedger",
         "FoundationalClaim"
       ],
-      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger."
+      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts."
     },
     {
       "id": "AnointedAutomation.Enums",
