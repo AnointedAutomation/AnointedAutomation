@@ -6,7 +6,7 @@
 
 **Architecture:** Two independent axes. A `Belief` is the professed claim (true God, another deity, a non-theistic path, atheism, or null = agnostic). A `Person` holds a claim, owns a `Life` (a personal fruit-record), and is read by a stateless `Heart` that applies one uniform rule: everyone starts unproven (`Divided`), and only fruit moves them to `InGod`, `Divided`, or `InIdol`. `FollowsChrist` and `Integrity` derive from the way, not the label.
 
-**Tech Stack:** C# (.NET), xUnit. New code lives in `AnointedAutomation.Objects/Concepts/Reality/` (namespace `AnointedAutomation.Objects.Concepts`). Tests in `AnointedAutomation.Objects.Tests/`. Demo in `AnointedAutomation.Objects.Demo/`.
+**Tech Stack:** C# (.NET), xUnit. New code lives in `dotnet/AnointedAutomation.Objects/Concepts/Reality/` (namespace `AnointedAutomation.Objects.Concepts`). Tests in `dotnet/AnointedAutomation.Objects.Tests/`. Demo in `dotnet/AnointedAutomation.Objects.Demo/`.
 
 **Spec:** `docs/superpowers/specs/2026-06-12-belief-person-way-of-living-design.md`
 
@@ -28,13 +28,13 @@ already holds a private `lifelessness` field (0.0 for God, 0.25 for Divided, 0.5
 public read-only getter over it. Additive only, no behavior change.
 
 **Files:**
-- Modify: `AnointedAutomation.Objects/Concepts/Reality/Grounding.cs`
-- Test: `AnointedAutomation.Objects.Tests/GroundingTests.cs`
+- Modify: `dotnet/AnointedAutomation.Objects/Concepts/Reality/Grounding.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/GroundingTests.cs`
 
 - [ ] **Step 1: Add failing tests**
 
 Append these three facts inside the `GroundingTests` class in
-`AnointedAutomation.Objects.Tests/GroundingTests.cs` (before the closing brace of the class):
+`dotnet/AnointedAutomation.Objects.Tests/GroundingTests.cs` (before the closing brace of the class):
 
 ```csharp
         [Fact]
@@ -58,12 +58,12 @@ Append these three facts inside the `GroundingTests` class in
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~GroundingTests.InGod_HasNoLifelessness"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~GroundingTests.InGod_HasNoLifelessness"`
 Expected: BUILD FAILURE — `'Grounding' does not contain a definition for 'Lifelessness'`.
 
 - [ ] **Step 3: Add the public getter**
 
-In `AnointedAutomation.Objects/Concepts/Reality/Grounding.cs`, add this property immediately after
+In `dotnet/AnointedAutomation.Objects/Concepts/Reality/Grounding.cs`, add this property immediately after
 the existing `IsInGod` property's closing brace:
 
 ```csharp
@@ -83,13 +83,13 @@ the existing `IsInGod` property's closing brace:
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~GroundingTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~GroundingTests"`
 Expected: PASS (all GroundingTests, old and new).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Reality/Grounding.cs AnointedAutomation.Objects.Tests/GroundingTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Reality/Grounding.cs dotnet/AnointedAutomation.Objects.Tests/GroundingTests.cs
 git commit -m "Expose Grounding.Lifelessness"
 ```
 
@@ -98,12 +98,12 @@ git commit -m "Expose Grounding.Lifelessness"
 ## Task 2: `Belief` — the professed claim
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Reality/Belief.cs`
-- Test: `AnointedAutomation.Objects.Tests/BeliefTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Reality/Belief.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/BeliefTests.cs`
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `AnointedAutomation.Objects.Tests/BeliefTests.cs`:
+Create `dotnet/AnointedAutomation.Objects.Tests/BeliefTests.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -209,12 +209,12 @@ namespace AnointedAutomation.Objects.Tests
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefTests"`
 Expected: BUILD FAILURE — `The type or namespace name 'Belief' could not be found`.
 
 - [ ] **Step 3: Implement `Belief`**
 
-Create `AnointedAutomation.Objects/Concepts/Reality/Belief.cs`:
+Create `dotnet/AnointedAutomation.Objects/Concepts/Reality/Belief.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -355,13 +355,13 @@ namespace AnointedAutomation.Objects.Concepts
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefTests"`
 Expected: PASS (all 10 facts).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Reality/Belief.cs AnointedAutomation.Objects.Tests/BeliefTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Reality/Belief.cs dotnet/AnointedAutomation.Objects.Tests/BeliefTests.cs
 git commit -m "Add Belief value object"
 ```
 
@@ -370,12 +370,12 @@ git commit -m "Add Belief value object"
 ## Task 3: `Beliefs` — the preset catalog
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Reality/Beliefs.cs`
-- Test: `AnointedAutomation.Objects.Tests/BeliefsTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Reality/Beliefs.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/BeliefsTests.cs`
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `AnointedAutomation.Objects.Tests/BeliefsTests.cs`:
+Create `dotnet/AnointedAutomation.Objects.Tests/BeliefsTests.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -420,12 +420,12 @@ namespace AnointedAutomation.Objects.Tests
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefsTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefsTests"`
 Expected: BUILD FAILURE — `The type or namespace name 'Beliefs' could not be found`.
 
 - [ ] **Step 3: Implement `Beliefs`**
 
-Create `AnointedAutomation.Objects/Concepts/Reality/Beliefs.cs`:
+Create `dotnet/AnointedAutomation.Objects/Concepts/Reality/Beliefs.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -490,13 +490,13 @@ namespace AnointedAutomation.Objects.Concepts
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefsTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~BeliefsTests"`
 Expected: PASS (all 4 facts).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Reality/Beliefs.cs AnointedAutomation.Objects.Tests/BeliefsTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Reality/Beliefs.cs dotnet/AnointedAutomation.Objects.Tests/BeliefsTests.cs
 git commit -m "Add Beliefs preset catalog"
 ```
 
@@ -505,12 +505,12 @@ git commit -m "Add Beliefs preset catalog"
 ## Task 4: `Life` — the personal fruit-record
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Reality/Life.cs`
-- Test: `AnointedAutomation.Objects.Tests/LifeTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Reality/Life.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/LifeTests.cs`
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `AnointedAutomation.Objects.Tests/LifeTests.cs`:
+Create `dotnet/AnointedAutomation.Objects.Tests/LifeTests.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -569,12 +569,12 @@ namespace AnointedAutomation.Objects.Tests
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~LifeTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~LifeTests"`
 Expected: BUILD FAILURE — `The type or namespace name 'Life' could not be found`.
 
 - [ ] **Step 3: Implement `Life`**
 
-Create `AnointedAutomation.Objects/Concepts/Reality/Life.cs`:
+Create `dotnet/AnointedAutomation.Objects/Concepts/Reality/Life.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -637,13 +637,13 @@ namespace AnointedAutomation.Objects.Concepts
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~LifeTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~LifeTests"`
 Expected: PASS (all 4 facts).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Reality/Life.cs AnointedAutomation.Objects.Tests/LifeTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Reality/Life.cs dotnet/AnointedAutomation.Objects.Tests/LifeTests.cs
 git commit -m "Add Life fruit-record"
 ```
 
@@ -655,12 +655,12 @@ This is the engine's core judgment, kept stateless and tested in isolation with 
 `Resolution`s so the thresholds are exact and independent of the witnessing pipeline.
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Reality/Heart.cs`
-- Test: `AnointedAutomation.Objects.Tests/HeartTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Reality/Heart.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/HeartTests.cs`
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `AnointedAutomation.Objects.Tests/HeartTests.cs`:
+Create `dotnet/AnointedAutomation.Objects.Tests/HeartTests.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -810,12 +810,12 @@ namespace AnointedAutomation.Objects.Tests
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~HeartTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~HeartTests"`
 Expected: BUILD FAILURE — `The type or namespace name 'Heart' could not be found`.
 
 - [ ] **Step 3: Implement `Heart`**
 
-Create `AnointedAutomation.Objects/Concepts/Reality/Heart.cs`:
+Create `dotnet/AnointedAutomation.Objects/Concepts/Reality/Heart.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -955,13 +955,13 @@ namespace AnointedAutomation.Objects.Concepts
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~HeartTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~HeartTests"`
 Expected: PASS (all 12 facts).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Reality/Heart.cs AnointedAutomation.Objects.Tests/HeartTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Reality/Heart.cs dotnet/AnointedAutomation.Objects.Tests/HeartTests.cs
 git commit -m "Add Heart way-of-living rule"
 ```
 
@@ -973,12 +973,12 @@ Wires `Belief` + `Life` + `Heart` and acts in `Reality`. Tested end-to-end throu
 witnessing pipeline.
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Reality/Person.cs`
-- Test: `AnointedAutomation.Objects.Tests/PersonTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Reality/Person.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/PersonTests.cs`
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `AnointedAutomation.Objects.Tests/PersonTests.cs`:
+Create `dotnet/AnointedAutomation.Objects.Tests/PersonTests.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -1094,12 +1094,12 @@ namespace AnointedAutomation.Objects.Tests
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PersonTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PersonTests"`
 Expected: BUILD FAILURE — `The type or namespace name 'Person' could not be found`.
 
 - [ ] **Step 3: Implement `Person`**
 
-Create `AnointedAutomation.Objects/Concepts/Reality/Person.cs`:
+Create `dotnet/AnointedAutomation.Objects/Concepts/Reality/Person.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -1234,13 +1234,13 @@ namespace AnointedAutomation.Objects.Concepts
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PersonTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PersonTests"`
 Expected: PASS (all 9 facts).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Reality/Person.cs AnointedAutomation.Objects.Tests/PersonTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Reality/Person.cs dotnet/AnointedAutomation.Objects.Tests/PersonTests.cs
 git commit -m "Add Person agent"
 ```
 
@@ -1249,12 +1249,12 @@ git commit -m "Add Person agent"
 ## Task 7: `Deeds` — a starter catalog of acts
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Reality/Deeds.cs`
-- Test: `AnointedAutomation.Objects.Tests/DeedsTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Reality/Deeds.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/DeedsTests.cs`
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `AnointedAutomation.Objects.Tests/DeedsTests.cs`:
+Create `dotnet/AnointedAutomation.Objects.Tests/DeedsTests.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -1323,12 +1323,12 @@ namespace AnointedAutomation.Objects.Tests
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~DeedsTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~DeedsTests"`
 Expected: BUILD FAILURE — `The type or namespace name 'Deeds' could not be found`.
 
 - [ ] **Step 3: Implement `Deeds`**
 
-Create `AnointedAutomation.Objects/Concepts/Reality/Deeds.cs`:
+Create `dotnet/AnointedAutomation.Objects/Concepts/Reality/Deeds.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -1401,13 +1401,13 @@ namespace AnointedAutomation.Objects.Concepts
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~DeedsTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~DeedsTests"`
 Expected: PASS (all 6 facts).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Reality/Deeds.cs AnointedAutomation.Objects.Tests/DeedsTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Reality/Deeds.cs dotnet/AnointedAutomation.Objects.Tests/DeedsTests.cs
 git commit -m "Add Deeds starter catalog"
 ```
 
@@ -1419,12 +1419,12 @@ A console walkthrough showing the two axes diverging. No unit test; verified by 
 the demo and reading its output.
 
 **Files:**
-- Create: `AnointedAutomation.Objects.Demo/PersonDemo.cs`
-- Modify: `AnointedAutomation.Objects.Demo/Program.cs`
+- Create: `dotnet/AnointedAutomation.Objects.Demo/PersonDemo.cs`
+- Modify: `dotnet/AnointedAutomation.Objects.Demo/Program.cs`
 
 - [ ] **Step 1: Create the demo**
 
-Create `AnointedAutomation.Objects.Demo/PersonDemo.cs`:
+Create `dotnet/AnointedAutomation.Objects.Demo/PersonDemo.cs`:
 
 ```csharp
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-06-12
@@ -1488,7 +1488,7 @@ namespace AnointedAutomation.Objects.Demo
 
 - [ ] **Step 2: Wire it into `Program.cs`**
 
-In `AnointedAutomation.Objects.Demo/Program.cs`, add a call to `PersonDemo.Run()` immediately after
+In `dotnet/AnointedAutomation.Objects.Demo/Program.cs`, add a call to `PersonDemo.Run()` immediately after
 the existing `RealityDemo.Run();` line (near the end of `Main`):
 
 ```csharp
@@ -1499,7 +1499,7 @@ the existing `RealityDemo.Run();` line (near the end of `Main`):
 
 - [ ] **Step 3: Build and run the demo**
 
-Run: `dotnet run --project AnointedAutomation.Objects.Demo/AnointedAutomation.Objects.Demo.csproj`
+Run: `dotnet run --project dotnet/AnointedAutomation.Objects.Demo/AnointedAutomation.Objects.Demo.csproj`
 Expected output includes the Person section, with these readings:
 - "Paul professes Christ, before acting" → grounding `a divided heart`, follows Christ `False`.
 - "Paul binds a stranger's wounds" → grounding `God`, follows Christ `True`.
@@ -1510,7 +1510,7 @@ Expected output includes the Person section, with these readings:
 - [ ] **Step 4: Commit**
 
 ```bash
-git add AnointedAutomation.Objects.Demo/PersonDemo.cs AnointedAutomation.Objects.Demo/Program.cs
+git add dotnet/AnointedAutomation.Objects.Demo/PersonDemo.cs dotnet/AnointedAutomation.Objects.Demo/Program.cs
 git commit -m "Add PersonDemo game flow"
 ```
 
@@ -1520,7 +1520,7 @@ git commit -m "Add PersonDemo game flow"
 
 - [ ] **Step 1: Run the whole Objects test suite**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj`
 Expected: PASS (all tests, including the pre-existing ones, with the new Belief/Beliefs/Life/Heart/Person/Deeds facts).
 
 - [ ] **Step 2: Update PROJECT documentation**

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<TargetFramework>net10.0</TargetFramework>
+	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+    <Title>AnointedAutomation.Optimization</Title>
+    <Company>Anointed Automation LLC - Alexander Fields</Company>
+    <Copyright>Copyright © 2024 Anointed Automation, LLC All rights reserved.</Copyright>
+    <Description>Reusable optimization utilities: CSV/DataTable/DataReader helpers, chunking, string helpers, Roman numerals, JSON flattening, file management, and null-safe JsonElement/BsonDocument field accessors.</Description>
+    <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
+    <Version>1.0.2</Version>
+    <PackageTags>optimization;utility;csv;datatable;datareader;json;bson;roman;filemanagement</PackageTags>
+    <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Optimization</PackageReleaseNotes>
+	  <Authors>Anointed Automation LLC, Alexander Fields</Authors>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Bson" Version="3.12.0" />
+  </ItemGroup>
+
+</Project>

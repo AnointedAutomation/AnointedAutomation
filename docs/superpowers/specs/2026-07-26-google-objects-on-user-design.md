@@ -42,14 +42,14 @@ open-source Objects package.
 
 ### Move the POCOs in
 - Move `Google/GoogleObjects.cs`, `Google/GoogleTokenInfo.cs`, `Google/UserProfile.cs`
-  into `AnointedAutomation.Objects/API/Google/` (mirrors the existing `API/Account/`
+  into `dotnet/AnointedAutomation.Objects/API/Google/` (mirrors the existing `API/Account/`
   layout).
 - Standardize namespace to `AnointedAutomation.Objects.Google` in all three.
 - Delete the orphaned root `Google/` folder (and its `README.md`, folding relevant
   content into the package README if useful).
 
 ### Add the property to `User`
-- In `AnointedAutomation.Objects/API/Account/User.cs`:
+- In `dotnet/AnointedAutomation.Objects/API/Account/User.cs`:
   - `using AnointedAutomation.Objects.Google;`
   - Add `[DataMember] public GoogleObjects Google { get; set; }`.
   - Remove the stale commented `//this.GoogleObjects = googleObjects;` line in the ctor.

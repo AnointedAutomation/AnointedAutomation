@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+		<Title>AnointedAutomation.Objects</Title>
+		<Company>Anointed Automation LLC - Alexander Fields</Company>
+		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
+		<Description>Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.</Description>
+		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
+		<Version>2.4.0</Version>
+		<PackageTags>models;poco;dto;billing;payments;user;response;anointedautomation</PackageTags>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Objects</PackageReleaseNotes>
+		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="nuget.config" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AnointedAutomation.Enums\AnointedAutomation.Enums.csproj" />
+		<ProjectReference Include="..\AnointedAutomation.Shopify\AnointedAutomation.Shopify.csproj" />
+		<ProjectReference Include="..\AnointedAutomation.Serialization\AnointedAutomation.Serialization.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Include="nuget.config" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="/" />
+	</ItemGroup>
+
+</Project>

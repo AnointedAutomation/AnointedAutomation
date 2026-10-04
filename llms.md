@@ -24,7 +24,7 @@ Encode QR codes in pure C# with no native or third party dependency. Algorithms 
 - Namespaces: `AnointedAutomation.Algorithms.QrCode`
 - Key types: `QrEncoder`, `QrMatrix`, `QrErrorCorrectionLevel`
 - Notes: QrEncoder.Encode(text, ecc) returns a QrMatrix (Size, IsDark(x, y)). Pair with Imaging to render.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Algorithms (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Algorithms/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Algorithms (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Algorithms/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Algorithms
@@ -46,7 +46,7 @@ Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/
 - Namespaces: `AnointedAutomation.APIMiddleware`, `AnointedAutomation.APIMiddleware.Filters`, `AnointedAutomation.APIMiddleware.Objects`, `AnointedAutomation.APIMiddleware.Utility`
 - Key types: `ApiKeyAuthMiddleware`, `IPBlacklistMiddleware`, `InvalidEndpointTrackerMiddleware`, `EndpointAccessMiddleware`, `APIKeyAttribute`, `IPBlacklist`
 - Notes: Note the namespace is AnointedAutomation.APIMiddleware (singular) while the package id is plural.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.APIMiddlewares (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.APIMiddlewares/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.APIMiddlewares (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.APIMiddlewares/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.APIMiddlewares
@@ -68,7 +68,7 @@ Theological concepts modeled as code, including a claim consistency engine. Mode
 - Namespaces: `AnointedAutomation.Concepts`, `AnointedAutomation.Concepts.Epistemics`
 - Key types: `Love`, `LoveAction`, `Situation`, `MoralConcept`, `Trinity`, `DivinePerson`, `Presence`, `Bond`, `Creed`, `EpistemicLedger`, `FoundationalClaim`
 - Notes: Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity (one essence, three distinct Persons, undivided works), the triadic coherence rule (ground x Word x Spirit), the love triad (lover x beloved x Bond) with a binary commitment gate, and `Creed.ToJson()` / `Creed.ToPrompt()` for AI system prompts.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Concepts (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Concepts/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Concepts
@@ -92,7 +92,7 @@ One shared set of payment and moderation enums so models and services agree. Sha
 - Namespaces: `AnointedAutomation.Enums`
 - Key types: `PaymentProvider`, `PaymentType`, `TransactionStatus`, `SubscriptionStatus`, `CardType`, `WebhookEventType`, `Sin`
 - Notes: Used by Objects billing models.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Enums (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Enums/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Enums (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Enums/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Enums
@@ -113,7 +113,7 @@ Turn a QrMatrix into SVG or PNG without System.Drawing or ImageSharp. Renders QR
 - Namespaces: `AnointedAutomation.Imaging.QrCode`
 - Key types: `QrRenderer`
 - Notes: QrRenderer.ToSvg(matrix, moduleSize = 8, quietZone = 4) returns a string; ToPng(...) returns byte[].
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Imaging (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Imaging/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Imaging (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Imaging/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Imaging
@@ -136,7 +136,7 @@ A tiny log record plus a static event you can route to any sink. A lightweight l
 - Namespaces: `AnointedAutomation.Optimization.Logging`
 - Key types: `LogMessage`, `MessageType`, `LogMessageEventArgs`
 - Notes: Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Logging (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Logging/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Logging (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Logging/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Logging
@@ -157,7 +157,7 @@ Ready-made foundational claims to seed an EpistemicLedger. A curated catalog of 
 - Namespaces: `AnointedAutomation.Mathematics`
 - Key types: `UniversalLaws`, `UniversalPropositions`, `PhysicalTheories`, `Conjectures`
 - Notes: Each catalog exposes a static All list.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Mathematics (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Mathematics/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Mathematics (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Mathematics/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Mathematics
@@ -178,7 +178,7 @@ Force a full GC and memory trim after a large batch job. On demand garbage colle
 - Namespaces: `AnointedAutomation.Optimization.Memory`
 - Key types: `GarbageCollection`
 - Notes: Used by APIMiddlewares EndpointAccessMiddleware for idle time cleanup.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Memory (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Memory/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Memory (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Memory/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Memory
@@ -199,7 +199,7 @@ Shared account, billing and response models so APIs and clients agree on shape. 
 - Namespaces: `AnointedAutomation.Objects`, `AnointedAutomation.Objects.Account`, `AnointedAutomation.Objects.Billing`, `AnointedAutomation.Objects.Common`, `AnointedAutomation.Objects.Google`, `AnointedAutomation.Objects.Apple`
 - Key types: `User`, `UserEmail`, `UserEmailSource`, `Profile`, `SSO`, `ResponseData`, `PaginatedResponse<T>`, `PaymentIntent`, `Subscription`
 - Notes: User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry. User has a full constructor (every settable property, declaration order, assigned exactly as passed, no defaults); the legacy 14-parameter constructor accepts a null password and defaults dates to DateTime.UtcNow.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Objects (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Objects/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Objects (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Objects/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Objects
@@ -222,7 +222,7 @@ Web host helpers: test-friendly IFormFile, the hybrid casing rule, GraphQL envel
 - Namespaces: `AnointedAutomation.Objects.API`
 - Key types: `CustomFormFile`, `JsonCasingConvention`, `UtcDateTimeJsonConverter`, `GraphQlEnvelope`, `GraphQlResult`, `GraphQlError`
 - Notes: Hybrid casing: reference types serialize PascalCase, value types camelCase.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Objects.API (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Objects.API/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Objects.API (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Objects.API/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Objects.API
@@ -243,7 +243,7 @@ Everyday data helpers: chunking, CSV and DataTable, JSON flattening, safe field 
 - Namespaces: `AnointedAutomation.Optimization`
 - Key types: `Utility`, `Roman`, `JsonFlattener`, `JsonElementExtensions`, `BsonMap`, `ChunkDataReader`, `FileManagement`
 - Notes: ToChunks<T>(chunkSize) is an extension on IEnumerable<T>.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Optimization (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Optimization/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Optimization (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Optimization/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Optimization
@@ -265,7 +265,7 @@ A thin, consistent Mongo layer: helper, repository base classes, casing and tole
 - Namespaces: `AnointedAutomation.Repository.Mongo`, `AnointedAutomation.Repository.Mongo.Bson`
 - Key types: `MongoHelper`, `IMongoHelper`, `MongoRepository<TDoc>`, `MongoDocument`, `TimestampedMongoRepository<TDoc>`, `HybridCasing`, `BsonClassMapRegistrar`
 - Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name).
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Repository.Mongo (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Repository.Mongo/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.Mongo (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.Mongo/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Repository.Mongo
@@ -290,7 +290,7 @@ Generic EF Core repository for MySQL via Pomelo. A generic repository and helper
 - Namespaces: `AnointedAutomation.Repository.MySql`
 - Key types: `GenericRepository<T>`, `IGenericRepository<T>`, `MySqlHelper`, `IMySqlHelper`, `MySqlHelperFactory`, `DynamicDbContext`
 - Notes: GenericRepository<T> wraps any DbContext: GetByIdAsync, GetAllAsync, FindAsync, FindSingleAsync.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Repository.MySql (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Repository.MySql/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.MySql (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.MySql/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Repository.MySql
@@ -311,7 +311,7 @@ One home for naming rules, JSON presets and tolerant converters, shared by the o
 - Namespaces: `AnointedAutomation.Serialization.Naming`, `AnointedAutomation.Serialization.SystemTextJson`, `AnointedAutomation.Serialization.Newtonsoft`, `AnointedAutomation.Serialization.Json`
 - Key types: `AnointedJson`, `JsonPresets`, `JsonCasingConvention`, `NamingRules`, `TolerantEnumConverter`, `NullOnErrorConverter`
 - Notes: JsonPresets exposes frozen options (SnakeCase, CamelCase, CaseInsensitive, IgnoreNulls, Api and more). AnointedJson.ConfigureApi applies the full API wire config to a host.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Serialization (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Serialization/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Serialization (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Serialization/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Serialization
@@ -334,7 +334,7 @@ Shopify REST models without pulling in a whole client library. Plain Newtonsoft.
 - Namespaces: `AnointedAutomation.Shopify`, `AnointedAutomation.Shopify.Converters`
 - Key types: `Customer`, `Order`, `Product`, `Fulfillment`, `InventoryLevel`, `Refund`
 - Notes: Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package.
-- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Shopify (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/AnointedAutomation.Shopify/README.md)
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Shopify (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Shopify/README.md)
 
 ```bash
 dotnet add package AnointedAutomation.Shopify

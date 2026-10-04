@@ -2,7 +2,7 @@
 
 Date: 2026-06-12
 Author: Alexander Fields (with Claude)
-Location in code: `AnointedAutomation.Objects/Concepts/Reality` (extends the existing grounding / reality engine)
+Location in code: `dotnet/AnointedAutomation.Objects/Concepts/Reality` (extends the existing grounding / reality engine)
 Status: Approved conceptually, pending written-spec review
 
 ## 1. Premise
@@ -78,7 +78,7 @@ So "Christian / follower of Christ" is **derived from the way (axis 2)**, never 
 ## 4. Components
 
 The `Person` cluster (`Belief`, `Beliefs`, `Life`, `Heart`, `Person`, `Deeds`) lives in
-`AnointedAutomation.Objects/Concepts/Reality/`, namespace `AnointedAutomation.Objects.Concepts`
+`dotnet/AnointedAutomation.Objects/Concepts/Reality/`, namespace `AnointedAutomation.Objects.Concepts`
 (matching `Grounding`, `Reality`, etc.).
 
 ### 4.1 `Belief` (immutable value object — the professed claim)
@@ -268,7 +268,7 @@ design; it is the social model and is deliberately out of this plan.
 
 ## 6. Files
 
-New (all in `AnointedAutomation.Objects/Concepts/Reality/`, namespace `…Concepts`):
+New (all in `dotnet/AnointedAutomation.Objects/Concepts/Reality/`, namespace `…Concepts`):
 
 - `Belief.cs` — the professed claim (4.1).
 - `Beliefs.cs` — the preset catalog (4.1.1).
@@ -305,7 +305,7 @@ Tests (xUnit, mirroring `AnointedAutomation.Objects.Tests`; no new code without 
 
 Demo:
 
-- `AnointedAutomation.Objects.Demo/PersonDemo.cs`, called from `Program.cs` — the game flow: create
+- `dotnet/AnointedAutomation.Objects.Demo/PersonDemo.cs`, called from `Program.cs` — the game flow: create
   a person, choose a claim from `Beliefs`, act out deeds from `Deeds`, and watch `Grounding`,
   `FollowsChrist`, and `Integrity()` reveal the heart over a sequence. Includes the
   Buddhist-who-follows-unknowingly and the professed-Christian-hypocrite to show the two axes diverge.

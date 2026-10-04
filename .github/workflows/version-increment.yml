@@ -13,6 +13,9 @@ jobs:
   version-check-and-increment:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: dotnet
     permissions:
       contents: write
       pull-requests: write
@@ -96,7 +99,7 @@ jobs:
             fi
 
             # Get version from master branch
-            MASTER_VERSION=$(git show master:"$PROJECT_PATH" 2>/dev/null | grep -o '<Version>[^<]*</Version>' | sed 's/<Version>\(.*\)<\/Version>/\1/' || echo "")
+            MASTER_VERSION=$(git show master:"./$PROJECT_PATH" 2>/dev/null | grep -o '<Version>[^<]*</Version>' | sed 's/<Version>\(.*\)<\/Version>/\1/' || echo "")
 
             if [ -z "$MASTER_VERSION" ]; then
               echo "  New project (not in master), version: $PR_VERSION"

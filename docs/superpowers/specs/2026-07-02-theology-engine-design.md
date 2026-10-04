@@ -35,9 +35,9 @@ These came out of the design conversation and are binding on the implementation:
 
 ## Location
 
-- Code: `AnointedAutomation.Objects/Concepts/Epistemics/` (sibling to `Concepts/Reality/`,
+- Code: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/` (sibling to `Concepts/Reality/`,
   deliberately separate from the God-grounded `Reality` model so neutrality is structural).
-- Tests: `AnointedAutomation.Objects.Tests/Epistemics/`.
+- Tests: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/`.
 - House style: explicit types (no `var`), `.Equals()` for string comparison, fail-fast null
   checks, XML docs.
 
@@ -166,7 +166,7 @@ store. All can bolt on later without changing the core types.
 ## Amendment (2026-07-02)
 
 Implemented with packaging changes decided mid-execution: the engine lives in the dedicated
-package `AnointedAutomation.Concepts` under `AnointedAutomation.Concepts/Epistemics/`
+package `AnointedAutomation.Concepts` under `dotnet/AnointedAutomation.Concepts/Epistemics/`
 (namespace `AnointedAutomation.Concepts.Epistemics`), not inside AnointedAutomation.Objects.
 All prior concept code (Love, Reality, etc.) migrated to the same package; curated catalogs of
 laws, theories, and conjectures ship separately in `AnointedAutomation.Mathematics`. An

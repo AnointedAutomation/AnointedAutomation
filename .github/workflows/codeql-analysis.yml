@@ -19,6 +19,9 @@ jobs:
     name: Analyze
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: dotnet
     if: github.event_name == 'push' || github.event_name == 'schedule' || github.actor == 'dependabot[bot]'
     permissions:
       actions: read
@@ -48,7 +51,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.fsproj', 'dotnet/**/packages.lock.json') }}
           restore-keys: ${{ runner.os }}-nuget-
       - name: Restore dependencies
         run: dotnet restore

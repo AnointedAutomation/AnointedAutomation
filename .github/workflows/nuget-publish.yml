@@ -14,6 +14,9 @@ jobs:
   publish-release:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: dotnet
     permissions:
       id-token: write   # required for NuGet Trusted Publishing (OIDC)
       contents: read
@@ -35,7 +38,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.fsproj', 'dotnet/**/packages.lock.json') }}
           restore-keys: ${{ runner.os }}-nuget-
       - name: Restore dependencies
         run: dotnet restore
@@ -146,7 +149,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: nuget-packages
-          path: ./nupkgs/*.nupkg
+          path: dotnet/nupkgs/*.nupkg
           retention-days: 7
 
       - name: No packages to publish

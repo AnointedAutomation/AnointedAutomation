@@ -2,7 +2,7 @@
 
 Date: 2026-06-11
 Author: Alexander Fields (with Claude)
-Location in code: `AnointedAutomation.Objects/Concepts` (new `Reality` grouping)
+Location in code: `dotnet/AnointedAutomation.Objects/Concepts` (new `Reality` grouping)
 Status: Approved conceptually, pending written-spec review
 
 ## 1. Premise

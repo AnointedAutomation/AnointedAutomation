@@ -4,7 +4,7 @@
 
 **Goal:** Build the epistemic ledger engine from the approved spec: a consistency-mapping engine that examines theological claims against foundational claims (survived-falsification regularities) and each other, with three-valued (`bool?`) truth, four-state verdicts, and contradictions as data.
 
-**Architecture:** New folder `AnointedAutomation.Objects/Concepts/Epistemics/` with immutable value types (`Proposition`, `FoundationalClaim`, `TheologicalClaim`, `Examination`, `Tension`) and one engine class (`EpistemicLedger`). Claims interact only through a shared proposition vocabulary; checking is set logic over propositions. Tests in `AnointedAutomation.Objects.Tests/Epistemics/`.
+**Architecture:** New folder `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/` with immutable value types (`Proposition`, `FoundationalClaim`, `TheologicalClaim`, `Examination`, `Tension`) and one engine class (`EpistemicLedger`). Claims interact only through a shared proposition vocabulary; checking is set logic over propositions. Tests in `dotnet/AnointedAutomation.Objects.Tests/Epistemics/`.
 
 **Tech Stack:** C# / net10.0, xUnit 2.9.3, no new dependencies.
 
@@ -24,16 +24,16 @@
 - Commit messages: short and generic, NO AI attribution of any kind.
 - NO em dashes or en dashes in any prose, docs, or comments.
 - Contradiction is never an exception; exceptions are reserved for misuse (null args, empty propositions, out-of-range weights, duplicate foundational names).
-- Build/test from repo root: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj`.
+- Build/test from repo root: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj`.
 
 ---
 
 ### Task 1: Proposition and Testability
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/Testability.cs`
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/Proposition.cs`
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/PropositionTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Testability.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Proposition.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/PropositionTests.cs`
 
 **Interfaces:**
 - Consumes: nothing.
@@ -108,7 +108,7 @@ namespace AnointedAutomation.Objects.Tests.Epistemics
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PropositionTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PropositionTests"`
 Expected: build FAILURE, `Proposition` and `Testability` do not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -261,13 +261,13 @@ namespace AnointedAutomation.Objects.Concepts.Epistemics
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PropositionTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~PropositionTests"`
 Expected: 5 passed.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Epistemics/Testability.cs AnointedAutomation.Objects/Concepts/Epistemics/Proposition.cs AnointedAutomation.Objects.Tests/Epistemics/PropositionTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Testability.cs dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Proposition.cs dotnet/AnointedAutomation.Objects.Tests/Epistemics/PropositionTests.cs
 git commit -m "Add epistemics proposition vocabulary"
 ```
 
@@ -276,9 +276,9 @@ git commit -m "Add epistemics proposition vocabulary"
 ### Task 2: LawDomain and FoundationalClaim
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/LawDomain.cs`
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/FoundationalClaim.cs`
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/FoundationalClaimTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/LawDomain.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/FoundationalClaim.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/FoundationalClaimTests.cs`
 
 **Interfaces:**
 - Consumes: `Proposition` (Task 1).
@@ -369,7 +369,7 @@ namespace AnointedAutomation.Objects.Tests.Epistemics
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~FoundationalClaimTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~FoundationalClaimTests"`
 Expected: build FAILURE, `FoundationalClaim` and `LawDomain` do not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -593,13 +593,13 @@ namespace AnointedAutomation.Objects.Concepts.Epistemics
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~FoundationalClaimTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~FoundationalClaimTests"`
 Expected: 4 passed.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Epistemics/LawDomain.cs AnointedAutomation.Objects/Concepts/Epistemics/FoundationalClaim.cs AnointedAutomation.Objects.Tests/Epistemics/FoundationalClaimTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Epistemics/LawDomain.cs dotnet/AnointedAutomation.Objects/Concepts/Epistemics/FoundationalClaim.cs dotnet/AnointedAutomation.Objects.Tests/Epistemics/FoundationalClaimTests.cs
 git commit -m "Add foundational claims with law domains"
 ```
 
@@ -608,8 +608,8 @@ git commit -m "Add foundational claims with law domains"
 ### Task 3: TheologicalClaim
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/TheologicalClaim.cs`
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/TheologicalClaimTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/TheologicalClaim.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/TheologicalClaimTests.cs`
 
 **Interfaces:**
 - Consumes: `Proposition` (Task 1).
@@ -686,7 +686,7 @@ namespace AnointedAutomation.Objects.Tests.Epistemics
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TheologicalClaimTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TheologicalClaimTests"`
 Expected: build FAILURE, `TheologicalClaim` does not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -858,13 +858,13 @@ namespace AnointedAutomation.Objects.Concepts.Epistemics
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TheologicalClaimTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TheologicalClaimTests"`
 Expected: 4 passed.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Epistemics/TheologicalClaim.cs AnointedAutomation.Objects.Tests/Epistemics/TheologicalClaimTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Epistemics/TheologicalClaim.cs dotnet/AnointedAutomation.Objects.Tests/Epistemics/TheologicalClaimTests.cs
 git commit -m "Add theological claims"
 ```
 
@@ -873,10 +873,10 @@ git commit -m "Add theological claims"
 ### Task 4: Verdict, DerivationStep, Examination
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/Verdict.cs`
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/DerivationStep.cs`
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/Examination.cs`
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/ExaminationTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Verdict.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/DerivationStep.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Examination.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/ExaminationTests.cs`
 
 **Interfaces:**
 - Consumes: `TheologicalClaim` (Task 3).
@@ -967,7 +967,7 @@ namespace AnointedAutomation.Objects.Tests.Epistemics
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~ExaminationTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~ExaminationTests"`
 Expected: build FAILURE, types do not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -1192,13 +1192,13 @@ namespace AnointedAutomation.Objects.Concepts.Epistemics
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~ExaminationTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~ExaminationTests"`
 Expected: 5 passed.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Epistemics/Verdict.cs AnointedAutomation.Objects/Concepts/Epistemics/DerivationStep.cs AnointedAutomation.Objects/Concepts/Epistemics/Examination.cs AnointedAutomation.Objects.Tests/Epistemics/ExaminationTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Verdict.cs dotnet/AnointedAutomation.Objects/Concepts/Epistemics/DerivationStep.cs dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Examination.cs dotnet/AnointedAutomation.Objects.Tests/Epistemics/ExaminationTests.cs
 git commit -m "Add verdicts and examinations"
 ```
 
@@ -1207,8 +1207,8 @@ git commit -m "Add verdicts and examinations"
 ### Task 5: Tension
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/Tension.cs`
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/TensionTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Tension.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/TensionTests.cs`
 
 **Interfaces:**
 - Consumes: `TheologicalClaim`, `Proposition` (Tasks 1, 3).
@@ -1268,7 +1268,7 @@ namespace AnointedAutomation.Objects.Tests.Epistemics
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TensionTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TensionTests"`
 Expected: build FAILURE, `Tension` does not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -1345,13 +1345,13 @@ namespace AnointedAutomation.Objects.Concepts.Epistemics
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TensionTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~TensionTests"`
 Expected: 2 passed.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Epistemics/Tension.cs AnointedAutomation.Objects.Tests/Epistemics/TensionTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Epistemics/Tension.cs dotnet/AnointedAutomation.Objects.Tests/Epistemics/TensionTests.cs
 git commit -m "Add tensions between claims"
 ```
 
@@ -1360,8 +1360,8 @@ git commit -m "Add tensions between claims"
 ### Task 6: EpistemicLedger.Examine
 
 **Files:**
-- Create: `AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs`
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerExamineTests.cs`
+- Create: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerExamineTests.cs`
 
 **Interfaces:**
 - Consumes: everything from Tasks 1 to 5.
@@ -1563,7 +1563,7 @@ namespace AnointedAutomation.Objects.Tests.Epistemics
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerExamineTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerExamineTests"`
 Expected: build FAILURE, `EpistemicLedger` does not exist.
 
 - [ ] **Step 3: Write the implementation**
@@ -1740,13 +1740,13 @@ namespace AnointedAutomation.Objects.Concepts.Epistemics
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerExamineTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerExamineTests"`
 Expected: 8 passed.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerExamineTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs dotnet/AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerExamineTests.cs
 git commit -m "Add epistemic ledger examine"
 ```
 
@@ -1755,8 +1755,8 @@ git commit -m "Add epistemic ledger examine"
 ### Task 7: Admit, Tensions, and queries
 
 **Files:**
-- Modify: `AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs` (add members after `Examine`)
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerAdmitTests.cs`
+- Modify: `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs` (add members after `Examine`)
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerAdmitTests.cs`
 
 **Interfaces:**
 - Consumes: `EpistemicLedger` from Task 6 (fields `admitted` and `tensions` already exist).
@@ -1880,7 +1880,7 @@ namespace AnointedAutomation.Objects.Tests.Epistemics
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerAdmitTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerAdmitTests"`
 Expected: build FAILURE, `Admit`, `Tensions`, `ClaimsAbout`, `ClaimsFrom` do not exist.
 
 - [ ] **Step 3: Add the members to EpistemicLedger**
@@ -1985,13 +1985,13 @@ Append inside the `EpistemicLedger` class, after `Examine`:
 
 - [ ] **Step 4: Run tests to verify they pass**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerAdmitTests"`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj --filter "FullyQualifiedName~EpistemicLedgerAdmitTests"`
 Expected: 4 passed.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerAdmitTests.cs
+git add dotnet/AnointedAutomation.Objects/Concepts/Epistemics/EpistemicLedger.cs dotnet/AnointedAutomation.Objects.Tests/Epistemics/EpistemicLedgerAdmitTests.cs
 git commit -m "Add ledger admit, tensions, and queries"
 ```
 
@@ -2000,7 +2000,7 @@ git commit -m "Add ledger admit, tensions, and queries"
 ### Task 8: Integration test, the worked example
 
 **Files:**
-- Test: `AnointedAutomation.Objects.Tests/Epistemics/WorkedExampleTests.cs`
+- Test: `dotnet/AnointedAutomation.Objects.Tests/Epistemics/WorkedExampleTests.cs`
 
 **Interfaces:**
 - Consumes: everything from Tasks 1 to 7. No new production code; this task locks the design conversation's worked example in as an executable specification.
@@ -2118,7 +2118,7 @@ Note: the domain-skip step only appears when a foundational claim actually touch
 
 - [ ] **Step 2: Run the full test suite**
 
-Run: `dotnet test AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj`
+Run: `dotnet test dotnet/AnointedAutomation.Objects.Tests/AnointedAutomation.Objects.Tests.csproj`
 Expected: all tests pass, including all pre-existing (non-Epistemics) tests.
 
 - [ ] **Step 3: Build the whole solution to confirm nothing else broke**
@@ -2129,7 +2129,7 @@ Expected: Build succeeded, 0 errors, 0 warnings.
 - [ ] **Step 4: Commit**
 
 ```bash
-git add AnointedAutomation.Objects.Tests/Epistemics/WorkedExampleTests.cs
+git add dotnet/AnointedAutomation.Objects.Tests/Epistemics/WorkedExampleTests.cs
 git commit -m "Add epistemics worked example test"
 ```
 
@@ -2149,8 +2149,8 @@ git commit -m "Add epistemics worked example test"
 - [ ] **Step 1: Update PROJECT_STRUCTURE_DICTIONARY.md**
 
 Read the file first and follow its existing format exactly. Add entries for:
-- `AnointedAutomation.Objects/Concepts/Epistemics/` and each file in it (`Testability.cs`, `Proposition.cs`, `LawDomain.cs`, `FoundationalClaim.cs`, `TheologicalClaim.cs`, `Verdict.cs`, `DerivationStep.cs`, `Examination.cs`, `Tension.cs`, `EpistemicLedger.cs`)
-- `AnointedAutomation.Objects.Tests/Epistemics/` and its five test files
+- `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/` and each file in it (`Testability.cs`, `Proposition.cs`, `LawDomain.cs`, `FoundationalClaim.cs`, `TheologicalClaim.cs`, `Verdict.cs`, `DerivationStep.cs`, `Examination.cs`, `Tension.cs`, `EpistemicLedger.cs`)
+- `dotnet/AnointedAutomation.Objects.Tests/Epistemics/` and its five test files
 
 - [ ] **Step 2: Update PROJECT_STRUCTURE_CODE.md**
 
@@ -2173,16 +2173,16 @@ git commit -m "Document epistemics engine"
 
 User decisions during execution changed the packaging architecture. Binding overrides:
 
-- The epistemics engine lives in a new package `AnointedAutomation.Concepts` (done, commit e120727). Wherever Tasks 4 to 8 say `AnointedAutomation.Objects/Concepts/Epistemics/` read `AnointedAutomation.Concepts/Epistemics/`; namespace `AnointedAutomation.Concepts.Epistemics`; tests in `AnointedAutomation.Concepts.Tests/Epistemics/`, namespace `AnointedAutomation.Concepts.Tests.Epistemics`. Test command: `dotnet test AnointedAutomation.Concepts.Tests/AnointedAutomation.Concepts.Tests.csproj`.
+- The epistemics engine lives in a new package `AnointedAutomation.Concepts` (done, commit e120727). Wherever Tasks 4 to 8 say `dotnet/AnointedAutomation.Objects/Concepts/Epistemics/` read `dotnet/AnointedAutomation.Concepts/Epistemics/`; namespace `AnointedAutomation.Concepts.Epistemics`; tests in `dotnet/AnointedAutomation.Concepts.Tests/Epistemics/`, namespace `AnointedAutomation.Concepts.Tests.Epistemics`. Test command: `dotnet test dotnet/AnointedAutomation.Concepts.Tests/AnointedAutomation.Concepts.Tests.csproj`.
 - Execution order: Tasks 5, 6, 7, 8, then 10, 11, 12, then 9 (docs last, covering everything).
 
 ### Task 10: Migrate all remaining concepts from Objects to Concepts
 
-Move `AnointedAutomation.Objects/Concepts/` (everything: Love, Agape, SacrificialLove, SelfSeekingLove, LoveAction, Deed, Situation, Circumstance(s), Condition, Selector, Sequence, BehaviorNode, BehaviorResult, and the whole `Reality/` subtree including `Morals/`) into `AnointedAutomation.Concepts/`, preserving subfolder structure (`AnointedAutomation.Concepts/Love.cs` etc. at package root mirroring current layout under `Concepts/`). Namespace `AnointedAutomation.Objects.Concepts` becomes `AnointedAutomation.Concepts`. Move the matching test files (`MoralConceptTests.cs`, `Canon/` concept tests, and any other test file whose usings reference `AnointedAutomation.Objects.Concepts`) from `AnointedAutomation.Objects.Tests` to `AnointedAutomation.Concepts.Tests`, updating namespaces and usings. Update ALL references across the solution (`grep -rn "Objects.Concepts" --include=*.cs`). If Objects.Demo or Objects.API reference concept types, add a ProjectReference to `AnointedAutomation.Concepts` where needed. Breaking change: bump `AnointedAutomation.Objects` csproj Version major (2.0.0) and `AnointedAutomation.Concepts` stays 1.0.0 (unreleased). Whole solution must build with 0 errors; all tests pass. One commit: `Move concepts into Concepts package`.
+Move `dotnet/AnointedAutomation.Objects/Concepts/` (everything: Love, Agape, SacrificialLove, SelfSeekingLove, LoveAction, Deed, Situation, Circumstance(s), Condition, Selector, Sequence, BehaviorNode, BehaviorResult, and the whole `Reality/` subtree including `Morals/`) into `dotnet/AnointedAutomation.Concepts/`, preserving subfolder structure (`dotnet/AnointedAutomation.Concepts/Love.cs` etc. at package root mirroring current layout under `Concepts/`). Namespace `AnointedAutomation.Objects.Concepts` becomes `AnointedAutomation.Concepts`. Move the matching test files (`MoralConceptTests.cs`, `Canon/` concept tests, and any other test file whose usings reference `AnointedAutomation.Objects.Concepts`) from `AnointedAutomation.Objects.Tests` to `AnointedAutomation.Concepts.Tests`, updating namespaces and usings. Update ALL references across the solution (`grep -rn "Objects.Concepts" --include=*.cs`). If Objects.Demo or Objects.API reference concept types, add a ProjectReference to `AnointedAutomation.Concepts` where needed. Breaking change: bump `AnointedAutomation.Objects` csproj Version major (2.0.0) and `AnointedAutomation.Concepts` stays 1.0.0 (unreleased). Whole solution must build with 0 errors; all tests pass. One commit: `Move concepts into Concepts package`.
 
 ### Task 11: EpistemicStatus
 
-Add `AnointedAutomation.Concepts/Epistemics/EpistemicStatus.cs`: `public enum EpistemicStatus { Law, Theory, Conjecture }` with XML docs explaining the split (Law: survived so much falsification it functions as bedrock; Theory: well supported, still contested at the edges; Conjecture: asserted and unproven, standing null, e.g. the Collatz conjecture). Add a `EpistemicStatus Status` property to `FoundationalClaim` via a new constructor parameter (after `survivedFalsificationWeight`), keeping the existing constructor overload which defaults to `EpistemicStatus.Law` for backward compatibility within this branch. TDD, tests in `FoundationalClaimTests`. Commit: `Add epistemic status`.
+Add `dotnet/AnointedAutomation.Concepts/Epistemics/EpistemicStatus.cs`: `public enum EpistemicStatus { Law, Theory, Conjecture }` with XML docs explaining the split (Law: survived so much falsification it functions as bedrock; Theory: well supported, still contested at the edges; Conjecture: asserted and unproven, standing null, e.g. the Collatz conjecture). Add a `EpistemicStatus Status` property to `FoundationalClaim` via a new constructor parameter (after `survivedFalsificationWeight`), keeping the existing constructor overload which defaults to `EpistemicStatus.Law` for backward compatibility within this branch. TDD, tests in `FoundationalClaimTests`. Commit: `Add epistemic status`.
 
 ### Task 12: AnointedAutomation.Mathematics package
 
