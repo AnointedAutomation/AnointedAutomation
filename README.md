@@ -1,19 +1,36 @@
-# Anointed Automation .NET Libraries
+# Anointed Automation Open Source
 
 Jesus is King ✝️
 
 [![Build and Test](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml)
+[![JS anointed-sso](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE)
 
-Open source .NET libraries from [Anointed Automation](https://anointedautomation.net), published on
-[NuGet.org](https://www.nuget.org/profiles/roku674). Every package targets **.NET 10**, is MIT licensed, and
-ships its own README and XML IntelliSense docs.
+Open source libraries from [Anointed Automation](https://anointedautomation.net), MIT licensed. The .NET
+packages are published on [NuGet.org](https://www.nuget.org/profiles/roku674), target **.NET 10** and ship
+their own README and XML IntelliSense docs.
 
 Part of the [Anointed](https://anointed.company) family of ventures.
 
 **For AI assistants:** see [llms.txt](llms.txt) (index), [llms.md](llms.md) (guide with code samples) and [llms.json](llms.json) (structured package data).
 
-## Packages
+## Repository layout
+
+Code is grouped by language. Each language folder builds and tests on its own.
+
+| Folder | Contents | Build and test |
+|---|---|---|
+| [`dotnet/`](./dotnet) | The .NET solution (`AnointedAutomation.sln`), every NuGet package and its tests | `cd dotnet && dotnet test AnointedAutomation.sln` |
+| [`js/`](./js) | JavaScript / TypeScript packages, one folder per npm package | `cd js/<package> && npm test` |
+| [`docs/`](./docs) | Design specs and plans | |
+
+## JavaScript packages
+
+| Package | What it does |
+|---|---|
+| [@anointedautomation/sso](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso) | "Sign in with Anointed Automation": a dependency-free OpenID Connect client (code + PKCE) for Node 18+, Deno (Base44) and edge runtimes, with Express and Web (Next.js, Base44) adapters. Not on npm yet |
+
+## .NET packages
 
 | Package | NuGet | What it does |
 |---|---|---|

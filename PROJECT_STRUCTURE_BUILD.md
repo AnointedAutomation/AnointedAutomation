@@ -72,8 +72,12 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 
 **Usage:**
 ```bash
+cd dotnet
 ./publish-packages.sh
 ```
+
+Lives at `dotnet/publish-packages.sh` and changes to its own folder first, so package paths resolve
+relative to `dotnet/`.
 
 **Safety Checks:**
 - Verifies .NET SDK installation
@@ -84,12 +88,13 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 ## Build Configuration
 
 ### Solution Structure
-- **Main Solution**: `AnointedAutomation.sln`
+- **Main Solution**: `dotnet/AnointedAutomation.sln` (all .NET projects, `Directory.Build.props` and
+  `NuGet.config` live in `dotnet/`)
 - **Projects**: 6 libraries + 4 test projects
 - **Target Framework**: .NET 8.0
 - **Configuration**: Debug/Release builds
 
-### Package Configuration (NuGet.config)
+### Package Configuration (dotnet/NuGet.config)
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <configuration>
@@ -122,10 +127,22 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 - **Logic**: Only publishes packages with incremented version numbers
 - **Benefits**: Prevents duplicate publishing and failed builds
 
+## JavaScript Packages (js/)
+
+- **Workflow**: `.github/workflows/js-anointed-sso.yml`, triggered only by changes under `js/anointed-sso/`.
+  Jobs: `node` (npm test on Node 18, 20, 22, 24), `deno` (`deno test --allow-net --no-check test/deno/smoke.ts`),
+  `types` (`tsc --noEmit --strict` on `index.d.ts`).
+- **Local**: `cd js/anointed-sso && npm test`. The package has no dependencies, so there is no install step.
+- **Publishing**: not published to npm; publishing needs the owner's go-ahead.
+- The .NET workflows set `defaults.run.working-directory: dotnet`; artifact paths are `dotnet/**/TestResults/*`
+  and `dotnet/nupkgs/*.nupkg`.
+
 ## Build Commands
 
 ### Local Development
 ```bash
+cd dotnet
+
 # Build solution
 ~/.dotnet/dotnet build
 
@@ -141,6 +158,8 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 
 ### Package Creation
 ```bash
+cd dotnet
+
 # Create packages
 ~/.dotnet/dotnet pack --configuration Release
 
@@ -198,7 +217,7 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 
 ## Troubleshooting and Documentation
 
-### PUBLISHING.md
+### dotnet/PUBLISHING.md
 Comprehensive guide covering:
 - Step-by-step publishing instructions
 - Common error scenarios and solutions

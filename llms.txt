@@ -1,6 +1,6 @@
 # Anointed Automation
 
-> Open-source .NET / NuGet libraries by Anointed Automation, LLC, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light C# packages published to NuGet under the AnointedAutomation.* prefix.
+> Open-source libraries by Anointed Automation, LLC, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light packages grouped by language: C# packages in dotnet/ published to NuGet under the AnointedAutomation.* prefix, and JavaScript packages in js/.
 
 Jesus is King ✝️
 
@@ -9,7 +9,7 @@ Every package targets net10.0, is MIT licensed, and installs with `dotnet add pa
 Primary site: https://anointedautomation.net
 NuGet profile: https://www.nuget.org/profiles/roku674
 
-## Packages
+## .NET packages (dotnet/)
 
 - [AnointedAutomation.Algorithms](https://www.nuget.org/packages/AnointedAutomation.Algorithms): Algorithms for .NET with no dependencies, starting with a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction and automatic version and mask selection. Version 1.0.3, net10.0. NuGet deps: none. AnointedAutomation deps: none. Key: AnointedAutomation.Algorithms.QrCode, QrEncoder, QrMatrix, QrErrorCorrectionLevel. Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Algorithms
 - [AnointedAutomation.APIMiddlewares](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares): ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup. Version 1.0.7, net10.0. NuGet deps: Microsoft.AspNetCore.App (framework reference). AnointedAutomation deps: AnointedAutomation.Logging, AnointedAutomation.Memory. Key: AnointedAutomation.APIMiddleware, AnointedAutomation.APIMiddleware.Filters, ApiKeyAuthMiddleware, IPBlacklistMiddleware, InvalidEndpointTrackerMiddleware, EndpointAccessMiddleware. Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.APIMiddlewares
@@ -26,6 +26,10 @@ NuGet profile: https://www.nuget.org/profiles/roku674
 - [AnointedAutomation.Repository.MySql](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql): A generic repository and helper for MySQL over Entity Framework Core and the Pomelo provider. Version 1.0.5, net10.0. NuGet deps: Microsoft.EntityFrameworkCore 10.0.12, Pomelo.EntityFrameworkCore.MySql 9.0.0. AnointedAutomation deps: AnointedAutomation.Logging. Key: AnointedAutomation.Repository.MySql, GenericRepository<T>, IGenericRepository<T>, MySqlHelper, IMySqlHelper. Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.MySql
 - [AnointedAutomation.Serialization](https://www.nuget.org/packages/AnointedAutomation.Serialization): Shared serialization helpers: naming rules (camel, Pascal, snake and the hybrid value/reference casing rule), System.Text.Json casing convention, presets and UTC DateTime converter, tolerant Newtonsoft.Json converters, and lenient JsonElement readers. No MongoDB dependency. Version 1.0.0, net10.0. NuGet deps: Newtonsoft.Json 13.0.4. AnointedAutomation deps: none. Key: AnointedAutomation.Serialization.Naming, AnointedAutomation.Serialization.SystemTextJson, AnointedJson, JsonPresets, JsonCasingConvention, NamingRules. Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Serialization
 - [AnointedAutomation.Shopify](https://www.nuget.org/packages/AnointedAutomation.Shopify): Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types. Version 1.0.0, net10.0. NuGet deps: Newtonsoft.Json 13.0.4. AnointedAutomation deps: AnointedAutomation.Serialization. Key: AnointedAutomation.Shopify, AnointedAutomation.Shopify.Converters, Customer, Order, Product, Fulfillment. Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Shopify
+
+## JavaScript packages (js/)
+
+- [@anointedautomation/sso](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso): "Sign in with Anointed Automation" for partner apps. A dependency-free, server-only OpenID Connect client (authorization code + PKCE S256, state, nonce, RS256 ID token validation via JWKS) for Node 18+, Deno (Base44) and edge runtimes. Key exports: createAnointedClient, createWebHandlers (Next.js App Router, Base44, Workers), createExpressHandlers, AnointedSsoError, ANOINTED_ISSUER. Default scope `openid email`; key users on `sub`. Not on npm yet.
 
 ## Docs
 

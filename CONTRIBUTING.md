@@ -2,6 +2,12 @@
 
 Jesus is King ✝️
 
+## Repository layout
+
+Code is grouped by language: .NET projects live in `dotnet/` (solution `dotnet/AnointedAutomation.sln`),
+JavaScript / TypeScript packages live in `js/<package>/`. A new language gets its own top-level folder and its
+own CI workflow in `.github/workflows/`; workflows set `working-directory` to their folder.
+
 ## File header standard
 
 Every source file starts with the Anointed copyright line, using the comment syntax of its language, and it always ends with "Jesus is King ✝️":

@@ -49,3 +49,9 @@ __pycache__/
 .Python
 *.pyc
 
+
+# JavaScript packages (js/)
+node_modules/
+.next/
+next-env.d.ts
+js/**/examples/**/package-lock.json

@@ -1,4 +1,4 @@
-# Anointed Automation .NET Libraries
+# Anointed Automation Open Source
 
 Jesus is King ✝️
 
@@ -347,6 +347,42 @@ using Newtonsoft.Json;
 Customer customer = JsonConvert.DeserializeObject<Customer>(json);
 long? id = customer.Id;
 ```
+
+## JavaScript packages
+
+### @anointedautomation/sso 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso
+- Runtime: Node 18+, Deno (Base44 backend functions), edge runtimes. Zero dependencies. Server only.
+- Not on npm yet.
+
+"Sign in with Anointed Automation": an OpenID Connect client for the issuer `https://api.anointedautomation.net/`
+(authorization code + PKCE S256, state, nonce, RS256 ID tokens validated against the JWKS, RFC 9207 `iss` check,
+back-channel logout). Default scope `openid email`; requesting `profile` makes users without a handle pick a
+username first. Key users on `sub`, never email.
+
+```js
+import { ANOINTED_ISSUER, createAnointedClient, createExpressHandlers } from "@anointedautomation/sso";
+
+// requireEnv(name) throws when a variable is missing (fail fast, no fallbacks).
+const client = createAnointedClient({
+  issuer: ANOINTED_ISSUER,
+  clientId: requireEnv("ANOINTED_OAUTH_CLIENT_ID"),
+  clientSecret: requireEnv("ANOINTED_OAUTH_CLIENT_SECRET"),
+  redirectUri: requireEnv("ANOINTED_OAUTH_REDIRECT_URI"),
+});
+const anointed = createExpressHandlers(client, {
+  onSignedIn(result, req, res) {
+    // result.user = { sub, email, emailVerified, name, ... }
+    res.redirect(result.returnTo === null ? "/" : result.returnTo);
+  },
+});
+app.get("/auth/anointed/start", anointed.start);
+app.get("/auth/anointed/callback", anointed.callback);
+```
+
+`createWebHandlers` gives the same `start` / `callback` / `backchannelLogout` as `Request -> Response` handlers
+for Next.js App Router, Base44 and Workers. Failures are `AnointedSsoError` with a stable `code`.
 
 ## Cross-package recipes
 

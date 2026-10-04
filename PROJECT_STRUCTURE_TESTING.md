@@ -3,7 +3,9 @@
 # PROJECT STRUCTURE TESTING
 
 ## Test Organization
-All test projects are organized under a "Tests" solution folder in the main .sln file.
+All .NET test projects live in `dotnet/` and are organized under a "Tests" solution folder in
+`dotnet/AnointedAutomation.sln`. JavaScript package tests live next to each package (`js/<package>/test/`, run
+with `npm test`).
 
 ## Test Projects Structure
 
@@ -364,9 +366,11 @@ tests). See sections 7-9 above for the current breakdown.
 
 ## Build and Test Commands
 Based on the .NET nature of the project:
-- Build: `~/.dotnet/dotnet build`
-- Test: `~/.dotnet/dotnet test`
-- Individual project testing: `~/.dotnet/dotnet test AnointedAutomation.{LibraryName}.Tests/`
+- Build (from `dotnet/`): `~/.dotnet/dotnet build`
+- Test (from `dotnet/`): `~/.dotnet/dotnet test`
+- Individual project testing (from `dotnet/`): `~/.dotnet/dotnet test AnointedAutomation.{LibraryName}.Tests/`
+- JS SSO kit: `cd js/anointed-sso && npm test` (unit tests + mocked end-to-end flow against
+  `test/helpers/fakeIdp.js`), Deno: `deno test --allow-net --no-check test/deno/smoke.ts`
 ---
 
 **[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**

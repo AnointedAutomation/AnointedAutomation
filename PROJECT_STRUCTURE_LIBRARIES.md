@@ -427,6 +427,28 @@ All billing models include complete XML documentation
 - `Json/`: JsonElementExtensions (lenient never-throwing readers), ResponseJson.
 - Consumers: Shopify, Objects, Objects.API, Repository.Mongo. Repository.Mongo 1.3.0 adds namespace `AnointedAutomation.Repository.Mongo.Bson` (BsonValueExtensions, HybridCasing, BsonToleranceRegistrar, LenientStringSerializer); Shopify adds ShopifyGid and ShopifyMoney.
 
+## JavaScript Packages (`js/`)
+
+### @anointedautomation/sso v0.1.0 (`js/anointed-sso/`)
+"Sign in with Anointed Automation" client kit for partner apps. Server only, zero dependencies, ESM, Node 18+,
+Deno (Base44 backend functions) and edge runtimes (WebCrypto + global fetch only).
+
+- `src/client.js`: `createAnointedClient(config)` (fail-fast config validation) returning `discover`, `getJwks`
+  (cached, refetch once on unknown `kid`), `createAuthorizeRequest` (PKCE S256, state, nonce, flow cookie),
+  `handleCallback` (state first, flow TTL, RFC 9207 `iss`, provider errors, code exchange, ID token validation,
+  verified email), `refresh`, `revoke`, `fetchUserInfo`, `buildLogoutUrl`, `verifyLogoutToken` (back-channel
+  logout). Exports `ANOINTED_ISSUER`, `DEFAULT_SCOPE` (`openid email`), `safeReturnTo`.
+- `src/jwt.js`: RS256-only JWS verification against a JWKS and ID token claim rules (iss, aud/azp, exp/iat skew,
+  nonce, sub).
+- `src/adapters/web.js`: `createWebHandlers` (Request -> Response: Next.js App Router, Base44, Workers).
+- `src/adapters/express.js`: `createExpressHandlers` (Express / node:http, no cookie-parser or body-parser).
+- `src/errors.js`: `AnointedSsoError` with stable `code` values.
+- `index.d.ts`: hand-written TypeScript definitions.
+- Tests: `test/*.test.js` (node:test) against `test/helpers/fakeIdp.js`, a local OIDC provider; Deno smoke test
+  `test/deno/smoke.ts`.
+- Examples: `examples/express`, `examples/nextjs`, `examples/base44/functions` (anointedStart, anointedCallback,
+  anointedMe).
+
 ## Inter-Library Dependencies
 
 ```

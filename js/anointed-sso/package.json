@@ -1,0 +1,50 @@
+{
+  "name": "@anointedautomation/sso",
+  "version": "0.1.0",
+  "description": "Sign in with Anointed Automation: a dependency-free OpenID Connect client (authorization code + PKCE) for Node 18+, Deno and edge runtimes, with Express and Web (Next.js, Base44) adapters.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "keywords": [
+    "anointed-automation",
+    "oidc",
+    "openid-connect",
+    "oauth2",
+    "pkce",
+    "sso",
+    "sign-in",
+    "express",
+    "nextjs",
+    "deno",
+    "base44"
+  ],
+  "author": "Anointed Automation, LLC.",
+  "license": "MIT",
+  "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnointedAutomation/AnointedAutomation.git",
+    "directory": "js/anointed-sso"
+  },
+  "bugs": {
+    "url": "https://github.com/AnointedAutomation/AnointedAutomation/issues"
+  }
+}
