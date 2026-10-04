@@ -4,7 +4,7 @@ version: 2
 updates:
   # Enable version updates for NuGet
   - package-ecosystem: "nuget"
-    directory: "/"
+    directory: "/dotnet"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 30
