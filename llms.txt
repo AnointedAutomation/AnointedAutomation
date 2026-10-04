@@ -42,7 +42,7 @@ NuGet profile: https://www.nuget.org/profiles/roku674
 
 - [License](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE): MIT. AnointedAutomation.Shopify (and portions of AnointedAutomation.Serialization) are derived from ShopifySharp, MIT, Copyright (c) 2015 Joshua Harms.
 - [File header](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/CONTRIBUTING.md): every source file starts with the copyright line, ending in "Jesus is King ✝️", e.g. `// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️`
-- [Publishing](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/PUBLISHING.md): Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org.
+- [Publishing](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/PUBLISHING.md): Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org (JavaScript packages under js/ publish to npm the same way).
 
 ## Support the author
 

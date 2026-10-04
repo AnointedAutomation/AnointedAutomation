@@ -91,6 +91,8 @@ Requires the .NET 10 SDK.
 - Work lands on `develop`; releases are cut by merging `develop` into `master`.
 - Opening a pull request to `master` auto increments the version of every package whose code changed.
 - Merging to `master` publishes each package whose version is newer than the one on NuGet.org.
+- JavaScript packages follow the same flow to npm (version bump on the PR, publish on merge). See
+  [js/README.md](./js/README.md#publishing).
 
 See [dotnet/PUBLISHING.md](./dotnet/PUBLISHING.md) for details.
 

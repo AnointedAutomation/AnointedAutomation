@@ -133,7 +133,12 @@ relative to `dotnet/`.
   Jobs: `node` (npm test on Node 18, 20, 22, 24), `deno` (`deno test --allow-net --no-check test/deno/smoke.ts`),
   `types` (`tsc --noEmit --strict` on `index.d.ts`).
 - **Local**: `cd js/anointed-sso && npm test`. The package has no dependencies, so there is no install step.
-- **Publishing**: not published to npm; publishing needs the owner's go-ahead.
+- **Publishing**: `.github/workflows/npm-publish.yml` on push to `master` (paths `js/**`): for each non-private
+  `js/*/package.json` whose version is not on npm, `npm test` then `npm publish --access public` over npm
+  Trusted Publishing (OIDC, `id-token: write`, npm 11.5.1+). First publish of a new package is manual, then
+  the workflow is registered as its trusted publisher (steps in `js/README.md`).
+- **Version bump**: `version-increment.yml` has a `js-version-check` step (runs from the repo root) that bumps
+  `package.json` the same way as the .csproj versions; one commit covers both.
 - The .NET workflows set `defaults.run.working-directory: dotnet`; artifact paths are `dotnet/**/TestResults/*`
   and `dotnet/nupkgs/*.nupkg`.
 

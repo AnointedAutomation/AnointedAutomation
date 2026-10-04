@@ -1,0 +1,68 @@
+# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Publishes every public package under js/ whose package.json version is not on npm yet, mirroring
+# nuget-publish.yml. Auth is npm Trusted Publishing (OIDC): no npm token is stored. Each package must exist on
+# npm once (first publish by hand) with this workflow registered as its trusted publisher.
+name: Publish npm Packages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "js/**"
+      - ".github/workflows/npm-publish.yml"
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      id-token: write   # required for npm Trusted Publishing (OIDC) and provenance
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Use an npm that supports Trusted Publishing (11.5.1+)
+        run: npm install -g npm@latest
+
+      - name: Test, then publish changed packages
+        run: |
+          set -euo pipefail
+          PUBLISHED=""
+          for MANIFEST in js/*/package.json; do
+            DIR=$(dirname "$MANIFEST")
+            NAME=$(node -p "require('./$MANIFEST').name")
+            VERSION=$(node -p "require('./$MANIFEST').version")
+            PRIVATE=$(node -p "require('./$MANIFEST').private === true")
+            if [ "$PRIVATE" = "true" ]; then
+              echo "$NAME is private - skipping"
+              continue
+            fi
+
+            echo "Checking npm for $NAME@$VERSION..."
+            if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
+              echo "  $NAME@$VERSION is already on npm - skipping"
+              continue
+            fi
+
+            echo "  Version changed - testing and publishing $NAME@$VERSION"
+            (cd "$DIR" && npm test && npm publish --access public)
+            PUBLISHED="$PUBLISHED $NAME@$VERSION"
+          done
+
+          if [ -z "$PUBLISHED" ]; then
+            echo "No packages have version changes - nothing to publish"
+          else
+            echo "Published:$PUBLISHED"
+          fi
