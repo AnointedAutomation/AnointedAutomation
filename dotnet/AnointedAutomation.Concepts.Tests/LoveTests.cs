@@ -325,7 +325,7 @@ namespace AnointedAutomation.Concepts.Tests
             Assert.DoesNotContain(" loves ", description);
         }
 
-        // EDGE CASE TESTS - per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void Agape_WithNullParties_CreatesInstance()

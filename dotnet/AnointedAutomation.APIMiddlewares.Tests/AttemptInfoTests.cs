@@ -81,7 +81,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests
             Assert.Equal(5, attemptInfo.Count);
         }
 
-        // EDGE CASE TESTS - Added per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void Count_CanBeSetToZero()

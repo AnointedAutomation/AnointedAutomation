@@ -80,7 +80,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Objects
             Assert.Equal(reason, bannedIP.Reason);
         }
 
-        // EDGE CASE TESTS - Added per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void Constructor_WithNullIPAddresses_SetsNullValues()

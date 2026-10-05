@@ -71,7 +71,7 @@ namespace AnointedAutomation.Concepts.Tests
             Assert.True(situation.Has(new Circumstance("quantumComputerMalfunctioned")));
         }
 
-        // EDGE CASE TESTS - per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void With_WithNullCircumstance_ThrowsArgumentNullException()

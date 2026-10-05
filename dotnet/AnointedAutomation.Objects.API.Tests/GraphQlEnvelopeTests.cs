@@ -7,7 +7,7 @@ namespace AnointedAutomation.Objects.API.Tests
 {
     /// <summary>
     /// Unit tests for GraphQlEnvelope and GraphQlResult.
-    /// Tests cover success, failure, and edge cases per CLAUDE_TESTING.md standards.
+    /// Tests cover success, failure, and edge cases.
     /// </summary>
     public class GraphQlEnvelopeTests
     {

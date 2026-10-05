@@ -73,4 +73,3 @@ Looking for information about:
 Each PROJECT_STRUCTURE file is kept under 1000 lines for optimal reading performance. If a file grows too large, it will be split into more specific files.
 ---
 
-**[← Back to Claude Documentation](/home/roku674/.claude/CLAUDE.md)**
