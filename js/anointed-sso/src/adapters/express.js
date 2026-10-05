@@ -4,6 +4,7 @@
 
 import { AnointedSsoError } from "../errors.js";
 import { parseCookieHeader } from "../cookies.js";
+import { requireOnSignedIn, validateCommonOptions } from "./options.js";
 
 const MAX_LOGOUT_BODY_BYTES = 64 * 1024;
 
@@ -80,25 +81,18 @@ async function readLogoutToken(req) {
 /**
  * @summary    Build start / callback / back-channel logout handlers for Express or node:http.
  * @param {import("../client.js").AnointedClient} client
- * @param {object} options
- * @param {(result: Awaited<ReturnType<import("../client.js").AnointedClient["handleCallback"]>>, req: any, res: any) => void | Promise<void>} options.onSignedIn
- *   Create YOUR session from `result.user.sub` and send the response (usually a redirect to `result.returnTo`).
+ * @param {object} [options]
+ * @param {(result: Awaited<ReturnType<import("../client.js").AnointedClient["handleCallback"]>>, req: any, res: any) => void | Promise<void>} [options.onSignedIn]
+ *   Required by `callback` only. Create YOUR session from `result.user.sub` and send the response (usually a redirect to `result.returnTo`).
  * @param {(error: unknown, req: any, res: any) => void | Promise<void>} [options.onError]
  *   Default: a plain 400. Branch on `error.code`; never echo `error.message` to users.
  * @param {(logout: Awaited<ReturnType<import("../client.js").AnointedClient["verifyLogoutToken"]>>, req: any) => void | Promise<void>} [options.onLogout]
  *   Enables `backchannelLogout`: end every session for `logout.sub` / `logout.sid`, skip a repeated `jti`.
+ * @param {string} [options.returnToParam]  Query parameter `start` reads the return target from. Default `returnTo`.
  * @returns {{start: (req: any, res: any) => Promise<void>, callback: (req: any, res: any) => Promise<void>, backchannelLogout: ((req: any, res: any) => Promise<void>) | undefined}}
  */
-export function createExpressHandlers(client, options) {
-  if (typeof options !== "object" || options === null || typeof options.onSignedIn !== "function") {
-    throw new AnointedSsoError("config", "onSignedIn is required");
-  }
-  if (options.onError !== undefined && typeof options.onError !== "function") {
-    throw new AnointedSsoError("config", "onError must be a function");
-  }
-  if (options.onLogout !== undefined && typeof options.onLogout !== "function") {
-    throw new AnointedSsoError("config", "onLogout must be a function");
-  }
+export function createExpressHandlers(client, options = {}) {
+  const returnToParam = validateCommonOptions(options);
 
   /**
    * @summary    Route a failure to `onError`, or answer a generic 400.
@@ -123,8 +117,8 @@ export function createExpressHandlers(client, options) {
    */
   async function start(req, res) {
     try {
-      const returnTo = requestQuery(req).get("returnTo");
-      const auth = await client.createAuthorizeRequest(returnTo === null ? {} : { returnTo });
+      const returnTo = requestQuery(req).get(returnToParam);
+      const auth = await client.createAuthorizeRequest(returnTo === null ? { request: req } : { returnTo, request: req });
       appendSetCookie(res, auth.setCookieHeader);
       res.setHeader("location", auth.url);
       sendStatus(res, 302);
@@ -140,10 +134,11 @@ export function createExpressHandlers(client, options) {
    * @returns {Promise<void>}
    */
   async function callback(req, res) {
+    requireOnSignedIn(options);
     appendSetCookie(res, client.clearFlowCookieHeader());
     try {
       const cookieValue = parseCookieHeader(req.headers.cookie)[client.cookieName];
-      const result = await client.handleCallback({ query: requestQuery(req), cookieValue });
+      const result = await client.handleCallback({ query: requestQuery(req), cookieValue, request: req });
       await options.onSignedIn(result, req, res);
     } catch (err) {
       await fail(err, req, res);

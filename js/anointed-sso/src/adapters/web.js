@@ -4,6 +4,7 @@
 
 import { AnointedSsoError } from "../errors.js";
 import { parseCookieHeader } from "../cookies.js";
+import { requireOnSignedIn, validateCommonOptions } from "./options.js";
 
 /**
  * @summary    Copy a Response so headers are mutable, and append one Set-Cookie value.
@@ -32,38 +33,31 @@ function defaultErrorResponse() {
 /**
  * @summary    Build start / callback / back-channel logout handlers for a fetch-style runtime.
  * @param {import("../client.js").AnointedClient} client
- * @param {object} options
- * @param {(result: Awaited<ReturnType<import("../client.js").AnointedClient["handleCallback"]>>, request: Request) => Response | Promise<Response>} options.onSignedIn
- *   Create YOUR session from `result.user.sub` and return the response (usually a redirect to
- *   `result.returnTo`). The flow cookie is cleared for you.
+ * @param {object} [options]
+ * @param {(result: Awaited<ReturnType<import("../client.js").AnointedClient["handleCallback"]>>, request: Request) => Response | Promise<Response>} [options.onSignedIn]
+ *   Required by `callback` only. Create YOUR session from `result.user.sub` and return the response
+ *   (usually a redirect to `result.returnTo`). The flow cookie is cleared for you.
  * @param {(error: unknown, request: Request) => Response | Promise<Response>} [options.onError]
  *   Default: a plain 400. Branch on `error.code` (see AnointedSsoError); never echo `error.message` to users.
  * @param {(logout: Awaited<ReturnType<import("../client.js").AnointedClient["verifyLogoutToken"]>>, request: Request) => void | Promise<void>} [options.onLogout]
  *   Enables `backchannelLogout`: end every session for `logout.sub` / `logout.sid`, skip a repeated `jti`.
+ * @param {string} [options.returnToParam]  Query parameter `start` reads the return target from. Default `returnTo`.
  * @returns {{start: (request: Request) => Promise<Response>, callback: (request: Request) => Promise<Response>, backchannelLogout: ((request: Request) => Promise<Response>) | undefined}}
  */
-export function createWebHandlers(client, options) {
-  if (typeof options !== "object" || options === null || typeof options.onSignedIn !== "function") {
-    throw new AnointedSsoError("config", "onSignedIn is required");
-  }
-  if (options.onError !== undefined && typeof options.onError !== "function") {
-    throw new AnointedSsoError("config", "onError must be a function");
-  }
-  if (options.onLogout !== undefined && typeof options.onLogout !== "function") {
-    throw new AnointedSsoError("config", "onLogout must be a function");
-  }
+export function createWebHandlers(client, options = {}) {
+  const returnToParam = validateCommonOptions(options);
   const onError = options.onError === undefined ? defaultErrorResponse : options.onError;
 
   /**
    * @summary    GET handler: redirect to Anointed Automation and set the flow cookie.
-   * @description `?returnTo=/path` is carried through when it is a same-site path.
+   * @description `?returnTo=` (or `returnToParam`) is carried through when the client accepts it as safe.
    * @param {Request} request
    * @returns {Promise<Response>}
    */
   async function start(request) {
     try {
-      const returnTo = new URL(request.url).searchParams.get("returnTo");
-      const auth = await client.createAuthorizeRequest(returnTo === null ? {} : { returnTo });
+      const returnTo = new URL(request.url).searchParams.get(returnToParam);
+      const auth = await client.createAuthorizeRequest(returnTo === null ? { request } : { returnTo, request });
       return new Response(null, {
         status: 302,
         headers: { location: auth.url, "set-cookie": auth.setCookieHeader, "cache-control": "no-store" },
@@ -79,10 +73,11 @@ export function createWebHandlers(client, options) {
    * @returns {Promise<Response>}
    */
   async function callback(request) {
+    requireOnSignedIn(options);
     const clear = client.clearFlowCookieHeader();
     try {
       const cookieValue = parseCookieHeader(request.headers.get("cookie"))[client.cookieName];
-      const result = await client.handleCallback({ url: request.url, cookieValue });
+      const result = await client.handleCallback({ url: request.url, cookieValue, request });
       return withSetCookie(await options.onSignedIn(result, request), clear);
     } catch (err) {
       return withSetCookie(await onError(err, request), clear);

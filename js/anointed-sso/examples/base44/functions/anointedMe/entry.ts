@@ -4,7 +4,7 @@
 // and gets `{ user: { sub, email } }` or `{ user: null }` from YOUR signed session cookie.
 
 import { secrets } from "base44:runtime";
-import { parseCookieHeader } from "npm:@anointedautomation/sso@0.1.0";
+import { parseCookieHeader } from "npm:@anointedautomation/sso@0.2.0";
 
 const SESSION_COOKIE = "app_session";
 

@@ -3,7 +3,7 @@
 // state and nonce) for the Anointed Automation identity provider. SERVER ONLY: it holds the client secret
 // and performs the token exchange. Never ship it to a browser or mobile bundle.
 //
-// The flow secrets (state, nonce, PKCE code_verifier and an optional same-site return path) ride ONE
+// The flow secrets (state, nonce, PKCE code_verifier and an optional validated return target) ride ONE
 // short-lived httpOnly cookie between the start and callback requests, so no server session store is needed.
 
 import { AnointedSsoError } from "./errors.js";
@@ -11,6 +11,7 @@ import { base64UrlToJson, jsonToBase64Url } from "./encoding.js";
 import { randomBase64Url, sha256Base64Url, timingSafeEqual } from "./crypto.js";
 import { assertAudience, validateIdTokenClaims, verifyJwsRs256 } from "./jwt.js";
 import { serializeCookie } from "./cookies.js";
+import { createReturnToValidator, isLoopbackHost, safeRelativePath } from "./returnTo.js";
 
 /** The production issuer. Pass it explicitly as `issuer`; it is exported so apps do not retype it. */
 export const ANOINTED_ISSUER = "https://api.anointedautomation.net/";
@@ -68,7 +69,7 @@ function stringOrNull(value) {
  * @returns {boolean}
  */
 function isLoopback(url) {
-  return url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "[::1]";
+  return isLoopbackHost(url.hostname);
 }
 
 /**
@@ -131,18 +132,36 @@ function positiveNumberOption(config, key) {
 }
 
 /**
- * @summary    Keep a return path only when it is a same-site absolute path (blocks open redirects).
+ * @summary    Keep a return target only when it is safe (blocks open redirects).
  * @description
- *   Accepts "/account?tab=1"; rejects absolute URLs, protocol-relative "//evil.example", backslash tricks,
- *   control characters and anything over 2048 characters.
+ *   With no options: accepts a same-site path like "/account?tab=1"; rejects absolute URLs,
+ *   protocol-relative "//evil.example", backslash tricks, control characters and anything over 2048
+ *   characters. With `allowedReturnOrigins` and/or `isAllowedReturnTo`, an absolute http(s) URL is also kept
+ *   (normalized) when its origin is listed or the predicate approves it; https only, http only for a loopback
+ *   host, never credentials, never another scheme.
  * @param {unknown} value
+ * @param {{allowedReturnOrigins?: string[], isAllowedReturnTo?: (url: URL) => boolean}} [options]
  * @returns {string | null}
  */
-export function safeReturnTo(value) {
-  if (typeof value !== "string" || value === "" || value.length > 2048) return null;
-  if (!value.startsWith("/") || value.startsWith("//") || value.startsWith("/\\")) return null;
-  if (/[\u0000-\u001f\u007f\\]/.test(value)) return null;
-  return value;
+export function safeReturnTo(value, options) {
+  if (options === undefined) return safeRelativePath(value);
+  return createReturnToValidator(options)(value);
+}
+
+/**
+ * @summary    Validate a resolved redirect URI: secure URL, and on the allowlist when one is configured.
+ * @param {unknown} value
+ * @param {Set<string> | null} allowed
+ * @param {string} code  Error code to raise.
+ * @returns {{uri: string, url: URL}}
+ */
+function checkRedirectUri(value, allowed, code) {
+  if (typeof value !== "string" || value.trim() === "") throw new AnointedSsoError(code, "redirectUri must be a non-empty string");
+  const url = parseSecureUrl(value, "redirectUri", code);
+  if (allowed !== null && !allowed.has(value)) {
+    throw new AnointedSsoError(code, `redirectUri ${value} is not in allowedRedirectUris`);
+  }
+  return { uri: value, url };
 }
 
 /**
@@ -154,8 +173,16 @@ export function safeReturnTo(value) {
  * @param {object} config
  * @param {string} config.issuer        `https://api.anointedautomation.net/` (export ANOINTED_ISSUER).
  * @param {string} config.clientId      `aa_<your key id>`.
- * @param {string} config.clientSecret  From the admin "Sign-in" dialog. Server only.
- * @param {string} config.redirectUri   The exact registered callback URL.
+ * @param {string} [config.clientSecret]  From the admin "Sign-in" dialog. Server only. Not needed to START a
+ *   sign-in; required (checked when used) by the code exchange, refresh and revoke.
+ * @param {string | ((request: unknown) => string)} config.redirectUri  The exact registered callback URL, or a
+ *   function of the request (the web adapter passes the Request, the Express adapter the node request) so one
+ *   client can serve several hosts. Every resolved value must be https (http only for localhost).
+ * @param {string[]} [config.allowedRedirectUris]  When set, every redirect URI must be exactly one of these.
+ * @param {string[]} [config.allowedReturnOrigins] Origins an absolute `returnTo` may point at, e.g.
+ *   "https://www.example.com", "https://*.example.com", "http://localhost:3000". Default: same-site paths only.
+ * @param {(url: URL) => boolean} [config.isAllowedReturnTo]  Custom approval for an absolute `returnTo`
+ *   (still https only, http only for localhost, never credentials or another scheme).
  * @param {string} [config.scope]       Space separated; must include `openid`. Default `openid email`.
  * @param {boolean} [config.requireVerifiedEmail]  Default: true when the scope includes `email`.
  * @param {string} [config.cookieName]  Flow cookie name. Default `aa_sso_flow`.
@@ -175,9 +202,33 @@ export function createAnointedClient(config) {
   const issuer = requireConfigString(config, "issuer");
   parseSecureUrl(issuer, "issuer", "config");
   const clientId = requireConfigString(config, "clientId");
-  const clientSecret = requireConfigString(config, "clientSecret");
-  const redirectUri = requireConfigString(config, "redirectUri");
-  const redirectUrl = parseSecureUrl(redirectUri, "redirectUri", "config");
+  // Optional at construction so a start-only deployment needs no secret; required at the token endpoint.
+  if (config.clientSecret !== undefined && (typeof config.clientSecret !== "string" || config.clientSecret.trim() === "")) {
+    throw new AnointedSsoError("config", "clientSecret must be a non-empty string when given");
+  }
+  const clientSecret = config.clientSecret === undefined ? null : config.clientSecret;
+
+  let allowedRedirectUris = null;
+  if (config.allowedRedirectUris !== undefined) {
+    if (!Array.isArray(config.allowedRedirectUris) || config.allowedRedirectUris.length === 0) {
+      throw new AnointedSsoError("config", "allowedRedirectUris must be a non-empty array");
+    }
+    for (const entry of config.allowedRedirectUris) checkRedirectUri(entry, null, "config");
+    allowedRedirectUris = new Set(config.allowedRedirectUris);
+  }
+  const redirectUriResolver = typeof config.redirectUri === "function" ? config.redirectUri : null;
+  let redirectUri = null;
+  let redirectUrl = null;
+  if (redirectUriResolver === null) {
+    const checked = checkRedirectUri(requireConfigString(config, "redirectUri"), allowedRedirectUris, "config");
+    redirectUri = checked.uri;
+    redirectUrl = checked.url;
+  }
+
+  const validateReturnTo = createReturnToValidator({
+    allowedReturnOrigins: config.allowedReturnOrigins,
+    isAllowedReturnTo: config.isAllowedReturnTo,
+  });
 
   const scope = optionOrDefault(config, "scope");
   if (typeof scope !== "string") throw new AnointedSsoError("config", "scope must be a string");
@@ -206,7 +257,9 @@ export function createAnointedClient(config) {
     path: cookiePath,
     maxAge: flowTtlSeconds,
     httpOnly: true,
-    secure: redirectUrl.protocol === "https:",
+    // With a per-request redirect URI the flow cookie's Secure flag follows the resolved URI; this default
+    // (used by clearFlowCookie) is Secure unless the static redirect URI is a plain-http localhost one.
+    secure: redirectUrl === null ? true : redirectUrl.protocol === "https:",
     sameSite: "Lax",
   };
   if (config.cookieDomain !== undefined) {
@@ -271,6 +324,9 @@ export function createAnointedClient(config) {
    * @returns {Promise<any>}
    */
   function postForm(url, fields, failCode) {
+    if (clientSecret === null) {
+      throw new AnointedSsoError("config", "clientSecret is required to call the token endpoint (confidential client)");
+    }
     const body = new URLSearchParams({ ...fields, client_id: clientId, client_secret: clientSecret });
     return requestJson(
       url,
@@ -377,7 +433,9 @@ export function createAnointedClient(config) {
    */
   function userFromClaims(claims) {
     const emailVerified = claims.email_verified === true;
-    const email = emailVerified && typeof claims.email === "string" && claims.email.trim() !== "" ? claims.email.trim() : null;
+    // Normalized (trimmed, lowercase) for matching; the raw claim stays on `claims.email`.
+    const email =
+      emailVerified && typeof claims.email === "string" && claims.email.trim() !== "" ? claims.email.trim().toLowerCase() : null;
     if (requireVerifiedEmail && email === null) {
       throw new AnointedSsoError("email_not_verified", "the ID token carries no verified email");
     }
@@ -428,20 +486,53 @@ export function createAnointedClient(config) {
       return null;
     }
     if (body.s === "" || body.n === "" || body.v === "") return null;
-    return { state: body.s, nonce: body.n, verifier: body.v, createdAt: body.t, returnTo: safeReturnTo(body.r) };
+    return { state: body.s, nonce: body.n, verifier: body.v, createdAt: body.t, returnTo: validateReturnTo(body.r) };
+  }
+
+  /**
+   * @summary    The redirect URI for one sign-in: a per-call value, else the configured function of the
+   *             request, else the static URI. Always a secure URL and, when configured, on the allowlist.
+   * @param {{redirectUri?: unknown, request?: unknown}} opts
+   * @returns {{uri: string, url: URL}}
+   * @throws {AnointedSsoError} `redirect_uri_rejected` when a per-request value fails validation.
+   */
+  function resolveRedirect(opts) {
+    if (opts.redirectUri !== undefined) return checkRedirectUri(opts.redirectUri, allowedRedirectUris, "redirect_uri_rejected");
+    if (redirectUriResolver !== null) {
+      let value;
+      try {
+        value = redirectUriResolver(opts.request);
+      } catch (err) {
+        throw new AnointedSsoError("redirect_uri_rejected", "the redirectUri function threw", { cause: err });
+      }
+      return checkRedirectUri(value, allowedRedirectUris, "redirect_uri_rejected");
+    }
+    return { uri: redirectUri, url: redirectUrl };
+  }
+
+  /**
+   * @summary    The redirect URI the client would use for a request (validated).
+   * @param {unknown} [request]  Passed to a `redirectUri` function; ignored for a static URI.
+   * @returns {string}
+   */
+  function resolveRedirectUri(request) {
+    return resolveRedirect({ request }).uri;
   }
 
   /**
    * @summary    Start a sign-in: the authorize URL plus the flow cookie to set on the redirect response.
    * @param {object} [opts]
-   * @param {string} [opts.returnTo]    Same-site path to land on after sign-in (dropped if unsafe).
+   * @param {string} [opts.returnTo]    Same-site path (or allowlisted absolute URL) to land on after sign-in; dropped if unsafe.
    * @param {string} [opts.prompt]      e.g. "login" to force re-authentication.
    * @param {string} [opts.loginHint]   Pre-fills the sign-in page.
    * @param {Record<string, string>} [opts.extraParams] Additional authorize parameters (not the reserved ones).
-   * @returns {Promise<{url: string, state: string, cookie: {name: string, value: string, options: object}, setCookieHeader: string}>}
+   * @param {string} [opts.redirectUri] This call's redirect URI (validated; overrides the configured one).
+   * @param {unknown} [opts.request]    Passed to a `redirectUri` function.
+   * @returns {Promise<{url: string, state: string, redirectUri: string, cookie: {name: string, value: string, options: object}, setCookieHeader: string}>}
    */
   async function createAuthorizeRequest(opts = {}) {
     if (!isPlainObject(opts)) throw new AnointedSsoError("config", "options must be an object");
+    const redirect = resolveRedirect(opts);
     const doc = await discover();
     const state = await randomBase64Url(32);
     const nonce = await randomBase64Url(32);
@@ -450,7 +541,7 @@ export function createAnointedClient(config) {
 
     const url = new URL(doc.authorization_endpoint);
     url.searchParams.set("client_id", clientId);
-    url.searchParams.set("redirect_uri", redirectUri);
+    url.searchParams.set("redirect_uri", redirect.uri);
     url.searchParams.set("response_type", "code");
     url.searchParams.set("scope", scopes.join(" "));
     url.searchParams.set("state", state);
@@ -468,14 +559,16 @@ export function createAnointedClient(config) {
     }
 
     const flow = { s: state, n: nonce, v: verifier, t: clock() };
-    const returnTo = safeReturnTo(opts.returnTo);
+    const returnTo = validateReturnTo(opts.returnTo);
     if (returnTo !== null) flow.r = returnTo;
     const value = jsonToBase64Url(flow);
+    const options = { ...cookieOptions, secure: redirect.url.protocol === "https:" };
     return {
       url: url.toString(),
       state,
-      cookie: { name: cookieName, value, options: { ...cookieOptions } },
-      setCookieHeader: serializeCookie(cookieName, value, cookieOptions),
+      redirectUri: redirect.uri,
+      cookie: { name: cookieName, value, options: { ...options } },
+      setCookieHeader: serializeCookie(cookieName, value, options),
     };
   }
 
@@ -492,13 +585,16 @@ export function createAnointedClient(config) {
    * @param {string} [input.url]  The full (or path-relative) callback request URL.
    * @param {URLSearchParams | Record<string, string>} [input.query]  The callback query, instead of `url`.
    * @param {string | undefined} input.cookieValue  The flow cookie value from the request.
+   * @param {string} [input.redirectUri]  This call's redirect URI (must equal the one used at start).
+   * @param {unknown} [input.request]     Passed to a `redirectUri` function.
    * @returns {Promise<{user: AnointedUser, claims: Record<string, any>, tokens: AnointedTokens, returnTo: string | null}>}
    */
   async function handleCallback(input) {
     if (!isPlainObject(input)) throw new AnointedSsoError("config", "handleCallback needs { url | query, cookieValue }");
+    const redirect = resolveRedirect(input);
     let params;
     if (typeof input.url === "string") {
-      params = new URL(input.url, redirectUri).searchParams;
+      params = new URL(input.url, redirect.uri).searchParams;
     } else if (input.query instanceof URLSearchParams) {
       params = input.query;
     } else if (isPlainObject(input.query)) {
@@ -527,7 +623,7 @@ export function createAnointedClient(config) {
     const doc = await discover();
     const raw = await postForm(
       doc.token_endpoint,
-      { grant_type: "authorization_code", code, redirect_uri: redirectUri, code_verifier: flow.verifier },
+      { grant_type: "authorization_code", code, redirect_uri: redirect.uri, code_verifier: flow.verifier },
       "token_exchange",
     );
     if (!isPlainObject(raw) || typeof raw.id_token !== "string") {
@@ -689,6 +785,8 @@ export function createAnointedClient(config) {
     buildLogoutUrl,
     verifyLogoutToken,
     decodeFlowCookie,
+    validateReturnTo,
+    resolveRedirectUri,
     clearFlowCookie,
     clearFlowCookieHeader,
   });
@@ -697,7 +795,8 @@ export function createAnointedClient(config) {
 /**
  * @typedef {object} AnointedUser
  * @property {string} sub                     Stable Anointed Automation user id. Key your users on this.
- * @property {string | null} email            Verified email only; null when absent or unverified.
+ * @property {string | null} email            Verified email only, trimmed and lowercase; null when absent or
+ *                                            unverified. The raw claim is `claims.email`.
  * @property {boolean} emailVerified
  * @property {string | null} name             Needs the `profile` scope.
  * @property {string | null} preferredUsername Needs the `profile` scope.

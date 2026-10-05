@@ -138,8 +138,12 @@ test("web adapter: start failure (provider unreachable) goes to onError", async 
 });
 
 test("web adapter: options are validated and backchannelLogout exists only with onLogout", () => {
-  assert.throws(() => createWebHandlers(client, {}), (err) => err.code === "config");
-  assert.throws(() => createWebHandlers(client, undefined), (err) => err.code === "config");
+  assert.doesNotThrow(() => createWebHandlers(client, {}));
+  assert.doesNotThrow(() => createWebHandlers(client));
+  assert.throws(() => createWebHandlers(client, null), (err) => err.code === "config");
+  assert.throws(() => createWebHandlers(client, { onSignedIn: "x" }), (err) => err.code === "config");
+  assert.throws(() => createWebHandlers(client, { returnToParam: "" }), (err) => err.code === "config");
+  assert.throws(() => createWebHandlers(client, { returnToParam: 5 }), (err) => err.code === "config");
   assert.throws(() => createWebHandlers(client, { onSignedIn: () => null, onError: 1 }), (err) => err.code === "config");
   assert.throws(() => createWebHandlers(client, { onSignedIn: () => null, onLogout: "x" }), (err) => err.code === "config");
   assert.equal(createWebHandlers(client, { onSignedIn: () => null }).backchannelLogout, undefined);
@@ -287,7 +291,10 @@ test("express adapter: back-channel logout reads a raw body or a pre-parsed req.
 });
 
 test("express adapter: options are validated", () => {
-  assert.throws(() => createExpressHandlers(client, {}), (err) => err.code === "config");
+  assert.doesNotThrow(() => createExpressHandlers(client, {}));
+  assert.throws(() => createExpressHandlers(client, null), (err) => err.code === "config");
+  assert.throws(() => createExpressHandlers(client, { onSignedIn: 1 }), (err) => err.code === "config");
+  assert.throws(() => createExpressHandlers(client, { returnToParam: " " }), (err) => err.code === "config");
   assert.throws(() => createExpressHandlers(client, { onSignedIn: () => {}, onError: 2 }), (err) => err.code === "config");
   assert.throws(() => createExpressHandlers(client, { onSignedIn: () => {}, onLogout: 2 }), (err) => err.code === "config");
   assert.equal(createExpressHandlers(client, { onSignedIn: () => {} }).backchannelLogout, undefined);
