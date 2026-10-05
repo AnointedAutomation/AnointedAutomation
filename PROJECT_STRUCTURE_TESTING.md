@@ -178,7 +178,7 @@ file in this pass; treat it as approximate).
   three-valued (bool?) claim standings, four-state verdicts (Consistent/Contradicts/Unfalsifiable/
   Undetermined), domain-bounded laws, tensions between contradicting claims, and zero-weight
   foundations never counting as support. Design spec:
-  `docs/superpowers/specs/2026-07-02-theology-engine-design.md`.
+  `docs/design/specs/2026-07-02-theology-engine-design.md`.
 - `ProofTests.cs` - covers the Proof / ProofSymbol / ProofStep types and the canonical
   Agnosticism and Christianity proofs, including that the logic glyphs (∃, ∀, ∧, ⊕, →) round-trip
   in an ordinary UTF-16 string and that \uXXXX escapes equal the raw glyphs (12 tests).

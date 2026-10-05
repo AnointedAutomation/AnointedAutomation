@@ -374,7 +374,7 @@ All billing models include complete XML documentation
   the triadic coherence rule (ground x Word x Spirit), the love triad (Lover x Beloved x Bond) with a
   binary commitment gate and condilectio, and Creed.ToJson()/Creed.ToPrompt() (AI constitution)
 - See PROJECT_STRUCTURE_CODE.md sections 4a for full class-level detail and the design spec at
-  `docs/superpowers/specs/2026-07-02-theology-engine-design.md`
+  `docs/design/specs/2026-07-02-theology-engine-design.md`
 
 **Key Namespaces:**
 - `AnointedAutomation.Concepts` - Love/Agape/Reality concept model

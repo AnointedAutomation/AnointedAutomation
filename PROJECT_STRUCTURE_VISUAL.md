@@ -235,7 +235,7 @@ AnointedAutomation/
 │       ├── index.d.ts
 │       ├── test/           node:test suites, helpers/fakeIdp.js, deno/smoke.ts
 │       └── examples/       express/, nextjs/, base44/functions/
-├── docs/superpowers/        specs and plans
+├── docs/design/             specs and plans
 ├── llms.txt, llms.md, llms.json
 ├── README.md, CONTRIBUTING.md, SUPPORT.md, LICENSE (MIT)
 └── PROJECT_STRUCTURE_*.md
