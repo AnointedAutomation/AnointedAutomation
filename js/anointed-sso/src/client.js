@@ -74,6 +74,9 @@ function isLoopback(url) {
 
 /**
  * @summary    Parse an absolute https URL (http only for loopback hosts) or throw a coded error.
+ * @description
+ *   The loopback allowance exists for local test providers. Anointed Automation itself registers https
+ *   callbacks only, so an http://localhost redirect URI never works against the real issuer.
  * @param {unknown} value
  * @param {string} label  What the URL is, for the error message.
  * @param {string} code   Error code to raise.
@@ -177,7 +180,8 @@ function checkRedirectUri(value, allowed, code) {
  *   sign-in; required (checked when used) by the code exchange, refresh and revoke.
  * @param {string | ((request: unknown) => string)} config.redirectUri  The exact registered callback URL, or a
  *   function of the request (the web adapter passes the Request, the Express adapter the node request) so one
- *   client can serve several hosts. Every resolved value must be https (http only for localhost).
+ *   client can serve several hosts. Every resolved value must be https. (The kit also accepts http on localhost
+ *   for a local test provider; Anointed Automation registers https callbacks only.)
  * @param {string[]} [config.allowedRedirectUris]  When set, every redirect URI must be exactly one of these.
  * @param {string[]} [config.allowedReturnOrigins] Origins an absolute `returnTo` may point at, e.g.
  *   "https://www.example.com", "https://*.example.com", "http://localhost:3000". Default: same-site paths only.

@@ -48,8 +48,9 @@ export interface AnointedClientConfig {
   clientSecret?: string;
   /**
    * The exact registered callback URL, or a function of the request (the web adapter passes the `Request`,
-   * the Express adapter the node request) so one client can serve several hosts. Every value must be https
-   * (http only for localhost).
+   * the Express adapter the node request) so one client can serve several hosts. Every value must be https.
+   * The kit also accepts http on localhost for a local test provider; Anointed Automation registers https
+   * callbacks only.
    */
   redirectUri: string | ((request: any) => string);
   /** When set, every redirect URI (static, per request or per call) must be exactly one of these. */

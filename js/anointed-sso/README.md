@@ -30,8 +30,10 @@ Sign-in is a capability on your existing Anointed Automation partner API key. We
 - `client_secret`: shown exactly once, sent over a private channel. Store it only in your server's
   secret store. If it leaks, ask us to rotate it.
 
-Tell us your exact callback URL(s): https only (http is allowed only for `localhost`), exact match, no
-wildcards.
+Tell us your exact callback URL(s): absolute `https` only, exact match, no fragment, no wildcards. Plain
+`http`, including `localhost`, cannot be registered; for local development use an https tunnel or a staging
+host. (The kit itself accepts an `http://localhost` redirect URI only so it can run against a local test
+provider; Anointed Automation will refuse it.)
 
 ### 2. Install
 
@@ -137,12 +139,14 @@ The Express and Next.js examples read these (they crash at startup when one is m
 ```
 ANOINTED_OAUTH_CLIENT_ID=aa_<your key id>
 ANOINTED_OAUTH_CLIENT_SECRET=<server only>
-ANOINTED_OAUTH_REDIRECT_URI=http://localhost:3000/auth/anointed/callback
+ANOINTED_OAUTH_REDIRECT_URI=https://<your-tunnel-host>/auth/anointed/callback
 SESSION_SECRET=<node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))">
 PORT=3000
 ```
 
-For Next.js the redirect URI is `http://localhost:3000/api/auth/anointed/callback` and `PORT` is not used.
+For Next.js the redirect URI is `https://<your-tunnel-host>/api/auth/anointed/callback` and `PORT` is not
+used. The redirect URI must be an https URL registered with us, so run the example behind an https tunnel
+(for example `cloudflared tunnel --url http://localhost:3000`) and register the tunnel's callback URL.
 
 The Express and Next.js examples also implement back-channel logout and a sign-out route.
 
@@ -209,7 +213,8 @@ query parameter `start` reads (default `returnTo`). `backchannelLogout` exists o
 
 One client can serve several hosts. Pass `redirectUri` as a function of the request (the web adapter passes
 the `Request`, the Express adapter the node request), or pass `redirectUri` per call. Every value must be
-https (http only for localhost) and, with `allowedRedirectUris`, exactly one of that list. Pin the list
+https and, with `allowedRedirectUris`, exactly one of that list (the kit also accepts `http://localhost` for
+a local test provider, but Anointed Automation only registers https callbacks). Pin the list
 whenever the URI comes from a `Host` header, so a spoofed header cannot steer the flow anywhere else. Each
 URI must also be registered with us.
 
@@ -260,7 +265,8 @@ spec and our retry policy expect.
 
 - [ ] The client secret is only in your server's secret store. Not in code, git, `.env.example`, logs,
       browser bundles or mobile apps. (In Next.js never prefix it with `NEXT_PUBLIC_`.)
-- [ ] Your redirect URI is https and registered exactly; the kit refuses http except on localhost.
+- [ ] Your redirect URI is https and registered exactly. Anointed Automation never registers an http
+      callback, `localhost` included; the kit refuses http except on localhost (local test providers only).
 - [ ] Users are keyed on `sub`, never on email or username.
 - [ ] You never auto-link accounts on an unverified email (the kit enforces this with the `email` scope).
 - [ ] You request the smallest scope that works: `openid email` by default.
