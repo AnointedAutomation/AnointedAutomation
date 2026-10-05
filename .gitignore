@@ -48,7 +48,6 @@ __pycache__/
 *.pyd
 .Python
 *.pyc
-docs/
 
 # JavaScript packages (js/)
 node_modules/
