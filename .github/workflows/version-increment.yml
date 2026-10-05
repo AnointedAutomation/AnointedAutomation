@@ -13,6 +13,9 @@ jobs:
   version-check-and-increment:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: dotnet
     permissions:
       contents: write
       pull-requests: write
@@ -96,7 +99,7 @@ jobs:
             fi
 
             # Get version from master branch
-            MASTER_VERSION=$(git show master:"$PROJECT_PATH" 2>/dev/null | grep -o '<Version>[^<]*</Version>' | sed 's/<Version>\(.*\)<\/Version>/\1/' || echo "")
+            MASTER_VERSION=$(git show master:"./$PROJECT_PATH" 2>/dev/null | grep -o '<Version>[^<]*</Version>' | sed 's/<Version>\(.*\)<\/Version>/\1/' || echo "")
 
             if [ -z "$MASTER_VERSION" ]; then
               echo "  New project (not in master), version: $PR_VERSION"
@@ -147,20 +150,72 @@ jobs:
           echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Check and increment npm package versions (js/)
+        id: js-version-check
+        working-directory: .
+        run: |
+          set -euo pipefail
+          VERSIONS_UPDATED=0
+          UPDATED_PROJECTS=""
+          for MANIFEST in js/*/package.json; do
+            DIR=$(dirname "$MANIFEST")
+            if [ "$(node -p "require('./$MANIFEST').private === true")" = "true" ]; then
+              continue
+            fi
+            echo ""
+            echo "Checking $MANIFEST:"
+            CODE_CHANGES=$(git diff --name-only master...HEAD -- "$DIR" | grep -v -x "$MANIFEST" | wc -l)
+            echo "  Code changes detected: $CODE_CHANGES file(s)"
+            if [ "$CODE_CHANGES" -eq 0 ]; then
+              echo "  ✓ No code changes - skipping version check"
+              continue
+            fi
+            PR_VERSION=$(node -p "require('./$MANIFEST').version")
+            MASTER_VERSION=$(git show master:"$MANIFEST" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{console.log(JSON.parse(s).version)}catch{console.log('')}})" || echo "")
+            if [ -z "$MASTER_VERSION" ]; then
+              echo "  New package (not in master), version: $PR_VERSION"
+              continue
+            fi
+            echo "  PR version:     $PR_VERSION"
+            echo "  Master version: $MASTER_VERSION"
+            if [ "$PR_VERSION" = "$MASTER_VERSION" ]; then
+              IFS='.' read -r -a VERSION_PARTS <<< "$PR_VERSION"
+              MAJOR="${VERSION_PARTS[0]}"
+              MINOR="${VERSION_PARTS[1]}"
+              PATCH="${VERSION_PARTS[2]}"
+              # Same rule as the NuGet packages: patch rolls into minor at 9, major is never touched.
+              if [ "$PATCH" -ge 9 ]; then
+                NEW_VERSION="${MAJOR}.$((MINOR + 1)).0"
+              else
+                NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+              fi
+              echo "  ✓ New version: $NEW_VERSION"
+              node -e "const fs=require('fs');const f=process.argv[1];const p=JSON.parse(fs.readFileSync(f,'utf8'));p.version=process.argv[2];fs.writeFileSync(f,JSON.stringify(p,null,2)+'\\n')" "$MANIFEST" "$NEW_VERSION"
+              VERSIONS_UPDATED=$((VERSIONS_UPDATED + 1))
+              UPDATED_PROJECTS="${UPDATED_PROJECTS}\\n- ${MANIFEST}: ${PR_VERSION} → ${NEW_VERSION}"
+            else
+              echo "  ✓ Version already incremented"
+            fi
+          done
+          echo "versions_updated=$VERSIONS_UPDATED" >> $GITHUB_OUTPUT
+          echo "updated_projects<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Commit version changes
-        if: steps.version-check.outputs.versions_updated != '0'
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0'
         run: |
           git add -A
           git commit -m "Auto-increment versions for PR to master"
           git push origin ${{ github.event.pull_request.head.ref }}
 
       - name: Comment on PR with version updates
-        if: steps.version-check.outputs.versions_updated != '0'
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0'
         uses: actions/github-script@v9
         with:
           script: |
-            const updatedProjects = `${{ steps.version-check.outputs.updated_projects }}`;
-            const count = '${{ steps.version-check.outputs.versions_updated }}';
+            const updatedProjects = `${{ steps.version-check.outputs.updated_projects }}${{ steps.js-version-check.outputs.updated_projects }}`;
+            const count = String(Number('${{ steps.version-check.outputs.versions_updated }}') + Number('${{ steps.js-version-check.outputs.versions_updated }}'));
 
             const comment = `## 🔢 Version Auto-Increment
 
@@ -181,6 +236,6 @@ jobs:
             });
 
       - name: No version updates needed
-        if: steps.version-check.outputs.versions_updated == '0'
+        if: steps.version-check.outputs.versions_updated == '0' && steps.js-version-check.outputs.versions_updated == '0'
         run: |
           echo "✓ All project versions are already different from master - no updates needed"

@@ -1,34 +1,54 @@
-# Anointed Automation .NET Libraries
+# Anointed Automation Open Source
 
 Jesus is King ✝️
 
 [![Build and Test](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml)
+[![JS anointed-sso](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE)
 
-Open source .NET libraries from [Anointed Automation](https://anointedautomation.net), published on
-[NuGet.org](https://www.nuget.org/profiles/roku674). Every package targets **.NET 10**, is MIT licensed, and
-ships its own README and XML IntelliSense docs.
+Open source libraries from [Anointed Automation](https://anointedautomation.net), MIT licensed. The .NET
+packages are published on [NuGet.org](https://www.nuget.org/profiles/roku674), target **.NET 10** and ship
+their own README and XML IntelliSense docs.
 
 Part of the [Anointed](https://anointed.company) family of ventures.
 
 **For AI assistants:** see [llms.txt](llms.txt) (index), [llms.md](llms.md) (guide with code samples) and [llms.json](llms.json) (structured package data).
 
-## Packages
+## Repository layout
+
+Code is grouped by language. Each language folder builds and tests on its own.
+
+| Folder | Contents | Build and test |
+|---|---|---|
+| [`dotnet/`](./dotnet) | The .NET solution (`AnointedAutomation.sln`), every NuGet package and its tests | `cd dotnet && dotnet test AnointedAutomation.sln` |
+| [`js/`](./js) | JavaScript / TypeScript packages, one folder per npm package | `cd js/<package> && npm test` |
+| [`docs/`](./docs) | Design specs and plans | |
+
+## JavaScript packages
+
+Adding "Sign in with Anointed Automation" to your own site? Start with the
+[Sign in with Anointed Automation guide](./docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md).
+
+| Package | What it does |
+|---|---|
+| [@anointedautomation/sso](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso) | "Sign in with Anointed Automation": a dependency-free OpenID Connect client (code + PKCE) for Node 18+, Deno (Base44) and edge runtimes, with Express and Web (Next.js, Base44) adapters. Not on npm yet |
+
+## .NET packages
 
 | Package | NuGet | What it does |
 |---|---|---|
-| [AnointedAutomation.Enums](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Enums) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Enums.svg)](https://www.nuget.org/packages/AnointedAutomation.Enums) | Shared enumerations used across the other packages |
-| [AnointedAutomation.Objects](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Objects) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects) | Common models (accounts, billing, payments, response envelopes) as plain POCOs |
-| [AnointedAutomation.Objects.API](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Objects.API) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.API.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects.API) | ASP.NET Core helpers: a custom `IFormFile`, a JSON casing convention and GraphQL envelopes |
-| [AnointedAutomation.Logging](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Logging) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Logging.svg)](https://www.nuget.org/packages/AnointedAutomation.Logging) | Structured log messages and levels |
-| [AnointedAutomation.Memory](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Memory) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory) | Memory management helpers |
-| [AnointedAutomation.APIMiddlewares](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.APIMiddlewares) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.APIMiddlewares.svg)](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares) | ASP.NET Core middleware: API key auth and an IP blacklist |
-| [AnointedAutomation.Repository.Mongo](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Repository.Mongo) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.Mongo.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo) | Generic MongoDB repository |
-| [AnointedAutomation.Repository.MySql](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Repository.MySql) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.MySql.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql) | Generic MySQL repository over EF Core |
-| [AnointedAutomation.Algorithms](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Algorithms) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms) | Algorithms with no dependencies, including an ISO/IEC 18004 QR encoder |
-| [AnointedAutomation.Imaging](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Imaging) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging) | Render QR codes to SVG and PNG with no image library |
-| [AnointedAutomation.Concepts](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Concepts) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts) | Abstract concept modeling and an epistemics engine |
-| [AnointedAutomation.Mathematics](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/AnointedAutomation.Mathematics) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Mathematics.svg)](https://www.nuget.org/packages/AnointedAutomation.Mathematics) | Catalog of mathematical and physical laws, theories and conjectures |
+| [AnointedAutomation.Enums](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Enums) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Enums.svg)](https://www.nuget.org/packages/AnointedAutomation.Enums) | Shared enumerations used across the other packages |
+| [AnointedAutomation.Objects](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Objects) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects) | Common models (accounts, billing, payments, response envelopes) as plain POCOs |
+| [AnointedAutomation.Objects.API](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Objects.API) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Objects.API.svg)](https://www.nuget.org/packages/AnointedAutomation.Objects.API) | ASP.NET Core helpers: a custom `IFormFile`, a JSON casing convention and GraphQL envelopes |
+| [AnointedAutomation.Logging](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Logging) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Logging.svg)](https://www.nuget.org/packages/AnointedAutomation.Logging) | Structured log messages and levels |
+| [AnointedAutomation.Memory](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Memory) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Memory.svg)](https://www.nuget.org/packages/AnointedAutomation.Memory) | Memory management helpers |
+| [AnointedAutomation.APIMiddlewares](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.APIMiddlewares) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.APIMiddlewares.svg)](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares) | ASP.NET Core middleware: API key auth and an IP blacklist |
+| [AnointedAutomation.Repository.Mongo](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.Mongo) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.Mongo.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo) | Generic MongoDB repository |
+| [AnointedAutomation.Repository.MySql](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.MySql) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Repository.MySql.svg)](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql) | Generic MySQL repository over EF Core |
+| [AnointedAutomation.Algorithms](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Algorithms) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Algorithms.svg)](https://www.nuget.org/packages/AnointedAutomation.Algorithms) | Algorithms with no dependencies, including an ISO/IEC 18004 QR encoder |
+| [AnointedAutomation.Imaging](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Imaging) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging) | Render QR codes to SVG and PNG with no image library |
+| [AnointedAutomation.Concepts](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts) | Abstract concept modeling and an epistemics engine |
+| [AnointedAutomation.Mathematics](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Mathematics) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Mathematics.svg)](https://www.nuget.org/packages/AnointedAutomation.Mathematics) | Catalog of mathematical and physical laws, theories and conjectures |
 
 Each package folder has a README with installation, a quick start and an API overview. The same README is
 shown on the package's NuGet.org page.
@@ -62,7 +82,7 @@ An arrow points from a package to one it depends on.
 
 ```bash
 git clone https://github.com/AnointedAutomation/AnointedAutomation.git
-cd AnointedAutomation
+cd AnointedAutomation/dotnet
 dotnet build AnointedAutomation.sln
 dotnet test AnointedAutomation.sln
 ```
@@ -74,8 +94,10 @@ Requires the .NET 10 SDK.
 - Work lands on `develop`; releases are cut by merging `develop` into `master`.
 - Opening a pull request to `master` auto increments the version of every package whose code changed.
 - Merging to `master` publishes each package whose version is newer than the one on NuGet.org.
+- JavaScript packages follow the same flow to npm (version bump on the PR, publish on merge). See
+  [js/README.md](./js/README.md#publishing).
 
-See [PUBLISHING.md](./PUBLISHING.md) for details.
+See [dotnet/PUBLISHING.md](./dotnet/PUBLISHING.md) for details.
 
 ## Contributing
 

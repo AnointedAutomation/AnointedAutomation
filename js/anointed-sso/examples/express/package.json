@@ -1,0 +1,16 @@
+{
+  "name": "anointed-sso-example-express",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env server.js"
+  },
+  "engines": {
+    "node": ">=20.6"
+  },
+  "dependencies": {
+    "@anointedautomation/sso": "file:../..",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1"
+  }
+}

@@ -1,7 +1,7 @@
 # PROJECT STRUCTURE DICTIONARY - AnointedAutomation Platform
 
 ## Overview
-This file serves as the index/directory for all PROJECT_STRUCTURE files in the AnointedAutomation .NET library solution. Use this to quickly find which file contains the information you need.
+This file serves as the index/directory for all PROJECT_STRUCTURE files in the AnointedAutomation open-source repository (.NET packages in `dotnet/`, JavaScript packages in `js/`). Use this to quickly find which file contains the information you need.
 
 ## PROJECT_STRUCTURE Files Directory
 
@@ -35,7 +35,8 @@ This file serves as the index/directory for all PROJECT_STRUCTURE files in the A
 - Solution file organization and folder hierarchy
 - Technology choices (.NET 8.0, C#, MongoDB, GitHub Actions)
 - High-level component relationships
-- Root directory structure and file organization
+- Root directory structure and file organization (`dotnet/`, `js/`, `docs/`)
+- JavaScript packages (`js/anointed-sso`: Sign in with Anointed Automation kit)
 
 ### [PROJECT_STRUCTURE_TESTING.md](./PROJECT_STRUCTURE_TESTING.md) ✅
 - Test organization under "Tests" solution folder

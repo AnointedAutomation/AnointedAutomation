@@ -98,7 +98,7 @@
 ## Test Organization Structure
 
 ```
-AnointedAutomation.sln
+dotnet/AnointedAutomation.sln
 ├── Libraries/
 │   ├── Base/
 │   ├── Logging/
@@ -214,38 +214,31 @@ Application Startup
 
 ```
 AnointedAutomation/
-├── .github/
-│   └── workflows/
-│       └── dotnet.yml (CI/CD Pipeline)
-├── Libraries/
-│   ├── AnointedAutomation.Base/
-│   │   ├── AnointedAutomation.Base.csproj
-│   │   └── [Core interfaces & types]
-│   ├── AnointedAutomation.Logging/
-│   │   ├── AnointedAutomation.Logging.csproj
-│   │   └── [Logging implementation]
-│   ├── AnointedAutomation.Memory/
-│   │   ├── AnointedAutomation.Memory.csproj
-│   │   └── [Memory management]
-│   ├── AnointedAutomation.MongoDB/
-│   │   ├── AnointedAutomation.MongoDB.csproj
-│   │   └── [MongoDB repository]
-│   ├── AnointedAutomation.APIMiddleware/
-│   │   ├── AnointedAutomation.APIMiddleware.csproj
-│   │   └── [API middleware]
-│   └── AnointedAutomation.Utilities/
-│       ├── AnointedAutomation.Utilities.csproj
-│       └── [Utility functions]
-├── Tests/
-│   ├── AnointedAutomation.BaseTests/
-│   ├── AnointedAutomation.LoggingTests/
-│   ├── AnointedAutomation.MemoryTests/
-│   ├── AnointedAutomation.MongoDBTests/
-│   ├── AnointedAutomation.APIMiddlewareTests/
-│   └── AnointedAutomation.UtilitiesTests/
-├── AnointedAutomation.sln
-├── LICENSE (MIT)
-└── README.md
+├── .github/workflows/
+│   ├── build-and-test.yml        .NET build + tests   (working-directory: dotnet)
+│   ├── codeql-analysis.yml       CodeQL C#            (working-directory: dotnet)
+│   ├── nuget-publish.yml         NuGet publish        (working-directory: dotnet)
+│   ├── version-increment.yml     PR version bumps     (working-directory: dotnet)
+│   ├── rebase-develop.yml        develop <- master sync
+│   └── js-anointed-sso.yml       JS kit: Node 18/20/22/24, Deno, d.ts type check
+├── dotnet/
+│   ├── AnointedAutomation.sln
+│   ├── Directory.Build.props, NuGet.config, PUBLISHING.md, publish-packages.sh
+│   ├── AnointedAutomation.<Library>/         one folder per NuGet package
+│   ├── AnointedAutomation.<Library>.Tests/   NUnit tests per package
+│   └── AnointedAutomation.Objects.Demo/      console demo (not packed)
+├── js/
+│   ├── README.md
+│   └── anointed-sso/                         @anointedautomation/sso
+│       ├── src/            client.js, jwt.js, crypto.js, encoding.js, cookies.js, errors.js, index.js
+│       │   └── adapters/   web.js (Request -> Response), express.js (node:http)
+│       ├── index.d.ts
+│       ├── test/           node:test suites, helpers/fakeIdp.js, deno/smoke.ts
+│       └── examples/       express/, nextjs/, base44/functions/
+├── docs/superpowers/        specs and plans
+├── llms.txt, llms.md, llms.json
+├── README.md, CONTRIBUTING.md, SUPPORT.md, LICENSE (MIT)
+└── PROJECT_STRUCTURE_*.md
 ```
 
 ## GitHub Actions Workflow Visualization

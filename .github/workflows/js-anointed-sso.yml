@@ -1,0 +1,76 @@
+# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+name: JS anointed-sso
+
+on:
+  push:
+    branches: ["master", "develop"]
+    paths:
+      - "js/anointed-sso/**"
+      - ".github/workflows/js-anointed-sso.yml"
+  pull_request:
+    branches: ["master", "develop"]
+    paths:
+      - "js/anointed-sso/**"
+      - ".github/workflows/js-anointed-sso.yml"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: js/anointed-sso
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["18", "20", "22", "24"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run tests
+        run: npm test
+
+  deno:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: js/anointed-sso
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Deno smoke test (Base44 runtime)
+        run: deno test --allow-net --no-check test/deno/smoke.ts
+
+  types:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: js/anointed-sso
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Type-check index.d.ts
+        run: npx -y -p typescript@5 tsc --noEmit --strict --lib es2022,dom index.d.ts

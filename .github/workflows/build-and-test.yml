@@ -14,6 +14,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: dotnet
     if: github.event_name == 'push' || github.actor == 'dependabot[bot]'
 
     steps:
@@ -29,7 +32,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.fsproj', 'dotnet/**/packages.lock.json') }}
           restore-keys: ${{ runner.os }}-nuget-
       - name: Install dependencies
         run: dotnet restore
@@ -40,6 +43,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: dotnet
     needs: build
     if: github.event_name == 'push' || github.actor == 'dependabot[bot]'
 
@@ -56,7 +62,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.fsproj', '**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('dotnet/**/*.csproj', 'dotnet/**/*.fsproj', 'dotnet/**/packages.lock.json') }}
           restore-keys: ${{ runner.os }}-nuget-
       - name: Install dependencies
         run: dotnet restore
@@ -105,4 +111,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: test-results
-          path: '**/TestResults/*'
+          path: 'dotnet/**/TestResults/*'
