@@ -122,7 +122,7 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   Reality/Morals/Virtues.cs and Reality/Morals/Vices.cs (the concrete moral concepts and their
   gravity), Gravity.cs, Act.cs, DivineAttribute.cs, Justice.cs/Mercy.cs/Order.cs, LoveFacet.cs,
   DivineCharacter.cs, Resolution.cs, Grounding.cs, and Word.cs. Design spec for this subtree:
-  `docs/superpowers/specs/2026-06-11-divine-grounding-reality-engine-design.md`.
+  `docs/design/specs/2026-06-11-divine-grounding-reality-engine-design.md`.
 
 - Trinity, love triad, and creed (1.1.0, additive): Trinity/ holds Trinity.cs (one God in three
   Persons over a Reality: one shared Essence instance = Reality.Character, three distinct
@@ -148,7 +148,7 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   a verdict was reached; Tension.cs holds contradicting claims as data rather than resolving them
   away; EpistemicLedger.cs is the aggregate that admits claims, runs examinations, and tracks tensions,
   treating zero-weight foundations as never counting toward support. Full design spec:
-  `docs/superpowers/specs/2026-07-02-theology-engine-design.md`.
+  `docs/design/specs/2026-07-02-theology-engine-design.md`.
   Proof.cs, ProofSymbol.cs and ProofStep.cs model theoretical proofs stated in first-order logic:
   a Proof carries a plain statement, a symbolic form (∃, ∀, ∧, ⊕, → live in the BMP, so a plain
   UTF-16 string holds them, no UTF-32 needed), a glossary of ProofSymbol tokens, and an ordered
@@ -171,7 +171,7 @@ theory, cell theory, plate tectonics, kinetic theory of gases, MassEnergyEquival
 InvariantLightSpeed). Conjectures.cs catalogs open mathematical conjectures
 with Conjecture status and zero weight (Collatz, Goldbach, RiemannHypothesis), so an unproven
 conjecture never counts as support for or against a claim. See
-`docs/superpowers/specs/2026-07-02-theology-engine-design.md` for how these catalogs plug into the
+`docs/design/specs/2026-07-02-theology-engine-design.md` for how these catalogs plug into the
 epistemics engine.
 
 ### 5. AnointedAutomation.Logging

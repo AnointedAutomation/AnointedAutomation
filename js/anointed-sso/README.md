@@ -30,8 +30,10 @@ Sign-in is a capability on your existing Anointed Automation partner API key. We
 - `client_secret`: shown exactly once, sent over a private channel. Store it only in your server's
   secret store. If it leaks, ask us to rotate it.
 
-Tell us your exact callback URL(s): https only (http is allowed only for `localhost`), exact match, no
-wildcards.
+Tell us your exact callback URL(s): absolute `https` only, exact match, no fragment, no wildcards. Plain
+`http`, including `localhost`, cannot be registered; for local development use an https tunnel or a staging
+host. (The kit itself accepts an `http://localhost` redirect URI only so it can run against a local test
+provider; Anointed Automation will refuse it.)
 
 ### 2. Install
 
@@ -100,14 +102,17 @@ export const GET = (request) => handlers.start(request); // and handlers.callbac
 </a>
 ```
 
-Add `?returnTo=/some/path` to land somewhere specific afterwards (same-site paths only; anything else is
-dropped).
+Add `?returnTo=/some/path` to land somewhere specific afterwards (same-site paths only by default; anything
+else is dropped). To send users back to other sites you trust, see
+[Several hosts and cross-site return](#several-hosts-and-cross-site-return).
 
 That's it. `result.user` is:
 
 ```js
 { sub, email, emailVerified, name, preferredUsername, givenName, familyName, picture, sid }
 ```
+
+`email` is the verified address, trimmed and lowercased; the raw claim is still on `result.claims.email`.
 
 ## Scope advice (read this)
 
@@ -134,12 +139,14 @@ The Express and Next.js examples read these (they crash at startup when one is m
 ```
 ANOINTED_OAUTH_CLIENT_ID=aa_<your key id>
 ANOINTED_OAUTH_CLIENT_SECRET=<server only>
-ANOINTED_OAUTH_REDIRECT_URI=http://localhost:3000/auth/anointed/callback
+ANOINTED_OAUTH_REDIRECT_URI=https://<your-tunnel-host>/auth/anointed/callback
 SESSION_SECRET=<node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))">
 PORT=3000
 ```
 
-For Next.js the redirect URI is `http://localhost:3000/api/auth/anointed/callback` and `PORT` is not used.
+For Next.js the redirect URI is `https://<your-tunnel-host>/api/auth/anointed/callback` and `PORT` is not
+used. The redirect URI must be an https URL registered with us, so run the example behind an https tunnel
+(for example `cloudflared tunnel --url http://localhost:3000`) and register the tunnel's callback URL.
 
 The Express and Next.js examples also implement back-channel logout and a sign-out route.
 
@@ -156,13 +163,18 @@ Base44 backend functions run on Deno. Copy the three folders from
 
 Set the secrets with `base44 secrets set` (`ANOINTED_OAUTH_CLIENT_ID`, `ANOINTED_OAUTH_CLIENT_SECRET`,
 `ANOINTED_OAUTH_REDIRECT_URI`, `SESSION_SECRET`) and create an `AnointedUser` entity with `sub` and `email`
-fields. The functions import the kit with `npm:@anointedautomation/sso@0.1.0`.
+fields. The functions import the kit with `npm:@anointedautomation/sso@0.2.0`. `anointedStart` does not
+need `ANOINTED_OAUTH_CLIENT_SECRET`; only `anointedCallback` does.
 
 ## API
 
 ```js
 const client = createAnointedClient({
-  issuer, clientId, clientSecret, redirectUri,   // required
+  issuer, clientId, redirectUri,   // required
+  clientSecret,          // required by the code exchange, refresh and revoke; not needed to start
+  allowedRedirectUris,   // optional exact list every redirect URI must be on
+  allowedReturnOrigins,  // optional origins an absolute returnTo may use, e.g. ["https://*.example.com"]
+  isAllowedReturnTo,     // optional (url: URL) => boolean for an absolute returnTo
   scope,                 // default "openid email"
   requireVerifiedEmail,  // default true when scope includes email
   cookieName,            // default "aa_sso_flow"
@@ -176,22 +188,54 @@ const client = createAnointedClient({
 ```
 
 The constructor validates everything immediately and throws `AnointedSsoError` with code `config` on a
-missing or invalid value (fail fast).
+missing or invalid value (fail fast). `redirectUri` is a string or a function of the request; see below.
 
 | Method | What it does |
 |---|---|
-| `createAuthorizeRequest({ returnTo?, prompt?, loginHint?, extraParams? })` | `{ url, state, cookie, setCookieHeader }`: redirect to `url` and set the flow cookie |
-| `handleCallback({ url \| query, cookieValue })` | Checks state, flow age, `iss`, provider errors; exchanges the code; validates the ID token; returns `{ user, claims, tokens, returnTo }` |
+| `createAuthorizeRequest({ returnTo?, prompt?, loginHint?, extraParams?, redirectUri?, request? })` | `{ url, state, redirectUri, cookie, setCookieHeader }`: redirect to `url` and set the flow cookie |
+| `handleCallback({ url \| query, cookieValue, redirectUri?, request? })` | Checks state, flow age, `iss`, provider errors; exchanges the code; validates the ID token; returns `{ user, claims, tokens, returnTo }` |
 | `refresh(refreshToken, { expectedSub? })` | New tokens (needs `offline_access`). Refresh tokens rotate: store the new one |
 | `revoke(token, { tokenTypeHint? })` | RFC 7009 revocation. Call it on sign-out when you hold a refresh token |
 | `fetchUserInfo(accessToken)` | Standard OIDC claims for the approved scopes |
 | `buildLogoutUrl({ idTokenHint?, postLogoutRedirectUri?, state? })` | Provider logout URL |
 | `verifyLogoutToken(logoutToken, { maxAgeSeconds? })` | Validates a back-channel Logout Token; returns `{ sub, sid, jti, exp }` |
+| `validateReturnTo(value)` | The safe return target (path or allowlisted URL) or `null` |
+| `resolveRedirectUri(request?)` | The validated redirect URI for a request |
 | `clearFlowCookieHeader()` | `Set-Cookie` that deletes the flow cookie (the adapters do this for you) |
 
-Adapters: `createExpressHandlers(client, { onSignedIn, onError?, onLogout? })` and
-`createWebHandlers(client, { onSignedIn, onError?, onLogout? })` return `{ start, callback, backchannelLogout }`.
-`backchannelLogout` exists only when you pass `onLogout`.
+Adapters: `createExpressHandlers(client, { onSignedIn?, onError?, onLogout?, returnToParam? })` and
+`createWebHandlers(client, { onSignedIn?, onError?, onLogout?, returnToParam? })` return
+`{ start, callback, backchannelLogout }`. `onSignedIn` is needed by `callback` only (calling `callback`
+without it throws a `config` error), so a start-only route needs no options. `returnToParam` names the
+query parameter `start` reads (default `returnTo`). `backchannelLogout` exists only when you pass `onLogout`.
+
+### Several hosts and cross-site return
+
+One client can serve several hosts. Pass `redirectUri` as a function of the request (the web adapter passes
+the `Request`, the Express adapter the node request), or pass `redirectUri` per call. Every value must be
+https and, with `allowedRedirectUris`, exactly one of that list (the kit also accepts `http://localhost` for
+a local test provider, but Anointed Automation only registers https callbacks). Pin the list
+whenever the URI comes from a `Host` header, so a spoofed header cannot steer the flow anywhere else. Each
+URI must also be registered with us.
+
+```js
+const client = createAnointedClient({
+  issuer: ANOINTED_ISSUER,
+  clientId,
+  clientSecret,
+  redirectUri: (request) => new URL("/auth/anointed/callback", request.url).toString(),
+  allowedRedirectUris: ["https://a.example/auth/anointed/callback", "https://b.example/auth/anointed/callback"],
+  allowedReturnOrigins: ["https://www.example.com", "https://*.example.com"],
+});
+const handlers = createWebHandlers(client, { returnToParam: "next", onSignedIn });
+```
+
+`allowedReturnOrigins` lets an absolute `returnTo` point at those origins. `https://*.example.com` covers any
+subdomain at any depth but not `example.com` itself (list it separately); a port must match exactly;
+`http://` is accepted only for a loopback host such as `http://localhost:3000`. `isAllowedReturnTo(url)`
+adds your own rule. Even with either option the kit never accepts another scheme (`javascript:`, `data:`),
+protocol-relative `//host`, credentials in the URL, backslashes or control characters, and the value is
+re-validated when the callback reads the flow cookie. With neither option only same-site paths are kept.
 
 ### Errors
 
@@ -206,7 +250,8 @@ generic message; `error.message` is for your logs only.
 | `id_token_invalid`, `issuer_mismatch` | Token failed validation | Log and refuse |
 | `email_not_verified` | No verified email | Refuse, or set `requireVerifiedEmail: false` and handle it yourself |
 | `discovery`, `http` | We could not be reached | Retry later |
-| `config` | Your configuration is wrong | Fix it; thrown at startup |
+| `config` | Your configuration is wrong | Fix it; thrown at startup (or at the exchange when `clientSecret` is missing) |
+| `redirect_uri_rejected` | A per-request redirect URI was not https or not on `allowedRedirectUris` | Refuse; check the `Host` the request arrived with |
 
 ## Back-channel logout
 
@@ -220,7 +265,8 @@ spec and our retry policy expect.
 
 - [ ] The client secret is only in your server's secret store. Not in code, git, `.env.example`, logs,
       browser bundles or mobile apps. (In Next.js never prefix it with `NEXT_PUBLIC_`.)
-- [ ] Your redirect URI is https and registered exactly; the kit refuses http except on localhost.
+- [ ] Your redirect URI is https and registered exactly. Anointed Automation never registers an http
+      callback, `localhost` included; the kit refuses http except on localhost (local test providers only).
 - [ ] Users are keyed on `sub`, never on email or username.
 - [ ] You never auto-link accounts on an unverified email (the kit enforces this with the `email` scope).
 - [ ] You request the smallest scope that works: `openid email` by default.
@@ -237,7 +283,23 @@ What the kit already does for you: PKCE S256 with a fresh 64-character verifier,
 callbacks), a 10-minute flow cookie (`HttpOnly`, `SameSite=Lax`, `Secure` on https), RFC 9207 `iss` check,
 RS256-only signature verification (no `alg: none`, no HMAC confusion), exact `iss`, `aud`/`azp`, `exp`/`iat`
 with skew, `sub` presence, JWKS caching with one refetch on an unknown `kid` (key rotation), open-redirect
-safe `returnTo`, and https-only provider endpoints.
+safe `returnTo` (same-site paths, or only the origins you allowlist), https-only redirect URIs (optionally
+pinned to an exact list), and https-only provider endpoints.
+
+## Migrating from 0.1.0
+
+0.2.0 is backward compatible for apps that pass a static `redirectUri` and a `clientSecret`, with three
+visible changes:
+
+- `user.email` is now trimmed and lowercased. If you stored the exact claim, read `result.claims.email`.
+- `clientSecret` is optional at construction. A client without one can start a sign-in; the code exchange,
+  refresh and revoke throw `AnointedSsoError("config")` instead of failing at startup.
+- The adapters no longer throw at construction when `onSignedIn` is missing; `callback` throws instead.
+
+New: `redirectUri` as a function, per-call `redirectUri` / `request`, `allowedRedirectUris`,
+`allowedReturnOrigins`, `isAllowedReturnTo`, `returnToParam`, `client.validateReturnTo`,
+`client.resolveRedirectUri`, `AuthorizeRequest.redirectUri`, and the `redirect_uri_rejected` error code.
+`client.redirectUri` is `null` when `redirectUri` is a function.
 
 ## Testing
 

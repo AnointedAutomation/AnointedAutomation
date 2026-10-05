@@ -22,6 +22,7 @@ export type AnointedSsoErrorCode =
   | "id_token_invalid"
   | "email_not_verified"
   | "logout_token_invalid"
+  | "redirect_uri_rejected"
   | "http";
 
 export declare class AnointedSsoError extends Error {
@@ -40,10 +41,27 @@ export interface AnointedClientConfig {
   issuer: string;
   /** `aa_<your key id>`. */
   clientId: string;
-  /** Server only. Never in a browser or mobile bundle. */
-  clientSecret: string;
-  /** The exact registered callback URL. */
-  redirectUri: string;
+  /**
+   * Server only. Never in a browser or mobile bundle. Not needed to START a sign-in; the code exchange,
+   * refresh and revoke throw a `config` error without it.
+   */
+  clientSecret?: string;
+  /**
+   * The exact registered callback URL, or a function of the request (the web adapter passes the `Request`,
+   * the Express adapter the node request) so one client can serve several hosts. Every value must be https.
+   * The kit also accepts http on localhost for a local test provider; Anointed Automation registers https
+   * callbacks only.
+   */
+  redirectUri: string | ((request: any) => string);
+  /** When set, every redirect URI (static, per request or per call) must be exactly one of these. */
+  allowedRedirectUris?: string[];
+  /**
+   * Origins an absolute `returnTo` may point at: `https://www.example.com`, `https://*.example.com` (any
+   * subdomain, not the bare domain), `http://localhost:3000`. Default: same-site paths only.
+   */
+  allowedReturnOrigins?: string[];
+  /** Custom approval of an absolute `returnTo` (still https only, http only for localhost, no credentials). */
+  isAllowedReturnTo?: (url: URL) => boolean;
   /** Space separated, must include `openid`. Default `openid email`. */
   scope?: string;
   /** Default: true when the scope includes `email`. */
@@ -69,7 +87,7 @@ export interface AnointedClientConfig {
 export interface AnointedUser {
   /** Stable Anointed Automation user id. Key your users on this, never on email. */
   sub: string;
-  /** Verified email only; null when absent or unverified. */
+  /** Verified email only, trimmed and lowercase; null when absent or unverified. Raw claim: `claims.email`. */
   email: string | null;
   emailVerified: boolean;
   /** Needs the `profile` scope. */
@@ -110,6 +128,8 @@ export interface AuthorizeRequest {
   /** Redirect the browser here. */
   url: string;
   state: string;
+  /** The redirect URI this flow uses (resolved and validated). */
+  redirectUri: string;
   /** Set this cookie on the redirect response. */
   cookie: { name: string; value: string; options: CookieOptions };
   /** The same cookie as a ready `Set-Cookie` header value. */
@@ -120,7 +140,7 @@ export interface CallbackResult {
   user: AnointedUser;
   claims: Record<string, unknown>;
   tokens: AnointedTokens;
-  /** The validated same-site path passed to `createAuthorizeRequest`, or null. */
+  /** The validated return target passed to `createAuthorizeRequest` (a path, or an allowlisted URL), or null. */
   returnTo: string | null;
 }
 
@@ -144,7 +164,8 @@ export interface FlowCookie {
 export interface AnointedClient {
   readonly issuer: string;
   readonly clientId: string;
-  readonly redirectUri: string;
+  /** The static redirect URI, or null when `redirectUri` is a function. */
+  readonly redirectUri: string | null;
   readonly scope: string;
   readonly cookieName: string;
   discover(opts?: { force?: boolean }): Promise<Record<string, unknown>>;
@@ -154,11 +175,19 @@ export interface AnointedClient {
     prompt?: string;
     loginHint?: string;
     extraParams?: Record<string, string>;
+    /** This call's redirect URI (validated; overrides the configured one). */
+    redirectUri?: string;
+    /** Passed to a `redirectUri` function. */
+    request?: unknown;
   }): Promise<AuthorizeRequest>;
   handleCallback(input: {
     url?: string;
     query?: URLSearchParams | Record<string, string>;
     cookieValue: string | undefined;
+    /** Must equal the redirect URI used at start. */
+    redirectUri?: string;
+    /** Passed to a `redirectUri` function. */
+    request?: unknown;
   }): Promise<CallbackResult>;
   refresh(refreshToken: string, opts?: { expectedSub?: string }): Promise<{ tokens: AnointedTokens; claims: Record<string, unknown> | null }>;
   revoke(token: string, opts?: { tokenTypeHint?: "refresh_token" | "access_token" }): Promise<void>;
@@ -166,22 +195,34 @@ export interface AnointedClient {
   buildLogoutUrl(opts?: { idTokenHint?: string; postLogoutRedirectUri?: string; state?: string }): Promise<string>;
   verifyLogoutToken(logoutToken: string, opts?: { maxAgeSeconds?: number }): Promise<LogoutNotice>;
   decodeFlowCookie(value: unknown): FlowCookie | null;
+  /** The safe return target (same-site path or allowlisted absolute URL), or null. */
+  validateReturnTo(value: unknown): string | null;
+  /** The validated redirect URI for a request (the static one when `redirectUri` is a string). */
+  resolveRedirectUri(request?: unknown): string;
   clearFlowCookie(): { name: string; value: string; options: CookieOptions };
   clearFlowCookieHeader(): string;
 }
 
 export declare function createAnointedClient(config: AnointedClientConfig): AnointedClient;
-export declare function safeReturnTo(value: unknown): string | null;
+export declare function safeReturnTo(
+  value: unknown,
+  options?: { allowedReturnOrigins?: string[]; isAllowedReturnTo?: (url: URL) => boolean },
+): string | null;
 export declare function parseCookieHeader(header: string | null | undefined): Record<string, string>;
 export declare function serializeCookie(name: string, value: string, options: CookieOptions): string;
 
 export interface WebHandlerOptions {
-  /** Create YOUR session from `result.user.sub` and return the response. The flow cookie is cleared for you. */
-  onSignedIn: (result: CallbackResult, request: Request) => Response | Promise<Response>;
+  /**
+   * Required by `callback` only (it throws a `config` error without one). Create YOUR session from
+   * `result.user.sub` and return the response. The flow cookie is cleared for you.
+   */
+  onSignedIn?: (result: CallbackResult, request: Request) => Response | Promise<Response>;
   /** Default: a generic 400. Branch on `error.code`; never show `error.message` to users. */
   onError?: (error: unknown, request: Request) => Response | Promise<Response>;
   /** Enables `backchannelLogout`. */
   onLogout?: (logout: LogoutNotice, request: Request) => void | Promise<void>;
+  /** Query parameter `start` reads the return target from. Default `returnTo`. */
+  returnToParam?: string;
 }
 
 export interface WebHandlers {
@@ -191,7 +232,7 @@ export interface WebHandlers {
 }
 
 /** Request -> Response handlers for Next.js App Router, Base44 / Deno, Cloudflare Workers, Bun, Hono. */
-export declare function createWebHandlers(client: AnointedClient, options: WebHandlerOptions): WebHandlers;
+export declare function createWebHandlers(client: AnointedClient, options?: WebHandlerOptions): WebHandlers;
 
 /** Minimal shapes of the node:http / Express request and response the Express adapter uses. */
 export interface NodeRequestLike {
@@ -210,12 +251,14 @@ export interface NodeResponseLike {
 }
 
 export interface ExpressHandlerOptions<Req extends NodeRequestLike = NodeRequestLike, Res extends NodeResponseLike = NodeResponseLike> {
-  /** Create YOUR session from `result.user.sub` and send the response. */
-  onSignedIn: (result: CallbackResult, req: Req, res: Res) => void | Promise<void>;
+  /** Required by `callback` only (it throws a `config` error without one). Create YOUR session and respond. */
+  onSignedIn?: (result: CallbackResult, req: Req, res: Res) => void | Promise<void>;
   /** Default: a generic 400. Branch on `error.code`; never show `error.message` to users. */
   onError?: (error: unknown, req: Req, res: Res) => void | Promise<void>;
   /** Enables `backchannelLogout`. */
   onLogout?: (logout: LogoutNotice, req: Req) => void | Promise<void>;
+  /** Query parameter `start` reads the return target from. Default `returnTo`. */
+  returnToParam?: string;
 }
 
 export interface ExpressHandlers<Req extends NodeRequestLike = NodeRequestLike, Res extends NodeResponseLike = NodeResponseLike> {
@@ -227,5 +270,5 @@ export interface ExpressHandlers<Req extends NodeRequestLike = NodeRequestLike, 
 /** Handlers for Express or plain node:http. No cookie-parser or body-parser needed. */
 export declare function createExpressHandlers<Req extends NodeRequestLike = NodeRequestLike, Res extends NodeResponseLike = NodeResponseLike>(
   client: AnointedClient,
-  options: ExpressHandlerOptions<Req, Res>,
+  options?: ExpressHandlerOptions<Req, Res>,
 ): ExpressHandlers<Req, Res>;

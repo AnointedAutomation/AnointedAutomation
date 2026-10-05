@@ -157,7 +157,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Utility
             Assert.Equal("198.51.100.255", resultIP);
         }
 
-        // EDGE CASE TESTS - Added per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void GetClientPublicIPAddress_FromHttpContext_WithNullRemoteIpAddress_ReturnsDefaultIP()

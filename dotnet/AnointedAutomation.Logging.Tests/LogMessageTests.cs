@@ -340,7 +340,7 @@ namespace AnointedAutomation.Logging.Tests
             Assert.DoesNotContain("MoveNext", logMessage.localOperationName);
         }
 
-        // EDGE CASE TESTS - Added per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void Constructor_WithNullMessage_CreatesInstance()

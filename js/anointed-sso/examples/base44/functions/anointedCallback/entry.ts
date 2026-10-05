@@ -5,7 +5,7 @@
 
 import { secrets } from "base44:runtime";
 import { createClientFromRequest } from "npm:@base44/sdk";
-import { ANOINTED_ISSUER, createAnointedClient, createWebHandlers } from "npm:@anointedautomation/sso@0.1.0";
+import { ANOINTED_ISSUER, createAnointedClient, createWebHandlers } from "npm:@anointedautomation/sso@0.2.0";
 
 const SESSION_COOKIE = "app_session";
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 7;

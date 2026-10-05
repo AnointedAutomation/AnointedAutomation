@@ -31,6 +31,11 @@ const client = createAnointedClient({
   clientId: requireEnv("ANOINTED_OAUTH_CLIENT_ID"),
   clientSecret: requireEnv("ANOINTED_OAUTH_CLIENT_SECRET"),
   redirectUri: requireEnv("ANOINTED_OAUTH_REDIRECT_URI"),
+  // Serving several hosts from one app? Derive the callback per request instead, and pin the list:
+  //   redirectUri: (req) => `https://${req.headers.host}/auth/anointed/callback`,
+  //   allowedRedirectUris: ["https://a.example/auth/anointed/callback", "https://b.example/auth/anointed/callback"],
+  // Returning users to sibling sites you trust (default: same-site paths only):
+  //   allowedReturnOrigins: ["https://*.example.com"],
 });
 
 // Demo-only stores. In production use your database / Redis for sessions, the sub index and seen jti values.

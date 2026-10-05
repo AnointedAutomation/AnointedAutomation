@@ -278,7 +278,7 @@ namespace AnointedAutomation.Concepts.Tests
             Assert.False(love.IsPerfect());
         }
 
-        // EDGE CASE TESTS - per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void Decide_WithNullSituation_ThrowsArgumentNullException()

@@ -126,7 +126,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Objects
             Assert.True(IPBlacklist.IsIPBlocked(ip2));
         }
 
-        // EDGE CASE TESTS - Added per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void AddBannedIP_WithNullIP_DoesNotAddToBlacklist()

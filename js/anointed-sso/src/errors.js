@@ -18,6 +18,7 @@
  * - `id_token_invalid`     the ID token failed signature or claim validation
  * - `email_not_verified`   a verified email was required but not present
  * - `logout_token_invalid` a back-channel Logout Token failed validation
+ * - `redirect_uri_rejected` a per-request redirect URI was not https (or localhost) or not on the allowlist
  * - `http`                 any other non-2xx response from the provider
  */
 export class AnointedSsoError extends Error {

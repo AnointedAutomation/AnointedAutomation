@@ -203,7 +203,7 @@ namespace AnointedAutomation.Concepts.Tests
             Assert.Same(fallback, tree.Tick(new Situation()).Action);
         }
 
-        // EDGE CASE TESTS - per CLAUDE_TESTING.md requirements
+        // EDGE CASE TESTS
 
         [Fact]
         public void Condition_WithNullPredicate_ThrowsArgumentNullException()

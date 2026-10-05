@@ -21,6 +21,11 @@ export function anointedHandlers() {
     clientId: requireEnv("ANOINTED_OAUTH_CLIENT_ID"),
     clientSecret: requireEnv("ANOINTED_OAUTH_CLIENT_SECRET"),
     redirectUri: requireEnv("ANOINTED_OAUTH_REDIRECT_URI"),
+    // Several hosts? Pass a function instead and pin the list:
+    //   redirectUri: (request) => new URL("/api/auth/anointed/callback", request.url).toString(),
+    //   allowedRedirectUris: ["https://a.example/api/auth/anointed/callback", "https://b.example/api/auth/anointed/callback"],
+    // Trusted sibling sites for ?returnTo= (default: same-site paths only):
+    //   allowedReturnOrigins: ["https://*.example.com"],
   });
   handlers = createWebHandlers(client, {
     async onSignedIn(result, request) {

@@ -44,6 +44,7 @@ export async function startFakeIdp() {
     idTokenTransform: null,
     tokenError: null,
     discoveryPatch: {},
+    redirectUris: new Set([REDIRECT_URI]),
     codes: new Map(),
     refreshTokens: new Map(),
     accessTokens: new Map(),
@@ -147,7 +148,7 @@ export async function startFakeIdp() {
     }
     if (url.pathname === "/connect/authorize") {
       const q = url.searchParams;
-      if (q.get("client_id") !== CLIENT_ID || q.get("redirect_uri") !== REDIRECT_URI) return json(res, 400, { error: "invalid_client" });
+      if (q.get("client_id") !== CLIENT_ID || !state.redirectUris.has(q.get("redirect_uri"))) return json(res, 400, { error: "invalid_client" });
       if (q.get("code_challenge_method") !== "S256" || !q.get("state")) return json(res, 400, { error: "invalid_request" });
       const code = crypto.randomBytes(16).toString("hex");
       state.codes.set(code, {

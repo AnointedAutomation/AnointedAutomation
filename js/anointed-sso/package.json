@@ -1,6 +1,6 @@
 {
   "name": "@anointedautomation/sso",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Sign in with Anointed Automation: a dependency-free OpenID Connect client (authorization code + PKCE) for Node 18+, Deno and edge runtimes, with Express and Web (Next.js, Base44) adapters.",
   "type": "module",
   "main": "./src/index.js",

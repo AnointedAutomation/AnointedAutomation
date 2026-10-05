@@ -19,7 +19,7 @@ with `npm test`).
 - `MessageTypeTests.cs` - Tests for MessageType enum
 
 **Testing Framework:** Xunit (.NET 8.0)
-**Test Coverage:** ✅ EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
+**Test Coverage:** ✅ EXCELLENT - Covers success, failure and edge scenarios
 
 ### 2. AnointedAutomation.Memory.Tests
 **Test Files:**
@@ -57,7 +57,7 @@ with `npm test`).
 - `Utility/APIUtilityTests.cs` - Tests for API utility methods
 
 **Testing Framework:** Xunit (.NET 10.0)
-**Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards
+**Test Coverage:** EXCELLENT - Covers success, failure and edge scenarios
 
 ### 4. AnointedAutomation.Repository.Mongo.Tests
 **Test Files:**
@@ -122,7 +122,7 @@ with `npm test`).
   - Failure scenarios (null content operations)
 
 **Testing Framework:** Xunit (.NET 10.0)
-**Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
+**Test Coverage:** EXCELLENT - Covers success, failure and edge scenarios
 
 ### 7. AnointedAutomation.Objects.Tests
 The Love/Reality behavioral tests previously documented here (LoveTests, SituationTests,
@@ -178,13 +178,13 @@ file in this pass; treat it as approximate).
   three-valued (bool?) claim standings, four-state verdicts (Consistent/Contradicts/Unfalsifiable/
   Undetermined), domain-bounded laws, tensions between contradicting claims, and zero-weight
   foundations never counting as support. Design spec:
-  `docs/superpowers/specs/2026-07-02-theology-engine-design.md`.
+  `docs/design/specs/2026-07-02-theology-engine-design.md`.
 - `ProofTests.cs` - covers the Proof / ProofSymbol / ProofStep types and the canonical
   Agnosticism and Christianity proofs, including that the logic glyphs (∃, ∀, ∧, ⊕, →) round-trip
   in an ordinary UTF-16 string and that \uXXXX escapes equal the raw glyphs (12 tests).
 
 **Testing Framework:** Xunit (.NET 10.0)
-**Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
+**Test Coverage:** EXCELLENT - Covers success, failure and edge scenarios
 
 ### 9. AnointedAutomation.Mathematics.Tests
 Approximately 25 tests (approximate; not independently re-counted file by file in this pass) across:
@@ -196,7 +196,7 @@ Approximately 25 tests (approximate; not independently re-counted file by file i
   RiemannHypothesis), verifying an unproven conjecture never counts as support
 
 **Testing Framework:** Xunit (.NET 10.0)
-**Test Coverage:** EXCELLENT - Meets CLAUDE_TESTING.md standards (Success, Failure, Edge scenarios)
+**Test Coverage:** EXCELLENT - Covers success, failure and edge scenarios
 
 ### Missing Test Projects
 The following libraries do not have corresponding test projects:
@@ -234,7 +234,7 @@ substantially further with the Canon narrative/oracle suites and the new Epistem
 ResponseData. A new AnointedAutomation.Mathematics.Tests project was also added (approximately 25
 tests). See sections 7-9 above for the current breakdown.
 
-**CLAUDE_TESTING.md Compliance:**
+**Test Standards:**
 - **AnointedAutomation.Logging.Tests** - EXCEEDS STANDARDS (Success, Failure, Null/Edge scenarios)
 - **AnointedAutomation.APIMiddlewares.Tests** - EXCEEDS STANDARDS (Success, Failure, Null/Edge scenarios)
   - EndpointAccessMiddlewareTests: 27 tests (comprehensive - NEW)
