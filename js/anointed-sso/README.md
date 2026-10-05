@@ -14,7 +14,7 @@ Anointed Automation is a standard OpenID Connect provider:
 | Discovery | `https://api.anointedautomation.net/.well-known/openid-configuration` |
 | ID tokens | RS256, verified against the published JWKS |
 | Flow | Authorization code + PKCE (`S256`) only; `state` required; `nonce` used |
-| Full reference | Section 9 of the Anointed Automation partner integration guide (sent with your credentials) |
+| Full guide | [Sign in with Anointed Automation](../../docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md): access, credentials, .NET and plain OIDC, claims, rotation, troubleshooting |
 
 The kit is **server only**. It holds your client secret and performs the token exchange. Never import it
 from browser or mobile code.

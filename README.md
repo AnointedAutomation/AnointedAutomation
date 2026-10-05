@@ -26,6 +26,9 @@ Code is grouped by language. Each language folder builds and tests on its own.
 
 ## JavaScript packages
 
+Adding "Sign in with Anointed Automation" to your own site? Start with the
+[Sign in with Anointed Automation guide](./docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md).
+
 | Package | What it does |
 |---|---|
 | [@anointedautomation/sso](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso) | "Sign in with Anointed Automation": a dependency-free OpenID Connect client (code + PKCE) for Node 18+, Deno (Base44) and edge runtimes, with Express and Web (Next.js, Base44) adapters. Not on npm yet |
