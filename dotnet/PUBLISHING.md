@@ -14,6 +14,7 @@ The repository ships these packages to [NuGet.org](https://www.nuget.org/profile
 - [AnointedAutomation.Objects.API](https://www.nuget.org/packages/AnointedAutomation.Objects.API/)
 - [AnointedAutomation.Repository.Mongo](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo/)
 - [AnointedAutomation.Repository.MySql](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql/)
+- [AnointedAutomation.SSO](https://www.nuget.org/packages/AnointedAutomation.SSO/)
 
 `AnointedAutomation.Objects.Mongo` still exists on NuGet.org but no longer lives in this repository and is not
 published from it.

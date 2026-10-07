@@ -161,35 +161,43 @@ ID token validation and the RFC 9207 `iss` check for you. Full API:
 
 ### .NET (ASP.NET Core)
 
-There is no Anointed-specific .NET kit; use the standard `Microsoft.AspNetCore.Authentication.OpenIdConnect`
-handler, which already does discovery, PKCE, `state`, `nonce` and ID token validation:
+Use the [AnointedAutomation.SSO](https://www.nuget.org/packages/AnointedAutomation.SSO) NuGet package
+(`dotnet add package AnointedAutomation.SSO`). It configures the standard
+`Microsoft.AspNetCore.Authentication.OpenIdConnect` handler for you (authorization code + PKCE S256, `state`,
+`nonce`, RS256-only ID token validation, `openid email` by default, raw claim names, verified email required)
+and adds a back-channel logout endpoint and a fail-open session status client:
 
 ```csharp
+using AnointedAutomation.SSO;
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = "Anointed";
+        options.DefaultChallengeScheme = AnointedAutomationDefaults.AuthenticationScheme; // "Anointed"
     })
     .AddCookie()
-    .AddOpenIdConnect("Anointed", options =>
+    .AddAnointedAutomation(options =>
     {
-        options.Authority = "https://api.anointedautomation.net/";
         options.ClientId = RequiredEnv("ANOINTED_OAUTH_CLIENT_ID");
         options.ClientSecret = RequiredEnv("ANOINTED_OAUTH_CLIENT_SECRET");
-        options.ResponseType = OpenIdConnectResponseType.Code;
-        options.UsePkce = true;
         options.CallbackPath = "/auth/anointed/callback"; // must match the registered URL exactly
-        options.Scope.Clear();
-        options.Scope.Add("openid");
-        options.Scope.Add("email");
-        options.MapInboundClaims = false;                  // keep "sub", "email", "email_verified" as-is
-        options.GetClaimsFromUserInfoEndpoint = true;
-        options.SaveTokens = false;                        // true only if you call userinfo or refresh later
+        // options.AdditionalScopes.Add("profile");       // only if you need the name or username
     });
+
+// after builder.Build():
+app.MapAnointedBackchannelLogout("/auth/anointed/backchannel-logout", async (logout, httpContext) =>
+{
+    // End every session for logout.Sub (or logout.Sid). Retries with the same jti are answered for you.
+});
 ```
 
-`RequiredEnv` is your own helper that throws when the variable is missing. Behind a reverse proxy, enable
-forwarded headers so the handler builds an `https` redirect URI.
+Key your users on `User.GetAnointedSubject()` (`sub`). `ClientId`, `ClientSecret` and `CallbackPath` are
+required and the app fails at startup without them. `RequiredEnv` is your own helper that throws when the
+variable is missing. Behind a reverse proxy, enable forwarded headers so the handler builds an `https`
+redirect URI. To end a local session when the user's Anointed Automation account or grant ends, add
+`builder.Services.AddAnointedSessionStatus(...)` (your partner API key needs the `sessions:status` scope); it
+fails open, so an outage never signs your users out. Full API and security checklist:
+[dotnet/AnointedAutomation.SSO/README.md](../dotnet/AnointedAutomation.SSO/README.md).
 
 ### Any other stack (plain OIDC)
 
@@ -252,7 +260,8 @@ Linking to your own users:
 - Store `sub` on your user record and look users up by it. Email and username can change; `sub` never does.
 - **Never link or merge accounts on an email unless `email_verified` is `true`.** Anointed Automation only
   releases verified email, but check it anyway so a future change or a different provider cannot open a hole.
-  The Node kit refuses a sign-in without a verified email when you request `email` (`requireVerifiedEmail`).
+  The Node kit (`requireVerifiedEmail`) and the .NET package (`RequireVerifiedEmail`) refuse a sign-in without a
+  verified email when you request `email`.
 - Request the smallest scope that works. `openid email` is the default; add `profile` only when you need the
   name or username, and `offline_access` only when you call the API on the user's behalf later.
 
@@ -289,7 +298,8 @@ app or signs out of all apps, an admin revokes it, the account is deleted or mer
 The token carries `sub`, `sid` and the back-channel logout event. End every session for that `sub` or `sid`,
 drop any refresh token you hold, and ignore a `jti` you already processed. Failed deliveries are retried with
 backoff (30 seconds doubling up to 6 hours, 12 attempts). The kit's `backchannelLogout` handler and
-`verifyLogoutToken` do the validation for you.
+`verifyLogoutToken`, and the .NET package's `MapAnointedBackchannelLogout` and `AnointedLogoutTokenValidator`,
+do the validation for you.
 
 **Sign-out.** To end the user's session at Anointed Automation too, redirect to the end session endpoint
 (`client.buildLogoutUrl()` in the kit). A `post_logout_redirect_uri` must be one the owner registered.

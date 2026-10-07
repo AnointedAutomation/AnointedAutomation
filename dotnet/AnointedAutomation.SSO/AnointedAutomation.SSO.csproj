@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+    <Title>AnointedAutomation.SSO</Title>
+    <Company>Anointed Automation LLC - Alexander Fields</Company>
+    <Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
+    <Description>Sign in with Anointed Automation for ASP.NET Core: an OpenID Connect handler preset (authorization code + PKCE S256, verified email only), a back-channel logout endpoint with Logout Token validation and replay protection, and a fail-open session status client.</Description>
+    <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
+    <Version>1.0.0</Version>
+    <PackageTags>aspnetcore;openid-connect;oidc;sso;authentication;backchannel-logout;pkce;anointedautomation</PackageTags>
+    <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.SSO</PackageReleaseNotes>
+    <Authors>Anointed Automation LLC, Alexander Fields</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.12" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.23.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="AnointedAutomation.SSO.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>
