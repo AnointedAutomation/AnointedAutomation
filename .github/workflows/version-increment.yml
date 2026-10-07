@@ -165,7 +165,8 @@ jobs:
             fi
             echo ""
             echo "Checking $MANIFEST:"
-            CODE_CHANGES=$(git diff --name-only master...HEAD -- "$DIR" | grep -v -x "$MANIFEST" | wc -l)
+            # grep exits 1 when nothing is left; under pipefail that would abort the step on a PR with no js/ changes.
+            CODE_CHANGES=$(git diff --name-only master...HEAD -- "$DIR" | { grep -v -x "$MANIFEST" || true; } | wc -l)
             echo "  Code changes detected: $CODE_CHANGES file(s)"
             if [ "$CODE_CHANGES" -eq 0 ]; then
               echo "  ✓ No code changes - skipping version check"
