@@ -63,6 +63,7 @@ jobs:
             ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="AnointedAutomation.Optimization"
             ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="AnointedAutomation.Shopify"
             ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="AnointedAutomation.Serialization"
+            ["AnointedAutomation.SSO/AnointedAutomation.SSO.csproj"]="AnointedAutomation.SSO"
           )
 
           VERSIONS_UPDATED=0

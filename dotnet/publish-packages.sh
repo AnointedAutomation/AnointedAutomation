@@ -66,6 +66,7 @@ declare -A PACKAGES=(
     ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="anointedautomation.mathematics"
     ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="anointedautomation.shopify"
     ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="anointedautomation.serialization"
+    ["AnointedAutomation.SSO/AnointedAutomation.SSO.csproj"]="anointedautomation.sso"
 )
 
 # Clean previous builds

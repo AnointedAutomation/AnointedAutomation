@@ -72,6 +72,7 @@ jobs:
             ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="anointedautomation.optimization"
             ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="anointedautomation.shopify"
             ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="anointedautomation.serialization"
+            ["AnointedAutomation.SSO/AnointedAutomation.SSO.csproj"]="anointedautomation.sso"
           )
 
           for PROJECT_PATH in "${!PACKAGES[@]}"; do
