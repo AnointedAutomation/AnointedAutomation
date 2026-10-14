@@ -1,3 +1,5 @@
+<p align="center"><img src="https://raw.githubusercontent.com/AnointedAutomation/AnointedAutomation/master/js/anointed-sso/assets/banner.jpg" alt="Anointed Automation" width="720"></p>
+
 # @anointedautomation/sso
 
 Jesus is King ✝️
