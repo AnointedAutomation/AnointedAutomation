@@ -54,3 +54,12 @@ node_modules/
 .next/
 next-env.d.ts
 js/**/examples/**/package-lock.json
+
+# Claude global/project instruction files (local only)
+CLAUDE*
+
+# Claude-generated artifacts (local only)
+docs/superpowers/
+docs/design/plans/
+docs/design/specs/
+docs/audits/
