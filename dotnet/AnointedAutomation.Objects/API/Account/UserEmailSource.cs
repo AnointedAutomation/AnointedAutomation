@@ -28,6 +28,18 @@ namespace AnointedAutomation.Objects.Account
         /// <summary>Added by an administrator.</summary>
         Admin = 9,
         /// <summary>From a Discord sign-in.</summary>
-        Discord = 10
+        Discord = 10,
+        /// <summary>From a GitHub sign-in.</summary>
+        GitHub = 11,
+        /// <summary>From a LinkedIn sign-in.</summary>
+        LinkedIn = 12,
+        /// <summary>From a Twitch sign-in.</summary>
+        Twitch = 13,
+        /// <summary>From a Yahoo sign-in.</summary>
+        Yahoo = 14,
+        /// <summary>From a Login with Amazon sign-in.</summary>
+        Amazon = 15,
+        /// <summary>From a Shopify Customer Account API sign-in.</summary>
+        ShopifyCustomerAccount = 16
     }
 }

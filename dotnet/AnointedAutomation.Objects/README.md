@@ -63,7 +63,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 |---|---|
 | `User` | Account record: `UserId`, `Email` (mirrors the primary `Emails` entry), `Emails`, `Username`, `Password`, `Role`, `Profile`, `Token`, `tokenExpiration`, `emailConfirmed`, `IPAddresses`, `Friends`, `FriendId`, `BlockedUsers`, `isBanned`, `banned`, `BannedReason`, `createdDate`, `lastActiveDate`, `timeOnline`, `SSO`, `Meta`, and account deletion fields (`deletionDate`, `DeletionConfirmationCode`, `deletionConfirmationExpiration`). Constructors: parameterless; a full constructor taking every settable property in declaration (BSON) order and assigning each exactly as passed (no defaults); and the legacy 14-parameter constructor, which defaults `banned` to 1900-01-01, `createdDate`/`lastActiveDate` to `DateTime.UtcNow`, a null `IPAddresses` to empty and a null `Profile` to new. A null password is accepted by both (SSO-only accounts). |
 | `UserEmail` | One address on a user: `Address` (lower-cased, trimmed), `Verified`, `VerifiedAt`, `IsPrimary`, `Source`, `AddedAt`. |
-| `UserEmailSource` | Enum: `Unknown` (0), `Manual`, `Signup`, `Google`, `Microsoft`, `Apple`, `Facebook`, `Shopify`, `Merge`, `Admin`, `Discord`. |
+| `UserEmailSource` | Enum: `Unknown` (0), `Manual`, `Signup`, `Google`, `Microsoft`, `Apple`, `Facebook`, `Shopify`, `Merge`, `Admin`, `Discord`, `GitHub`, `LinkedIn`, `Twitch`, `Yahoo`, `Amazon`, `ShopifyCustomerAccount`. |
 | `Profile` | Extends `Billing.Contact` (`FirstName`, `MiddleName`, `LastName`, `dob`, `number`) with a Newtonsoft `JObject AccountSettings`. |
 | `Credentials` | Login payload: `Email`, `Password`, `Token`, `GoogleToken`. |
 | `IPInfo` | Login history for one IP: `IpAddress`, `firstLogin`, `lastLogin`, `loginCount`, `timeOnline`. |
@@ -101,6 +101,41 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `DiscordLogin` | Holds the Discord `User`; stored on `User.SSO.Discord`. |
 | `DiscordUser` | Discord's full documented User object as `/users/@me` returns it (`id`, `username`, `discriminator`, `global_name`, `avatar`, `bot`, `system`, `mfa_enabled`, `banner`, `accent_color`, `locale`, `verified`, `email`, `flags`, `premium_type`, `public_flags`, `avatar_decoration_data`, `collectibles`, `primary_guild`), mapped with `[JsonProperty]` to Discord's snake_case names. |
 | `DiscordAvatarDecorationData`, `DiscordCollectibles`, `DiscordNameplate`, `DiscordPrimaryGuild` | The nested Discord user structures. |
+
+### GitHub (`AnointedAutomation.Objects.GitHub`)
+
+| Type | Description |
+|---|---|
+| `GitHubLogin` | Holds `User`, `VerifiedPrimaryEmail` (the primary AND verified address) and `Emails`; stored on `User.SSO.GitHub`. |
+| `GitHubUser`, `GitHubPlan` | GitHub's "Private User" object as `GET /user` returns it (every documented field, snake_case `[JsonProperty]` names). |
+| `GitHubEmail` | One `GET /user/emails` entry (`email`, `primary`, `verified`, `visibility`). |
+
+### LinkedIn (`AnointedAutomation.Objects.LinkedIn`)
+
+| Type | Description |
+|---|---|
+| `LinkedInLogin` | Holds `UserInfo`; stored on `User.SSO.LinkedIn`. |
+| `LinkedInUserInfo` | OIDC userinfo (`sub`, `name`, `given_name`, `family_name`, `picture`, `locale`, `email`, `email_verified`). |
+| `LinkedInLocale`, `LinkedInLocaleConverter` | `locale` as `{country, language}`; reads either the object or a `"en-US"` string. |
+
+### Twitch (`AnointedAutomation.Objects.Twitch`)
+
+| Type | Description |
+|---|---|
+| `TwitchLogin` | Holds `User` and `IdToken`; stored on `User.SSO.Twitch`. |
+| `TwitchUser` | One Get Users entry (`id`, `login`, `display_name`, `type`, `broadcaster_type`, `description`, `profile_image_url`, `offline_image_url`, `view_count`, `email`, `created_at`). |
+| `TwitchIdTokenClaims` | OIDC claims (`aud`, `azp`, `exp`, `iat`, `iss`, `sub`, `nonce`, `email`, `email_verified`, `picture`, `preferred_username`, `updated_at`). |
+
+### Yahoo, Amazon, Reddit, Shopify Customer Account
+
+| Type | Description |
+|---|---|
+| `YahooLogin`, `YahooUserInfo` | Yahoo OIDC claims (`sub`, `name`, `given_name`, `family_name`, `nickname`, `email`, `email_verified`, `birthdate`, `locale`, `picture`, plus token claims); stored on `User.SSO.Yahoo`. |
+| `AmazonLogin`, `AmazonProfile` | Login with Amazon profile (`user_id`, `name`, `email`, `postal_code`); stored on `User.SSO.Amazon`. |
+| `RedditLogin`, `RedditUser` | Reddit `GET /api/v1/me` identity (no email; `has_verified_email` only); stored on `User.SSO.Reddit`. |
+| `ShopifyCustomerAccountLogin`, `ShopifyCustomerAccountClaims` | Shopify Customer Account API id_token claims (`iss`, `sub`, `aud`, `exp`, `iat`, `nonce`, `sid`, `email`, `email_verified`, `given_name`, `family_name`); stored on `User.SSO.ShopifyCustomerAccount`, separate from the `User.SSO.Shopify` store customer link. |
+
+No slot ever holds an access or refresh token.
 
 ## Naming convention
 
