@@ -26,6 +26,8 @@ namespace AnointedAutomation.Objects.Account
         /// <summary>Brought over by an account merge.</summary>
         Merge = 8,
         /// <summary>Added by an administrator.</summary>
-        Admin = 9
+        Admin = 9,
+        /// <summary>From a Discord sign-in.</summary>
+        Discord = 10
     }
 }

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using AnointedAutomation.Objects.Account;
 using AnointedAutomation.Objects.Apple;
+using AnointedAutomation.Objects.Discord;
 using AnointedAutomation.Objects.Facebook;
 using AnointedAutomation.Objects.Google;
 using AnointedAutomation.Objects.Microsoft;
@@ -33,7 +34,58 @@ namespace AnointedAutomation.Objects.Tests
             Assert.Null(sso.Microsoft);
             Assert.Null(sso.Apple);
             Assert.Null(sso.Facebook);
+            Assert.Null(sso.Discord);
             Assert.Null(sso.Shopify);
+        }
+
+        [Fact]
+        public void DiscordUser_DeserializesUsersMeShape()
+        {
+            string me = "{\"id\":\"80351110224678912\",\"username\":\"nelly\",\"discriminator\":\"0\",\"global_name\":\"Nelly\",\"avatar\":\"8342729096ea3675442027381ff50dfe\",\"verified\":true,\"email\":\"nelly@discord.com\",\"flags\":64,\"locale\":\"en-US\"}";
+
+            DiscordUser user = JsonConvert.DeserializeObject<DiscordUser>(me);
+
+            Assert.Equal("80351110224678912", user.Id);
+            Assert.Equal("nelly", user.Username);
+            Assert.Equal("0", user.Discriminator);
+            Assert.Equal("Nelly", user.GlobalName);
+            Assert.Equal("8342729096ea3675442027381ff50dfe", user.Avatar);
+            Assert.True(user.Verified);
+            Assert.Equal("nelly@discord.com", user.Email);
+        }
+
+        [Fact]
+        public void DiscordUser_WithoutEmailScope_LeavesEmailAndVerifiedNull()
+        {
+            DiscordUser user = JsonConvert.DeserializeObject<DiscordUser>("{\"id\":\"1\",\"username\":\"u\",\"global_name\":null,\"avatar\":null}");
+
+            Assert.Equal("1", user.Id);
+            Assert.Null(user.Email);
+            Assert.Null(user.Verified);
+            Assert.Null(user.GlobalName);
+            Assert.Null(user.Avatar);
+        }
+
+        [Fact]
+        public void SSO_DiscordSlot_BsonRoundTrips()
+        {
+            SSO sso = new SSO { Discord = new DiscordLogin { User = new DiscordUser { Id = "d-1", Username = "u", Email = "u@x.com", Verified = false } } };
+
+            BsonDocument doc = sso.ToBsonDocument();
+            SSO back = BsonSerializer.Deserialize<SSO>(doc);
+
+            Assert.True(doc.Contains("Discord"));
+            Assert.Equal("d-1", back.Discord.User.Id);
+            Assert.Equal("u@x.com", back.Discord.User.Email);
+            Assert.False(back.Discord.User.Verified);
+            Assert.Null(back.Facebook);
+        }
+
+        [Fact]
+        public void UserEmailSource_Discord_IsAppendedAfterAdmin()
+        {
+            Assert.Equal(9, (int)UserEmailSource.Admin);
+            Assert.Equal(10, (int)UserEmailSource.Discord);
         }
 
         [Fact]

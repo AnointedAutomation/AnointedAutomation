@@ -54,15 +54,16 @@ namespace AnointedAutomation.Objects.Tests
         [InlineData(UserEmailSource.Shopify, 7)]
         [InlineData(UserEmailSource.Merge, 8)]
         [InlineData(UserEmailSource.Admin, 9)]
+        [InlineData(UserEmailSource.Discord, 10)]
         public void UserEmailSource_Values(UserEmailSource source, int expected)
         {
             Assert.Equal(expected, (int)source);
         }
 
         [Fact]
-        public void UserEmailSource_HasTenMembers()
+        public void UserEmailSource_HasElevenMembers()
         {
-            Assert.Equal(10, Enum.GetValues(typeof(UserEmailSource)).Length);
+            Assert.Equal(11, Enum.GetValues(typeof(UserEmailSource)).Length);
         }
 
         [Fact]

@@ -63,7 +63,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 |---|---|
 | `User` | Account record: `UserId`, `Email` (mirrors the primary `Emails` entry), `Emails`, `Username`, `Password`, `Role`, `Profile`, `Token`, `tokenExpiration`, `emailConfirmed`, `IPAddresses`, `Friends`, `FriendId`, `BlockedUsers`, `isBanned`, `banned`, `BannedReason`, `createdDate`, `lastActiveDate`, `timeOnline`, `SSO`, `Meta`, and account deletion fields (`deletionDate`, `DeletionConfirmationCode`, `deletionConfirmationExpiration`). Constructors: parameterless; a full constructor taking every settable property in declaration (BSON) order and assigning each exactly as passed (no defaults); and the legacy 14-parameter constructor, which defaults `banned` to 1900-01-01, `createdDate`/`lastActiveDate` to `DateTime.UtcNow`, a null `IPAddresses` to empty and a null `Profile` to new. A null password is accepted by both (SSO-only accounts). |
 | `UserEmail` | One address on a user: `Address` (lower-cased, trimmed), `Verified`, `VerifiedAt`, `IsPrimary`, `Source`, `AddedAt`. |
-| `UserEmailSource` | Enum: `Unknown` (0), `Manual`, `Signup`, `Google`, `Microsoft`, `Apple`, `Facebook`, `Shopify`, `Merge`, `Admin`. |
+| `UserEmailSource` | Enum: `Unknown` (0), `Manual`, `Signup`, `Google`, `Microsoft`, `Apple`, `Facebook`, `Shopify`, `Merge`, `Admin`, `Discord`. |
 | `Profile` | Extends `Billing.Contact` (`FirstName`, `MiddleName`, `LastName`, `dob`, `number`) with a Newtonsoft `JObject AccountSettings`. |
 | `Credentials` | Login payload: `Email`, `Password`, `Token`, `GoogleToken`. |
 | `IPInfo` | Login history for one IP: `IpAddress`, `firstLogin`, `lastLogin`, `loginCount`, `timeOnline`. |
@@ -93,6 +93,13 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `GoogleObjects` | Holds `GoogleTokenInfo` and `UserProfile`; stored on `User.Google`. |
 | `GoogleTokenInfo` | Google token response and token info fields, mapped with `[JsonProperty]` to Google's snake_case names. |
 | `UserProfile` | Google user info (`id`, `email`, `verifiedEmail`, `name`, `givenName`, `familyName`, `picture`, `locale`, `hd`, ...). |
+
+### Discord (`AnointedAutomation.Objects.Discord`)
+
+| Type | Description |
+|---|---|
+| `DiscordLogin` | Holds the Discord `User`; stored on `User.SSO.Discord`. |
+| `DiscordUser` | Discord OAuth2 `/users/@me` fields (`id`, `username`, `discriminator`, `global_name`, `email`, `verified`, `avatar`), mapped with `[JsonProperty]` to Discord's snake_case names. |
 
 ## Naming convention
 
