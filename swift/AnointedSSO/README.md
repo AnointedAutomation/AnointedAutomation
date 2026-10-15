@@ -25,7 +25,7 @@ Xcode > File > Add Package Dependencies > `https://github.com/AnointedAutomation
 product `AnointedSSO`. Or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/AnointedAutomation/AnointedAutomation", from: "<version>")
+.package(url: "https://github.com/AnointedAutomation/AnointedAutomation", from: "0.1.0")
 ```
 
 ## Use it
@@ -93,3 +93,10 @@ Send the person back with `?error=<code>` (keeping `aa_state`) to fail the sign-
 
 Credentials (`client_id` = `aa_<your key id>`, the secret, your https callback URL): see the
 [full guide](../../docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md).
+
+## Releasing
+
+Bump `swift/AnointedSSO/VERSION` (MAJOR.MINOR.PATCH) and merge to `master`. The `Swift AnointedSSO release`
+workflow tags that commit with the version, which is what Swift Package Manager and the
+[Swift Package Index](https://swiftpackageindex.com) read. Every tag on this repo is a Swift package version, so
+only that workflow creates tags.

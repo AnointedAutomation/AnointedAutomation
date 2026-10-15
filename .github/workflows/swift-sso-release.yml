@@ -1,0 +1,39 @@
+# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Swift packages are published by a semver git tag. When swift/AnointedSSO/VERSION changes on master, tag that
+# commit with the version (once). Swift Package Index picks the new tag up by itself.
+name: Swift AnointedSSO release
+
+on:
+  push:
+    branches: ["master"]
+    paths:
+      - "swift/AnointedSSO/VERSION"
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Tag the version
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < swift/AnointedSSO/VERSION)"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::swift/AnointedSSO/VERSION must be MAJOR.MINOR.PATCH, got '$version'"
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$version" >/dev/null; then
+            echo "Tag $version already exists, nothing to do."
+            exit 0
+          fi
+          git tag "$version" "$GITHUB_SHA"
+          git push origin "refs/tags/$version"
+          echo "Published AnointedSSO $version"
