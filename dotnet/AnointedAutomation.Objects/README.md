@@ -99,7 +99,8 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | Type | Description |
 |---|---|
 | `DiscordLogin` | Holds the Discord `User`; stored on `User.SSO.Discord`. |
-| `DiscordUser` | Discord OAuth2 `/users/@me` fields (`id`, `username`, `discriminator`, `global_name`, `email`, `verified`, `avatar`), mapped with `[JsonProperty]` to Discord's snake_case names. |
+| `DiscordUser` | Discord's full documented User object as `/users/@me` returns it (`id`, `username`, `discriminator`, `global_name`, `avatar`, `bot`, `system`, `mfa_enabled`, `banner`, `accent_color`, `locale`, `verified`, `email`, `flags`, `premium_type`, `public_flags`, `avatar_decoration_data`, `collectibles`, `primary_guild`), mapped with `[JsonProperty]` to Discord's snake_case names. |
+| `DiscordAvatarDecorationData`, `DiscordCollectibles`, `DiscordNameplate`, `DiscordPrimaryGuild` | The nested Discord user structures. |
 
 ## Naming convention
 
