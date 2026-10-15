@@ -2,11 +2,18 @@
 //Stewarded by Alexander Fields
 
 using System.Runtime.Serialization;
+using AnointedAutomation.Objects.Amazon;
 using AnointedAutomation.Objects.Apple;
 using AnointedAutomation.Objects.Discord;
 using AnointedAutomation.Objects.Facebook;
+using AnointedAutomation.Objects.GitHub;
 using AnointedAutomation.Objects.Google;
+using AnointedAutomation.Objects.LinkedIn;
 using AnointedAutomation.Objects.Microsoft;
+using AnointedAutomation.Objects.Reddit;
+using AnointedAutomation.Objects.ShopifyCustomerAccounts;
+using AnointedAutomation.Objects.Twitch;
+using AnointedAutomation.Objects.Yahoo;
 
 namespace AnointedAutomation.Objects.Account
 {
@@ -49,6 +56,37 @@ namespace AnointedAutomation.Objects.Account
         /// <summary>The user's Discord identity (the OAuth2 <c>/users/@me</c> user), null if never linked.</summary>
         [DataMember]
         public DiscordLogin Discord { get; set; }
+
+        /// <summary>The user's GitHub identity (<c>GET /user</c> + <c>GET /user/emails</c>), null if never linked.</summary>
+        [DataMember]
+        public GitHubLogin GitHub { get; set; }
+
+        /// <summary>The user's LinkedIn identity (the OIDC userinfo), null if never linked.</summary>
+        [DataMember]
+        public LinkedInLogin LinkedIn { get; set; }
+
+        /// <summary>The user's Twitch identity (Get Users user + OIDC claims), null if never linked.</summary>
+        [DataMember]
+        public TwitchLogin Twitch { get; set; }
+
+        /// <summary>The user's Yahoo identity (the OIDC claims), null if never linked.</summary>
+        [DataMember]
+        public YahooLogin Yahoo { get; set; }
+
+        /// <summary>The user's Login with Amazon identity (the customer profile), null if never linked.</summary>
+        [DataMember]
+        public AmazonLogin Amazon { get; set; }
+
+        /// <summary>The user's Reddit identity (the <c>/api/v1/me</c> user, no email), null if never linked.</summary>
+        [DataMember]
+        public RedditLogin Reddit { get; set; }
+
+        /// <summary>
+        /// The user's Shopify Customer Account API sign-in (the OIDC id_token claims), null if never signed in that
+        /// way. Separate from <see cref="Shopify"/>, which is the store's Admin customer link.
+        /// </summary>
+        [DataMember]
+        public ShopifyCustomerAccountLogin ShopifyCustomerAccount { get; set; }
 
         /// <summary>
         /// The user's Shopify customer as the Admin REST <c>Customer</c>, null if not linked. Its

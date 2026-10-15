@@ -1,0 +1,33 @@
+# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+name: Swift AnointedSSO
+
+on:
+  push:
+    branches: ["master", "develop"]
+    paths:
+      - "Package.swift"
+      - "swift/AnointedSSO/**"
+      - ".github/workflows/swift-anointed-sso.yml"
+  pull_request:
+    branches: ["master", "develop"]
+    paths:
+      - "Package.swift"
+      - "swift/AnointedSSO/**"
+      - ".github/workflows/swift-anointed-sso.yml"
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Test (macOS)
+        run: swift test
+
+      - name: Build (iOS)
+        run: xcodebuild build -scheme AnointedSSO -destination 'generic/platform=iOS' -quiet
