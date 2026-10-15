@@ -3,6 +3,7 @@
 
 using System.Runtime.Serialization;
 using AnointedAutomation.Objects.Apple;
+using AnointedAutomation.Objects.Discord;
 using AnointedAutomation.Objects.Facebook;
 using AnointedAutomation.Objects.Google;
 using AnointedAutomation.Objects.Microsoft;
@@ -44,6 +45,10 @@ namespace AnointedAutomation.Objects.Account
         /// <summary>The user's Facebook Login identity, null if never linked.</summary>
         [DataMember]
         public FacebookLogin Facebook { get; set; }
+
+        /// <summary>The user's Discord identity (the OAuth2 <c>/users/@me</c> user), null if never linked.</summary>
+        [DataMember]
+        public DiscordLogin Discord { get; set; }
 
         /// <summary>
         /// The user's Shopify customer as the Admin REST <c>Customer</c>, null if not linked. Its

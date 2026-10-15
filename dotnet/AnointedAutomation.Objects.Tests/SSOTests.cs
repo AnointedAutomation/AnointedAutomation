@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using AnointedAutomation.Objects.Account;
 using AnointedAutomation.Objects.Apple;
+using AnointedAutomation.Objects.Discord;
 using AnointedAutomation.Objects.Facebook;
 using AnointedAutomation.Objects.Google;
 using AnointedAutomation.Objects.Microsoft;
@@ -33,7 +34,98 @@ namespace AnointedAutomation.Objects.Tests
             Assert.Null(sso.Microsoft);
             Assert.Null(sso.Apple);
             Assert.Null(sso.Facebook);
+            Assert.Null(sso.Discord);
             Assert.Null(sso.Shopify);
+        }
+
+        [Fact]
+        public void DiscordUser_DeserializesUsersMeShape()
+        {
+            string me = "{\"id\":\"80351110224678912\",\"username\":\"nelly\",\"discriminator\":\"0\",\"global_name\":\"Nelly\",\"avatar\":\"8342729096ea3675442027381ff50dfe\",\"verified\":true,\"email\":\"nelly@discord.com\",\"flags\":64,\"locale\":\"en-US\"}";
+
+            DiscordUser user = JsonConvert.DeserializeObject<DiscordUser>(me);
+
+            Assert.Equal("80351110224678912", user.Id);
+            Assert.Equal("nelly", user.Username);
+            Assert.Equal("0", user.Discriminator);
+            Assert.Equal("Nelly", user.GlobalName);
+            Assert.Equal("8342729096ea3675442027381ff50dfe", user.Avatar);
+            Assert.True(user.Verified);
+            Assert.Equal("nelly@discord.com", user.Email);
+        }
+
+        [Fact]
+        public void DiscordUser_DeserializesFullDocumentedUserObject()
+        {
+            string me = "{\"id\":\"1\",\"username\":\"u\",\"discriminator\":\"0\",\"global_name\":\"U\",\"avatar\":\"a\",\"bot\":false,\"system\":false,\"mfa_enabled\":true,\"banner\":\"b\",\"accent_color\":16711680,\"locale\":\"en-US\",\"verified\":true,\"email\":\"u@x.com\",\"flags\":4194304,\"premium_type\":2,\"public_flags\":64,"
+                + "\"avatar_decoration_data\":{\"asset\":\"deco\",\"sku_id\":\"111\"},"
+                + "\"collectibles\":{\"nameplate\":{\"sku_id\":\"222\",\"asset\":\"nameplates/x/\",\"label\":\"\",\"palette\":\"bubble_gum\"}},"
+                + "\"primary_guild\":{\"identity_guild_id\":\"333\",\"identity_enabled\":true,\"tag\":\"ANNT\",\"badge\":\"bdg\"}}";
+
+            DiscordUser user = JsonConvert.DeserializeObject<DiscordUser>(me);
+
+            Assert.False(user.Bot);
+            Assert.False(user.System);
+            Assert.True(user.MfaEnabled);
+            Assert.Equal("b", user.Banner);
+            Assert.Equal(16711680, user.AccentColor);
+            Assert.Equal("en-US", user.Locale);
+            Assert.Equal(4194304L, user.Flags);
+            Assert.Equal(2, user.PremiumType);
+            Assert.Equal(64L, user.PublicFlags);
+            Assert.Equal("deco", user.AvatarDecorationData.Asset);
+            Assert.Equal("111", user.AvatarDecorationData.SkuId);
+            Assert.Equal("222", user.Collectibles.Nameplate.SkuId);
+            Assert.Equal("bubble_gum", user.Collectibles.Nameplate.Palette);
+            Assert.Equal("333", user.PrimaryGuild.IdentityGuildId);
+            Assert.True(user.PrimaryGuild.IdentityEnabled);
+            Assert.Equal("ANNT", user.PrimaryGuild.Tag);
+            Assert.Equal("bdg", user.PrimaryGuild.Badge);
+        }
+
+        [Fact]
+        public void DiscordPrimaryGuild_NullIdentityEnabled_StaysNull()
+        {
+            DiscordUser user = JsonConvert.DeserializeObject<DiscordUser>("{\"id\":\"1\",\"primary_guild\":{\"identity_guild_id\":null,\"identity_enabled\":null,\"tag\":null,\"badge\":null},\"collectibles\":null,\"avatar_decoration_data\":null}");
+
+            Assert.Null(user.PrimaryGuild.IdentityEnabled);
+            Assert.Null(user.PrimaryGuild.IdentityGuildId);
+            Assert.Null(user.Collectibles);
+            Assert.Null(user.AvatarDecorationData);
+        }
+
+        [Fact]
+        public void DiscordUser_WithoutEmailScope_LeavesEmailAndVerifiedNull()
+        {
+            DiscordUser user = JsonConvert.DeserializeObject<DiscordUser>("{\"id\":\"1\",\"username\":\"u\",\"global_name\":null,\"avatar\":null}");
+
+            Assert.Equal("1", user.Id);
+            Assert.Null(user.Email);
+            Assert.Null(user.Verified);
+            Assert.Null(user.GlobalName);
+            Assert.Null(user.Avatar);
+        }
+
+        [Fact]
+        public void SSO_DiscordSlot_BsonRoundTrips()
+        {
+            SSO sso = new SSO { Discord = new DiscordLogin { User = new DiscordUser { Id = "d-1", Username = "u", Email = "u@x.com", Verified = false } } };
+
+            BsonDocument doc = sso.ToBsonDocument();
+            SSO back = BsonSerializer.Deserialize<SSO>(doc);
+
+            Assert.True(doc.Contains("Discord"));
+            Assert.Equal("d-1", back.Discord.User.Id);
+            Assert.Equal("u@x.com", back.Discord.User.Email);
+            Assert.False(back.Discord.User.Verified);
+            Assert.Null(back.Facebook);
+        }
+
+        [Fact]
+        public void UserEmailSource_Discord_IsAppendedAfterAdmin()
+        {
+            Assert.Equal(9, (int)UserEmailSource.Admin);
+            Assert.Equal(10, (int)UserEmailSource.Discord);
         }
 
         [Fact]
