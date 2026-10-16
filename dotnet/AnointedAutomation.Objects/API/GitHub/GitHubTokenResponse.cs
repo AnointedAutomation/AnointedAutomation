@@ -37,5 +37,10 @@ namespace AnointedAutomation.Objects.GitHub
         /// <summary>Human-readable error text on a refused exchange.</summary>
         [JsonProperty("error_description")]
         public string? ErrorDescription { get; set; }
+
+        /// <summary>Link to GitHub's page for the error (documented on
+        /// https://docs.github.com/en/apps/oauth-apps/maintaining-oauth-apps/troubleshooting-oauth-app-access-token-request-errors).</summary>
+        [JsonProperty("error_uri")]
+        public string? ErrorUri { get; set; }
     }
 }

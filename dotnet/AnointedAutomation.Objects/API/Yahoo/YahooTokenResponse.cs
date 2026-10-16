@@ -38,11 +38,13 @@ namespace AnointedAutomation.Objects.Yahoo
         [JsonProperty("id_token")]
         public string? IdToken { get; set; }
 
-        /// <summary>Error code on a refused exchange (e.g. <c>invalid_grant</c>).</summary>
+        /// <summary>Error code on a refused exchange (e.g. <c>invalid_grant</c>). Yahoo's guides document NO error body;
+        /// this and <see cref="ErrorDescription"/> are the RFC 6749 section 5.2 standard error fields
+        /// (https://datatracker.ietf.org/doc/html/rfc6749#section-5.2).</summary>
         [JsonProperty("error")]
         public string? Error { get; set; }
 
-        /// <summary>Human-readable error text on a refused exchange.</summary>
+        /// <summary>Human-readable error text on a refused exchange (RFC 6749 section 5.2, not Yahoo-documented).</summary>
         [JsonProperty("error_description")]
         public string? ErrorDescription { get; set; }
     }

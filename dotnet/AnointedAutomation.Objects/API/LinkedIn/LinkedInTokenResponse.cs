@@ -34,7 +34,8 @@ namespace AnointedAutomation.Objects.LinkedIn
         [JsonProperty("scope")]
         public string? Scope { get; set; }
 
-        /// <summary>The token type, <c>Bearer</c>.</summary>
+        /// <summary>The token type. NOT in LinkedIn's field table; kept because RFC 6749 section 5.1 requires it in
+        /// every successful token answer (https://datatracker.ietf.org/doc/html/rfc6749#section-5.1).</summary>
         [JsonProperty("token_type")]
         public string? TokenType { get; set; }
 

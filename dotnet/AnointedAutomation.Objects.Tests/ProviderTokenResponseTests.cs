@@ -58,23 +58,24 @@ namespace AnointedAutomation.Objects.Tests
             Assert.Null(r.AccessToken);
             Assert.Equal("bad_verification_code", r.Error);
             Assert.Equal("The code passed is incorrect or expired.", r.ErrorDescription);
+            Assert.StartsWith("https://docs.github.com/", r.ErrorUri);
         }
 
         [Fact]
         public void LinkedInTokenResponse_DeserializesDocumentedSample()
         {
-            // https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow (step 3 response)
-            const string json = "{\"access_token\":\"AQUvlL_DYEzvT2wz1QJiEPeLioeA\",\"expires_in\":5184000,\"scope\":\"r_basicprofile\",\"refresh_token\":\"AQWAft_WjYZKwuWXLC5hQlghgTam\",\"refresh_token_expires_in\":525600,\"token_type\":\"Bearer\",\"id_token\":\"eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.e30.sig\"}";
+            // https://learn.microsoft.com/en-us/linkedin/shared/authentication/authorization-code-flow (step 3 response),
+            // the documented sample verbatim. refresh_token / refresh_token_expires_in are in the field table only;
+            // id_token is returned for the openid scope (sign-in-with-linkedin-v2 page). Neither page shows them in a sample.
+            const string json = "{\"access_token\":\"AQUvlL_DYEzvT2wz1QJiEPeLioeA\",\"expires_in\":5184000,\"scope\":\"r_basicprofile\"}";
 
             LinkedInTokenResponse r = JsonConvert.DeserializeObject<LinkedInTokenResponse>(json);
 
             Assert.Equal("AQUvlL_DYEzvT2wz1QJiEPeLioeA", r.AccessToken);
             Assert.Equal(5184000L, r.ExpiresIn);
             Assert.Equal("r_basicprofile", r.Scope);
-            Assert.Equal("AQWAft_WjYZKwuWXLC5hQlghgTam", r.RefreshToken);
-            Assert.Equal(525600L, r.RefreshTokenExpiresIn);
-            Assert.Equal("Bearer", r.TokenType);
-            Assert.StartsWith("eyJ", r.IdToken);
+            Assert.Null(r.RefreshToken);
+            Assert.Null(r.IdToken);
         }
 
         [Fact]
@@ -95,15 +96,16 @@ namespace AnointedAutomation.Objects.Tests
         public void TwitchTokenResponse_DeserializesDocumentedSample()
         {
             // https://dev.twitch.tv/docs/authentication/getting-tokens-oidc/ (authorization code grant flow)
-            const string json = "{\"access_token\":\"rfx2uswqe8l4g1mkagrvg5tv0ks3\",\"expires_in\":14124,\"id_token\":\"eyJhbGciOiJSUzI1NiIsInR5cC6IkpXVCIsImtpZCI6IjEifQ\",\"refresh_token\":\"5b93chm6hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01\",\"scope\":[\"openid\",\"user:read:email\"],\"token_type\":\"bearer\"}";
+            // The documented sample verbatim.
+            const string json = "{\"access_token\":\"rfx2uswqe8lu4g1mkagrvg5tv0ks3\",\"expires_in\":14124,\"id_token\":\"eyJhbGciOiJSUzI1...\",\"refresh_token\":\"5b93chm63hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01\",\"scope\":[\"channel:moderate\",\"chat:edit\",\"chat:read\"],\"token_type\":\"bearer\"}";
 
             TwitchTokenResponse r = JsonConvert.DeserializeObject<TwitchTokenResponse>(json);
 
-            Assert.Equal("rfx2uswqe8l4g1mkagrvg5tv0ks3", r.AccessToken);
+            Assert.Equal("rfx2uswqe8lu4g1mkagrvg5tv0ks3", r.AccessToken);
             Assert.Equal(14124L, r.ExpiresIn);
             Assert.StartsWith("eyJ", r.IdToken);
-            Assert.Equal("5b93chm6hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01", r.RefreshToken);
-            Assert.Equal(new List<string> { "openid", "user:read:email" }, r.Scope);
+            Assert.Equal("5b93chm63hdve3mycz05zfzatkfdenfspp1h1ar2xxdalen01", r.RefreshToken);
+            Assert.Equal(new List<string> { "channel:moderate", "chat:edit", "chat:read" }, r.Scope);
             Assert.Equal("bearer", r.TokenType);
             Assert.Null(r.Status);
         }
