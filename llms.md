@@ -384,6 +384,22 @@ app.get("/auth/anointed/callback", anointed.callback);
 `createWebHandlers` gives the same `start` / `callback` / `backchannelLogout` as `Request -> Response` handlers
 for Next.js App Router, Base44 and Workers. Failures are `AnointedSsoError` with a stable `code`.
 
+## Swift package
+
+### AnointedSSO 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO
+- Install: Swift Package Manager, `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
+- The app never holds the client secret: `AnointedSignIn` opens the partner's own server start route (`@anointedautomation/sso`) in `ASWebAuthenticationSession`; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` the package checks.
+- Callbacks: `.https(host:path:)` (universal link, iOS 17.4+) or `.scheme(name, via:)` (an https server route that forwards the query to `name://anointed-sign-in`).
+
+```swift
+import AnointedSSO
+let signIn = AnointedSignIn(start: URL(string: "https://api.yourapp.com/auth/anointed/start")!,
+                            callback: .https(host: "app.yourapp.com", path: "/anointed/done"))
+let items = try await signIn.signIn() // query items your server added, e.g. items["code"]
+```
+
 ## Cross-package recipes
 
 ### QR code to SVG and PNG (Algorithms + Imaging)

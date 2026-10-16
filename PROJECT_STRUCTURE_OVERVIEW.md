@@ -49,7 +49,12 @@ All test projects are organized under a "Tests" solution folder:
 ### JavaScript Packages (`js/`)
 - **@anointedautomation/sso** (`js/anointed-sso/`) - "Sign in with Anointed Automation" OpenID Connect
   client kit for partner apps (Node 18+, Deno/Base44, edge). Dependency-free core, Express and Web adapters,
-  runnable Express / Next.js / Base44 examples. Not published to npm.
+  runnable Express / Next.js / Base44 examples.
+
+### Swift Package (`swift/`)
+- **AnointedSSO** (`swift/AnointedSSO/`, `Package.swift` at the repo root) - "Sign in with Anointed Automation"
+  for iOS 15+ / macOS 12+: system sign-in sheet against the partner's own server (which keeps the secret),
+  state check, SwiftUI button. Released by semver tag, listed on Swift Package Index.
 
 ### External Dependencies
 - **Google/** - Contains Google OAuth integration objects

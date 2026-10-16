@@ -17,6 +17,7 @@ Anointed Automation is a standard OpenID Connect provider:
 | Flow | Authorization code + PKCE (`S256`) only; `state` required; `nonce` used |
 | Full guide | [Sign in with Anointed Automation](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md): access, credentials, claims, rotation, troubleshooting |
 | Node / Deno / edge | [@anointedautomation/sso](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso) |
+| iOS / macOS apps | [AnointedSSO (Swift)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO) (talks to your server, which keeps the secret) |
 
 **Server only.** This package holds your client secret and your partner API key. Never ship either to a
 browser, a Blazor WebAssembly app, a MAUI or other mobile/desktop app, or anything else that runs on a user's
