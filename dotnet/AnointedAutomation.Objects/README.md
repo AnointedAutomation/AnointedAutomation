@@ -101,6 +101,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `DiscordLogin` | Holds the Discord `User`; stored on `User.SSO.Discord`. |
 | `DiscordUser` | Discord's full documented User object as `/users/@me` returns it (`id`, `username`, `discriminator`, `global_name`, `avatar`, `bot`, `system`, `mfa_enabled`, `banner`, `accent_color`, `locale`, `verified`, `email`, `flags`, `premium_type`, `public_flags`, `avatar_decoration_data`, `collectibles`, `primary_guild`), mapped with `[JsonProperty]` to Discord's snake_case names. |
 | `DiscordAvatarDecorationData`, `DiscordCollectibles`, `DiscordNameplate`, `DiscordPrimaryGuild` | The nested Discord user structures. |
+| `DiscordTokenResponse` | `POST /oauth2/token` answer (`access_token`, `token_type`, `expires_in`, `refresh_token`, `scope`). Transport only, never stored. |
 
 ### GitHub (`AnointedAutomation.Objects.GitHub`)
 
@@ -109,6 +110,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `GitHubLogin` | Holds `User`, `VerifiedPrimaryEmail` (the primary AND verified address) and `Emails`; stored on `User.SSO.GitHub`. |
 | `GitHubUser`, `GitHubPlan` | GitHub's "Private User" object as `GET /user` returns it (every documented field, snake_case `[JsonProperty]` names). |
 | `GitHubEmail` | One `GET /user/emails` entry (`email`, `primary`, `verified`, `visibility`). |
+| `GitHubTokenResponse` | `POST https://github.com/login/oauth/access_token` answer (`access_token`, `scope`, `token_type`, or `error`, `error_description`). Transport only, never stored. |
 
 ### LinkedIn (`AnointedAutomation.Objects.LinkedIn`)
 
@@ -117,6 +119,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `LinkedInLogin` | Holds `UserInfo`; stored on `User.SSO.LinkedIn`. |
 | `LinkedInUserInfo` | OIDC userinfo (`sub`, `name`, `given_name`, `family_name`, `picture`, `locale`, `email`, `email_verified`). |
 | `LinkedInLocale`, `LinkedInLocaleConverter` | `locale` as `{country, language}`; reads either the object or a `"en-US"` string. |
+| `LinkedInTokenResponse` | `POST /oauth/v2/accessToken` answer (`access_token`, `expires_in`, `refresh_token`, `refresh_token_expires_in`, `scope`, `token_type`, `id_token`, or `error`, `error_description`). Transport only, never stored. |
 
 ### Twitch (`AnointedAutomation.Objects.Twitch`)
 
@@ -125,6 +128,8 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `TwitchLogin` | Holds `User` and `IdToken`; stored on `User.SSO.Twitch`. |
 | `TwitchUser` | One Get Users entry (`id`, `login`, `display_name`, `type`, `broadcaster_type`, `description`, `profile_image_url`, `offline_image_url`, `view_count`, `email`, `created_at`). |
 | `TwitchIdTokenClaims` | OIDC claims (`aud`, `azp`, `exp`, `iat`, `iss`, `sub`, `nonce`, `email`, `email_verified`, `picture`, `preferred_username`, `updated_at`). |
+| `TwitchTokenResponse` | `POST https://id.twitch.tv/oauth2/token` answer (`access_token`, `expires_in`, `id_token`, `refresh_token`, `scope` array, `token_type`, or `status`, `message`). Transport only, never stored. |
+| `TwitchUsersResponse` | Helix `GET /users` envelope (`data`: list of `TwitchUser`). |
 
 ### Yahoo, Amazon, Reddit, Shopify Customer Account
 
@@ -134,8 +139,11 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `AmazonLogin`, `AmazonProfile` | Login with Amazon profile (`user_id`, `name`, `email`, `postal_code`); stored on `User.SSO.Amazon`. |
 | `RedditLogin`, `RedditUser` | Reddit `GET /api/v1/me` identity (no email; `has_verified_email` only); stored on `User.SSO.Reddit`. |
 | `ShopifyCustomerAccountLogin`, `ShopifyCustomerAccountClaims` | Shopify Customer Account API id_token claims (`iss`, `sub`, `aud`, `exp`, `iat`, `nonce`, `sid`, `email`, `email_verified`, `given_name`, `family_name`); stored on `User.SSO.ShopifyCustomerAccount`, separate from the `User.SSO.Shopify` store customer link. |
+| `YahooTokenResponse` | `POST /oauth2/get_token` answer (`access_token`, `refresh_token`, `expires_in`, `token_type`, `xoauth_yahoo_guid`, `id_token`, or `error`, `error_description`). Transport only, never stored. |
+| `AmazonTokenResponse` | Login with Amazon `POST https://api.amazon.com/auth/o2/token` answer (`access_token`, `token_type`, `expires_in`, `refresh_token`, or `error`, `error_description`, `error_uri`). Transport only, never stored. |
+| `RedditTokenResponse` | `POST https://www.reddit.com/api/v1/access_token` answer (`access_token`, `token_type`, `expires_in`, `scope`, `refresh_token` for permanent grants, or `error`). Transport only, never stored. |
 
-No slot ever holds an access or refresh token.
+No slot ever holds an access or refresh token. The `*TokenResponse` types are wire-only (nullable-annotated, no BSON mapping): read the answer, use the token once, discard it.
 
 ## Naming convention
 
