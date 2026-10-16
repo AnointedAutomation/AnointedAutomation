@@ -220,7 +220,9 @@ AnointedAutomation/
 │   ├── nuget-publish.yml         NuGet publish        (working-directory: dotnet)
 │   ├── version-increment.yml     PR version bumps     (working-directory: dotnet)
 │   ├── rebase-develop.yml        develop <- master sync
-│   └── js-anointed-sso.yml       JS kit: Node 18/20/22/24, Deno, d.ts type check
+│   ├── js-anointed-sso.yml       JS kit: Node 18/20/22/24, Deno, d.ts type check
+│   ├── swift-anointed-sso.yml    Swift kit: swift test (macOS) + iOS build
+│   └── swift-sso-release.yml     tags master from swift/AnointedSSO/VERSION
 ├── dotnet/
 │   ├── AnointedAutomation.sln
 │   ├── Directory.Build.props, NuGet.config, PUBLISHING.md, publish-packages.sh
@@ -235,6 +237,12 @@ AnointedAutomation/
 │       ├── index.d.ts
 │       ├── test/           node:test suites, helpers/fakeIdp.js, deno/smoke.ts
 │       └── examples/       express/, nextjs/, base44/functions/
+├── swift/
+│   └── AnointedSSO/                          Swift package (manifest: root Package.swift)
+│       ├── Sources/AnointedSSO/  AnointedSignInRequest, AnointedSignIn, AnointedSignInButton
+│       ├── Tests/AnointedSSOTests/
+│       └── VERSION                           release version (tagged by swift-sso-release.yml)
+├── Package.swift, .spi.yml                   Swift Package Manager manifest, Swift Package Index config
 ├── docs/design/             specs and plans
 ├── llms.txt, llms.md, llms.json
 ├── README.md, CONTRIBUTING.md, SUPPORT.md, LICENSE (MIT)

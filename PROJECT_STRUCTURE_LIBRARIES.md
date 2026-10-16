@@ -449,6 +449,22 @@ Deno (Base44 backend functions) and edge runtimes (WebCrypto + global fetch only
 - Examples: `examples/express`, `examples/nextjs`, `examples/base44/functions` (anointedStart, anointedCallback,
   anointedMe).
 
+## Swift Package (`swift/`)
+
+### AnointedSSO v0.1.0 (`swift/AnointedSSO/`, manifest `Package.swift` at the repo root)
+"Sign in with Anointed Automation" for iOS 15+ and macOS 12+ apps. Zero dependencies. The app never holds the
+client secret: it opens the partner's OWN server start route (the JS kit) in `ASWebAuthenticationSession`, and
+that server finishes OIDC and redirects back to the app.
+
+- `AnointedSignInRequest.swift`: pure, testable. `AnointedSignInRequest` builds the start URL with
+  `returnTo` = callback + `aa_state` (random 32 bytes, base64url), `parseCallback` checks the state and surfaces
+  `?error=`. `AnointedCallback` = `.https(host:path:)` (universal link, iOS 17.4+) or `.scheme(_, via:)` (custom
+  scheme through an https bounce route, since the JS kit only returns to https). `AnointedSignInError`.
+- `AnointedSignIn.swift`: `AnointedSignIn.signIn() async throws -> [String: String]` over
+  `ASWebAuthenticationSession` (Apple platforms only).
+- `AnointedSignInButton.swift`: SwiftUI button with the live site logo.
+- Tests: `swift/AnointedSSO/Tests/AnointedSSOTests` (XCTest).
+
 ## Inter-Library Dependencies
 
 ```

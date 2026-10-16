@@ -30,6 +30,7 @@ NuGet profile: https://www.nuget.org/profiles/roku674
 ## JavaScript packages (js/)
 
 - [@anointedautomation/sso](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso): "Sign in with Anointed Automation" for partner apps. A dependency-free, server-only OpenID Connect client (authorization code + PKCE S256, state, nonce, RS256 ID token validation via JWKS) for Node 18+, Deno (Base44) and edge runtimes. Key exports: createAnointedClient, createWebHandlers (Next.js App Router, Base44, Workers), createExpressHandlers, AnointedSsoError, ANOINTED_ISSUER. Default scope `openid email`; key users on `sub`. Not on npm yet.
+- [AnointedSSO (Swift)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO): "Sign in with Anointed Automation" for iOS 15+ / macOS 12+ apps via Swift Package Manager (repo URL, product AnointedSSO). The app opens the partner's own server start route (the JS kit) in ASWebAuthenticationSession; the server keeps the secret and redirects back. Key types: AnointedSignIn (signIn() async), AnointedCallback (.https(host:path:) iOS 17.4+, .scheme(_, via:)), AnointedSignInRequest, AnointedSignInButton, AnointedSignInError.
 
 ## Docs
 

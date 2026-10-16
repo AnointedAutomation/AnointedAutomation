@@ -35,8 +35,9 @@ This file serves as the index/directory for all PROJECT_STRUCTURE files in the A
 - Solution file organization and folder hierarchy
 - Technology choices (.NET 8.0, C#, MongoDB, GitHub Actions)
 - High-level component relationships
-- Root directory structure and file organization (`dotnet/`, `js/`, `docs/`)
+- Root directory structure and file organization (`dotnet/`, `js/`, `swift/`, `docs/`)
 - JavaScript packages (`js/anointed-sso`: Sign in with Anointed Automation kit)
+- Swift package (`swift/AnointedSSO`: Sign in with Anointed Automation for iOS/macOS)
 
 ### [PROJECT_STRUCTURE_TESTING.md](./PROJECT_STRUCTURE_TESTING.md) ✅
 - Test organization under "Tests" solution folder

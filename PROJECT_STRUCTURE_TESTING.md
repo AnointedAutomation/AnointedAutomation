@@ -371,6 +371,7 @@ Based on the .NET nature of the project:
 - Individual project testing (from `dotnet/`): `~/.dotnet/dotnet test AnointedAutomation.{LibraryName}.Tests/`
 - JS SSO kit: `cd js/anointed-sso && npm test` (unit tests + mocked end-to-end flow against
   `test/helpers/fakeIdp.js`), Deno: `deno test --allow-net --no-check test/deno/smoke.ts`
+- Swift SSO kit: `swift test` from the repo root (XCTest, `swift/AnointedSSO/Tests`); CI also builds for iOS
 ---
 
 **[← Back to Project Dictionary](./PROJECT_STRUCTURE_DICTIONARY.md)**
