@@ -127,6 +127,17 @@ relative to `dotnet/`.
 - **Logic**: Only publishes packages with incremented version numbers
 - **Benefits**: Prevents duplicate publishing and failed builds
 
+## Swift Package (swift/)
+
+- **Manifest**: `Package.swift` at the repo root (Swift Package Manager only reads the root); sources under
+  `swift/AnointedSSO/`.
+- **Workflow**: `.github/workflows/swift-anointed-sso.yml` (macOS: `swift test`, then an iOS `xcodebuild build`),
+  triggered by `Package.swift` or `swift/AnointedSSO/**`.
+- **Local**: `swift test` from the repo root (macOS; the pure request tests also run on Linux).
+- **Publishing**: a semver git tag IS the release. `.github/workflows/swift-sso-release.yml` tags `master` with
+  `swift/AnointedSSO/VERSION` when that file changes (once per version). Swift Package Index (`.spi.yml`)
+  picks up new tags itself. Every tag on this repo is a Swift package version, so only that workflow tags.
+
 ## JavaScript Packages (js/)
 
 - **Workflow**: `.github/workflows/js-anointed-sso.yml`, triggered only by changes under `js/anointed-sso/`.

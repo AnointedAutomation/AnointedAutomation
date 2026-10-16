@@ -4,7 +4,8 @@ Jesus is King ✝️
 
 A practical guide for clients and partners who want a "Sign in with Anointed Automation" button on their own
 site or app. Anointed Automation is a standard OpenID Connect (OIDC) provider, so any OIDC library works; for
-Node, Deno and edge runtimes there is a ready-made kit, [`@anointedautomation/sso`](../js/anointed-sso).
+Node, Deno and edge runtimes there is a ready-made kit, [`@anointedautomation/sso`](../js/anointed-sso), and for
+iOS and macOS apps the Swift package [`AnointedSSO`](../swift/AnointedSSO).
 
 ## 1. What it is
 
@@ -158,6 +159,29 @@ The same `createWebHandlers` works on Base44 (Deno), Cloudflare Workers, Bun and
 [examples/base44](../js/anointed-sso/examples/base44). The kit handles PKCE, `state`, `nonce`, the flow cookie,
 ID token validation and the RFC 9207 `iss` check for you. Full API:
 [js/anointed-sso/README.md](../js/anointed-sso/README.md).
+
+### iOS and macOS: `AnointedSSO` (Swift)
+
+A phone app can't keep a secret, and redirect URIs must be https, so the app never talks to Anointed Automation
+directly. It opens YOUR server's start route (the Node kit above) in the system sign-in sheet; your server
+finishes sign-in and redirects back to the app with something like a one-time code the app trades for its own
+session. The package checks its `aa_state` came back.
+
+Xcode > Add Package Dependencies > `https://github.com/AnointedAutomation/AnointedAutomation`, product
+`AnointedSSO`.
+
+```swift
+import AnointedSSO
+
+let signIn = AnointedSignIn(
+    start: URL(string: "https://api.yourapp.com/auth/anointed/start")!,
+    callback: .https(host: "app.yourapp.com", path: "/anointed/done") // iOS 17.4+; .scheme(_, via:) for older
+)
+AnointedSignInButton { Task { let items = try await signIn.signIn() /* items["code"] */ } }
+```
+
+Server side: set `allowedReturnOrigins` to the app's return origin and, in `onSignedIn`, redirect to
+`result.returnTo` with your code added. Full example: [swift/AnointedSSO](../swift/AnointedSSO).
 
 ### .NET (ASP.NET Core)
 

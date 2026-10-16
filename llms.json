@@ -482,5 +482,26 @@
       ],
       "notes": "Issuer https://api.anointedautomation.net/. Default scope openid email; profile forces users without a handle to pick a username. Key users on sub. client_id is aa_<partner key id>; the secret stays server side."
     }
+  ],
+  "swiftPackages": [
+    {
+      "id": "AnointedSSO",
+      "version": "0.1.0",
+      "runtime": "iOS 15+, macOS 12+ (Swift Package Manager)",
+      "published": true,
+      "description": "Sign in with Anointed Automation for iOS and macOS apps: opens the partner's own server start route in ASWebAuthenticationSession; the server (using @anointedautomation/sso) keeps the client secret and redirects back. State check and SwiftUI button included.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/swift/AnointedSSO/README.md",
+      "install": "https://github.com/AnointedAutomation/AnointedAutomation (product AnointedSSO)",
+      "dependencies": [],
+      "keyExports": [
+        "AnointedSignIn",
+        "AnointedCallback",
+        "AnointedSignInRequest",
+        "AnointedSignInButton",
+        "AnointedSignInError"
+      ],
+      "notes": "Never put the client secret in the app. .https callbacks need iOS 17.4+; .scheme(_, via:) needs an https bounce route on the server."
+    }
   ]
 }
