@@ -40,7 +40,7 @@ the same email we approved. That page only signs in an existing account, so crea
 first at [https://www.anointedautomation.net/signup](https://www.anointedautomation.net/signup) if you have not.
 You land on the portal at [https://www.anointedautomation.net/partner](https://www.anointedautomation.net/partner).
 
-**Step 3: create an API key** (portal > **Keys** tab).
+**Step 3: create an API key** ([portal > **Keys** tab](https://www.anointedautomation.net/partner?tab=keys)).
 
 1. Tick only the permissions your app needs. You can pick any of the partner permissions:
    `partner-feed:read` (product feed and ad picks), `partner:users:provision` (create shopper accounts),

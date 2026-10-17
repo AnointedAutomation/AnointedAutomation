@@ -36,7 +36,7 @@ Getting access:
    tab at the top: **Earnings**, **Links**, **Ads library** (Ads, Both), **Performance**, **Payouts**, **Keys**
    and **Sign in** (Tech, Both), **Integration** (Tech, Both).
 
-Keys and sign-in are self-serve for Tech partners: create up to 3 keys on the **Keys** tab and turn on sign-in
+Keys and sign-in are self-serve for Tech partners: create up to 3 keys on the [**Keys** tab](https://www.anointedautomation.net/partner?tab=keys) and turn on sign-in
 for a key on the [**Sign in** tab](https://www.anointedautomation.net/partner?tab=signin). Every change is confirmed with a code we email you, and each new key or client
 secret is shown once.
 
