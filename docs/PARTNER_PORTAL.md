@@ -32,18 +32,18 @@ How to become an Anointed Automation partner, sign in, and find your way around 
 ## Finding your way around
 
 Everything lives on one page, [https://www.anointedautomation.net/partner](https://www.anointedautomation.net/partner).
-Pick a tab at the top. You only see the tabs your partner type includes.
+Pick a tab at the top, or open one directly with the links below. You only see the tabs your partner type includes.
 
 | Tab | Who | What it does |
 |---|---|---|
-| **Earnings** | Everyone | Your sales, your share and your monthly statements |
-| **Links** | Everyone | Build a tracked link to a product, a collection or a store home page |
-| **Ads library** | Ads, Both | Products we picked for you to promote, with a ready link and an image |
-| **Performance** | Everyone | Clicks, orders, revenue and your commission for any date range |
-| **Payouts** | Everyone | Payouts we sent, and your PayPal payout email |
-| **Keys** | Tech, Both | Create, revoke and rotate your API keys |
-| **Sign in** | Tech, Both | Turn on Sign in with Anointed Automation for a key |
-| **Integration** | Tech, Both | Your partner details, your keys at a glance, and your site status if we monitor it |
+| [**Earnings**](https://www.anointedautomation.net/partner?tab=earnings) | Everyone | Your sales, your share and your monthly statements |
+| [**Links**](https://www.anointedautomation.net/partner?tab=links) | Everyone | Build a tracked link to a product, a collection or a store home page |
+| [**Ads library**](https://www.anointedautomation.net/partner?tab=ads) | Ads, Both | Products we picked for you to promote, with a ready link and an image |
+| [**Performance**](https://www.anointedautomation.net/partner?tab=performance) | Everyone | Clicks, orders, revenue and your commission for any date range |
+| [**Payouts**](https://www.anointedautomation.net/partner?tab=payouts) | Everyone | Payouts we sent, and your PayPal payout email |
+| [**Keys**](https://www.anointedautomation.net/partner?tab=keys) | Tech, Both | Create, revoke and rotate your API keys |
+| [**Sign in**](https://www.anointedautomation.net/partner?tab=signin) | Tech, Both | Turn on Sign in with Anointed Automation for a key |
+| [**Integration**](https://www.anointedautomation.net/partner?tab=integration) | Tech, Both | Your partner details, your keys at a glance, and your site status if we monitor it |
 
 ## For Ads partners
 

@@ -28,8 +28,8 @@ device. Use it in your ASP.NET Core server.
 ### 1. Get your credentials
 
 Sign-in is self-serve for Tech partners. Apply at https://www.anointedautomation.net/partners/apply, then in
-the partner portal (https://www.anointedautomation.net/partner): create an API key on the **Keys** tab, and on
-the **Sign in** tab turn sign-in on for that key with your exact callback URL(s) (absolute `https`, exact match,
+the partner portal (https://www.anointedautomation.net/partner): create an API key on the [**Keys** tab](https://www.anointedautomation.net/partner?tab=keys), and on
+the [**Sign in** tab](https://www.anointedautomation.net/partner?tab=signin) turn sign-in on for that key with your exact callback URL(s) (absolute `https`, exact match,
 no wildcards) and, if you want back-channel logout, your back-channel logout URL. Confirm with the code we email
 you. You get:
 

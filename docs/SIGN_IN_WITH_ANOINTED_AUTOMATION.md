@@ -51,7 +51,7 @@ You land on the portal at [https://www.anointedautomation.net/partner](https://w
 You can have up to **3** active keys. Revoke one on the same tab to make room. A revoked key stops working at
 once, and so does its sign-in.
 
-**Step 4: turn on sign-in** (portal > **Sign in** tab). Each active key has its own card:
+**Step 4: turn on sign-in** ([portal > **Sign in** tab](https://www.anointedautomation.net/partner?tab=signin)). Each active key has its own card:
 
 1. **Callback URLs:** one per line, exact `https` URLs, up to 10.
 2. **After sign out URLs** (optional): where we may send people after they sign out, exact `https`.

@@ -92,7 +92,7 @@ Send the person back with `?error=<code>` (keeping `aa_state`) to fail the sign-
 `AnointedSignInError.serverError(code)`.
 
 Credentials (`client_id` = `aa_<your key id>`, the secret, your https callback URL) are self-serve for Tech
-partners in the partner portal (**Keys** and **Sign in** tabs, confirmed with an emailed code). See
+partners in the partner portal ([**Keys**](https://www.anointedautomation.net/partner?tab=keys) and [**Sign in**](https://www.anointedautomation.net/partner?tab=signin) tabs, confirmed with an emailed code). See
 [How to get access](../../docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md#2-how-to-get-access).
 
 ## Releasing

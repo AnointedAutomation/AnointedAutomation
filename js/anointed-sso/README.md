@@ -26,8 +26,8 @@ from browser or mobile code.
 ### 1. Get your credentials
 
 Sign-in is self-serve for Tech partners. Apply at https://www.anointedautomation.net/partners/apply, then in
-the partner portal (https://www.anointedautomation.net/partner): create an API key on the **Keys** tab, and on
-the **Sign in** tab turn sign-in on for that key with your callback URLs. Confirm with the code we email you.
+the partner portal (https://www.anointedautomation.net/partner): create an API key on the [**Keys** tab](https://www.anointedautomation.net/partner?tab=keys), and on
+the [**Sign in** tab](https://www.anointedautomation.net/partner?tab=signin) turn sign-in on for that key with your callback URLs. Confirm with the code we email you.
 You get:
 
 - `client_id`: `aa_<your key id>`

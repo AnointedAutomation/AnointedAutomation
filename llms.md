@@ -13,7 +13,7 @@ Open-source .NET / NuGet libraries by Anointed Automation, LLC, stewarded by Ale
 - Publishing: Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org.
 - File header: every source file starts with the Anointed copyright line ending in "Jesus is King ✝️" (see CONTRIBUTING.md)
 - Machine-readable: llms.json. Short index: llms.txt.
-- Partners (Ads, Tech or Both): apply at https://www.anointedautomation.net/partners/apply; once approved, sign in at https://www.anointedautomation.net/partner/sign-in with the same email (create the account at /signup first) and use the portal at https://www.anointedautomation.net/partner. Tech partners create up to 3 API keys and turn on Sign in with Anointed Automation themselves (Keys and Sign in tabs, confirmed with an emailed code). Guides: docs/PARTNER_PORTAL.md, docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md.
+- Partners (Ads, Tech or Both): apply at https://www.anointedautomation.net/partners/apply; once approved, sign in at https://www.anointedautomation.net/partner/sign-in with the same email (create the account at /signup first) and use the portal at https://www.anointedautomation.net/partner. Tech partners create up to 3 API keys and turn on Sign in with Anointed Automation themselves (https://www.anointedautomation.net/partner?tab=keys and ?tab=signin, confirmed with an emailed code). Guides: docs/PARTNER_PORTAL.md, docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md.
 
 ## Packages
 

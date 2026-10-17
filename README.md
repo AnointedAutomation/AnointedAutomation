@@ -37,7 +37,7 @@ Getting access:
    and **Sign in** (Tech, Both), **Integration** (Tech, Both).
 
 Keys and sign-in are self-serve for Tech partners: create up to 3 keys on the **Keys** tab and turn on sign-in
-for a key on the **Sign in** tab. Every change is confirmed with a code we email you, and each new key or client
+for a key on the [**Sign in** tab](https://www.anointedautomation.net/partner?tab=signin). Every change is confirmed with a code we email you, and each new key or client
 secret is shown once.
 
 More: [Partner portal guide](./docs/PARTNER_PORTAL.md) (tracked links, ads library, earnings, statements,
