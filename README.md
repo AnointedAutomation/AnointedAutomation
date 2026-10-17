@@ -15,6 +15,34 @@ Part of the [Anointed](https://anointed.company) family of ventures.
 
 **For AI assistants:** see [llms.txt](llms.txt) (index), [llms.md](llms.md) (guide with code samples) and [llms.json](llms.json) (structured package data).
 
+## Become a partner
+
+There are three partner types:
+
+- **Ads:** promote our products with your own tracked links and earn on every sale. You get an ads library with
+  ready links and images, plus earnings, statements and PayPal payouts.
+- **Tech:** build on our API. You get self-serve API keys, our product feed and Sign in with Anointed Automation.
+- **Both:** everything above.
+
+Getting access:
+
+1. Apply at [https://www.anointedautomation.net/partners/apply](https://www.anointedautomation.net/partners/apply).
+   We email you either way.
+2. Once approved, sign in at [https://www.anointedautomation.net/partner/sign-in](https://www.anointedautomation.net/partner/sign-in)
+   with the SAME email you applied with. That page never creates an account, so if you do not have one yet,
+   create it first at [https://www.anointedautomation.net/signup](https://www.anointedautomation.net/signup) with
+   that email.
+3. Your portal is [https://www.anointedautomation.net/partner](https://www.anointedautomation.net/partner). Pick a
+   tab at the top: **Earnings**, **Links**, **Ads library** (Ads, Both), **Performance**, **Payouts**, **Keys**
+   and **Sign in** (Tech, Both), **Integration** (Tech, Both).
+
+Keys and sign-in are self-serve for Tech partners: create up to 3 keys on the [**Keys** tab](https://www.anointedautomation.net/partner?tab=keys) and turn on sign-in
+for a key on the [**Sign in** tab](https://www.anointedautomation.net/partner?tab=signin). Every change is confirmed with a code we email you, and each new key or client
+secret is shown once.
+
+More: [Partner portal guide](./docs/PARTNER_PORTAL.md) (tracked links, ads library, earnings, statements,
+payouts) and the [Sign in with Anointed Automation guide](./docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md).
+
 ## Repository layout
 
 Code is grouped by language. Each language folder builds and tests on its own.
@@ -23,7 +51,7 @@ Code is grouped by language. Each language folder builds and tests on its own.
 |---|---|---|
 | [`dotnet/`](./dotnet) | The .NET solution (`AnointedAutomation.sln`), every NuGet package and its tests | `cd dotnet && dotnet test AnointedAutomation.sln` |
 | [`js/`](./js) | JavaScript / TypeScript packages, one folder per npm package | `cd js/<package> && npm test` |
-| [`docs/`](./docs) | Design specs and plans | |
+| [`docs/`](./docs) | Partner guides, design specs and plans | |
 
 ## JavaScript packages
 

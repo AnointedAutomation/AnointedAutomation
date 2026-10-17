@@ -2,7 +2,7 @@
 
 Jesus is King ✝️
 
-A practical guide for clients and partners who want a "Sign in with Anointed Automation" button on their own
+A practical guide for partners who want a "Sign in with Anointed Automation" button on their own
 site or app. Anointed Automation is a standard OpenID Connect (OIDC) provider, so any OIDC library works; for
 Node, Deno and edge runtimes there is a ready-made kit, [`@anointedautomation/sso`](../js/anointed-sso), and for
 iOS and macOS apps the Swift package [`AnointedSSO`](../swift/AnointedSSO).
@@ -25,37 +25,61 @@ the next refresh or userinfo call.
 
 ## 2. How to get access
 
-Sign-in is not self-service. It is a capability switched on for one of your Anointed Automation API keys, and
-only the Anointed Automation owner can do that.
+Sign-in is self-serve for **Tech** and **Both** partners. It is a capability you switch on for one of your own
+Anointed Automation API keys, from the partner portal. Every change is confirmed with a code we email to your
+account email.
 
-1. **Ask Anointed Automation.** Email the owner with your app's name, the exact callback URL(s) your server
-   will use, the scopes you need (start with `openid email`), and optionally a post-logout redirect URL and a
-   back-channel logout URL.
-2. **The owner creates or approves your API key** in the admin console (Admin > API Keys). The key's client
-   name is your partner slug, and a partner record with that slug must already exist. Partner keys normally
-   get the `partner` preset (product feed, user provisioning, store-credit rewards, read of your own
-   earnings); sign-in is NOT a scope and is not part of any preset.
-3. **The owner switches on sign-in for that key** (Admin > API Keys > your key > Sign-in) and enters your
-   exact callback URLs and allowed scopes.
+**Step 1: become a partner.** Apply at
+[https://www.anointedautomation.net/partners/apply](https://www.anointedautomation.net/partners/apply) and pick
+**Tech** or **Both**. We read every application and email you either way. Ads partners do not get keys or
+sign-in. See the [partner portal guide](./PARTNER_PORTAL.md) for the full sign-up steps.
 
-Be clear about what you can and cannot do yourself:
+**Step 2: sign in to the portal.** Open
+[https://www.anointedautomation.net/partner/sign-in](https://www.anointedautomation.net/partner/sign-in) and use
+the same email we approved. That page only signs in an existing account, so create your account with that email
+first at [https://www.anointedautomation.net/signup](https://www.anointedautomation.net/signup) if you have not.
+You land on the portal at [https://www.anointedautomation.net/partner](https://www.anointedautomation.net/partner).
 
-- Keys and permissions are **never granted automatically**. Every key, every scope and the sign-in
-  capability are set by the owner, by hand.
-- You **cannot** add scopes, add callback URLs, or turn sign-in on. Ask the owner for any change.
-- The **partner portal** only shows your keys (prefix, scopes, state, and your sign-in client_id and
-  registered URLs) and lets you **rotate** a key or the sign-in client secret. A rotation keeps exactly the
-  same permissions, callback URLs and client_id; it only replaces the secret. Rotation is confirmed with a
-  code emailed to your account address, and the owner is notified.
-- If the owner disables or deletes your key, or turns sign-in off, your app stops working at once: every user
-  grant is revoked and your back-channel logout URL (if any) is notified.
+**Step 3: create an API key** ([portal > **Keys** tab](https://www.anointedautomation.net/partner?tab=keys)).
+
+1. Tick only the permissions your app needs. You can pick any of the partner permissions:
+   `partner-feed:read` (product feed and ad picks), `partner:users:provision` (create shopper accounts),
+   `store-credit:grant` (store credit rewards) and `partner:self:read` (your own earnings and payouts).
+2. Press **Email me a code to create the key**, then enter the code from your email (it works for 15 minutes).
+3. Copy the new key right away. We show it **once** and never again.
+
+You can have up to **3** active keys. Revoke one on the same tab to make room. A revoked key stops working at
+once, and so does its sign-in.
+
+**Step 4: turn on sign-in** ([portal > **Sign in** tab](https://www.anointedautomation.net/partner?tab=signin)). Each active key has its own card:
+
+1. **Callback URLs:** one per line, exact `https` URLs, up to 10.
+2. **After sign out URLs** (optional): where we may send people after they sign out, exact `https`.
+3. **Back-channel logout URL** (optional, `https`): we call it when someone signs out or disconnects your app
+   (section 6). Tick **Send the session id** if you want `sid` in every logout token.
+4. **Share email / Share profile:** the scopes your app may ask for.
+5. Press **Email me a code to turn it on** (or **to save** for later edits) and confirm with the emailed code.
+
+The first time you turn sign-in on, the answer shows your **client secret once**. Copy it into your server's
+secret store right away. The card then shows your `client_id`. Use the same tab to change URLs or scopes later,
+or to turn sign-in off.
+
+Good to know:
+
+- You only manage keys that belong to your partner account. Keys are never granted automatically.
+- Sign-in is not a scope and is not part of any key permission. It is switched on per key.
+- The `sessions:status` permission (for the session status check in the .NET section) is not in the self-serve list. Ask us and we add
+  it to your key.
+- Turning sign-in off, revoking the key, or us disabling it stops your app at once: every user grant is revoked
+  and your back-channel logout URL (if any) is notified.
+- Every change emails us a heads up too, so we can spot anything odd.
 
 ## 3. What you receive
 
 | Item | Value |
 |---|---|
 | `client_id` | `aa_<your key id>`. It never changes, not even when your key is rotated |
-| `client_secret` | Shown **once**, when sign-in is first enabled or the secret is rotated. Anointed Automation stores only a hash and can never show it again |
+| `client_secret` | Shown **once** in the portal, when sign-in is first turned on or the secret is rotated. Anointed Automation stores only a hash and can never show it again |
 | Issuer | `https://api.anointedautomation.net/` |
 | Discovery | `https://api.anointedautomation.net/.well-known/openid-configuration` |
 
@@ -72,12 +96,12 @@ If you lose the secret, rotate it (section 6). Nobody can read the old one back.
 - **Flow:** Authorization Code with PKCE only. `code_challenge_method=S256` is required; `plain` is rejected.
   No implicit flow, no password grant, no client credentials.
 - **`state` is required** on every authorize request.
-- **Redirect URIs** are exact string matches against what the owner registered: absolute `https` URLs, no
+- **Redirect URIs** are exact string matches against the callback URLs you registered on the **Sign in** tab: absolute `https` URLs, no
   fragment, no wildcards. A trailing slash or a different port is a different URI. Plain `http`, including
   `localhost`, cannot be registered; test against an https tunnel or staging host.
 - **Client authentication** at the token endpoint uses your `client_id` and `client_secret`.
 - **Scopes:** `openid` (always), `email`, `profile`, `offline_access`. Your client can use `openid`,
-  `offline_access`, and whichever of `email` and `profile` the owner enabled for it.
+  `offline_access`, and whichever of `email` and `profile` you ticked for it on the **Sign in** tab.
 
 ### Node, Deno and edge: `@anointedautomation/sso`
 
@@ -305,20 +329,20 @@ Checklist:
 - [ ] Users who signed up only through Anointed Automation have another way back in (email reset or a local
       password).
 
-**Rotating the client secret.** In the partner portal, request a rotation of the sign-in client secret (or of
+**Rotating the client secret.** In the partner portal (**Keys** tab, "If your key leaks"), request a rotation of the sign-in client secret (or of
 the whole API key, optionally with a new sign-in secret). A code is emailed to your account address; confirm
 it and the new secret is shown once. The `client_id`, callback URLs, scopes and every user's grant stay the
-same. Deploy the new secret promptly: the old one stops working at once. You can also ask the owner to rotate
-it for you. A full key rotation can keep the old API key working for 24 hours; the sign-in secret has no
+same. Deploy the new secret promptly: the old one stops working at once. We can also rotate it for you if you
+are locked out. A full key rotation can keep the old API key working for 24 hours; the sign-in secret has no
 overlap.
 
 **How users revoke your app.** A signed-in user opens Settings > **Connected apps** on anointedautomation.net
-and disconnects your app, or signs out of every connected app at once. The owner can also revoke a user's
-grants from the admin console. Revocation kills that user's refresh and access tokens for your app.
+and disconnects your app, or signs out of every connected app at once. We can also revoke a user's
+grants. Revocation kills that user's refresh and access tokens for your app.
 
-**Back-channel logout.** If you gave the owner a back-channel logout URL (https, exact, no wildcards), we POST
+**Back-channel logout.** If you set a back-channel logout URL on the **Sign in** tab (https, exact, no wildcards), we POST
 a signed Logout Token (`logout_token` form field) to it whenever a user's grant ends: the user disconnects your
-app or signs out of all apps, an admin revokes it, the account is deleted or merged, or your app is disabled.
+app or signs out of all apps, we revoke it, the account is deleted or merged, or your app is disabled.
 The token carries `sub`, `sid` and the back-channel logout event. End every session for that `sub` or `sid`,
 drop any refresh token you hold, and ignore a `jti` you already processed. Failed deliveries are retried with
 backoff (30 seconds doubling up to 6 hours, 12 attempts). The kit's `backchannelLogout` handler and
@@ -326,16 +350,16 @@ backoff (30 seconds doubling up to 6 hours, 12 attempts). The kit's `backchannel
 do the validation for you.
 
 **Sign-out.** To end the user's session at Anointed Automation too, redirect to the end session endpoint
-(`client.buildLogoutUrl()` in the kit). A `post_logout_redirect_uri` must be one the owner registered.
+(`client.buildLogoutUrl()` in the kit). A `post_logout_redirect_uri` must be one of the after sign out URLs you registered.
 
 ## 7. Troubleshooting
 
 | Symptom | Cause and fix |
 |---|---|
-| `redirect_uri` mismatch (`invalid_request` at authorize) | The URL you send is not an exact match for a registered one. Compare scheme, host, port, path and trailing slash. Only the owner can add a URL, and it must be https |
-| `invalid_client` | Wrong or rotated `client_secret`, wrong `client_id`, or sign-in was turned off / the key was disabled or deleted. Check the portal's integration view for your client_id; rotate the secret if unsure |
-| `unauthorized_client` at authorize | Sign-in is turned off for this app. Ask the owner |
-| Scope rejected at authorize | You requested a scope the owner did not enable for your client. Request less, or ask for it |
+| `redirect_uri` mismatch (`invalid_request` at authorize) | The URL you send is not an exact match for a registered one. Compare scheme, host, port, path and trailing slash. Add the exact URL on the portal **Sign in** tab (https only) |
+| `invalid_client` | Wrong or rotated `client_secret`, wrong `client_id`, or sign-in was turned off / the key was disabled or deleted. Check the portal **Sign in** tab for your client_id; rotate the secret if unsure |
+| `unauthorized_client` at authorize | Sign-in is turned off for this app. Turn it on again on the portal **Sign in** tab |
+| Scope rejected at authorize | You requested a scope you did not tick for your client. Request less, or tick it on the **Sign in** tab |
 | `invalid_grant` on the code exchange | The code is older than 2 minutes, was already used, or `redirect_uri` / `code_verifier` does not match the authorize request |
 | `invalid_grant` on refresh | The user disconnected your app or was banned, or the refresh token expired or was already used. Sign the user in again |
 | `state` mismatch (`state_mismatch`, `flow_missing`, `flow_expired` in the kit) | Stale tab, blocked or cross-site cookies, or the flow cookie expired (10 minutes in the kit). Restart sign-in; make sure the callback is on the same site that set the cookie |
@@ -344,4 +368,4 @@ do the validation for you.
 | `email_not_verified` (kit) | The user has no verified email. Ask them to verify it at Anointed Automation, or handle the no-email case yourself |
 | HTTP 429 from the token endpoint | More than 30 token requests per minute from one IP. Back off and retry |
 
-Still stuck? Email the owner with your `client_id`, the time of the failure (UTC) and the exact error.
+Still stuck? Reach us through [https://www.anointedautomation.net/services](https://www.anointedautomation.net/services) with your `client_id`, the time of the failure (UTC) and the exact error.

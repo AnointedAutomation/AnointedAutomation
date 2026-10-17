@@ -25,14 +25,18 @@ from browser or mobile code.
 
 ### 1. Get your credentials
 
-Sign-in is a capability on your existing Anointed Automation partner API key. We enable it for you
-(Admin > API Keys > your key > **Sign-in**) and send you:
+Sign-in is self-serve for Tech partners. Apply at https://www.anointedautomation.net/partners/apply, then in
+the partner portal (https://www.anointedautomation.net/partner): create an API key on the [**Keys** tab](https://www.anointedautomation.net/partner?tab=keys), and on
+the [**Sign in** tab](https://www.anointedautomation.net/partner?tab=signin) turn sign-in on for that key with your callback URLs. Confirm with the code we email you.
+You get:
 
 - `client_id`: `aa_<your key id>`
-- `client_secret`: shown exactly once, sent over a private channel. Store it only in your server's
-  secret store. If it leaks, ask us to rotate it.
+- `client_secret`: shown exactly once in the portal. Store it only in your server's secret store. If it
+  leaks, rotate it on the **Keys** tab.
 
-Tell us your exact callback URL(s): absolute `https` only, exact match, no fragment, no wildcards. Plain
+Steps in detail: [How to get access](../../docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md#2-how-to-get-access).
+
+Callback URLs are absolute `https` only, exact match, no fragment, no wildcards. Plain
 `http`, including `localhost`, cannot be registered; for local development use an https tunnel or a staging
 host. (The kit itself accepts an `http://localhost` redirect URI only so it can run against a local test
 provider; Anointed Automation will refuse it.)

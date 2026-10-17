@@ -12,7 +12,7 @@
     <Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
     <Description>Sign in with Anointed Automation for ASP.NET Core: an OpenID Connect handler preset (authorization code + PKCE S256, verified email only), a back-channel logout endpoint with Logout Token validation and replay protection, and a fail-open session status client.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <PackageTags>aspnetcore;openid-connect;oidc;sso;authentication;backchannel-logout;pkce;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.SSO</PackageReleaseNotes>
     <Authors>Anointed Automation LLC, Alexander Fields</Authors>
