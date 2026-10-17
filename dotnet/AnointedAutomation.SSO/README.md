@@ -27,13 +27,16 @@ device. Use it in your ASP.NET Core server.
 
 ### 1. Get your credentials
 
-Sign-in is a capability on your existing Anointed Automation partner API key. We enable it for you and send you:
+Sign-in is self-serve for Tech partners. Apply at https://www.anointedautomation.net/partners/apply, then in
+the partner portal (https://www.anointedautomation.net/partner): create an API key on the **Keys** tab, and on
+the **Sign in** tab turn sign-in on for that key with your exact callback URL(s) (absolute `https`, exact match,
+no wildcards) and, if you want back-channel logout, your back-channel logout URL. Confirm with the code we email
+you. You get:
 
 - `client_id`: `aa_<your key id>`
-- `client_secret`: shown exactly once, sent over a private channel. Store it only in your server's secret store.
+- `client_secret`: shown exactly once in the portal. Store it only in your server's secret store.
 
-Tell us your exact callback URL(s) (absolute `https`, exact match, no wildcards) and, if you want back-channel
-logout, your back-channel logout URL.
+Steps in detail: [How to get access](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md#2-how-to-get-access).
 
 ### 2. Install
 
@@ -190,7 +193,8 @@ instance, register your own `IAnointedLogoutReplayStore` (for example over Redis
 `IAnointedSessionStatus.CheckAsync(userId, grant, cancellationToken)` asks
 `GET https://api.anointedautomation.net/api/session-status?userId=<sub>&grant=<true|false>` whether a session
 may continue. Pass `grant: true` for a session that came from Sign in with Anointed Automation (it also ends
-when the user disconnected your app). Your API key needs the `sessions:status` scope.
+when the user disconnected your app). Your API key needs the `sessions:status` scope. It is not in the
+self-serve permission list, so ask us to add it to your key.
 
 The client exchanges your API key for a machine token at `POST /api/auth/machine-token`, caches it until shortly
 before it expires, re-exchanges it once on a 401, times out each request after 3 seconds, and reuses each answer

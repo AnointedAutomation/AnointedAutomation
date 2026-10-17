@@ -13,6 +13,7 @@ Open-source .NET / NuGet libraries by Anointed Automation, LLC, stewarded by Ale
 - Publishing: Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org.
 - File header: every source file starts with the Anointed copyright line ending in "Jesus is King ✝️" (see CONTRIBUTING.md)
 - Machine-readable: llms.json. Short index: llms.txt.
+- Partners (Ads, Tech or Both): apply at https://www.anointedautomation.net/partners/apply; once approved, sign in at https://www.anointedautomation.net/partner/sign-in with the same email (create the account at /signup first) and use the portal at https://www.anointedautomation.net/partner. Tech partners create up to 3 API keys and turn on Sign in with Anointed Automation themselves (Keys and Sign in tabs, confirmed with an emailed code). Guides: docs/PARTNER_PORTAL.md, docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md.
 
 ## Packages
 
@@ -360,6 +361,7 @@ long? id = customer.Id;
 (authorization code + PKCE S256, state, nonce, RS256 ID tokens validated against the JWKS, RFC 9207 `iss` check,
 back-channel logout). Default scope `openid email`; requesting `profile` makes users without a handle pick a
 username first. Key users on `sub`, never email.
+Credentials (`client_id` `aa_<key id>`, client secret shown once) are self-serve for Tech partners in the partner portal.
 
 ```js
 import { ANOINTED_ISSUER, createAnointedClient, createExpressHandlers } from "@anointedautomation/sso";

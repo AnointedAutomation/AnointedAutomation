@@ -91,8 +91,9 @@ app.get("/auth/anointed/app-done", (req, res) => {
 Send the person back with `?error=<code>` (keeping `aa_state`) to fail the sign-in; the app gets
 `AnointedSignInError.serverError(code)`.
 
-Credentials (`client_id` = `aa_<your key id>`, the secret, your https callback URL): see the
-[full guide](../../docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md).
+Credentials (`client_id` = `aa_<your key id>`, the secret, your https callback URL) are self-serve for Tech
+partners in the partner portal (**Keys** and **Sign in** tabs, confirmed with an emailed code). See
+[How to get access](../../docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md#2-how-to-get-access).
 
 ## Releasing
 
