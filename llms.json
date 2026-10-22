@@ -481,6 +481,39 @@
         "safeReturnTo"
       ],
       "notes": "Issuer https://api.anointedautomation.net/. Default scope openid email; profile forces users without a handle to pick a username. Key users on sub. client_id is aa_<partner key id>; the secret stays server side."
+    },
+    {
+      "id": "@anointedautomation/sso-react",
+      "version": "0.1.0",
+      "runtime": "Browser and SSR, React 18+ (peer dependency)",
+      "published": false,
+      "description": "React companion for Sign in with Anointed Automation: an accessible sign-in button and a useAnointedSignIn hook that navigate the browser to the partner server's start route. No secrets client side.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-react/README.md",
+      "dependencies": [],
+      "keyExports": [
+        "AnointedSignInButton",
+        "useAnointedSignIn",
+        "buildStartUrl"
+      ],
+      "notes": "startUrl is required (no default). The server side is @anointedautomation/sso."
+    },
+    {
+      "id": "@anointedautomation/sso-next",
+      "version": "0.1.0",
+      "runtime": "Next.js App Router, Node 18+ (server only)",
+      "published": false,
+      "description": "Next.js App Router start, callback and back-channel logout route handlers built on @anointedautomation/sso.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-next",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-next/README.md",
+      "dependencies": [
+        "@anointedautomation/sso"
+      ],
+      "keyExports": [
+        "createAnointedRouteHandlers",
+        "redirectTo"
+      ],
+      "notes": "On first sign-in call client.takeNewUserPassword(sub) and store a hash; never create a null-password account. Env vars: ANOINTED_OAUTH_ISSUER, ANOINTED_OAUTH_CLIENT_ID, ANOINTED_OAUTH_CLIENT_SECRET, ANOINTED_OAUTH_REDIRECT_URI."
     }
   ],
   "swiftPackages": [

@@ -221,6 +221,8 @@ AnointedAutomation/
 │   ├── version-increment.yml     PR version bumps     (working-directory: dotnet)
 │   ├── rebase-develop.yml        develop <- master sync
 │   ├── js-anointed-sso.yml       JS kit: Node 18/20/22/24, Deno, d.ts type check
+│   ├── js-anointed-sso-react.yml React kit: Node 18-24, d.ts type check
+│   ├── js-anointed-sso-next.yml  Next kit: Node 18-24, d.ts type check
 │   ├── swift-anointed-sso.yml    Swift kit: swift test (macOS) + iOS build
 │   └── swift-sso-release.yml     tags master from swift/AnointedSSO/VERSION
 ├── dotnet/
@@ -231,6 +233,8 @@ AnointedAutomation/
 │   └── AnointedAutomation.Objects.Demo/      console demo (not packed)
 ├── js/
 │   ├── README.md
+│   ├── anointed-sso-react/                   @anointedautomation/sso-react
+│   ├── anointed-sso-next/                    @anointedautomation/sso-next
 │   └── anointed-sso/                         @anointedautomation/sso
 │       ├── src/            client.js, jwt.js, crypto.js, encoding.js, cookies.js, errors.js, index.js
 │       │   └── adapters/   web.js (Request -> Response), express.js (node:http)

@@ -4,7 +4,10 @@ Jesus is King ✝️
 
 [![Build and Test](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/build-and-test.yml)
 [![JS anointed-sso](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso.yml)
+[![JS anointed-sso-react](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso-react.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso-react.yml)
+[![JS anointed-sso-next](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso-next.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/js-anointed-sso-next.yml)
 [![Swift AnointedSSO](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/swift-anointed-sso.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/swift-anointed-sso.yml)
+[![Android AnointedSSO](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/android-anointed-sso.yml/badge.svg)](https://github.com/AnointedAutomation/AnointedAutomation/actions/workflows/android-anointed-sso.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE)
 
 Open source libraries from [Anointed Automation](https://anointedautomation.net), MIT licensed. The .NET
@@ -61,7 +64,10 @@ Adding "Sign in with Anointed Automation" to your own site? Start with the
 | Package | What it does |
 |---|---|
 | [@anointedautomation/sso](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso) | "Sign in with Anointed Automation": a dependency-free OpenID Connect client (code + PKCE) for Node 18+, Deno (Base44) and edge runtimes, with Express and Web (Next.js, Base44) adapters. Not on npm yet |
+| [@anointedautomation/sso-react](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react) | React button and `useAnointedSignIn` hook for "Sign in with Anointed Automation"; sends the browser to your server's start route, no secrets client side. Not on npm yet |
+| [@anointedautomation/sso-next](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-next) | Next.js App Router route handlers (`start`, `callback`, `backchannelLogout`) built on `@anointedautomation/sso`. Not on npm yet |
 | [AnointedSSO (Swift)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO) | "Sign in with Anointed Automation" for iOS 15+ and macOS 12+ apps (Swift Package Manager): the system sign-in sheet against your server, which keeps the secret. SwiftUI button included |
+| [AnointedSSO (Android)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/android/AnointedSSO) | "Sign in with Anointed Automation" for Android 7.0+ (API 24) apps (Kotlin, Custom Tabs): opens your server, which keeps the secret, and checks the returned state. Jetpack Compose button included. Consume from source or JitPack |
 
 ## .NET packages
 
