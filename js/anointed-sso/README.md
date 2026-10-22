@@ -203,6 +203,7 @@ missing or invalid value (fail fast). `redirectUri` is a string or a function of
 | `refresh(refreshToken, { expectedSub? })` | New tokens (needs `offline_access`). Refresh tokens rotate: store the new one |
 | `revoke(token, { tokenTypeHint? })` | RFC 7009 revocation. Call it on sign-out when you hold a refresh token |
 | `fetchUserInfo(accessToken)` | Standard OIDC claims for the approved scopes |
+| `takeNewUserPassword(sub)` | Server only. The password we generated for a NEW user's account on your site, or `null` for a returning user. See "New accounts get a password" |
 | `buildLogoutUrl({ idTokenHint?, postLogoutRedirectUri?, state? })` | Provider logout URL |
 | `verifyLogoutToken(logoutToken, { maxAgeSeconds? })` | Validates a back-channel Logout Token; returns `{ sub, sid, jti, exp }` |
 | `validateReturnTo(value)` | The safe return target (path or allowlisted URL) or `null` |
@@ -258,6 +259,26 @@ generic message; `error.message` is for your logs only.
 | `discovery`, `http` | We could not be reached | Retry later |
 | `config` | Your configuration is wrong | Fix it; thrown at startup (or at the exchange when `clientSecret` is missing) |
 | `redirect_uri_rejected` | A per-request redirect URI was not https or not on `allowedRedirectUris` | Refuse; check the `Host` the request arrived with |
+
+## New accounts get a password
+
+Never create a local account with a null password. On a user's first ever sign-in to your app we generate a
+password for their account on YOUR site and show it to them once on our consent screen ("This is your password
+for <your app>. You will only be shown it once."), so they can also sign in to your site directly with their
+email and that password.
+
+Right after `handleCallback`, when you create the local account, take it and store your own hash:
+
+```js
+const password = await client.takeNewUserPassword(user.sub); // null for a returning user
+if (password !== null) {
+  await createLocalUser({ sub: user.sub, email: user.email, passwordHash: await hash(password) });
+}
+```
+
+It can be taken exactly once and expires about 15 minutes after the user consents. We do not keep it, so we can
+never show it again: a user who loses it changes it on your site. Users who already had an account on your site
+before this keep their existing login and change their password on your site.
 
 ## Back-channel logout
 
