@@ -694,6 +694,49 @@ export function createAnointedClient(config) {
   }
 
   /**
+   * @summary    The password we generated for a NEW user's account on your site (server only).
+   * @description On a user's first ever "Sign in with Anointed Automation" to your app, we create a password for
+   *   their account on YOUR site and show it to them once. Call this right after `handleCallback` when you create
+   *   the local account, hash the result with your own password hasher and store that hash: never create an
+   *   account with a null password. It can be taken exactly once and expires about 15 minutes after consent.
+   *   Returns null for a returning user (or when it was already taken or expired). Needs `clientSecret`.
+   * @param {string} sub The user's `sub` (from `handleCallback`'s `user.sub` / claims).
+   * @returns {Promise<string | null>}
+   */
+  async function takeNewUserPassword(sub) {
+    if (typeof sub !== "string" || sub === "") throw new AnointedSsoError("config", "sub is required");
+    if (clientSecret === null) {
+      throw new AnointedSsoError("config", "clientSecret is required to take a new user's password (server only)");
+    }
+    const url = `${issuer.replace(/\/+$/, "")}/api/oauth/partner-password`;
+    let response;
+    try {
+      response = await fetchImpl(url, {
+        method: "POST",
+        headers: { "content-type": "application/json", accept: "application/json" },
+        body: JSON.stringify({ clientId, clientSecret, subject: sub }),
+      });
+    } catch (err) {
+      throw new AnointedSsoError("http", `${url} request failed: ${err instanceof Error ? err.message : String(err)}`, {
+        cause: err,
+      });
+    }
+    if (response.status === 404) return null;
+    const text = await response.text();
+    if (!response.ok) throw new AnointedSsoError("http", `${url} -> ${response.status}`, { status: response.status });
+    let envelope;
+    try {
+      envelope = JSON.parse(text);
+    } catch {
+      throw new AnointedSsoError("http", `${url} returned invalid JSON`);
+    }
+    const data = isPlainObject(envelope) ? envelope.Data : undefined;
+    const password = isPlainObject(data) ? data.Password : undefined;
+    if (typeof password !== "string" || password === "") throw new AnointedSsoError("http", `${url} response has no password`);
+    return password;
+  }
+
+  /**
    * @summary    The provider logout (end session) URL to send the browser to.
    * @param {{idTokenHint?: string, postLogoutRedirectUri?: string, state?: string}} [opts]
    * @returns {Promise<string>}
@@ -786,6 +829,7 @@ export function createAnointedClient(config) {
     refresh,
     revoke,
     fetchUserInfo,
+    takeNewUserPassword,
     buildLogoutUrl,
     verifyLogoutToken,
     decodeFlowCookie,

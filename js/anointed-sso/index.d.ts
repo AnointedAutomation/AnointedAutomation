@@ -192,6 +192,8 @@ export interface AnointedClient {
   refresh(refreshToken: string, opts?: { expectedSub?: string }): Promise<{ tokens: AnointedTokens; claims: Record<string, unknown> | null }>;
   revoke(token: string, opts?: { tokenTypeHint?: "refresh_token" | "access_token" }): Promise<void>;
   fetchUserInfo(accessToken: string): Promise<Record<string, unknown> & { sub: string }>;
+  /** The password we generated for a NEW user's account on your site; null for a returning user. Server only; take it once and store your own hash. */
+  takeNewUserPassword(sub: string): Promise<string | null>;
   buildLogoutUrl(opts?: { idTokenHint?: string; postLogoutRedirectUri?: string; state?: string }): Promise<string>;
   verifyLogoutToken(logoutToken: string, opts?: { maxAgeSeconds?: number }): Promise<LogoutNotice>;
   decodeFlowCookie(value: unknown): FlowCookie | null;

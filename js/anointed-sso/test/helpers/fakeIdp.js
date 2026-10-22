@@ -49,6 +49,8 @@ export async function startFakeIdp() {
     refreshTokens: new Map(),
     accessTokens: new Map(),
     revoked: [],
+    // sub -> password waiting for the partner pull (POST /api/oauth/partner-password), taken once.
+    partnerPasswords: new Map(),
     tokenRequests: [],
     discoveryFetches: 0,
     jwksFetches: 0,
@@ -119,7 +121,8 @@ export async function startFakeIdp() {
 
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, issuer);
-    const body = req.method === "POST" ? new URLSearchParams(await readBody(req)) : new URLSearchParams();
+    const raw = req.method === "POST" ? await readBody(req) : "";
+    const body = new URLSearchParams(raw);
 
     if (url.pathname === "/.well-known/openid-configuration") {
       state.discoveryFetches += 1;
@@ -218,6 +221,16 @@ export async function startFakeIdp() {
       state.refreshTokens.delete(body.get("token"));
       res.writeHead(200);
       return res.end();
+    }
+    if (url.pathname === "/api/oauth/partner-password") {
+      const pull = JSON.parse(raw);
+      if (pull.clientId !== CLIENT_ID || pull.clientSecret !== CLIENT_SECRET) {
+        return json(res, 401, { success: false, Message: "Invalid client credentials." });
+      }
+      const password = state.partnerPasswords.get(pull.subject);
+      if (password === undefined) return json(res, 404, { success: false, Message: "No password is waiting for this user." });
+      state.partnerPasswords.delete(pull.subject);
+      return json(res, 200, { success: true, Data: { Password: password } });
     }
     return json(res, 404, { error: "not_found" });
   });

@@ -514,3 +514,26 @@ test("verifyLogoutToken rejects every rule the spec requires", async () => {
     await rejectsWith(client.verifyLogoutToken(token), "logout_token_invalid");
   }
 });
+
+test("takeNewUserPassword returns a new user's password once, then null", async () => {
+  const client = makeClient();
+  idp.state.partnerPasswords.set("new-user", "Gen-Pw-7xQ2mZ9kT4abc");
+  assert.equal(await client.takeNewUserPassword("new-user"), "Gen-Pw-7xQ2mZ9kT4abc");
+  assert.equal(await client.takeNewUserPassword("new-user"), null);
+});
+
+test("takeNewUserPassword is null for a returning user", async () => {
+  const client = makeClient();
+  assert.equal(await client.takeNewUserPassword("returning-user"), null);
+});
+
+test("takeNewUserPassword needs the client secret and a sub", async () => {
+  await assert.rejects(makeClient({ clientSecret: undefined }).takeNewUserPassword("x"), (err) => err.code === "config");
+  await assert.rejects(makeClient().takeNewUserPassword(""), (err) => err.code === "config");
+});
+
+test("takeNewUserPassword surfaces a credential failure as http 401", async () => {
+  const client = makeClient({ clientSecret: "wrong-secret" });
+  idp.state.partnerPasswords.set("new-user-2", "Gen-Pw-abc");
+  await assert.rejects(client.takeNewUserPassword("new-user-2"), (err) => err.code === "http" && err.status === 401);
+});

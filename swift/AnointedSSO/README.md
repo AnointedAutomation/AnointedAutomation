@@ -95,6 +95,14 @@ Credentials (`client_id` = `aa_<your key id>`, the secret, your https callback U
 partners in the partner portal ([**Keys**](https://www.anointedautomation.net/partner?tab=keys) and [**Sign in**](https://www.anointedautomation.net/partner?tab=signin) tabs, confirmed with an emailed code). See
 [How to get access](../../docs/SIGN_IN_WITH_ANOINTED_AUTOMATION.md#2-how-to-get-access).
 
+## New accounts get a password (server side)
+
+On a person's first ever sign-in to your app, Anointed Automation generates a password for their account on
+YOUR service and shows it to them once on the consent screen. Your server (never the app: it needs the client
+secret) takes it once with `client.takeNewUserPassword(user.sub)` from
+[`@anointedautomation/sso`](../../js/anointed-sso#new-accounts-get-a-password) right after the callback, and
+stores its own hash. Never create the account with a null password. Nothing changes in the app.
+
 ## Releasing
 
 Bump `swift/AnointedSSO/VERSION` (MAJOR.MINOR.PATCH) and merge to `master`. The `Swift AnointedSSO release`
