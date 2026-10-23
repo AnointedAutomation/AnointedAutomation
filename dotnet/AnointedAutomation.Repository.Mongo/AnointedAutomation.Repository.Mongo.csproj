@@ -29,8 +29,8 @@
 		<ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Serialization\AnointedAutomation.Serialization.csproj" />
-		<PackageReference Include="MongoDB.Bson" Version="3.12.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="3.12.0" />
+		<PackageReference Include="MongoDB.Bson" Version="3.13.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
 	  <PackageReference Include="MongoDB.Libmongocrypt" Version="1.12.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
