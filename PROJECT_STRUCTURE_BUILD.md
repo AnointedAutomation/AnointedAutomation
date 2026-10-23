@@ -144,6 +144,9 @@ relative to `dotnet/`.
   Jobs: `node` (npm test on Node 18, 20, 22, 24), `deno` (`deno test --allow-net --no-check test/deno/smoke.ts`),
   `types` (`tsc --noEmit --strict` on `index.d.ts`).
 - **Local**: `cd js/anointed-sso && npm test`. The package has no dependencies, so there is no install step.
+- **React / Next kits**: `.github/workflows/js-anointed-sso-react.yml` and `js-anointed-sso-next.yml` (Node 18-24 `npm test`,
+  `tsc` type check); also triggered by changes under `js/anointed-sso/`. Local: `cd js/anointed-sso-react && npm test`
+  (installs react on first run), `cd js/anointed-sso-next && npm test` (links `../anointed-sso`).
 - **Publishing**: `.github/workflows/npm-publish.yml` on push to `master` (paths `js/**`): for each non-private
   `js/*/package.json` whose version is not on npm, `npm test` then `npm publish --access public` over npm
   Trusted Publishing (OIDC, `id-token: write`, npm 11.5.1+). First publish of a new package is manual, then

@@ -369,6 +369,7 @@ Based on the .NET nature of the project:
 - Build (from `dotnet/`): `~/.dotnet/dotnet build`
 - Test (from `dotnet/`): `~/.dotnet/dotnet test`
 - Individual project testing (from `dotnet/`): `~/.dotnet/dotnet test AnointedAutomation.{LibraryName}.Tests/`
+- JS React / Next kits: `cd js/anointed-sso-react && npm test`; `cd js/anointed-sso-next && npm test` (Request objects against the core kit fake IdP).
 - JS SSO kit: `cd js/anointed-sso && npm test` (unit tests + mocked end-to-end flow against
   `test/helpers/fakeIdp.js`), Deno: `deno test --allow-net --no-check test/deno/smoke.ts`
 - Swift SSO kit: `swift test` from the repo root (XCTest, `swift/AnointedSSO/Tests`); CI also builds for iOS

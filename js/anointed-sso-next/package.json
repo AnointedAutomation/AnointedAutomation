@@ -1,0 +1,49 @@
+{
+  "name": "@anointedautomation/sso-next",
+  "version": "0.1.0",
+  "description": "Sign in with Anointed Automation for the Next.js App Router: start, callback and back-channel logout route handlers built on @anointedautomation/sso. Server only.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "pretest": "node scripts/link-sibling.mjs",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@anointedautomation/sso": "^0.2.3"
+  },
+  "keywords": [
+    "anointed-automation",
+    "oidc",
+    "sso",
+    "sign-in",
+    "nextjs",
+    "app-router"
+  ],
+  "author": "Anointed Automation, LLC.",
+  "license": "MIT",
+  "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-next#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnointedAutomation/AnointedAutomation.git",
+    "directory": "js/anointed-sso-next"
+  },
+  "bugs": {
+    "url": "https://github.com/AnointedAutomation/AnointedAutomation/issues"
+  }
+}

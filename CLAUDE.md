@@ -12,8 +12,9 @@ Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 ## Process
 - .NET (run from `dotnet/`): `dotnet restore`, `dotnet build --configuration Release`,
   `dotnet test <Project>.Tests/<Project>.Tests.csproj --configuration Release` (solution: `dotnet/AnointedAutomation.sln`).
-- JS (`js/anointed-sso/`): `npm test` (runs `node --test test/*.test.js`).
+- JS (`js/anointed-sso/`, `js/anointed-sso-react/`, `js/anointed-sso-next/`): `npm test` (runs `node --test test/*.test.js`).
 - Swift (repo root): `swift test`.
+- Android (`android/AnointedSSO/`): `gradle :anointedsso:testDebugUnitTest`.
 - Every source file starts with the Anointed copyright header and ends it with "Jesus is King" (see `CONTRIBUTING.md`).
 - New code needs unit tests. Test projects sit next to each package as `<Package>.Tests`.
 

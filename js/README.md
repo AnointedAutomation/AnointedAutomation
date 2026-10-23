@@ -8,6 +8,8 @@ its own README, tests and CI workflow. The .NET libraries live in [`../dotnet`](
 | Package | What it does |
 |---|---|
 | [@anointedautomation/sso](./anointed-sso) | "Sign in with Anointed Automation": a dependency-free OpenID Connect client (code + PKCE) for Node 18+, Deno (Base44) and edge runtimes, with Express and Web (Next.js, Base44) adapters |
+| [@anointedautomation/sso-react](./anointed-sso-react) | React sign-in button and `useAnointedSignIn` hook that send the browser to your server's start route (no secrets client side) |
+| [@anointedautomation/sso-next](./anointed-sso-next) | Next.js App Router `start` / `callback` / `backchannelLogout` route handlers built on `@anointedautomation/sso` |
 
 ## Publishing
 

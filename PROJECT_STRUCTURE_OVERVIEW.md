@@ -50,11 +50,20 @@ All test projects are organized under a "Tests" solution folder:
 - **@anointedautomation/sso** (`js/anointed-sso/`) - "Sign in with Anointed Automation" OpenID Connect
   client kit for partner apps (Node 18+, Deno/Base44, edge). Dependency-free core, Express and Web adapters,
   runnable Express / Next.js / Base44 examples.
+- **@anointedautomation/sso-react** (`js/anointed-sso-react/`) - React sign-in button and `useAnointedSignIn` hook
+  (browser safe, no secrets; the server uses `@anointedautomation/sso`).
+- **@anointedautomation/sso-next** (`js/anointed-sso-next/`) - Next.js App Router `start` / `callback` /
+  `backchannelLogout` route handlers built on `@anointedautomation/sso`.
 
 ### Swift Package (`swift/`)
 - **AnointedSSO** (`swift/AnointedSSO/`, `Package.swift` at the repo root) - "Sign in with Anointed Automation"
   for iOS 15+ / macOS 12+: system sign-in sheet against the partner's own server (which keeps the secret),
   state check, SwiftUI button. Released by semver tag, listed on Swift Package Index.
+
+### Android Library (`android/`)
+- **AnointedSSO** (`android/AnointedSSO/`, Gradle module `anointedsso`) - "Sign in with Anointed Automation" for
+  Android 7.0+: Custom Tab against the partner's own server (which keeps the secret), state check, Compose button.
+  Consumed from source or JitPack; not on Maven Central.
 
 ### External Dependencies
 - **Google/** - Contains Google OAuth integration objects

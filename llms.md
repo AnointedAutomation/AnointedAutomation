@@ -388,6 +388,42 @@ for Next.js App Router, Base44 and Workers. Failures are `AnointedSsoError` with
 
 ## Swift package
 
+### @anointedautomation/sso-react 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react
+- Runtime: browser and SSR, peer dependency react >=18. No secrets, no OIDC logic. Not on npm yet.
+
+```jsx
+import { AnointedSignInButton, useAnointedSignIn } from "@anointedautomation/sso-react";
+
+<AnointedSignInButton startUrl="/api/auth/anointed/start" returnTo="/dashboard" />;
+const { signIn } = useAnointedSignIn({ startUrl: "/api/auth/anointed/start" }); // signIn("/dashboard")
+```
+
+`startUrl` is required (no default). The partner server (`@anointedautomation/sso`) holds the secret.
+
+### @anointedautomation/sso-next 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-next
+- Runtime: Next.js App Router (Node 18+), server only. Depends on `@anointedautomation/sso`. Not on npm yet.
+
+```js
+import { createAnointedClient } from "@anointedautomation/sso";
+import { createAnointedRouteHandlers, redirectTo } from "@anointedautomation/sso-next";
+
+const anointed = createAnointedRouteHandlers({
+  client: createAnointedClient({ issuer, clientId, clientSecret, redirectUri }),
+  async onSignedIn(result, request, { client }) {
+    const password = await client.takeNewUserPassword(result.user.sub); // null for a returning user
+    // create the local user with a hash of `password` when it is not null, then set YOUR session cookie
+    return redirectTo(request, result.returnTo === null ? "/" : result.returnTo, [sessionCookie]);
+  },
+});
+// app/api/auth/anointed/start/route.js:     export const GET = anointed.start;
+// app/api/auth/anointed/callback/route.js:  export const GET = anointed.callback;
+// .../backchannel-logout/route.js:          export const POST = anointed.backchannelLogout; (needs onLogout)
+```
+
 ### AnointedSSO 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO
@@ -400,6 +436,22 @@ import AnointedSSO
 let signIn = AnointedSignIn(start: URL(string: "https://api.yourapp.com/auth/anointed/start")!,
                             callback: .https(host: "app.yourapp.com", path: "/anointed/done"))
 let items = try await signIn.signIn() // query items your server added, e.g. items["code"]
+```
+
+## Android library
+
+### AnointedSSO (Android) 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/android/AnointedSSO
+- Install: not on Maven Central; include the `anointedsso` module from source or use JitPack. minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
+- The app never holds the client secret: `AnointedSignIn.signIn(activity)` opens the partner's own server start route (`@anointedautomation/sso`) in a Custom Tab; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` that `handleCallback(intent)` checks (constant time).
+- Callbacks: `AnointedCallback.Https(host, path)` (App Link) or `AnointedCallback.Scheme(name, via)` (an https server route that forwards the query to `name://anointed-sign-in`).
+
+```kotlin
+val signIn = AnointedSignIn(Uri.parse("https://api.yourapp.com/auth/anointed/start"),
+                            AnointedCallback.Https("app.yourapp.com", "/anointed/done"))
+signIn.signIn(activity)
+val params = signIn.handleCallback(intent) // query params your server added, e.g. params["code"]
 ```
 
 ## Cross-package recipes

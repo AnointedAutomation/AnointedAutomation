@@ -449,6 +449,27 @@ Deno (Base44 backend functions) and edge runtimes (WebCrypto + global fetch only
 - Examples: `examples/express`, `examples/nextjs`, `examples/base44/functions` (anointedStart, anointedCallback,
   anointedMe).
 
+### @anointedautomation/sso-react v0.1.0 (`js/anointed-sso-react/`)
+React companion to the SSO kit. Browser safe, no secrets: it only navigates to the partner server's start route.
+Peer dependency `react >= 18`; no framework imports (Vite, CRA, Next, Remix).
+
+- `src/AnointedSignInButton.js`: accessible `<button>` with inline brand styling (dropped when `className` is set).
+- `src/useAnointedSignIn.js`: `useAnointedSignIn({ startUrl })` returning `{ signIn(returnTo?) }`.
+- `src/startUrl.js`: `buildStartUrl`, `startUrl` required (fail fast, no default).
+- `index.d.ts`: TypeScript definitions (needs `@types/react`).
+- Tests: `test/*.test.js` (node:test + `react-dom/server`); `npm test` installs dev dependencies on first run.
+
+### @anointedautomation/sso-next v0.1.0 (`js/anointed-sso-next/`)
+Next.js App Router helpers on top of `@anointedautomation/sso` (dependency; reuses `createAnointedClient` and
+`createWebHandlers`, no OIDC logic of its own). Server only.
+
+- `src/routeHandlers.js`: `createAnointedRouteHandlers({ client, onSignedIn, onError?, onLogout?, returnToParam? })`
+  returning `{ start, callback, backchannelLogout }`; `onSignedIn` also receives `{ client }` for
+  `takeNewUserPassword`. `redirectTo(request, target, setCookies?)` builds the 302.
+- `index.d.ts`: TypeScript definitions.
+- Tests: `test/routeHandlers.test.js` against `../anointed-sso/test/helpers/fakeIdp.js`; `scripts/link-sibling.mjs`
+  links `../anointed-sso` for `npm test` while the registry copy is absent.
+
 ## Swift Package (`swift/`)
 
 ### AnointedSSO v0.1.0 (`swift/AnointedSSO/`, manifest `Package.swift` at the repo root)
@@ -464,6 +485,22 @@ that server finishes OIDC and redirects back to the app.
   `ASWebAuthenticationSession` (Apple platforms only).
 - `AnointedSignInButton.swift`: SwiftUI button with the live site logo.
 - Tests: `swift/AnointedSSO/Tests/AnointedSSOTests` (XCTest).
+
+## Android Library (`android/`)
+
+### AnointedSSO v0.1.0 (`android/AnointedSSO/`, Gradle root with module `anointedsso`)
+"Sign in with Anointed Automation" for Android 7.0+ (minSdk 24, compileSdk 35). Mirrors the Swift kit: the app
+never holds the client secret, it opens the partner's OWN server start route in a Custom Tab.
+
+- `AnointedSignInRequest.kt`: pure JVM, testable. Builds the start URL with `returnTo` = callback + `aa_state`
+  (32 SecureRandom bytes, base64url), `parseCallback` checks the callback URL, the state (constant time) and
+  surfaces `?error=`. `AnointedCallback` = `Https(host, path)` (App Link) or `Scheme(scheme, via)`.
+  `AnointedSignInException` codes: config, cancelled, state_mismatch, missing_state, provider_error,
+  no_pending_request, invalid_callback, presentation.
+- `AnointedSignIn.kt`: `signIn(activity)` over `CustomTabsIntent`, `handleCallback(intent)`, pending-state stores
+  (`AnointedMemoryStore`, `AnointedPreferencesStore`).
+- `AnointedSignInButton.kt`: Compose button (optional, `compileOnly` Compose).
+- Tests: `android/AnointedSSO/anointedsso/src/test` (JUnit4). CI: `.github/workflows/android-anointed-sso.yml`.
 
 ## Inter-Library Dependencies
 
