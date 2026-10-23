@@ -48,6 +48,10 @@ dependencies {
     compileOnly("androidx.compose.material3:material3")
 
     testImplementation("junit:junit:4.13.2")
+    // The Compose compiler plugin also compiles the unit tests, and it refuses to run without the Compose runtime on
+    // that classpath (compileOnly does not reach it).
+    testImplementation(platform("androidx.compose:compose-bom:2024.12.01"))
+    testImplementation("androidx.compose.runtime:runtime")
 }
 
 afterEvaluate {
