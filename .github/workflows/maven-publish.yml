@@ -1,0 +1,68 @@
+# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Publishes android/AnointedSSO to Maven Central (com.anointedautomation:anointedsso) when its VERSION is not on
+# Central yet, mirroring npm-publish.yml and nuget-publish.yml. Secrets (repository settings):
+#   MAVEN_CENTRAL_USERNAME / MAVEN_CENTRAL_PASSWORD  - the Central Portal user token (central.sonatype.com)
+#   SIGNING_KEY / SIGNING_KEY_PASSWORD               - ASCII-armored GPG private key and its passphrase
+name: Publish Maven Packages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "android/AnointedSSO/**"
+      - ".github/workflows/maven-publish.yml"
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: android/AnointedSSO
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Check Maven Central for this version
+        id: check
+        run: |
+          set -euo pipefail
+          version="$(tr -d '[:space:]' < VERSION)"
+          url="https://repo1.maven.org/maven2/com/anointedautomation/anointedsso/${version}/anointedsso-${version}.pom"
+          if curl -sfI "$url" >/dev/null; then
+            echo "anointedsso ${version} is already on Maven Central - nothing to publish"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "anointedsso ${version} is not on Maven Central - publishing"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Test
+        if: steps.check.outputs.publish == 'true'
+        run: gradle :anointedsso:testDebugUnitTest --no-daemon
+
+      - name: Publish to Maven Central
+        if: steps.check.outputs.publish == 'true'
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: gradle :anointedsso:publishToMavenCentral --no-daemon --no-configuration-cache

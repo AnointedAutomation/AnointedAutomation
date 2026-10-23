@@ -4,10 +4,10 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
-    id("maven-publish")
+    id("com.vanniktech.maven.publish")
 }
 
-group = "com.github.AnointedAutomation.AnointedAutomation"
+group = "com.anointedautomation"
 version = file("../VERSION").readText().trim()
 
 android {
@@ -31,12 +31,6 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
 }
 
 dependencies {
@@ -54,15 +48,41 @@ dependencies {
     testImplementation("androidx.compose.runtime:runtime")
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            register<MavenPublication>("release") {
-                from(components["release"])
-                groupId = project.group.toString()
-                artifactId = "anointedsso"
-                version = project.version.toString()
+// Maven Central (Central Portal), published by .github/workflows/maven-publish.yml on master. Credentials and the
+// signing key come from ORG_GRADLE_PROJECT_* secrets in CI; a local publishToMavenLocal needs neither.
+mavenPublishing {
+    configure(
+        com.vanniktech.maven.publish.AndroidSingleVariantLibrary(
+            variant = "release",
+            sourcesJar = true,
+            publishJavadocJar = true,
+        ),
+    )
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+    signAllPublications()
+    coordinates("com.anointedautomation", "anointedsso", project.version.toString())
+
+    pom {
+        name.set("AnointedSSO")
+        description.set("Sign in with Anointed Automation for Android apps (OAuth 2.0 + PKCE via Custom Tabs).")
+        url.set("https://github.com/AnointedAutomation/AnointedAutomation")
+        licenses {
+            license {
+                name.set("MIT License")
+                url.set("https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE")
             }
+        }
+        developers {
+            developer {
+                id.set("anointedautomation")
+                name.set("Anointed Automation, LLC")
+                url.set("https://www.anointedautomation.net")
+            }
+        }
+        scm {
+            url.set("https://github.com/AnointedAutomation/AnointedAutomation")
+            connection.set("scm:git:https://github.com/AnointedAutomation/AnointedAutomation.git")
+            developerConnection.set("scm:git:ssh://git@github.com/AnointedAutomation/AnointedAutomation.git")
         }
     }
 }
