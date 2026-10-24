@@ -1,0 +1,6 @@
+// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Type definitions for @anointedautomation/sso-sveltekit/client.
+
+export { default as AnointedSignInButton } from "./AnointedSignInButton.svelte";
+export declare const DEFAULT_LABEL: string;
+export declare function buildStartUrl(startUrl: string, returnTo?: string, returnToParam?: string): string;
