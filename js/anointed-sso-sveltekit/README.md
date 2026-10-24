@@ -121,10 +121,12 @@ export const POST = ({ request }) => anointed.backchannelLogout(request);
 ```
 
 **3. Allow the back-channel POST.** Anointed Automation calls your logout URL server to server with a form
-body and no matching browser `Origin`, which SvelteKit's CSRF origin check rejects with a 403. Allow it in
-`svelte.config.js` (`csrf: { trustedOrigins: [...] }` on recent SvelteKit 2.x, or `csrf: { checkOrigin: false }`
-on older ones; see the [SvelteKit configuration docs](https://svelte.dev/docs/kit/configuration#csrf)). The
-token is verified by signature, issuer, audience and `jti`, so the route does not rely on the origin check. Skip
+body and no browser `Origin` header, which SvelteKit's CSRF origin check rejects with a 403 in production. A
+missing `Origin` never matches a named entry in `trustedOrigins`, so allow it in `svelte.config.js` with
+`kit: { csrf: { trustedOrigins: ['*'] } }` (or the deprecated `kit: { csrf: { checkOrigin: false } }`, removed in
+SvelteKit 3; see the [SvelteKit configuration docs](https://svelte.dev/docs/kit/configuration#csrf)). This turns
+off SvelteKit's origin check for every form POST in the app, so keep your own CSRF protection on other form
+actions. The token is verified by signature, issuer, audience and `jti`, so the route does not rely on the origin check. Skip
 this step if you do not use back-channel logout.
 
 **4. The button** (in any `.svelte` file; it is a link, so it also works without JavaScript)
