@@ -1,0 +1,91 @@
+# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Publishes every package under python/ whose pyproject.toml version is not on PyPI yet, mirroring
+# npm-publish.yml. Auth is PyPI Trusted Publishing (OIDC): no PyPI token is stored. Each project needs a
+# trusted publisher on PyPI (a "pending publisher" before the first release) for owner AnointedAutomation,
+# repository AnointedAutomation, workflow pypi-publish.yml, environment pypi.
+name: Publish PyPI Packages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "python/**"
+      - ".github/workflows/pypi-publish.yml"
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      packages: ${{ steps.find.outputs.packages }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Find packages whose version is not on PyPI
+        id: find
+        run: |
+          set -euo pipefail
+          PACKAGES="[]"
+          for MANIFEST in python/*/pyproject.toml; do
+            DIR=$(dirname "$MANIFEST")
+            NAME=$(python -c "import tomllib,sys;print(tomllib.load(open('$MANIFEST','rb'))['project']['name'])")
+            VERSION=$(python -c "import tomllib,sys;print(tomllib.load(open('$MANIFEST','rb'))['project']['version'])")
+            echo "Checking PyPI for $NAME==$VERSION..."
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://pypi.org/pypi/$NAME/$VERSION/json")
+            if [ "$STATUS" = "200" ]; then
+              echo "  $NAME==$VERSION is already on PyPI - skipping"
+            elif [ "$STATUS" = "404" ]; then
+              echo "  $NAME==$VERSION is not on PyPI - will publish"
+              PACKAGES=$(python -c "import json;p=json.loads('$PACKAGES');p.append('$DIR');print(json.dumps(p))")
+            else
+              echo "Unexpected PyPI status $STATUS for $NAME==$VERSION"
+              exit 1
+            fi
+          done
+          echo "packages=$PACKAGES" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: detect
+    if: needs.detect.outputs.packages != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: pypi
+    permissions:
+      id-token: write   # required for PyPI Trusted Publishing (OIDC)
+      contents: read
+    strategy:
+      max-parallel: 1
+      matrix:
+        package: ${{ fromJSON(needs.detect.outputs.packages) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Test, then build
+        working-directory: ${{ matrix.package }}
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip build
+          python -m pip install ".[test]"
+          python -m pytest
+          python -m build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ matrix.package }}/dist
