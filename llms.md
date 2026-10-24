@@ -349,6 +349,19 @@ Customer customer = JsonConvert.DeserializeObject<Customer>(json);
 long? id = customer.Id;
 ```
 
+### AnointedAutomation.SSO 1.0.2
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO
+- Target: net10.0. Depends on Microsoft.AspNetCore.Authentication.OpenIdConnect, Microsoft.IdentityModel.Protocols.OpenIdConnect.
+
+Sign in with Anointed Automation for ASP.NET Core: an OpenID Connect handler preset (authorization code + PKCE S256, verified email only), a back-channel logout endpoint with Logout Token validation and replay protection, and a fail-open session status client.
+
+```csharp
+builder.Services.AddAuthentication().AddCookie().AddAnointedAutomation(o => { o.ClientId = "aa_..."; o.ClientSecret = secret; });
+builder.Services.AddAnointedSessionStatus(o => { ... });
+app.MapAnointedBackchannelLogout("/auth/anointed/backchannel-logout", async (logout, httpContext) => { ... });
+```
+
 ### AnointedAutomation.SSO.UI 1.0.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.UI

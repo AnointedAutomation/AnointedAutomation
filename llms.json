@@ -435,6 +435,25 @@
       "notes": "Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package."
     },
     {
+      "id": "AnointedAutomation.SSO",
+      "version": "1.0.2",
+      "targetFramework": "net10.0",
+      "description": "Sign in with Anointed Automation for ASP.NET Core: an OpenID Connect handler preset (authorization code + PKCE S256, verified email only), a back-channel logout endpoint with Logout Token validation and replay protection, and a fail-open session status client.",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.SSO",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.SSO/README.md",
+      "dependencies": {
+        "nuget": [
+          "Microsoft.AspNetCore.Authentication.OpenIdConnect",
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect"
+        ],
+        "anointed": []
+      },
+      "keyNamespaces": [
+        "AnointedAutomation.SSO"
+      ]
+    },
+    {
       "id": "AnointedAutomation.SSO.UI",
       "version": "1.0.0",
       "targetFramework": "net10.0",

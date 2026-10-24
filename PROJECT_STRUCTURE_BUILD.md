@@ -17,7 +17,7 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 - **Test**: Runs all test suites with code coverage
 - **Coverage**: Collects XPlat Code Coverage data
 
-**Environment:** Ubuntu-latest, .NET 8.0
+**Environment:** Ubuntu-latest, .NET 10
 
 ### 2. nuget-publish.yml (Primary Publishing Pipeline)
 **Triggers:**
@@ -91,7 +91,7 @@ relative to `dotnet/`.
 - **Main Solution**: `dotnet/AnointedAutomation.sln` (all .NET projects, `Directory.Build.props` and
   `NuGet.config` live in `dotnet/`)
 - **Projects**: 6 libraries + 4 test projects
-- **Target Framework**: .NET 8.0
+- **Target Framework**: .NET 10
 - **Configuration**: Debug/Release builds
 
 ### Package Configuration (dotnet/NuGet.config)
@@ -106,7 +106,7 @@ relative to `dotnet/`.
 
 ### .NET Installation
 - **Script**: `dotnet-install.sh` (Official Microsoft installer)
-- **Purpose**: Ensures .NET 8.0 SDK availability in CI/CD environments
+- **Purpose**: Ensures .NET 10 SDK availability in CI/CD environments
 
 ## Version Management Strategy
 
@@ -216,13 +216,13 @@ cd dotnet
 ## Environment Requirements
 
 ### Development Environment
-- **.NET 8.0 SDK** (required)
+- **.NET 10 SDK** (required)
 - **Git** (for version control)
 - **Text Editor/IDE** (Visual Studio, VS Code, etc.)
 
 ### CI/CD Environment
 - **OS**: Ubuntu-latest (GitHub Actions)
-- **Runtime**: .NET 8.0
+- **Runtime**: .NET 10
 - **Package Manager**: NuGet CLI
 - **Secrets**: NUGET_API_KEY, GITHUB_TOKEN
 
