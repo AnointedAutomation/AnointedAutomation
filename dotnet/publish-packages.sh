@@ -67,6 +67,9 @@ declare -A PACKAGES=(
     ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="anointedautomation.shopify"
     ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="anointedautomation.serialization"
     ["AnointedAutomation.SSO/AnointedAutomation.SSO.csproj"]="anointedautomation.sso"
+    ["AnointedAutomation.SSO.Owin/AnointedAutomation.SSO.Owin.csproj"]="anointedautomation.sso.owin"
+    ["AnointedAutomation.SSO.UI/AnointedAutomation.SSO.UI.csproj"]="anointedautomation.sso.ui"
+    ["templates/AnointedAutomation.Templates/AnointedAutomation.Templates.csproj"]="anointedautomation.templates"
 )
 
 # Clean previous builds
@@ -115,13 +118,16 @@ echo
 PUBLISHED_COUNT=0
 SKIPPED_COUNT=0
 
-# Dependency order first (Serialization, Shopify, Objects, Repository.Mongo, Objects.API), then the rest.
+# Dependency order first (Serialization, Shopify, Objects, Repository.Mongo, Objects.API, SSO, SSO.UI, Templates), then the rest.
 ORDERED_PROJECTS=(
     "AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"
     "AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"
     "AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"
     "AnointedAutomation.Repository.Mongo/AnointedAutomation.Repository.Mongo.csproj"
     "AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"
+    "AnointedAutomation.SSO/AnointedAutomation.SSO.csproj"
+    "AnointedAutomation.SSO.UI/AnointedAutomation.SSO.UI.csproj"
+    "templates/AnointedAutomation.Templates/AnointedAutomation.Templates.csproj"
 )
 for PROJECT_PATH in "${!PACKAGES[@]}"; do
     case " ${ORDERED_PROJECTS[*]} " in *" $PROJECT_PATH "*) ;; *) ORDERED_PROJECTS+=("$PROJECT_PATH") ;; esac
