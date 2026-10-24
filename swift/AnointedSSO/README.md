@@ -25,7 +25,7 @@ Xcode > File > Add Package Dependencies > `https://github.com/AnointedAutomation
 product `AnointedSSO`. Or in `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/AnointedAutomation/AnointedAutomation", from: "0.1.0")
+.package(url: "https://github.com/AnointedAutomation/AnointedAutomation", from: "0.1.1")
 ```
 
 ## Use it

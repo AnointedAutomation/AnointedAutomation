@@ -26,7 +26,7 @@ From Maven Central:
 
 ```kotlin
 // app/build.gradle.kts (mavenCentral() is in every new Android project)
-implementation("com.anointedautomation:anointedsso:0.1.0")
+implementation("com.anointedautomation:anointedsso:0.1.1")
 ```
 
 From source: clone this repo, then either
@@ -35,7 +35,7 @@ From source: clone this repo, then either
   `include(":anointedsso"); project(":anointedsso").projectDir = file("/path/to/AnointedAutomation/android/AnointedSSO/anointedsso")`
   and `implementation(project(":anointedsso"))`, or
 - publish to Maven Local: `cd android/AnointedSSO && gradle :anointedsso:publishToMavenLocal`,
-  add `mavenLocal()` and use `com.anointedautomation:anointedsso:0.1.0`.
+  add `mavenLocal()` and use `com.anointedautomation:anointedsso:0.1.1`.
 
 ## Use it
 

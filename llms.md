@@ -395,11 +395,11 @@ dotnet new anointed-razor -n MyApp   # or anointed-blazor
 
 ## JavaScript packages
 
-### @anointedautomation/sso 0.1.0
+### @anointedautomation/sso 0.2.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso
 - Runtime: Node 18+, Deno (Base44 backend functions), edge runtimes. Zero dependencies. Server only.
-- Not on npm yet.
+- On npm: `npm install @anointedautomation/sso`.
 
 "Sign in with Anointed Automation": an OpenID Connect client for the issuer `https://api.anointedautomation.net/`
 (authorization code + PKCE S256, state, nonce, RS256 ID tokens validated against the JWKS, RFC 9207 `iss` check,
@@ -430,10 +430,10 @@ app.get("/auth/anointed/callback", anointed.callback);
 `createWebHandlers` gives the same `start` / `callback` / `backchannelLogout` as `Request -> Response` handlers
 for Next.js App Router, Base44 and Workers. Failures are `AnointedSsoError` with a stable `code`.
 
-### @anointedautomation/sso-react 0.1.0
+### @anointedautomation/sso-react 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react
-- Runtime: browser and SSR, peer dependency react >=18. No secrets, no OIDC logic. Not on npm yet.
+- Runtime: browser and SSR, peer dependency react >=18. No secrets, no OIDC logic. On npm: `npm install @anointedautomation/sso-react`.
 
 ```jsx
 import { AnointedSignInButton, useAnointedSignIn } from "@anointedautomation/sso-react";
@@ -447,7 +447,7 @@ const { signIn } = useAnointedSignIn({ startUrl: "/api/auth/anointed/start" }); 
 ### @anointedautomation/sso-next 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-next
-- Runtime: Next.js App Router (Node 18+), server only. Depends on `@anointedautomation/sso`. Not on npm yet.
+- Runtime: Next.js App Router (Node 18+), server only. Depends on `@anointedautomation/sso`. On npm: `npm install @anointedautomation/sso-next`.
 
 ```js
 import { createAnointedClient } from "@anointedautomation/sso";
@@ -469,35 +469,35 @@ const anointed = createAnointedRouteHandlers({
 ### @anointedautomation/sso-vue 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue
-- Runtime: Vue 3 (browser). Not on npm yet.
+- Runtime: Vue 3 (browser). On npm: `npm install @anointedautomation/sso-vue`.
 
 Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side. Key exports: `AnointedSignInButton`, `useAnointedSignIn`, `buildStartUrl`.
 
 ### @anointedautomation/sso-nuxt 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-nuxt
-- Runtime: Nuxt 3 and 4 (Nitro/h3 server). Depends on @anointedautomation/sso. Not on npm yet.
+- Runtime: Nuxt 3 and 4 (Nitro/h3 server). Depends on @anointedautomation/sso. On npm: `npm install @anointedautomation/sso-nuxt`.
 
 Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
 
 ### @anointedautomation/sso-angular 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
-- Runtime: Angular 17+ (browser). Not on npm yet.
+- Runtime: Angular 17+ (browser). On npm: `npm install @anointedautomation/sso-angular`.
 
 Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side. Key exports: `AnointedSignInButtonComponent`, `AnointedSignInService`, `provideAnointedSignIn`, `buildStartUrl`.
 
 ### @anointedautomation/sso-sveltekit 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-sveltekit
-- Runtime: SvelteKit 2 + Svelte 5. Depends on @anointedautomation/sso. Not on npm yet.
+- Runtime: SvelteKit 2 + Svelte 5. Depends on @anointedautomation/sso. On npm: `npm install @anointedautomation/sso-sveltekit`.
 
 SvelteKit start, callback, logout and back-channel logout handlers (handle hook or +server.js) built on @anointedautomation/sso, plus a sign-in button (./client). Key exports: `createAnointedHandle`, `createAnointedHandlers`, `redirectTo`, `AnointedSignInButton`.
 
 ### @anointedautomation/sso-react-native 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react-native
-- Runtime: React Native / Expo. Not on npm yet.
+- Runtime: React Native / Expo. On npm: `npm install @anointedautomation/sso-react-native`.
 
 React Native and Expo sign-in button and useAnointedSignIn hook: open the partner server's start route in a system auth session and read the deep-link callback. No secrets in the app. Key exports: `AnointedSignInButton`, `useAnointedSignIn`, `createAnointedSignIn`, `createExpoOpener`, `createLinkingOpener`.
 
@@ -506,25 +506,25 @@ React Native and Expo sign-in button and useAnointedSignIn hook: open the partne
 ### anointedautomation-sso 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso
-- Runtime: Python 3.10+, server only. Not on PyPI yet.
+- Runtime: Python 3.10+, server only. On PyPI: `pip install anointedautomation-sso`.
 
 Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client. Key exports: `AnointedClient`, `SessionStatusClient`, `process_backchannel_logout`, `safe_return_to`.
 
 ## PHP package
 
-### anointedautomation/sso
+### anointedautomation/sso 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso
-- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` once the repo is submitted on Packagist (versions from repo git tags shared with the Swift package; manifest is the root composer.json).
+- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` (on Packagist, 0.1.1; versions come from repo git tags shared with the Swift package; manifest is the root composer.json).
 
 Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Key classes: `Client`, `SsoConfig`, `BackchannelLogoutHandler`, `AnointedSsoServiceProvider` (Laravel).
 
 ## Swift package
 
-### AnointedSSO 0.1.0
+### AnointedSSO 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO
-- Install: Swift Package Manager, `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
+- Install: Swift Package Manager (git tag 0.1.1), `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
 - The app never holds the client secret: `AnointedSignIn` opens the partner's own server start route (`@anointedautomation/sso`) in `ASWebAuthenticationSession`; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` the package checks.
 - Callbacks: `.https(host:path:)` (universal link, iOS 17.4+) or `.scheme(name, via:)` (an https server route that forwards the query to `name://anointed-sign-in`).
 
@@ -537,10 +537,10 @@ let items = try await signIn.signIn() // query items your server added, e.g. ite
 
 ## Android library
 
-### AnointedSSO (Android) 0.1.0
+### AnointedSSO (Android) 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/android/AnointedSSO
-- Install: not on Maven Central; include the `anointedsso` module from source or use JitPack. minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
+- Install: Maven Central, `implementation("com.anointedautomation:anointedsso:0.1.1")` (or include the `anointedsso` module from source). minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
 - The app never holds the client secret: `AnointedSignIn.signIn(activity)` opens the partner's own server start route (`@anointedautomation/sso`) in a Custom Tab; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` that `handleCallback(intent)` checks (constant time).
 - Callbacks: `AnointedCallback.Https(host, path)` (App Link) or `AnointedCallback.Scheme(name, via)` (an https server route that forwards the query to `name://anointed-sign-in`).
 
