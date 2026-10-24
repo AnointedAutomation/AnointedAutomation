@@ -62,7 +62,7 @@ Code is grouped by language. Each language folder builds and tests on its own.
 | [`dotnet/`](./dotnet) | The .NET solution (`AnointedAutomation.sln`), every NuGet package and its tests | `cd dotnet && dotnet test AnointedAutomation.sln` |
 | [`js/`](./js) | JavaScript / TypeScript packages, one folder per npm package | `cd js/<package> && npm test` |
 | [`python/`](./python) | Python packages (PyPI) | `cd python/anointed-sso && pip install -e ".[test]" && pytest` |
-| [`php/`](./php) | PHP packages (Composer) | `cd php/anointed-sso && composer install && vendor/bin/phpunit` |
+| [`php/`](./php) | PHP packages (Composer) | `cd php/anointed-sso && composer install && vendor/bin/phpunit` (Packagist manifest: root `composer.json`) |
 | [`docs/`](./docs) | Partner guides, design specs and plans | |
 
 ## JavaScript packages
@@ -83,7 +83,7 @@ Adding "Sign in with Anointed Automation" to your own site? Start with the
 | [AnointedSSO (Swift)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO) | "Sign in with Anointed Automation" for iOS 15+ and macOS 12+ apps (Swift Package Manager): the system sign-in sheet against your server, which keeps the secret. SwiftUI button included |
 | [AnointedSSO (Android)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/android/AnointedSSO) | "Sign in with Anointed Automation" for Android 7.0+ (API 24) apps (Kotlin, Custom Tabs): opens your server, which keeps the secret, and checks the returned state. Jetpack Compose button included. Consume from source or JitPack |
 | [anointedautomation-sso (Python)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso) | Server-side OpenID Connect kit (code + PKCE) for Python 3.9+ with Django, FastAPI/Starlette and Flask adapters (PyPI) |
-| [anointedautomation/sso (PHP)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso) | Sign in with Anointed Automation for PHP 8.1+ and Laravel: code + PKCE, ID token verification, logout and back-channel logout (Composer) |
+| [anointedautomation/sso (PHP)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso) | Sign in with Anointed Automation for PHP 8.1+ and Laravel: code + PKCE, ID token verification, logout and back-channel logout (Packagist: `composer require anointedautomation/sso`) |
 
 ## .NET packages
 

@@ -88,3 +88,15 @@ To publish one package without the script (from `dotnet/`):
 dotnet pack AnointedAutomation.Logging/AnointedAutomation.Logging.csproj --configuration Release --output ./nupkgs
 dotnet nuget push ./nupkgs/AnointedAutomation.Logging.*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 ```
+
+## Publishing PHP (Packagist)
+
+- The PHP kit `anointedautomation/sso` is published from the root `composer.json` of this repo. There is no split repo
+  and no publish workflow.
+- One-time, by the owner: submit `https://github.com/AnointedAutomation/AnointedAutomation` on packagist.org and enable
+  the GitHub hook (or the Packagist GitHub App) so new tags are picked up automatically.
+- Packagist versions come from git tags. Swift (`swift-sso-release.yml`) uses plain semver tags (`1.2.3`) at the same repo
+  root, so Swift and PHP share ONE tag stream: a Swift tag also becomes a PHP version, and tagging for PHP is a tag for
+  Swift consumers too. Pick the next number with both in mind.
+- A Composer dist install is trimmed by `.gitattributes` `export-ignore` (and `archive.exclude` in `composer.json` for
+  `composer archive`); keep the two lists in step.

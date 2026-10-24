@@ -17,7 +17,8 @@ Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 - JS (every `js/*` package: sso, -react, -next, -vue, -nuxt, -angular, -sveltekit, -react-native): `npm test`
   (runs `node --test test/*.test.js`; pretest installs or links what it needs).
 - Python (`python/anointed-sso/`): venv (`.venv`, gitignored), `pip install -e ".[test]"`, `python -m pytest`.
-- PHP (`php/anointed-sso/`): `composer install && vendor/bin/phpunit`.
+- PHP (`php/anointed-sso/`): `composer install && vendor/bin/phpunit`. The root `composer.json` is the Packagist manifest
+  (no split repo); keep it in step with `php/anointed-sso/composer.json` (CI checks), and `composer validate --strict` it.
 - Swift (repo root): `swift test`.
 - Android (`android/AnointedSSO/`): `gradle :anointedsso:testDebugUnitTest`.
 - Every source file starts with the Anointed copyright header and ends it with "Jesus is King" (see `CONTRIBUTING.md`).
@@ -27,6 +28,9 @@ Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 - Work on `develop`, PR to `master`. Version-increment workflow bumps patch versions on the PR.
 - Push to `master` runs `nuget-publish.yml` (NuGet Trusted Publishing, OIDC, no stored key). Unchanged packages are skipped.
 - npm publish: `npm-publish.yml`. Swift: released by semver tag (`swift-sso-release.yml`).
+- PHP: Packagist reads versions from the repo git tags. Swift also uses plain semver tags at the repo root, so there is ONE
+  tag stream: cutting a Swift tag also publishes that number as a PHP version, and a PHP release is a tag. Plan tags
+  with both kits in mind. Details: `dotnet/PUBLISHING.md` ("Publishing PHP").
 
 ## Verification
 - `cd dotnet && dotnet build --configuration Release && dotnet test --configuration Release`

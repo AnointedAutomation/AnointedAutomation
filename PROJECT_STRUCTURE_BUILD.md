@@ -150,7 +150,7 @@ relative to `dotnet/`.
 - **Vue / Nuxt / Angular / SvelteKit / React Native kits**: `js-anointed-sso-{vue,nuxt,angular,sveltekit,react-native}.yml`
   (same shape; Angular runs Node 20-24 and has no d.ts job because ng-packagr emits its types).
 - **Python**: `python-anointed-sso.yml` (pytest), `pypi-publish.yml` (Trusted Publishing on master).
-- **PHP**: `php-anointed-sso.yml` (PHPUnit core + Laravel), `php-split.yml`.
+- **PHP**: `php-anointed-sso.yml` (PHPUnit core + Laravel, plus `composer validate --strict` on the root `composer.json`).
 - **.NET Framework**: `build-and-test.yml` job `test-owin-windows` runs SSO.Owin tests on net48 + net10.0.
 - **Publishing**: `.github/workflows/npm-publish.yml` on push to `master` (paths `js/**`): for each non-private
   `js/*/package.json` whose version is not on npm, `npm test` then `npm publish --access public` over npm

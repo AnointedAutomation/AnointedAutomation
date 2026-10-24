@@ -554,6 +554,7 @@
       "version": "0.1.0",
       "runtime": "Node 18+, Deno (Base44), edge runtimes",
       "published": false,
+      "install": "composer require anointedautomation/sso (after the owner submits the repo on packagist.org)",
       "description": "Sign in with Anointed Automation: a dependency-free, server-only OpenID Connect client (authorization code + PKCE S256, state, nonce, RS256 ID token validation via JWKS) with Express and Web (Next.js App Router, Base44, Workers) adapters.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso/README.md",

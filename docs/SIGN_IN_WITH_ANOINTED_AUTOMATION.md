@@ -274,7 +274,7 @@ Every kit keeps the client secret on your server and follows the rules above. Ea
 | React Native / Expo | `@anointedautomation/sso-react-native` | [js/anointed-sso-react-native](../js/anointed-sso-react-native) |
 | Android (Kotlin) | `AnointedSSO` | [android/AnointedSSO](../android/AnointedSSO) |
 | Python (Django, FastAPI, Flask) | `anointedautomation-sso` | [python/anointed-sso](../python/anointed-sso) |
-| PHP 8.1+ / Laravel | `anointedautomation/sso` | [php/anointed-sso](../php/anointed-sso) |
+| PHP 8.1+ / Laravel | `anointedautomation/sso` (Packagist) | [php/anointed-sso](../php/anointed-sso) |
 | ASP.NET Core UI | `AnointedAutomation.SSO.UI` | [dotnet/AnointedAutomation.SSO.UI](../dotnet/AnointedAutomation.SSO.UI) |
 | `dotnet new` templates | `AnointedAutomation.Templates` | [dotnet/templates/AnointedAutomation.Templates](../dotnet/templates/AnointedAutomation.Templates) |
 | Classic ASP.NET (.NET Framework 4.7.2+, MVC 5, Web Forms) | `AnointedAutomation.SSO.Owin` | [dotnet/AnointedAutomation.SSO.Owin](../dotnet/AnointedAutomation.SSO.Owin) |

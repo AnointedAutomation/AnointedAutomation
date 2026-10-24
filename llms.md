@@ -515,7 +515,7 @@ Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Sta
 ### anointedautomation/sso
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso
-- Runtime: PHP 8.1+, Laravel optional. Not on Packagist yet.
+- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` once the repo is submitted on Packagist (versions from repo git tags shared with the Swift package; manifest is the root composer.json).
 
 Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Key classes: `Client`, `SsoConfig`, `BackchannelLogoutHandler`, `AnointedSsoServiceProvider` (Laravel).
 

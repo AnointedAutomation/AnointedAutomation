@@ -212,4 +212,10 @@ vendor/bin/phpunit --testsuite core
 composer require --dev orchestra/testbench:^10.0 --with-all-dependencies && vendor/bin/phpunit --testsuite laravel
 ```
 
+## Releases
+
+Packagist reads this package's versions from git tags on the monorepo root (`composer.json` at the repo root is the manifest;
+this folder's `composer.json` is for the kit's own tests and must stay in step). The Swift package also releases by plain semver tag
+at the same root, so there is one tag stream: a Swift tag also becomes a PHP version, and a PHP release is cut by tagging.
+
 MIT licensed. Source: [AnointedAutomation/AnointedAutomation](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso).

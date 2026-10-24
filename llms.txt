@@ -47,7 +47,7 @@ NuGet profile: https://www.nuget.org/profiles/roku674
 ## Python and PHP packages
 
 - [anointedautomation-sso (Python)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso): Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client. Key exports: AnointedClient, SessionStatusClient, process_backchannel_logout.
-- [anointedautomation/sso (PHP)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso): Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Key classes: Client, SsoConfig, BackchannelLogoutHandler, AnointedSsoServiceProvider.
+- [anointedautomation/sso (PHP)](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso): Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Install: composer require anointedautomation/sso. Key classes: Client, SsoConfig, BackchannelLogoutHandler, AnointedSsoServiceProvider.
 
 ## Docs
 

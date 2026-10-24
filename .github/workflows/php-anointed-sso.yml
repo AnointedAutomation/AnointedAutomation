@@ -6,11 +6,13 @@ on:
     branches: ["master", "develop"]
     paths:
       - "php/**"
+      - "composer.json"
       - ".github/workflows/php-anointed-sso.yml"
   pull_request:
     branches: ["master", "develop"]
     paths:
       - "php/**"
+      - "composer.json"
       - ".github/workflows/php-anointed-sso.yml"
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -44,6 +46,27 @@ jobs:
 
       - name: Run PHPUnit (core)
         run: vendor/bin/phpunit --testsuite core
+
+  validate-root:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+          coverage: none
+
+      - name: Validate root composer.json (the Packagist manifest)
+        run: composer validate --strict
+
+      - name: Root and php/anointed-sso manifests agree
+        run: |
+          php -r '$r=json_decode(file_get_contents("composer.json"),true);$k=json_decode(file_get_contents("php/anointed-sso/composer.json"),true);foreach(["name","description","type","license","keywords","homepage","support","require","require-dev","suggest","extra"] as $f){if($r[$f]!==$k[$f]){fwrite(STDERR,"composer.json differs from php/anointed-sso/composer.json at $f\n");exit(1);}}'
 
   laravel:
     runs-on: ubuntu-latest

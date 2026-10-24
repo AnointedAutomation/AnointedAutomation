@@ -1,0 +1,25 @@
+# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Packagist serves Composer dist zips from GitHub's archive, which honors export-ignore (composer.json archive.exclude
+# only affects `composer archive`). Keep both lists in step: a Composer install ships only composer.json, LICENSE and
+# php/anointed-sso/{src,config,README.md}.
+/.github export-ignore
+/.editorconfig export-ignore
+/.gitignore export-ignore
+/.spi.yml export-ignore
+/android export-ignore
+/docs export-ignore
+/dotnet export-ignore
+/js export-ignore
+/python export-ignore
+/swift export-ignore
+/Package.swift export-ignore
+/CLAUDE.md export-ignore
+/CONTRIBUTING.md export-ignore
+/SUPPORT.md export-ignore
+/README.md export-ignore
+/PROJECT_*.md export-ignore
+/llms.* export-ignore
+/sources.txt export-ignore
+/php/anointed-sso/tests export-ignore
+/php/anointed-sso/phpunit.xml.dist export-ignore
+/php/anointed-sso/.gitignore export-ignore
