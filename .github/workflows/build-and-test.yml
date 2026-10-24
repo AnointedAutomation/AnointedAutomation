@@ -3,6 +3,7 @@
 name: .NET Test
 
 on:
+  workflow_dispatch:
   push:
     branches: ["master", "develop"]
   pull_request:
@@ -17,7 +18,7 @@ jobs:
     defaults:
       run:
         working-directory: dotnet
-    if: github.event_name == 'push' || github.actor == 'dependabot[bot]'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.actor == 'dependabot[bot]'
 
     steps:
       - name: Checkout code
@@ -47,7 +48,7 @@ jobs:
       run:
         working-directory: dotnet
     needs: build
-    if: github.event_name == 'push' || github.actor == 'dependabot[bot]'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.actor == 'dependabot[bot]'
 
     steps:
       - name: Checkout code
@@ -130,7 +131,7 @@ jobs:
       run:
         working-directory: dotnet
     needs: build
-    if: github.event_name == 'push' || github.actor == 'dependabot[bot]'
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.actor == 'dependabot[bot]'
 
     steps:
       - name: Checkout code
