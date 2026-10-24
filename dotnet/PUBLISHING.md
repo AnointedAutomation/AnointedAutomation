@@ -15,6 +15,9 @@ The repository ships these packages to [NuGet.org](https://www.nuget.org/profile
 - [AnointedAutomation.Repository.Mongo](https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo/)
 - [AnointedAutomation.Repository.MySql](https://www.nuget.org/packages/AnointedAutomation.Repository.MySql/)
 - [AnointedAutomation.SSO](https://www.nuget.org/packages/AnointedAutomation.SSO/)
+- [AnointedAutomation.SSO.Owin](https://www.nuget.org/packages/AnointedAutomation.SSO.Owin/) (.NET Framework 4.7.2; its tests also run on net48 in a Windows CI job)
+- [AnointedAutomation.SSO.UI](https://www.nuget.org/packages/AnointedAutomation.SSO.UI/)
+- [AnointedAutomation.Templates](https://www.nuget.org/packages/AnointedAutomation.Templates/) (`dotnet new` template pack, project at `templates/AnointedAutomation.Templates`)
 
 `AnointedAutomation.Objects.Mongo` still exists on NuGet.org but no longer lives in this repository and is not
 published from it.
@@ -29,6 +32,11 @@ published from it.
 3. Merge to `master`. The **Publish NuGet Packages** workflow (`.github/workflows/nuget-publish.yml`) builds and
    tests the solution in Release, then packs and pushes each package whose `<Version>` differs from the latest
    version on NuGet.org. Unchanged packages are skipped.
+
+Publish order: Serialization, Shopify, Objects, Repository.Mongo, Objects.API, SSO, SSO.UI, Templates, then the
+rest. The templates pin `AnointedAutomation.SSO` and `AnointedAutomation.SSO.UI` in
+`templates/AnointedAutomation.Templates/content/*/*.csproj`; the version-increment workflow moves those pins to the
+current SSO / SSO.UI versions and bumps the Templates package when a pin changes.
 
 Publishing uses [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (OIDC
 through `NuGet/login`), so no long lived API key is stored in the repository secrets.
@@ -80,3 +88,15 @@ To publish one package without the script (from `dotnet/`):
 dotnet pack AnointedAutomation.Logging/AnointedAutomation.Logging.csproj --configuration Release --output ./nupkgs
 dotnet nuget push ./nupkgs/AnointedAutomation.Logging.*.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
 ```
+
+## Publishing PHP (Packagist)
+
+- The PHP kit `anointedautomation/sso` is published from the root `composer.json` of this repo. There is no split repo
+  and no publish workflow.
+- One-time, by the owner: submit `https://github.com/AnointedAutomation/AnointedAutomation` on packagist.org and enable
+  the GitHub hook (or the Packagist GitHub App) so new tags are picked up automatically.
+- Packagist versions come from git tags. Swift (`swift-sso-release.yml`) uses plain semver tags (`1.2.3`) at the same repo
+  root, so Swift and PHP share ONE tag stream: a Swift tag also becomes a PHP version, and tagging for PHP is a tag for
+  Swift consumers too. Pick the next number with both in mind.
+- A Composer dist install is trimmed by `.gitattributes` `export-ignore` (and `archive.exclude` in `composer.json` for
+  `composer archive`); keep the two lists in step.

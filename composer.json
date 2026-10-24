@@ -1,0 +1,64 @@
+{
+    "name": "anointedautomation/sso",
+    "description": "Sign in with Anointed Automation for PHP and Laravel: OpenID Connect authorization code + PKCE S256, ID token verification, logout and back-channel logout.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "sso",
+        "oidc",
+        "openid-connect",
+        "pkce",
+        "laravel",
+        "anointed-automation"
+    ],
+    "homepage": "https://github.com/AnointedAutomation/AnointedAutomation",
+    "support": {
+        "issues": "https://github.com/AnointedAutomation/AnointedAutomation/issues",
+        "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso"
+    },
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "firebase/php-jwt": "^7.0",
+        "guzzlehttp/guzzle": "^7.5",
+        "psr/http-client": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.5"
+    },
+    "suggest": {
+        "laravel/framework": "Enables the service provider, routes and cache-backed stores (Laravel 10, 11, 12)."
+    },
+    "autoload": {
+        "psr-4": {
+            "AnointedAutomation\\Sso\\": "php/anointed-sso/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AnointedAutomation\\Sso\\Tests\\": "php/anointed-sso/tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AnointedAutomation\\Sso\\Laravel\\AnointedSsoServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "archive": {
+        "exclude": [
+            "/*",
+            "!/composer.json",
+            "!/LICENSE",
+            "!/php",
+            "/php/anointed-sso/tests",
+            "/php/anointed-sso/phpunit.xml.dist",
+            "/php/anointed-sso/.gitignore"
+        ]
+    }
+}

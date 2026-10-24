@@ -1,0 +1,42 @@
+@* Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ *@
+@namespace AnointedAutomation.SSO.UI.Components
+@* A plain POST form with an antiforgery token: works in static SSR and in interactive server mode. *@
+<form method="post" action="@Action" data-anointed-sign-out="" data-enhance="false" style="display:inline;margin:0;"><AntiforgeryToken />@if (ReturnTo != null)
+{<input type="hidden" name="@ReturnToParam" value="@ReturnTo" />}<button type="submit" class="@Class" style="@InlineStyle" @attributes="AdditionalAttributes"><img src="@AnointedButtonLook.LogoUrl" alt="" aria-hidden="true" width="20" height="20" style="@AnointedButtonLook.LogoStyle" /><span>@Label</span></button></form>
+
+@code {
+    /// <summary>Required. Your sign-out route, for example /auth/anointed/sign-out.</summary>
+    [Parameter, EditorRequired]
+    public string Action { get; set; }
+
+    /// <summary>Where to land after sign-out. Omit for the server's default.</summary>
+    [Parameter]
+    public string ReturnTo { get; set; }
+
+    /// <summary>The form field your server reads. Default returnTo.</summary>
+    [Parameter]
+    public string ReturnToParam { get; set; } = AnointedButtonLook.DefaultReturnToParam;
+
+    /// <summary>Button text. Default "Sign out".</summary>
+    [Parameter]
+    public string Label { get; set; } = AnointedButtonLook.DefaultSignOutLabel;
+
+    /// <summary>When set, the built-in inline look is dropped so your CSS owns the button.</summary>
+    [Parameter]
+    public string Class { get; set; }
+
+    /// <summary>Any other attributes, passed to the button.</summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
+
+    private string InlineStyle => Class == null ? AnointedButtonLook.ButtonStyle : null;
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrWhiteSpace(Action))
+        {
+            throw new InvalidOperationException("AnointedAutomation.SSO.UI: AnointedSignOutButton needs Action, the path of your sign-out route.");
+        }
+    }
+}

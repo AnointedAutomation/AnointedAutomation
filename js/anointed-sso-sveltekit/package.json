@@ -1,0 +1,74 @@
+{
+  "name": "@anointedautomation/sso-sveltekit",
+  "version": "0.1.0",
+  "description": "Sign in with Anointed Automation for SvelteKit (Svelte 5): start, callback, logout and back-channel logout handlers (a handle hook or +server.js helpers) built on @anointedautomation/sso, plus an accessible brand-styled sign-in button. Secrets stay on the server.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./index.d.ts",
+  "svelte": "./src/client.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./client": {
+      "types": "./client.d.ts",
+      "svelte": "./src/client.js",
+      "default": "./src/client.js"
+    },
+    "./AnointedSignInButton.svelte": {
+      "types": "./AnointedSignInButton.svelte.d.ts",
+      "svelte": "./src/AnointedSignInButton.svelte",
+      "default": "./src/AnointedSignInButton.svelte"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "client.d.ts",
+    "AnointedSignInButton.svelte.d.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "pretest": "node scripts/prepare-tests.mjs",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@anointedautomation/sso": "^0.2.3"
+  },
+  "peerDependencies": {
+    "@sveltejs/kit": "^2.0.0",
+    "svelte": "^5.16.0"
+  },
+  "peerDependenciesMeta": {
+    "@sveltejs/kit": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "svelte": "^5.16.0"
+  },
+  "keywords": [
+    "anointed-automation",
+    "oidc",
+    "sso",
+    "sign-in",
+    "sveltekit",
+    "svelte"
+  ],
+  "author": "Anointed Automation, LLC.",
+  "license": "MIT",
+  "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-sveltekit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnointedAutomation/AnointedAutomation.git",
+    "directory": "js/anointed-sso-sveltekit"
+  },
+  "bugs": {
+    "url": "https://github.com/AnointedAutomation/AnointedAutomation/issues"
+  }
+}

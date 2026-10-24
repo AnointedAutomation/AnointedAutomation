@@ -17,7 +17,7 @@ The AnointedAutomation solution uses GitHub Actions for automated build, test, a
 - **Test**: Runs all test suites with code coverage
 - **Coverage**: Collects XPlat Code Coverage data
 
-**Environment:** Ubuntu-latest, .NET 8.0
+**Environment:** Ubuntu-latest, .NET 10
 
 ### 2. nuget-publish.yml (Primary Publishing Pipeline)
 **Triggers:**
@@ -91,7 +91,7 @@ relative to `dotnet/`.
 - **Main Solution**: `dotnet/AnointedAutomation.sln` (all .NET projects, `Directory.Build.props` and
   `NuGet.config` live in `dotnet/`)
 - **Projects**: 6 libraries + 4 test projects
-- **Target Framework**: .NET 8.0
+- **Target Framework**: .NET 10
 - **Configuration**: Debug/Release builds
 
 ### Package Configuration (dotnet/NuGet.config)
@@ -106,7 +106,7 @@ relative to `dotnet/`.
 
 ### .NET Installation
 - **Script**: `dotnet-install.sh` (Official Microsoft installer)
-- **Purpose**: Ensures .NET 8.0 SDK availability in CI/CD environments
+- **Purpose**: Ensures .NET 10 SDK availability in CI/CD environments
 
 ## Version Management Strategy
 
@@ -147,6 +147,11 @@ relative to `dotnet/`.
 - **React / Next kits**: `.github/workflows/js-anointed-sso-react.yml` and `js-anointed-sso-next.yml` (Node 18-24 `npm test`,
   `tsc` type check); also triggered by changes under `js/anointed-sso/`. Local: `cd js/anointed-sso-react && npm test`
   (installs react on first run), `cd js/anointed-sso-next && npm test` (links `../anointed-sso`).
+- **Vue / Nuxt / Angular / SvelteKit / React Native kits**: `js-anointed-sso-{vue,nuxt,angular,sveltekit,react-native}.yml`
+  (same shape; Angular runs Node 20-24 and has no d.ts job because ng-packagr emits its types).
+- **Python**: `python-anointed-sso.yml` (pytest), `pypi-publish.yml` (Trusted Publishing on master).
+- **PHP**: `php-anointed-sso.yml` (PHPUnit core + Laravel, plus `composer validate --strict` on the root `composer.json`).
+- **.NET Framework**: `build-and-test.yml` job `test-owin-windows` runs SSO.Owin tests on net48 + net10.0.
 - **Publishing**: `.github/workflows/npm-publish.yml` on push to `master` (paths `js/**`): for each non-private
   `js/*/package.json` whose version is not on npm, `npm test` then `npm publish --access public` over npm
   Trusted Publishing (OIDC, `id-token: write`, npm 11.5.1+). First publish of a new package is manual, then
@@ -211,13 +216,13 @@ cd dotnet
 ## Environment Requirements
 
 ### Development Environment
-- **.NET 8.0 SDK** (required)
+- **.NET 10 SDK** (required)
 - **Git** (for version control)
 - **Text Editor/IDE** (Visual Studio, VS Code, etc.)
 
 ### CI/CD Environment
 - **OS**: Ubuntu-latest (GitHub Actions)
-- **Runtime**: .NET 8.0
+- **Runtime**: .NET 10
 - **Package Manager**: NuGet CLI
 - **Secrets**: NUGET_API_KEY, GITHUB_TOKEN
 

@@ -1,0 +1,13 @@
+@* Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ *@
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <header style="display:flex; justify-content:space-between; align-items:center;">
+            <a href="/">AnointedBlazorApp</a>
+            <AuthorizeView>
+                <Authorized><AnointedSignOutButton Action="/auth/anointed/sign-out" /></Authorized>
+                <NotAuthorized><AnointedSignInButton StartUrl="/auth/anointed/start" ReturnTo="/" /></NotAuthorized>
+            </AuthorizeView>
+        </header>
+        <main><RouteView RouteData="routeData" /></main>
+    </Found>
+</Router>

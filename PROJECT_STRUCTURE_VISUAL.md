@@ -223,24 +223,31 @@ AnointedAutomation/
 │   ├── js-anointed-sso.yml       JS kit: Node 18/20/22/24, Deno, d.ts type check
 │   ├── js-anointed-sso-react.yml React kit: Node 18-24, d.ts type check
 │   ├── js-anointed-sso-next.yml  Next kit: Node 18-24, d.ts type check
+│   ├── js-anointed-sso-{vue,nuxt,angular,sveltekit,react-native}.yml  framework kits
+│   ├── python-anointed-sso.yml, pypi-publish.yml   Python kit
+│   ├── php-anointed-sso.yml, php-split.yml         PHP kit
 │   ├── swift-anointed-sso.yml    Swift kit: swift test (macOS) + iOS build
 │   └── swift-sso-release.yml     tags master from swift/AnointedSSO/VERSION
 ├── dotnet/
 │   ├── AnointedAutomation.sln
 │   ├── Directory.Build.props, NuGet.config, PUBLISHING.md, publish-packages.sh
 │   ├── AnointedAutomation.<Library>/         one folder per NuGet package
-│   ├── AnointedAutomation.<Library>.Tests/   NUnit tests per package
+│   ├── AnointedAutomation.<Library>.Tests/   xunit tests per package
+│   ├── templates/AnointedAutomation.Templates/  dotnet new template pack
 │   └── AnointedAutomation.Objects.Demo/      console demo (not packed)
 ├── js/
 │   ├── README.md
 │   ├── anointed-sso-react/                   @anointedautomation/sso-react
 │   ├── anointed-sso-next/                    @anointedautomation/sso-next
+│   ├── anointed-sso-{vue,nuxt,angular,sveltekit,react-native}/  framework kits
 │   └── anointed-sso/                         @anointedautomation/sso
 │       ├── src/            client.js, jwt.js, crypto.js, encoding.js, cookies.js, errors.js, index.js
 │       │   └── adapters/   web.js (Request -> Response), express.js (node:http)
 │       ├── index.d.ts
 │       ├── test/           node:test suites, helpers/fakeIdp.js, deno/smoke.ts
 │       └── examples/       express/, nextjs/, base44/functions/
+├── python/anointed-sso/                    anointedautomation-sso (PyPI)
+├── php/anointed-sso/                       anointedautomation/sso (Composer)
 ├── swift/
 │   └── AnointedSSO/                          Swift package (manifest: root Package.swift)
 │       ├── Sources/AnointedSSO/  AnointedSignInRequest, AnointedSignIn, AnointedSignInButton

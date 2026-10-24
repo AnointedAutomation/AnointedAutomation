@@ -1,0 +1,54 @@
+{
+  "name": "@anointedautomation/sso-vue",
+  "version": "0.1.0",
+  "description": "Sign in with Anointed Automation for Vue 3: an accessible brand-styled sign-in button and a useAnointedSignIn composable that send the browser to your server's start route. No secrets client side.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "pretest": "node scripts/ensure-deps.mjs",
+    "test": "node --test test/*.test.js"
+  },
+  "peerDependencies": {
+    "vue": ">=3.3"
+  },
+  "devDependencies": {
+    "@vue/server-renderer": "^3.5.44",
+    "vue": "^3.5.44"
+  },
+  "keywords": [
+    "anointed-automation",
+    "oidc",
+    "sso",
+    "sign-in",
+    "vue",
+    "nuxt",
+    "vite"
+  ],
+  "author": "Anointed Automation, LLC.",
+  "license": "MIT",
+  "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnointedAutomation/AnointedAutomation.git",
+    "directory": "js/anointed-sso-vue"
+  },
+  "bugs": {
+    "url": "https://github.com/AnointedAutomation/AnointedAutomation/issues"
+  }
+}

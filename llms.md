@@ -349,6 +349,50 @@ Customer customer = JsonConvert.DeserializeObject<Customer>(json);
 long? id = customer.Id;
 ```
 
+### AnointedAutomation.SSO 1.0.2
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO
+- Target: net10.0. Depends on Microsoft.AspNetCore.Authentication.OpenIdConnect, Microsoft.IdentityModel.Protocols.OpenIdConnect.
+
+Sign in with Anointed Automation for ASP.NET Core: an OpenID Connect handler preset (authorization code + PKCE S256, verified email only), a back-channel logout endpoint with Logout Token validation and replay protection, and a fail-open session status client.
+
+```csharp
+builder.Services.AddAuthentication().AddCookie().AddAnointedAutomation(o => { o.ClientId = "aa_..."; o.ClientSecret = secret; });
+builder.Services.AddAnointedSessionStatus(o => { ... });
+app.MapAnointedBackchannelLogout("/auth/anointed/backchannel-logout", async (logout, httpContext) => { ... });
+```
+
+### AnointedAutomation.SSO.UI 1.0.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.UI
+- Target: net10.0. Depends on AnointedAutomation.SSO.
+
+Front end for Sign in with Anointed Automation in ASP.NET Core: brand-styled sign-in and sign-out buttons as a Tag Helper (Razor Pages, MVC) and Blazor components, plus MapAnointedAutomationAuth() BFF routes (start, sign-out, user info). Cookie only, no tokens in the browser; sign-out also runs RP-initiated logout when the provider publishes end_session_endpoint.
+
+```csharp
+app.MapAnointedAutomationAuth("/auth/anointed"); // GET start, POST sign-out, GET user
+// Razor: <anointed-sign-in start-url="/auth/anointed/start" />  <anointed-sign-out action="/auth/anointed/sign-out" />
+```
+
+### AnointedAutomation.SSO.Owin 1.0.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.Owin
+- Target: net472.
+
+Sign in with Anointed Automation for classic ASP.NET (.NET Framework 4.7.2+, MVC 5 and Web Forms on OWIN/Katana): OpenID Connect middleware preset (code + PKCE S256, verified email only), back-channel logout with Logout Token validation and replay protection, a session status client, and a sign-in button for Razor and Web Forms.
+
+### AnointedAutomation.Templates 1.0.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/templates/AnointedAutomation.Templates
+- Target: net10.0. Depends on AnointedAutomation.SSO, AnointedAutomation.SSO.UI.
+
+dotnet new templates: anointed-razor (Razor Pages) and anointed-blazor (Blazor Web App, interactive server), wired to AnointedAutomation.SSO and AnointedAutomation.SSO.UI with the client id and secret in user-secrets.
+
+```bash
+dotnet new install AnointedAutomation.Templates
+dotnet new anointed-razor -n MyApp   # or anointed-blazor
+```
+
 ## JavaScript packages
 
 ### @anointedautomation/sso 0.1.0
@@ -386,8 +430,6 @@ app.get("/auth/anointed/callback", anointed.callback);
 `createWebHandlers` gives the same `start` / `callback` / `backchannelLogout` as `Request -> Response` handlers
 for Next.js App Router, Base44 and Workers. Failures are `AnointedSsoError` with a stable `code`.
 
-## Swift package
-
 ### @anointedautomation/sso-react 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react
@@ -423,6 +465,61 @@ const anointed = createAnointedRouteHandlers({
 // app/api/auth/anointed/callback/route.js:  export const GET = anointed.callback;
 // .../backchannel-logout/route.js:          export const POST = anointed.backchannelLogout; (needs onLogout)
 ```
+
+### @anointedautomation/sso-vue 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue
+- Runtime: Vue 3 (browser). Not on npm yet.
+
+Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side. Key exports: `AnointedSignInButton`, `useAnointedSignIn`, `buildStartUrl`.
+
+### @anointedautomation/sso-nuxt 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-nuxt
+- Runtime: Nuxt 3 and 4 (Nitro/h3 server). Depends on @anointedautomation/sso. Not on npm yet.
+
+Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
+
+### @anointedautomation/sso-angular 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
+- Runtime: Angular 17+ (browser). Not on npm yet.
+
+Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side. Key exports: `AnointedSignInButtonComponent`, `AnointedSignInService`, `provideAnointedSignIn`, `buildStartUrl`.
+
+### @anointedautomation/sso-sveltekit 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-sveltekit
+- Runtime: SvelteKit 2 + Svelte 5. Depends on @anointedautomation/sso. Not on npm yet.
+
+SvelteKit start, callback, logout and back-channel logout handlers (handle hook or +server.js) built on @anointedautomation/sso, plus a sign-in button (./client). Key exports: `createAnointedHandle`, `createAnointedHandlers`, `redirectTo`, `AnointedSignInButton`.
+
+### @anointedautomation/sso-react-native 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react-native
+- Runtime: React Native / Expo. Not on npm yet.
+
+React Native and Expo sign-in button and useAnointedSignIn hook: open the partner server's start route in a system auth session and read the deep-link callback. No secrets in the app. Key exports: `AnointedSignInButton`, `useAnointedSignIn`, `createAnointedSignIn`, `createExpoOpener`, `createLinkingOpener`.
+
+## Python package
+
+### anointedautomation-sso 0.1.0
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso
+- Runtime: Python 3.10+, server only. Not on PyPI yet.
+
+Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client. Key exports: `AnointedClient`, `SessionStatusClient`, `process_backchannel_logout`, `safe_return_to`.
+
+## PHP package
+
+### anointedautomation/sso
+
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso
+- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` once the repo is submitted on Packagist (versions from repo git tags shared with the Swift package; manifest is the root composer.json).
+
+Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Key classes: `Client`, `SsoConfig`, `BackchannelLogoutHandler`, `AnointedSsoServiceProvider` (Laravel).
+
+## Swift package
 
 ### AnointedSSO 0.1.0
 

@@ -1,0 +1,14 @@
+@* Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ *@
+@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Welcome</h1>
+<AuthorizeView>
+    <Authorized>
+        <p>Signed in as @context.User.GetAnointedEmail() (Anointed Automation id @context.User.GetAnointedSubject()).</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>Sign in with your Anointed Automation account to continue.</p>
+    </NotAuthorized>
+</AuthorizeView>

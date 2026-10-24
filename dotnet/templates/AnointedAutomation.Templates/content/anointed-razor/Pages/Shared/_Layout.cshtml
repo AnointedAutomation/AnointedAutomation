@@ -1,0 +1,23 @@
+@* Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ *@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AnointedRazorApp</title>
+</head>
+<body style="font-family: system-ui, sans-serif; margin: 2rem;">
+    <header style="display:flex; justify-content:space-between; align-items:center;">
+        <a href="/">AnointedRazorApp</a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <anointed-sign-out action="/auth/anointed/sign-out" />
+        }
+        else
+        {
+            <anointed-sign-in start-url="/auth/anointed/start" return-to="/" />
+        }
+    </header>
+    <main>@RenderBody()</main>
+</body>
+</html>

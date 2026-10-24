@@ -36,7 +36,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '8.x'
+          dotnet-version: '10.x'
 
       - name: Check and increment versions
         id: version-check
@@ -64,6 +64,9 @@ jobs:
             ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="AnointedAutomation.Shopify"
             ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="AnointedAutomation.Serialization"
             ["AnointedAutomation.SSO/AnointedAutomation.SSO.csproj"]="AnointedAutomation.SSO"
+            ["AnointedAutomation.SSO.Owin/AnointedAutomation.SSO.Owin.csproj"]="AnointedAutomation.SSO.Owin"
+            ["AnointedAutomation.SSO.UI/AnointedAutomation.SSO.UI.csproj"]="AnointedAutomation.SSO.UI"
+            ["templates/AnointedAutomation.Templates/AnointedAutomation.Templates.csproj"]="templates/AnointedAutomation.Templates"
           )
 
           VERSIONS_UPDATED=0
@@ -151,6 +154,89 @@ jobs:
           echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Sync template package pins with SSO and SSO.UI
+        id: template-pins
+        run: |
+          set -euo pipefail
+          # The dotnet new templates pin AnointedAutomation.SSO and AnointedAutomation.SSO.UI. Keep the pins on the
+          # versions this PR will publish, and bump the Templates package when a pin moves.
+          VERSIONS_UPDATED=0
+          UPDATED_PROJECTS=""
+          TEMPLATES=templates/AnointedAutomation.Templates/AnointedAutomation.Templates.csproj
+          PIN_CHANGED=0
+          for PKG in AnointedAutomation.SSO AnointedAutomation.SSO.UI; do
+            VERSION=$(grep -o '<Version>[^<]*</Version>' "$PKG/$PKG.csproj" | sed 's/<Version>\(.*\)<\/Version>/\1/')
+            for CONTENT in templates/AnointedAutomation.Templates/content/*/*.csproj; do
+              BEFORE=$(md5sum "$CONTENT")
+              sed -i -E "s|(<PackageReference Include=\"${PKG//./\\.}\" Version=\")[^\"]*(\")|\1${VERSION}\2|" "$CONTENT"
+              if [ "$BEFORE" != "$(md5sum "$CONTENT")" ]; then
+                echo "  $CONTENT: $PKG pinned to $VERSION"
+                PIN_CHANGED=1
+              fi
+            done
+          done
+          if [ "$PIN_CHANGED" -eq 1 ]; then
+            PR_VERSION=$(grep -o '<Version>[^<]*</Version>' "$TEMPLATES" | sed 's/<Version>\(.*\)<\/Version>/\1/')
+            MASTER_VERSION=$(git show master:"./$TEMPLATES" 2>/dev/null | grep -o '<Version>[^<]*</Version>' | sed 's/<Version>\(.*\)<\/Version>/\1/' || echo "")
+            if [ -n "$MASTER_VERSION" ] && [ "$PR_VERSION" = "$MASTER_VERSION" ]; then
+              IFS='.' read -r -a VERSION_PARTS <<< "$PR_VERSION"
+              if [ "${VERSION_PARTS[2]}" -ge 9 ]; then
+                NEW_VERSION="${VERSION_PARTS[0]}.$((VERSION_PARTS[1] + 1)).0"
+              else
+                NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$((VERSION_PARTS[2] + 1))"
+              fi
+              sed -i "s|<Version>${PR_VERSION}</Version>|<Version>${NEW_VERSION}</Version>|" "$TEMPLATES"
+              UPDATED_PROJECTS="\n- ${TEMPLATES}: ${PR_VERSION} → ${NEW_VERSION}"
+            fi
+            VERSIONS_UPDATED=1
+          fi
+          echo "versions_updated=$VERSIONS_UPDATED" >> $GITHUB_OUTPUT
+          echo "updated_projects<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check and increment Python package versions (python/)
+        id: py-version-check
+        working-directory: .
+        run: |
+          set -euo pipefail
+          VERSIONS_UPDATED=0
+          UPDATED_PROJECTS=""
+          for MANIFEST in python/*/pyproject.toml; do
+            DIR=$(dirname "$MANIFEST")
+            CODE_CHANGES=$(git diff --name-only master...HEAD -- "$DIR" | { grep -v -x "$MANIFEST" || true; } | wc -l)
+            echo "Checking $MANIFEST: $CODE_CHANGES changed file(s)"
+            if [ "$CODE_CHANGES" -eq 0 ]; then
+              continue
+            fi
+            PR_VERSION=$(python3 -c "import tomllib,sys;print(tomllib.load(open(sys.argv[1],'rb'))['project']['version'])" "$MANIFEST")
+            MASTER_VERSION=$(git show master:"$MANIFEST" 2>/dev/null | python3 -c "import tomllib,sys;print(tomllib.loads(sys.stdin.read())['project']['version'])" 2>/dev/null || echo "")
+            if [ -z "$MASTER_VERSION" ]; then
+              echo "  New package (not in master), version: $PR_VERSION"
+              continue
+            fi
+            if [ "$PR_VERSION" = "$MASTER_VERSION" ]; then
+              IFS='.' read -r -a VERSION_PARTS <<< "$PR_VERSION"
+              if [ "${VERSION_PARTS[2]}" -ge 9 ]; then
+                NEW_VERSION="${VERSION_PARTS[0]}.$((VERSION_PARTS[1] + 1)).0"
+              else
+                NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$((VERSION_PARTS[2] + 1))"
+              fi
+              echo "  ✓ New version: $NEW_VERSION"
+              sed -i "s|^version = \"${PR_VERSION}\"|version = \"${NEW_VERSION}\"|" "$MANIFEST"
+              # Keep __version__ in the package's __init__.py in step with pyproject.toml.
+              for INIT in "$DIR"/*/__init__.py; do
+                sed -i "s|^__version__ = \"${PR_VERSION}\"|__version__ = \"${NEW_VERSION}\"|" "$INIT"
+              done
+              VERSIONS_UPDATED=$((VERSIONS_UPDATED + 1))
+              UPDATED_PROJECTS="${UPDATED_PROJECTS}\n- ${MANIFEST}: ${PR_VERSION} → ${NEW_VERSION}"
+            fi
+          done
+          echo "versions_updated=$VERSIONS_UPDATED" >> $GITHUB_OUTPUT
+          echo "updated_projects<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Check and increment npm package versions (js/)
         id: js-version-check
         working-directory: .
@@ -204,20 +290,64 @@ jobs:
           echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Check and increment VERSION-file packages (Swift, PHP, Android)
+        id: file-version-check
+        working-directory: .
+        run: |
+          set -euo pipefail
+          VERSIONS_UPDATED=0
+          UPDATED_PROJECTS=""
+          # "VERSION file|paths whose changes bump it". Swift and PHP share the repo's semver tags (the Swift release
+          # workflow tags master with swift/AnointedSSO/VERSION and Packagist reads those tags), so PHP changes bump it too.
+          for ENTRY in \
+            "swift/AnointedSSO/VERSION|swift/AnointedSSO Package.swift php/anointed-sso composer.json" \
+            "android/AnointedSSO/VERSION|android/AnointedSSO"; do
+            FILE="${ENTRY%%|*}"
+            PATHS="${ENTRY#*|}"
+            # shellcheck disable=SC2086
+            CODE_CHANGES=$(git diff --name-only master...HEAD -- $PATHS | { grep -v -x "$FILE" || true; } | wc -l)
+            echo "Checking $FILE: $CODE_CHANGES changed file(s)"
+            if [ "$CODE_CHANGES" -eq 0 ]; then
+              continue
+            fi
+            PR_VERSION=$(tr -d '[:space:]' < "$FILE")
+            MASTER_VERSION=$(git show master:"$FILE" 2>/dev/null | tr -d '[:space:]' || echo "")
+            if [ -z "$MASTER_VERSION" ]; then
+              echo "  New package (not in master), version: $PR_VERSION"
+              continue
+            fi
+            if [ "$PR_VERSION" = "$MASTER_VERSION" ]; then
+              IFS='.' read -r -a VERSION_PARTS <<< "$PR_VERSION"
+              if [ "${VERSION_PARTS[2]}" -ge 9 ]; then
+                NEW_VERSION="${VERSION_PARTS[0]}.$((VERSION_PARTS[1] + 1)).0"
+              else
+                NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$((VERSION_PARTS[2] + 1))"
+              fi
+              echo "  ✓ New version: $NEW_VERSION"
+              printf '%s\n' "$NEW_VERSION" > "$FILE"
+              VERSIONS_UPDATED=$((VERSIONS_UPDATED + 1))
+              UPDATED_PROJECTS="${UPDATED_PROJECTS}\n- ${FILE}: ${PR_VERSION} → ${NEW_VERSION}"
+            fi
+          done
+          echo "versions_updated=$VERSIONS_UPDATED" >> $GITHUB_OUTPUT
+          echo "updated_projects<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Commit version changes
-        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0'
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         run: |
           git add -A
           git commit -m "Auto-increment versions for PR to master"
           git push origin ${{ github.event.pull_request.head.ref }}
 
       - name: Comment on PR with version updates
-        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0'
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         uses: actions/github-script@v9
         with:
           script: |
-            const updatedProjects = `${{ steps.version-check.outputs.updated_projects }}${{ steps.js-version-check.outputs.updated_projects }}`;
-            const count = String(Number('${{ steps.version-check.outputs.versions_updated }}') + Number('${{ steps.js-version-check.outputs.versions_updated }}'));
+            const updatedProjects = `${{ steps.version-check.outputs.updated_projects }}${{ steps.template-pins.outputs.updated_projects }}${{ steps.js-version-check.outputs.updated_projects }}${{ steps.py-version-check.outputs.updated_projects }}${{ steps.file-version-check.outputs.updated_projects }}`;
+            const count = String(Number('${{ steps.version-check.outputs.versions_updated }}') + Number('${{ steps.template-pins.outputs.versions_updated }}') + Number('${{ steps.js-version-check.outputs.versions_updated }}') + Number('${{ steps.py-version-check.outputs.versions_updated }}') + Number('${{ steps.file-version-check.outputs.versions_updated }}'));
 
             const comment = `## 🔢 Version Auto-Increment
 
@@ -238,6 +368,6 @@ jobs:
             });
 
       - name: No version updates needed
-        if: steps.version-check.outputs.versions_updated == '0' && steps.js-version-check.outputs.versions_updated == '0'
+        if: steps.version-check.outputs.versions_updated == '0' && steps.js-version-check.outputs.versions_updated == '0' && steps.template-pins.outputs.versions_updated == '0' && steps.py-version-check.outputs.versions_updated == '0' && steps.file-version-check.outputs.versions_updated == '0'
         run: |
           echo "✓ All project versions are already different from master - no updates needed"

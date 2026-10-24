@@ -1,0 +1,15 @@
+@* Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ *@
+@page
+@using AnointedAutomation.SSO
+@{
+    ViewData["Title"] = "Home";
+}
+<h1>Welcome</h1>
+@if (User.Identity.IsAuthenticated)
+{
+    <p>Signed in as @User.GetAnointedEmail() (Anointed Automation id @User.GetAnointedSubject()).</p>
+}
+else
+{
+    <p>Sign in with your Anointed Automation account to continue.</p>
+}

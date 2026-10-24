@@ -22,26 +22,20 @@ Anointed Automation directly:
 
 ## Install
 
-Not published to Maven Central. Consume it from source or JitPack.
-
-JitPack (once a release tag exists; the coordinate below is what JitPack derives from the repo, check
-jitpack.io for the build status of your tag first):
+From Maven Central:
 
 ```kotlin
-// settings.gradle.kts
-dependencyResolutionManagement { repositories { maven("https://jitpack.io") } }
-
-// app/build.gradle.kts
-implementation("com.github.AnointedAutomation.AnointedAutomation:anointedsso:<tag>")
+// app/build.gradle.kts (mavenCentral() is in every new Android project)
+implementation("com.anointedautomation:anointedsso:0.1.0")
 ```
 
-From source (always works): clone this repo, then either
+From source: clone this repo, then either
 
 - include the module: in your `settings.gradle.kts`,
   `include(":anointedsso"); project(":anointedsso").projectDir = file("/path/to/AnointedAutomation/android/AnointedSSO/anointedsso")`
   and `implementation(project(":anointedsso"))`, or
-- publish to Maven Local: `cd android/AnointedSSO && gradle :anointedsso:publishReleasePublicationToMavenLocal`,
-  add `mavenLocal()` and use `com.github.AnointedAutomation.AnointedAutomation:anointedsso:0.1.0`.
+- publish to Maven Local: `cd android/AnointedSSO && gradle :anointedsso:publishToMavenLocal`,
+  add `mavenLocal()` and use `com.anointedautomation:anointedsso:0.1.0`.
 
 ## Use it
 

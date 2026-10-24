@@ -1,0 +1,61 @@
+{
+  "name": "@anointedautomation/sso-react-native",
+  "version": "0.1.0",
+  "description": "Sign in with Anointed Automation for React Native and Expo: an accessible brand-styled sign-in button and a useAnointedSignIn hook that open your server's start route in a system auth session and read the deep-link callback. No secrets in the app.",
+  "type": "module",
+  "main": "./src/index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "index.d.ts",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "pretest": "node scripts/ensure-deps.mjs",
+    "test": "node --test test/*.test.js"
+  },
+  "peerDependencies": {
+    "expo-web-browser": ">=12",
+    "react": ">=18",
+    "react-native": ">=0.72"
+  },
+  "peerDependenciesMeta": {
+    "expo-web-browser": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "keywords": [
+    "anointed-automation",
+    "oidc",
+    "sso",
+    "sign-in",
+    "react-native",
+    "expo"
+  ],
+  "author": "Anointed Automation, LLC.",
+  "license": "MIT",
+  "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react-native#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnointedAutomation/AnointedAutomation.git",
+    "directory": "js/anointed-sso-react-native"
+  },
+  "bugs": {
+    "url": "https://github.com/AnointedAutomation/AnointedAutomation/issues"
+  }
+}

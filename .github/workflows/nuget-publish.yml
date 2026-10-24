@@ -73,6 +73,9 @@ jobs:
             ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="anointedautomation.shopify"
             ["AnointedAutomation.Serialization/AnointedAutomation.Serialization.csproj"]="anointedautomation.serialization"
             ["AnointedAutomation.SSO/AnointedAutomation.SSO.csproj"]="anointedautomation.sso"
+            ["AnointedAutomation.SSO.Owin/AnointedAutomation.SSO.Owin.csproj"]="anointedautomation.sso.owin"
+            ["AnointedAutomation.SSO.UI/AnointedAutomation.SSO.UI.csproj"]="anointedautomation.sso.ui"
+            ["templates/AnointedAutomation.Templates/AnointedAutomation.Templates.csproj"]="anointedautomation.templates"
           )
 
           for PROJECT_PATH in "${!PACKAGES[@]}"; do
@@ -124,10 +127,11 @@ jobs:
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           echo "Publishing changed packages to NuGet.org..."
-          # Dependency order first (a package must never land before what it depends on), then the rest.
+          # Dependency order first (a package must never land before what it depends on; SSO before SSO.UI before
+          # Templates), then the rest.
           shopt -s nocaseglob
           ORDERED=""
-          for pattern in "AnointedAutomation.Serialization.[0-9]*.nupkg" "AnointedAutomation.Shopify.[0-9]*.nupkg" "AnointedAutomation.Objects.[0-9]*.nupkg" "AnointedAutomation.Repository.Mongo.[0-9]*.nupkg" "AnointedAutomation.Objects.API.[0-9]*.nupkg"; do
+          for pattern in "AnointedAutomation.Serialization.[0-9]*.nupkg" "AnointedAutomation.Shopify.[0-9]*.nupkg" "AnointedAutomation.Objects.[0-9]*.nupkg" "AnointedAutomation.Repository.Mongo.[0-9]*.nupkg" "AnointedAutomation.Objects.API.[0-9]*.nupkg" "AnointedAutomation.SSO.[0-9]*.nupkg" "AnointedAutomation.SSO.UI.[0-9]*.nupkg" "AnointedAutomation.Templates.[0-9]*.nupkg"; do
             for package in ./nupkgs/$pattern; do
               if [ -f "$package" ]; then ORDERED="$ORDERED $package"; fi
             done
