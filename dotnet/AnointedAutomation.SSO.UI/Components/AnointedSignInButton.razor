@@ -1,0 +1,35 @@
+@* Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ *@
+@namespace AnointedAutomation.SSO.UI.Components
+@* A real link to the server's start route. data-enhance-nav="false" makes Blazor do a full page load, so the
+   redirect to Anointed Automation is never swallowed by enhanced or interactive navigation. *@
+<a href="@Href" class="@Class" style="@InlineStyle" data-anointed-sign-in="" data-enhance-nav="false" @attributes="AdditionalAttributes"><img src="@AnointedButtonLook.LogoUrl" alt="" aria-hidden="true" width="20" height="20" style="@AnointedButtonLook.LogoStyle" /><span>@Label</span></a>
+
+@code {
+    /// <summary>Required. Path or URL of your start route, for example /auth/anointed/start.</summary>
+    [Parameter, EditorRequired]
+    public string StartUrl { get; set; }
+
+    /// <summary>Where to land after sign-in. Omit for none.</summary>
+    [Parameter]
+    public string ReturnTo { get; set; }
+
+    /// <summary>The parameter your server reads. Default returnTo.</summary>
+    [Parameter]
+    public string ReturnToParam { get; set; } = AnointedButtonLook.DefaultReturnToParam;
+
+    /// <summary>Button text. Default "Sign in with Anointed Automation".</summary>
+    [Parameter]
+    public string Label { get; set; } = AnointedButtonLook.DefaultSignInLabel;
+
+    /// <summary>When set, the built-in inline look is dropped so your CSS owns the button.</summary>
+    [Parameter]
+    public string Class { get; set; }
+
+    /// <summary>Any other attributes, passed to the link.</summary>
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> AdditionalAttributes { get; set; }
+
+    private string Href => AnointedButtonLook.BuildStartUrl(StartUrl, ReturnTo, ReturnToParam);
+
+    private string InlineStyle => Class == null ? AnointedButtonLook.ButtonStyle : null;
+}
