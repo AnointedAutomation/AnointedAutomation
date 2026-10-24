@@ -1,0 +1,56 @@
+{
+  "name": "@anointedautomation/sso-angular",
+  "version": "0.1.0",
+  "description": "Sign in with Anointed Automation for Angular 17+: a standalone accessible brand-styled sign-in button, an AnointedSignInService and provideAnointedSignIn() that send the browser to your server's start route. No secrets client side.",
+  "type": "module",
+  "sideEffects": false,
+  "module": "./dist/fesm2022/anointedautomation-sso-angular.mjs",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/fesm2022/anointedautomation-sso-angular.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json -c tsconfig.lib.json",
+    "pretest": "node scripts/ensure-deps.mjs && npm run build",
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@angular/common": ">=17.0.0",
+    "@angular/core": ">=17.0.0"
+  },
+  "devDependencies": {
+    "@angular/common": "^20.3.0",
+    "@angular/compiler": "^20.3.0",
+    "@angular/compiler-cli": "^20.3.0",
+    "@angular/core": "^20.3.0",
+    "@angular/platform-browser": "^20.3.0",
+    "@angular/platform-server": "^20.3.0",
+    "ng-packagr": "^20.3.0",
+    "rxjs": "^7.8.0",
+    "typescript": "~5.8.0",
+    "tslib": "^2.8.0"
+  },
+  "keywords": ["anointed-automation", "oidc", "sso", "sign-in", "angular"],
+  "author": "Anointed Automation, LLC.",
+  "license": "MIT",
+  "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AnointedAutomation/AnointedAutomation.git",
+    "directory": "js/anointed-sso-angular"
+  },
+  "bugs": {
+    "url": "https://github.com/AnointedAutomation/AnointedAutomation/issues"
+  }
+}
