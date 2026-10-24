@@ -4,14 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace AnointedAutomation.SSO.UI.Tests
 {
-    [TestFixture]
     public class TagHelperTests
     {
         private static TagHelperOutput NewOutput(string tag, TagHelperAttributeList attributes)
@@ -24,23 +23,23 @@ namespace AnointedAutomation.SSO.UI.Tests
             return new TagHelperContext(attributes, new Dictionary<object, object>(), Guid.NewGuid().ToString("N"));
         }
 
-        [Test]
+        [Fact]
         public void SignIn_RendersStyledLinkWithLogoAndLabel()
         {
             AnointedSignInTagHelper helper = new AnointedSignInTagHelper { StartUrl = "/auth/anointed/start", ReturnTo = "/account" };
             TagHelperOutput output = NewOutput("anointed-sign-in", new TagHelperAttributeList());
             helper.Process(NewContext(new TagHelperAttributeList()), output);
 
-            Assert.That(output.TagName, Is.EqualTo("a"));
-            Assert.That(output.Attributes["href"].Value, Is.EqualTo("/auth/anointed/start?returnTo=%2Faccount"));
-            Assert.That(output.Attributes["style"].Value, Is.EqualTo(AnointedButtonLook.ButtonStyle));
-            Assert.That(output.Attributes.ContainsName("data-anointed-sign-in"), Is.True);
+            Assert.Equal("a", output.TagName);
+            Assert.Equal("/auth/anointed/start?returnTo=%2Faccount", output.Attributes["href"].Value);
+            Assert.Equal(AnointedButtonLook.ButtonStyle, output.Attributes["style"].Value);
+            Assert.True(output.Attributes.ContainsName("data-anointed-sign-in"));
             string content = output.Content.GetContent();
-            Assert.That(content, Does.Contain("alt=\"\" aria-hidden=\"true\""));
-            Assert.That(content, Does.Contain("<span>Sign in with Anointed Automation</span>"));
+            Assert.Contains("alt=\"\" aria-hidden=\"true\"", content);
+            Assert.Contains("<span>Sign in with Anointed Automation</span>", content);
         }
 
-        [Test]
+        [Fact]
         public void SignIn_WithClass_DropsInlineStyle_AndEncodesLabel()
         {
             TagHelperAttributeList attributes = new TagHelperAttributeList { { "class", "btn" } };
@@ -48,18 +47,18 @@ namespace AnointedAutomation.SSO.UI.Tests
             TagHelperOutput output = NewOutput("anointed-sign-in", attributes);
             helper.Process(NewContext(attributes), output);
 
-            Assert.That(output.Attributes.ContainsName("style"), Is.False);
-            Assert.That(output.Content.GetContent(), Does.Contain("&lt;b&gt;Go&lt;/b&gt;"));
+            Assert.False(output.Attributes.ContainsName("style"));
+            Assert.Contains("&lt;b&gt;Go&lt;/b&gt;", output.Content.GetContent());
         }
 
-        [Test]
+        [Fact]
         public void SignIn_MissingStartUrl_Throws()
         {
             AnointedSignInTagHelper helper = new AnointedSignInTagHelper();
             Assert.Throws<InvalidOperationException>(() => helper.Process(NewContext(new TagHelperAttributeList()), NewOutput("anointed-sign-in", new TagHelperAttributeList())));
         }
 
-        [Test]
+        [Fact]
         public void SignOut_RendersPostFormWithAntiforgeryAndReturnTo()
         {
             ServiceProvider services = new ServiceCollection().AddLogging().AddAntiforgery().BuildServiceProvider();
@@ -73,30 +72,30 @@ namespace AnointedAutomation.SSO.UI.Tests
             TagHelperOutput output = NewOutput("anointed-sign-out", new TagHelperAttributeList());
             helper.Process(NewContext(new TagHelperAttributeList()), output);
 
-            Assert.That(output.TagName, Is.EqualTo("form"));
-            Assert.That(output.Attributes["method"].Value, Is.EqualTo("post"));
-            Assert.That(output.Attributes["action"].Value, Is.EqualTo("/auth/anointed/sign-out"));
+            Assert.Equal("form", output.TagName);
+            Assert.Equal("post", output.Attributes["method"].Value);
+            Assert.Equal("/auth/anointed/sign-out", output.Attributes["action"].Value);
             string content = output.Content.GetContent();
-            Assert.That(content, Does.Contain("name=\"__RequestVerificationToken\""));
-            Assert.That(content, Does.Contain("name=\"returnTo\" value=\"/bye\""));
-            Assert.That(content, Does.Contain("<button type=\"submit\" style="));
-            Assert.That(content, Does.Contain("<span>Sign out</span>"));
+            Assert.Contains("name=\"__RequestVerificationToken\"", content);
+            Assert.Contains("name=\"returnTo\" value=\"/bye\"", content);
+            Assert.Contains("<button type=\"submit\" style=", content);
+            Assert.Contains("<span>Sign out</span>", content);
         }
 
-        [Test]
+        [Fact]
         public void SignOut_WithClass_MovesClassToButton()
         {
             TagHelperAttributeList attributes = new TagHelperAttributeList { { "class", "btn" } };
             TagHelperOutput output = NewOutput("anointed-sign-out", attributes);
             AnointedSignOutTagHelper.Render(output, "/so", null, "returnTo", "Leave", "f", "t");
 
-            Assert.That(output.Attributes.ContainsName("class"), Is.False);
+            Assert.False(output.Attributes.ContainsName("class"));
             string content = output.Content.GetContent();
-            Assert.That(content, Does.Contain("<button type=\"submit\" class=\"btn\">"));
-            Assert.That(content, Does.Not.Contain("name=\"returnTo\""));
+            Assert.Contains("<button type=\"submit\" class=\"btn\">", content);
+            Assert.DoesNotContain("name=\"returnTo\"", content);
         }
 
-        [Test]
+        [Fact]
         public void SignOut_MissingAction_Throws()
         {
             AnointedSignOutTagHelper helper = new AnointedSignOutTagHelper();

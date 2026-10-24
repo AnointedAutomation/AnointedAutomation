@@ -1,10 +1,13 @@
 // Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
 using System.Threading.Tasks;
 
@@ -15,7 +18,9 @@ namespace AnointedAutomation.SSO.UI
     /// Under the prefix you choose:
     /// <list type="bullet">
     /// <item><c>GET {prefix}/start?returnTo=/path</c> starts the Anointed Automation sign-in.</item>
-    /// <item><c>POST {prefix}/sign-out</c> ends the local session (form with an antiforgery token, or a script sending <c>X-Anointed-CSRF: 1</c>).</item>
+    /// <item><c>POST {prefix}/sign-out</c> ends the local session (form with an antiforgery token, or a script sending <c>X-Anointed-CSRF: 1</c>)
+/// and, when the challenge scheme is OpenID Connect and the provider publishes an <c>end_session_endpoint</c>, also signs out
+/// at Anointed Automation (RP-initiated logout).</item>
     /// <item><c>GET {prefix}/user</c> returns <see cref="AnointedUserInfo"/> JSON for single page apps (no tokens).</item>
     /// </list>
     /// </summary>
@@ -110,14 +115,64 @@ namespace AnointedAutomation.SSO.UI
                 }
             }
 
+            string target = ResolveReturn(requested, options);
             await context.SignOutAsync(options.CookieScheme).ConfigureAwait(false);
             context.Response.Headers.CacheControl = "no-store";
+            if (await ProviderEndSessionAvailableAsync(context, options).ConfigureAwait(false))
+            {
+                AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = target };
+                await context.SignOutAsync(options.ChallengeScheme, properties).ConfigureAwait(false);
+                if (fromScript)
+                {
+                    string location = context.Response.Headers.Location;
+                    context.Response.Headers.Remove("Location");
+                    context.Response.StatusCode = StatusCodes.Status200OK;
+                    await context.Response.WriteAsJsonAsync(new SignOutRedirect { Redirect = location }).ConfigureAwait(false);
+                }
+                return;
+            }
             if (fromScript)
             {
                 context.Response.StatusCode = StatusCodes.Status204NoContent;
                 return;
             }
-            context.Response.Redirect(ResolveReturn(requested, options));
+            context.Response.Redirect(target);
+        }
+
+        /// <summary>
+        /// True when <see cref="AnointedAuthEndpointOptions.SignOutOfProvider"/> is on, the challenge scheme is an OpenID Connect
+        /// scheme, and its provider metadata publishes an <c>end_session_endpoint</c>.
+        /// </summary>
+        /// <param name="context">The request.</param>
+        /// <param name="options">Validated settings.</param>
+        /// <returns>Whether to run RP-initiated logout.</returns>
+        internal static async Task<bool> ProviderEndSessionAvailableAsync(HttpContext context, AnointedAuthEndpointOptions options)
+        {
+            if (!options.SignOutOfProvider)
+            {
+                return false;
+            }
+            IAuthenticationSchemeProvider schemes = context.RequestServices.GetRequiredService<IAuthenticationSchemeProvider>();
+            AuthenticationScheme scheme = await schemes.GetSchemeAsync(options.ChallengeScheme).ConfigureAwait(false);
+            if (scheme == null || !typeof(OpenIdConnectHandler).IsAssignableFrom(scheme.HandlerType))
+            {
+                return false;
+            }
+            OpenIdConnectOptions oidc = context.RequestServices.GetRequiredService<IOptionsMonitor<OpenIdConnectOptions>>().Get(options.ChallengeScheme);
+            OpenIdConnectConfiguration configuration = oidc.Configuration;
+            if (configuration == null)
+            {
+                configuration = await oidc.ConfigurationManager.GetConfigurationAsync(context.RequestAborted).ConfigureAwait(false);
+            }
+            return !string.IsNullOrEmpty(configuration.EndSessionEndpoint);
+        }
+
+        /// <summary>The JSON a script sign-out gets when the browser must visit the provider to finish signing out.</summary>
+        internal sealed class SignOutRedirect
+        {
+            /// <summary>The provider end-session URL to navigate to.</summary>
+            [System.Text.Json.Serialization.JsonPropertyName("redirect")]
+            public string Redirect { get; set; }
         }
 
         /// <summary>Writes the signed-in user (or the signed-out answer) as JSON. Never a token.</summary>

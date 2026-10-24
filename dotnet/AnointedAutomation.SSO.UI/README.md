@@ -61,15 +61,19 @@ app.MapAnointedAutomationAuth("/auth/anointed");
 | Route | What it does |
 |---|---|
 | `GET /auth/anointed/start?returnTo=/account` | Starts sign-in. `returnTo` must be a same-site path (`/account`); anything else lands on `/`. |
-| `POST /auth/anointed/sign-out` | Ends the local session. Needs a form antiforgery token (the buttons add it) or, from script, the header `X-Anointed-CSRF: 1` (answers `204`). |
+| `POST /auth/anointed/sign-out` | Ends the local session and, when the provider publishes an `end_session_endpoint`, signs out at Anointed Automation too (RP-initiated logout). Needs a form antiforgery token (the buttons add it) or, from script, the header `X-Anointed-CSRF: 1`. A form gets a redirect to the provider; a script gets `200` with `{"redirect":"https://..."}` to navigate to (or `204` when only the local session ended). |
 | `GET /auth/anointed/user` | `{"isAuthenticated":true,"sub":"...","email":"...","name":null,"preferredUsername":null,"picture":null}` for single page apps. Never a token. `Cache-Control: no-store`. |
 
 Options (`app.MapAnointedAutomationAuth("/auth/anointed", o => { ... })`): `ChallengeScheme` (default `Anointed`),
-`CookieScheme` (default `Cookies`), `ReturnToParam` (default `returnTo`), `DefaultReturnPath` (default `/`).
+`CookieScheme` (default `Cookies`), `ReturnToParam` (default `returnTo`), `DefaultReturnPath` (default `/`),
+`SignOutOfProvider` (default `true`).
 The call returns the route group so you can add rate limiting or other conventions.
 
-Sign-out ends the local session only. To react to a sign-out at Anointed Automation, map the back-channel logout
-endpoint from AnointedAutomation.SSO.
+Sign-out clears the local cookie, then (when `ChallengeScheme` is the OpenID Connect scheme from
+`AddAnointedAutomation` and discovery lists `end_session_endpoint`) signs out the `Anointed` scheme so the browser
+ends the Anointed Automation session and comes back to `returnTo`. Set `SignOutOfProvider = false` to end the local
+session only. To react to a sign-out made at Anointed Automation, map the back-channel logout endpoint from
+AnointedAutomation.SSO.
 
 ## Razor Pages / MVC
 

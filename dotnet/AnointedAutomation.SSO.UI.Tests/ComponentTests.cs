@@ -4,30 +4,27 @@ using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
+using Xunit;
 using System;
 
 namespace AnointedAutomation.SSO.UI.Tests
 {
-    [TestFixture]
-    public class ComponentTests
+    public class ComponentTests : IDisposable
     {
         private BunitContext _context;
 
-        [SetUp]
-        public void SetUp()
+        public ComponentTests()
         {
             _context = new BunitContext();
             _context.Services.AddSingleton<AntiforgeryStateProvider>(new FakeAntiforgeryStateProvider());
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             _context.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void SignInButton_RendersBrandLink()
         {
             IRenderedComponent<AnointedSignInButton> cut = _context.Render<AnointedSignInButton>(p => p
@@ -35,15 +32,15 @@ namespace AnointedAutomation.SSO.UI.Tests
                 .Add(x => x.ReturnTo, "/account"));
 
             IElement link = cut.Find("a[data-anointed-sign-in]");
-            Assert.That(link.GetAttribute("href"), Is.EqualTo("/auth/anointed/start?returnTo=%2Faccount"));
-            Assert.That(link.GetAttribute("data-enhance-nav"), Is.EqualTo("false"));
-            Assert.That(link.GetAttribute("style"), Is.EqualTo(AnointedButtonLook.ButtonStyle));
-            Assert.That(cut.Find("img").GetAttribute("aria-hidden"), Is.EqualTo("true"));
-            Assert.That(cut.Find("img").GetAttribute("alt"), Is.EqualTo(string.Empty));
-            Assert.That(cut.Find("span").TextContent, Is.EqualTo(AnointedButtonLook.DefaultSignInLabel));
+            Assert.Equal("/auth/anointed/start?returnTo=%2Faccount", link.GetAttribute("href"));
+            Assert.Equal("false", link.GetAttribute("data-enhance-nav"));
+            Assert.Equal(AnointedButtonLook.ButtonStyle, link.GetAttribute("style"));
+            Assert.Equal("true", cut.Find("img").GetAttribute("aria-hidden"));
+            Assert.Equal(string.Empty, cut.Find("img").GetAttribute("alt"));
+            Assert.Equal(AnointedButtonLook.DefaultSignInLabel, cut.Find("span").TextContent);
         }
 
-        [Test]
+        [Fact]
         public void SignInButton_WithClass_DropsInlineStyle()
         {
             IRenderedComponent<AnointedSignInButton> cut = _context.Render<AnointedSignInButton>(p => p
@@ -52,18 +49,18 @@ namespace AnointedAutomation.SSO.UI.Tests
                 .Add(x => x.Label, "Continue"));
 
             IElement link = cut.Find("a");
-            Assert.That(link.GetAttribute("class"), Is.EqualTo("my-btn"));
-            Assert.That(link.HasAttribute("style"), Is.False);
-            Assert.That(cut.Find("span").TextContent, Is.EqualTo("Continue"));
+            Assert.Equal("my-btn", link.GetAttribute("class"));
+            Assert.False(link.HasAttribute("style"));
+            Assert.Equal("Continue", cut.Find("span").TextContent);
         }
 
-        [Test]
+        [Fact]
         public void SignInButton_MissingStartUrl_Throws()
         {
             Assert.Throws<InvalidOperationException>(() => _context.Render<AnointedSignInButton>());
         }
 
-        [Test]
+        [Fact]
         public void SignOutButton_RendersPostFormWithToken()
         {
             IRenderedComponent<AnointedSignOutButton> cut = _context.Render<AnointedSignOutButton>(p => p
@@ -71,15 +68,15 @@ namespace AnointedAutomation.SSO.UI.Tests
                 .Add(x => x.ReturnTo, "/bye"));
 
             IElement form = cut.Find("form[data-anointed-sign-out]");
-            Assert.That(form.GetAttribute("method"), Is.EqualTo("post"));
-            Assert.That(form.GetAttribute("action"), Is.EqualTo("/auth/anointed/sign-out"));
-            Assert.That(cut.Find("input[name=__test_token]").GetAttribute("value"), Is.EqualTo("token-value"));
-            Assert.That(cut.Find("input[name=returnTo]").GetAttribute("value"), Is.EqualTo("/bye"));
-            Assert.That(cut.Find("button").GetAttribute("type"), Is.EqualTo("submit"));
-            Assert.That(cut.Find("button span").TextContent, Is.EqualTo(AnointedButtonLook.DefaultSignOutLabel));
+            Assert.Equal("post", form.GetAttribute("method"));
+            Assert.Equal("/auth/anointed/sign-out", form.GetAttribute("action"));
+            Assert.Equal("token-value", cut.Find("input[name=__test_token]").GetAttribute("value"));
+            Assert.Equal("/bye", cut.Find("input[name=returnTo]").GetAttribute("value"));
+            Assert.Equal("submit", cut.Find("button").GetAttribute("type"));
+            Assert.Equal(AnointedButtonLook.DefaultSignOutLabel, cut.Find("button span").TextContent);
         }
 
-        [Test]
+        [Fact]
         public void SignOutButton_MissingAction_Throws()
         {
             Assert.Throws<InvalidOperationException>(() => _context.Render<AnointedSignOutButton>());

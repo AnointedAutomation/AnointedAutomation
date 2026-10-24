@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,14 +22,12 @@ using System.Threading.Tasks;
 
 namespace AnointedAutomation.SSO.UI.Tests
 {
-    [TestFixture]
-    public class AuthEndpointTests
+    public class AuthEndpointTests : IAsyncLifetime
     {
         private IHost _host;
         private HttpClient _client;
 
-        [SetUp]
-        public async Task SetUp()
+        public async Task InitializeAsync()
         {
             _host = await new HostBuilder()
                 .ConfigureWebHost(web => web
@@ -72,8 +70,7 @@ namespace AnointedAutomation.SSO.UI.Tests
             _client = _host.GetTestClient();
         }
 
-        [TearDown]
-        public async Task TearDown()
+        public async Task DisposeAsync()
         {
             _client.Dispose();
             await _host.StopAsync();
@@ -99,44 +96,45 @@ namespace AnointedAutomation.SSO.UI.Tests
                 request.Headers.Add("Cookie", cookie);
             }
             HttpResponseMessage response = await _client.SendAsync(request);
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(response.Headers.CacheControl.NoStore, Is.True);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.True(response.Headers.CacheControl.NoStore);
             string body = await response.Content.ReadAsStringAsync();
-            Assert.That(body, Does.Not.Contain("SECRET-TOKEN"));
+            Assert.DoesNotContain("SECRET-TOKEN", body);
             return JsonDocument.Parse(body).RootElement;
         }
+        [Theory]
 
-        [TestCase("/account", "%2Faccount")]
-        [TestCase("//evil.example", "%2F")]
-        [TestCase("https://evil.example", "%2F")]
+        [InlineData("/account", "%2Faccount")]
+        [InlineData("//evil.example", "%2F")]
+        [InlineData("https://evil.example", "%2F")]
         public async Task Start_ChallengesWithSafeReturn(string returnTo, string expectedEncoded)
         {
             HttpResponseMessage response = await _client.GetAsync("/auth/anointed/start?returnTo=" + Uri.EscapeDataString(returnTo));
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
             string location = response.Headers.Location.ToString();
-            Assert.That(location, Does.Contain("/idp?ReturnUrl=" + expectedEncoded));
-            Assert.That(location.EndsWith("ReturnUrl=" + expectedEncoded, StringComparison.Ordinal), Is.True);
+            Assert.Contains("/idp?ReturnUrl=" + expectedEncoded, location);
+            Assert.EndsWith("ReturnUrl=" + expectedEncoded, location, StringComparison.Ordinal);
         }
 
-        [Test]
+        [Fact]
         public async Task User_SignedOut_ReturnsFalse()
         {
             JsonElement user = await UserAsync(null);
-            Assert.That(user.GetProperty("isAuthenticated").GetBoolean(), Is.False);
+            Assert.False(user.GetProperty("isAuthenticated").GetBoolean());
         }
 
-        [Test]
+        [Fact]
         public async Task User_SignedIn_ReturnsClaimsButNoTokens()
         {
             string cookie = await SignInAsync();
             JsonElement user = await UserAsync(cookie);
-            Assert.That(user.GetProperty("isAuthenticated").GetBoolean(), Is.True);
-            Assert.That(user.GetProperty("sub").GetString(), Is.EqualTo("user-1"));
-            Assert.That(user.GetProperty("email").GetString(), Is.EqualTo("a@example.com"));
-            Assert.That(user.GetProperty("name").GetString(), Is.EqualTo("Ann"));
+            Assert.True(user.GetProperty("isAuthenticated").GetBoolean());
+            Assert.Equal("user-1", user.GetProperty("sub").GetString());
+            Assert.Equal("a@example.com", user.GetProperty("email").GetString());
+            Assert.Equal("Ann", user.GetProperty("name").GetString());
         }
 
-        [Test]
+        [Fact]
         public async Task SignOut_WithoutCsrfProof_Is400()
         {
             string cookie = await SignInAsync();
@@ -144,10 +142,10 @@ namespace AnointedAutomation.SSO.UI.Tests
             request.Headers.Add("Cookie", cookie);
             request.Content = new FormUrlEncodedContent(new Dictionary<string, string>());
             HttpResponseMessage response = await _client.SendAsync(request);
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
-        [Test]
+        [Fact]
         public async Task SignOut_FromScript_ClearsCookieWith204()
         {
             string cookie = await SignInAsync();
@@ -155,12 +153,13 @@ namespace AnointedAutomation.SSO.UI.Tests
             request.Headers.Add("Cookie", cookie);
             request.Headers.Add(AnointedAuthEndpointOptions.CsrfHeaderName, "1");
             HttpResponseMessage response = await _client.SendAsync(request);
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
-            Assert.That(string.Join(",", response.Headers.GetValues("Set-Cookie")), Does.Contain("expires=Thu, 01 Jan 1970"));
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            Assert.Contains("expires=Thu, 01 Jan 1970", string.Join(",", response.Headers.GetValues("Set-Cookie")));
         }
+        [Theory]
 
-        [TestCase("/bye", "/bye")]
-        [TestCase("//evil.example", "/")]
+        [InlineData("/bye", "/bye")]
+        [InlineData("//evil.example", "/")]
         public async Task SignOut_FormWithAntiforgery_RedirectsToSafeTarget(string returnTo, string expected)
         {
             string sessionCookie = await SignInAsync();
@@ -178,11 +177,11 @@ namespace AnointedAutomation.SSO.UI.Tests
                 { "returnTo", returnTo },
             });
             HttpResponseMessage response = await _client.SendAsync(request);
-            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.Redirect));
-            Assert.That(response.Headers.Location.ToString(), Is.EqualTo(expected));
+            Assert.Equal(HttpStatusCode.Redirect, response.StatusCode);
+            Assert.Equal(expected, response.Headers.Location.ToString());
         }
 
-        [Test]
+        [Fact]
         public void Map_BadPrefix_Throws()
         {
             WebApplication app = WebApplication.CreateBuilder().Build();

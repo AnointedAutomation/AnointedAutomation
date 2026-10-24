@@ -24,6 +24,12 @@ namespace AnointedAutomation.SSO.UI
         /// <summary>Where to land when no safe return target was given. Must be a same-site path. Default <c>/</c>.</summary>
         public string DefaultReturnPath { get; set; } = "/";
 
+        /// <summary>
+        /// Also sign out at Anointed Automation (RP-initiated logout) when the challenge scheme is OpenID Connect and the
+        /// provider publishes an <c>end_session_endpoint</c>. Default <c>true</c>.
+        /// </summary>
+        public bool SignOutOfProvider { get; set; } = true;
+
         /// <summary>Throws <see cref="InvalidOperationException"/> naming the first invalid setting.</summary>
         public void Validate()
         {
