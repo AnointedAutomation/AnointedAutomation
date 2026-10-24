@@ -75,7 +75,7 @@ Versions 1 to 10 are supported (up to 57 x 57 modules). The maximum payload, in 
 ## License
 
 MIT. See [LICENSE](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE).
-Copyright © Anointed Automation, LLC. Stewarded by Alexander Fields.
+Copyright © Anointed Automation Corporation. Stewarded by Alexander Fields.
 
 ## Support This Project
 

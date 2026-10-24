@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // base64url and UTF-8 helpers built on web standards only (btoa/atob, TextEncoder), so the same code runs
 // on Node 18+, Deno and edge runtimes without Buffer.
 

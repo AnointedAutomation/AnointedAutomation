@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // SvelteKit handlers on top of @anointedautomation/sso's createWebHandlers (SvelteKit speaks Web Request/Response).
 
 import { AnointedSsoError, createWebHandlers } from "@anointedautomation/sso";

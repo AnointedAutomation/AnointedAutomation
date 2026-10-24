@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 
 plugins {
     id("com.android.library")
@@ -75,7 +75,7 @@ mavenPublishing {
         developers {
             developer {
                 id.set("anointedautomation")
-                name.set("Anointed Automation, LLC")
+                name.set("Anointed Automation Corporation")
                 url.set("https://www.anointedautomation.net")
             }
         }

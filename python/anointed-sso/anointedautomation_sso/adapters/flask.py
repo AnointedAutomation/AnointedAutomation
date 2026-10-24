@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 """Flask adapter: a blueprint with the start, callback and back-channel logout routes.
 
     anointed = create_blueprint(client, on_signed_in=..., on_logout=...)

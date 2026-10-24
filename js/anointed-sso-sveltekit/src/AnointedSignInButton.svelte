@@ -1,4 +1,4 @@
-<!-- Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ -->
+<!-- Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️ -->
 <script>
   // "Sign in with Anointed Automation". A real link to YOUR server's start route, so it works without JavaScript,
   // is keyboard and screen reader friendly, and carries no secrets and makes no network calls of its own.

@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from the Anointed API (Tests/Services/Setup/LenientStringSerializerTests.cs).
 
 using MongoDB.Bson;

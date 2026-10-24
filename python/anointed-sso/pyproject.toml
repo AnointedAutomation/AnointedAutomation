@@ -9,7 +9,7 @@ description = "Sign in with Anointed Automation: a server-side OpenID Connect ki
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10"
-authors = [{ name = "Anointed Automation, LLC." }]
+authors = [{ name = "Anointed Automation Corporation." }]
 keywords = ["anointed-automation", "oidc", "openid-connect", "oauth2", "sso", "pkce", "django", "fastapi", "flask"]
 classifiers = [
   "Development Status :: 4 - Beta",

@@ -217,7 +217,7 @@ For a ready made set of foundational claims (64 laws, 12 theories and 3 conjectu
 ## License
 
 MIT. See [LICENSE](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE).
-Copyright © Anointed Automation, LLC. Stewarded by Alexander Fields.
+Copyright © Anointed Automation Corporation. Stewarded by Alexander Fields.
 
 ## Support This Project
 

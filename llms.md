@@ -2,7 +2,7 @@
 
 Jesus is King ✝️
 
-Open-source .NET / NuGet libraries by Anointed Automation, LLC, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light C# packages published to NuGet under the AnointedAutomation.* prefix.
+Open-source .NET / NuGet libraries by Anointed Automation Corporation, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light C# packages published to NuGet under the AnointedAutomation.* prefix.
 
 - Repository: https://github.com/AnointedAutomation/AnointedAutomation
 - Site: https://anointedautomation.net

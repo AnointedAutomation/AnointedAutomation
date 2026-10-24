@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Test-only helper (not shipped): installs the dev dependency (svelte) when it is missing, then links the sibling
 // ../anointed-sso when @anointedautomation/sso is not installed from the registry yet.
 

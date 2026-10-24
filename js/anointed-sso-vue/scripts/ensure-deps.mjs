@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Test-only helper: installs the dev dependencies (vue, @vue/server-renderer) when they are not there yet, so
 // `npm test` works from a fresh clone and in the publish workflow. Not shipped in the package.
 

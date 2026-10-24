@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Shared, READ-ONLY System.Text.Json option sets. Each preset reproduces EXACTLY the settings of the hand-rolled
 // static options it replaces (noted per member). Reuse the instance; to customize, copy it first:

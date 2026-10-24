@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 # Publishes every package under python/ whose pyproject.toml version is not on PyPI yet, mirroring
 # npm-publish.yml. Auth is PyPI Trusted Publishing (OIDC): no PyPI token is stored. Each project needs a
 # trusted publisher on PyPI (a "pending publisher" before the first release) for owner AnointedAutomation,

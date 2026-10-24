@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // A local, in-process OpenID Connect provider that mimics api.anointedautomation.net closely enough to run
 // the whole sign-in flow in tests: discovery, JWKS (with key rotation), authorize (PKCE S256, state, nonce,
 // RFC 9207 iss), token (authorization_code + refresh_token with rotation), userinfo, revoke and logout.

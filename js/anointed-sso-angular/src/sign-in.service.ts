@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // signIn(returnTo?) sends the browser to YOUR server's start route. The server (using @anointedautomation/sso)
 // holds the client secret, builds the PKCE request and redirects to Anointed Automation.
 

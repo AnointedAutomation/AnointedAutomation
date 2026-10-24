@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Compact JWS (RS256 only) verification against a JWKS, plus OpenID Connect ID token claim checks.
 // Pure apart from WebCrypto: the caller supplies the JWKS and the clock, so every rule is unit tested.
 

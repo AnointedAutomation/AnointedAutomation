@@ -8,14 +8,14 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
 		<Title>AnointedAutomation.Objects</Title>
-		<Company>Anointed Automation LLC - Alexander Fields</Company>
-		<Copyright>Copyright © 2023 Anointed Automation, LLC All rights reserved.</Copyright>
+		<Company>Anointed Automation Corporation - Alexander Fields</Company>
+		<Copyright>Copyright © 2023 Anointed Automation Corporation All rights reserved.</Copyright>
 		<Description>Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Discord, GitHub, LinkedIn, Twitch, Yahoo, Amazon, Reddit, Shopify), and standard API response envelopes.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>2.7.0</Version>
 		<PackageTags>models;poco;dto;billing;payments;user;response;anointedautomation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Objects</PackageReleaseNotes>
-		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
+		<Authors>Anointed Automation Corporation, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 

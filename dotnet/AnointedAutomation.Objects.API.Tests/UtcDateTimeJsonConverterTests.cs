@@ -1,5 +1,5 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
-// Copyright 2026 Anointed Automation, LLC. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright 2026 Anointed Automation Corporation. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
 using System;
 using System.Text.Json;
 using Xunit;

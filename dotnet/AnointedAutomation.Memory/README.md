@@ -72,7 +72,7 @@ Keep a reference to the `Timer` for as long as it should run.
 ## License
 
 MIT. See [LICENSE](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/LICENSE).
-Copyright © Anointed Automation, LLC. Stewarded by Alexander Fields.
+Copyright © Anointed Automation Corporation. Stewarded by Alexander Fields.
 
 ## Support This Project
 

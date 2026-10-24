@@ -1,14 +1,14 @@
 {
   "name": "Anointed Automation",
   "faith": "Jesus is King ✝️",
-  "summary": "Open-source .NET / NuGet libraries by Anointed Automation, LLC, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light C# packages published to NuGet under the AnointedAutomation.* prefix.",
+  "summary": "Open-source .NET / NuGet libraries by Anointed Automation Corporation, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light C# packages published to NuGet under the AnointedAutomation.* prefix.",
   "site": "https://anointedautomation.net",
   "repository": "https://github.com/AnointedAutomation/AnointedAutomation",
   "license": "MIT. AnointedAutomation.Shopify (and portions of AnointedAutomation.Serialization) are derived from ShopifySharp, MIT, Copyright (c) 2015 Joshua Harms.",
   "nugetProfile": "https://www.nuget.org/profiles/roku674",
   "install": "dotnet add package <PackageId>",
   "publishing": "Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org.",
-  "fileHeader": "// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
+  "fileHeader": "// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
   "packages": [
     {
       "id": "AnointedAutomation.Algorithms",

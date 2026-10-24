@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // The four handlers against the fake provider from the core kit's tests: fake h3 v2 style events ({req}) for the
 // flow, and a real h3 v1 app on a local HTTP server to prove the toWebRequest path and Response passthrough.
 

@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Lenient, never-throwing readers over System.Text.Json JsonElement. Moved from the Anointed API
 // (Services/Common/JsonElementExtensions.cs) and widened into a SUPERSET so every hand-rolled private reader in the

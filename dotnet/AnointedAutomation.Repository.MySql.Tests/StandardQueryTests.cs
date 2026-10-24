@@ -1,5 +1,5 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
-// Copyright 2026 Anointed Automation, LLC. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright 2026 Anointed Automation Corporation. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me
 // Unit tests for the additive standard query methods on GenericRepository and MySqlHelper, exercised against
 // the EF Core InMemory provider. Raw-SQL (ExecuteRawSqlAsync) and transactions (ExecuteInTransactionAsync)
 // are intentionally NOT covered here: the InMemory provider supports neither, so they require a live MySQL

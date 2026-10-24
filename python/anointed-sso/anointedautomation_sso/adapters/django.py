@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 """Django adapter: views and URL patterns for the start, callback and back-channel logout routes.
 
     anointed = create_views(client, on_signed_in=..., on_logout=...)

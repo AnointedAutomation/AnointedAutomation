@@ -6,9 +6,9 @@
     <PackageId>AnointedAutomation.Templates</PackageId>
     <Title>AnointedAutomation.Templates</Title>
     <Version>1.0.0</Version>
-    <Authors>Anointed Automation LLC, Alexander Fields</Authors>
-    <Company>Anointed Automation LLC - Alexander Fields</Company>
-    <Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
+    <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
+    <Company>Anointed Automation Corporation - Alexander Fields</Company>
+    <Copyright>Copyright © 2026 Anointed Automation Corporation All rights reserved.</Copyright>
     <Description>dotnet new templates for Sign in with Anointed Automation: anointed-razor (Razor Pages) and anointed-blazor (Blazor Web App, interactive server), wired to AnointedAutomation.SSO and AnointedAutomation.SSO.UI with the client id and secret in user-secrets.</Description>
     <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>

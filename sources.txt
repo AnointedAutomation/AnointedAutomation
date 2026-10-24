@@ -4,7 +4,7 @@
 # Lines starting with # are comments
 
 # Company name for copyright
-COMPANY_NAME=Anointed Automation, LLC.
+COMPANY_NAME=Anointed Automation Corporation.
 
 # Rights statement (leave empty for "All Rights Reserved")
 RIGHTS_STATEMENT=

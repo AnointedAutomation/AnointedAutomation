@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-01-16 19:19:01 Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-01-16 19:19:01 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2026-10-01
 //Stewarded by Alexander Fields
 

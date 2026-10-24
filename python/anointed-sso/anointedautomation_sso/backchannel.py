@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 """Framework-neutral back-channel logout handling (validation, replay protection, status code)."""
 
 from __future__ import annotations

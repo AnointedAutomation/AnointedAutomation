@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // WebCrypto access. Node 19+, Deno and edge runtimes expose `globalThis.crypto`; Node 18 only exposes it
 // through `node:crypto`, which is imported lazily so bundlers for other runtimes never see it.
 

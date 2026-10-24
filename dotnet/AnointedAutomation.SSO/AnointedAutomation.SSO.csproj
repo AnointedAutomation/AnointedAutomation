@@ -8,14 +8,14 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
     <Title>AnointedAutomation.SSO</Title>
-    <Company>Anointed Automation LLC - Alexander Fields</Company>
-    <Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
+    <Company>Anointed Automation Corporation - Alexander Fields</Company>
+    <Copyright>Copyright © 2026 Anointed Automation Corporation All rights reserved.</Copyright>
     <Description>Sign in with Anointed Automation for ASP.NET Core: an OpenID Connect handler preset (authorization code + PKCE S256, verified email only), a back-channel logout endpoint with Logout Token validation and replay protection, and a fail-open session status client.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>1.0.2</Version>
     <PackageTags>aspnetcore;openid-connect;oidc;sso;authentication;backchannel-logout;pkce;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.SSO</PackageReleaseNotes>
-    <Authors>Anointed Automation LLC, Alexander Fields</Authors>
+    <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>

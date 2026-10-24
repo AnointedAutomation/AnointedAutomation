@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 # Publishes every public package under js/ whose package.json version is not on npm yet, mirroring
 # nuget-publish.yml. Auth is npm Trusted Publishing (OIDC): no npm token is stored. Each package must exist on
 # npm once (first publish by hand) with this workflow registered as its trusted publisher.
