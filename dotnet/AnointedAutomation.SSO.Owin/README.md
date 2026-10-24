@@ -42,6 +42,18 @@ Install-Package Microsoft.Owin.Host.SystemWeb
 `Microsoft.Owin.Host.SystemWeb` runs the OWIN pipeline inside IIS / IIS Express and gives you
 `SystemWebCookieManager` and `HttpContext.GetOwinContext()`.
 
+Binding redirects are required. The package depends on `System.Text.Json`, `System.Memory`,
+`Microsoft.Bcl.*` and `Microsoft.IdentityModel.*`, whose assembly versions differ across the graph. Without
+redirects .NET Framework throws `FileNotFoundException` at runtime (back-channel logout answers 500). NuGet adds
+them to `Web.config` on install; if it did not, set this in the web project's `.csproj` and rebuild:
+
+```xml
+<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+```
+
+Or run `Add-BindingRedirect` in the Package Manager Console.
+
 ## 3. Startup (shared by MVC 5 and Web Forms)
 
 `Startup.cs` at the project root:
