@@ -36,7 +36,8 @@ This file serves as the index/directory for all PROJECT_STRUCTURE files in the A
 - Technology choices (.NET 8.0, C#, MongoDB, GitHub Actions)
 - High-level component relationships
 - Root directory structure and file organization (`dotnet/`, `js/`, `swift/`, `docs/`)
-- JavaScript packages (`js/anointed-sso`: Sign in with Anointed Automation kit; `js/anointed-sso-react` React button/hook; `js/anointed-sso-next` Next.js App Router handlers)
+- JavaScript packages (`js/anointed-sso`: Sign in with Anointed Automation kit; `js/anointed-sso-react` React button/hook; `js/anointed-sso-next` Next.js App Router handlers; Vue, Nuxt, Angular, SvelteKit and React Native kits beside them)
+- Python package (`python/anointed-sso`) and PHP package (`php/anointed-sso`)
 - Swift package (`swift/AnointedSSO`: Sign in with Anointed Automation for iOS/macOS)
 
 ### [PROJECT_STRUCTURE_TESTING.md](./PROJECT_STRUCTURE_TESTING.md) ✅

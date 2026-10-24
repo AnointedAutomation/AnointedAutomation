@@ -5,7 +5,9 @@ Jesus is King ✝️
 A practical guide for partners who want a "Sign in with Anointed Automation" button on their own
 site or app. Anointed Automation is a standard OpenID Connect (OIDC) provider, so any OIDC library works; for
 Node, Deno and edge runtimes there is a ready-made kit, [`@anointedautomation/sso`](../js/anointed-sso), and for
-iOS and macOS apps the Swift package [`AnointedSSO`](../swift/AnointedSSO).
+iOS and macOS apps the Swift package [`AnointedSSO`](../swift/AnointedSSO). Kits for other frameworks
+(Vue, Nuxt, Angular, SvelteKit, React Native, Python, PHP / Laravel, ASP.NET Core UI, classic ASP.NET) are listed
+in [Framework kits](#framework-kits).
 
 ## 1. What it is
 
@@ -246,6 +248,36 @@ redirect URI. To end a local session when the user's Anointed Automation account
 `builder.Services.AddAnointedSessionStatus(...)` (your partner API key needs the `sessions:status` scope); it
 fails open, so an outage never signs your users out. Full API and security checklist:
 [dotnet/AnointedAutomation.SSO/README.md](../dotnet/AnointedAutomation.SSO/README.md).
+
+### ASP.NET Core buttons, routes and templates
+
+[AnointedAutomation.SSO.UI](../dotnet/AnointedAutomation.SSO.UI) adds the brand sign-in and sign-out buttons
+(Tag Helper for Razor Pages / MVC, components for Blazor) and `app.MapAnointedAutomationAuth("/auth/anointed")`
+(start, sign-out and user-info routes; the browser only holds your cookie). Sign-out clears your cookie and, because
+discovery lists an `end_session_endpoint`, also ends the Anointed Automation session (RP-initiated logout).
+To start from a working app: `dotnet new install AnointedAutomation.Templates`, then
+`dotnet new anointed-razor` or `dotnet new anointed-blazor`
+([dotnet/templates/AnointedAutomation.Templates](../dotnet/templates/AnointedAutomation.Templates)).
+
+### Framework kits
+
+Every kit keeps the client secret on your server and follows the rules above. Each README has the full setup.
+
+| Stack | Package | Folder |
+|---|---|---|
+| React (button / hook) | `@anointedautomation/sso-react` | [js/anointed-sso-react](../js/anointed-sso-react) |
+| Next.js App Router | `@anointedautomation/sso-next` | [js/anointed-sso-next](../js/anointed-sso-next) |
+| Vue 3 (button / composable) | `@anointedautomation/sso-vue` | [js/anointed-sso-vue](../js/anointed-sso-vue) |
+| Nuxt 3 / 4 (server routes) | `@anointedautomation/sso-nuxt` | [js/anointed-sso-nuxt](../js/anointed-sso-nuxt) |
+| Angular 17+ (button / service) | `@anointedautomation/sso-angular` | [js/anointed-sso-angular](../js/anointed-sso-angular) |
+| SvelteKit (handlers + button) | `@anointedautomation/sso-sveltekit` | [js/anointed-sso-sveltekit](../js/anointed-sso-sveltekit) |
+| React Native / Expo | `@anointedautomation/sso-react-native` | [js/anointed-sso-react-native](../js/anointed-sso-react-native) |
+| Android (Kotlin) | `AnointedSSO` | [android/AnointedSSO](../android/AnointedSSO) |
+| Python (Django, FastAPI, Flask) | `anointedautomation-sso` | [python/anointed-sso](../python/anointed-sso) |
+| PHP 8.1+ / Laravel | `anointedautomation/sso` | [php/anointed-sso](../php/anointed-sso) |
+| ASP.NET Core UI | `AnointedAutomation.SSO.UI` | [dotnet/AnointedAutomation.SSO.UI](../dotnet/AnointedAutomation.SSO.UI) |
+| `dotnet new` templates | `AnointedAutomation.Templates` | [dotnet/templates/AnointedAutomation.Templates](../dotnet/templates/AnointedAutomation.Templates) |
+| Classic ASP.NET (.NET Framework 4.7.2+, MVC 5, Web Forms) | `AnointedAutomation.SSO.Owin` | [dotnet/AnointedAutomation.SSO.Owin](../dotnet/AnointedAutomation.SSO.Owin) |
 
 ### Any other stack (plain OIDC)
 

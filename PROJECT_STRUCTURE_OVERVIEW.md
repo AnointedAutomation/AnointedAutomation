@@ -36,6 +36,13 @@ The solution `dotnet/AnointedAutomation.sln` contains the following project orga
 9. **AnointedAutomation.Mathematics** (`dotnet/AnointedAutomation.Mathematics/`) - curated mathematics and
    physics claim catalogs (UniversalLaws, PhysicalTheories, Conjectures) that feed the Epistemics
    engine; references AnointedAutomation.Concepts
+10. **AnointedAutomation.SSO** (`dotnet/AnointedAutomation.SSO/`) - Sign in with Anointed Automation for ASP.NET Core
+11. **AnointedAutomation.SSO.UI** (`dotnet/AnointedAutomation.SSO.UI/`) - Tag Helper / Blazor buttons and BFF auth
+    routes on top of SSO; sign-out also does RP-initiated logout
+12. **AnointedAutomation.SSO.Owin** (`dotnet/AnointedAutomation.SSO.Owin/`) - .NET Framework 4.7.2 OWIN kit (MVC 5,
+    Web Forms); tests target net10.0 everywhere and net48 on Windows
+13. **AnointedAutomation.Templates** (`dotnet/templates/AnointedAutomation.Templates/`) - `dotnet new`
+    `anointed-razor` and `anointed-blazor` templates pinned to SSO and SSO.UI
 
 ### Test Projects
 All test projects are organized under a "Tests" solution folder:
@@ -45,6 +52,7 @@ All test projects are organized under a "Tests" solution folder:
 - **AnointedAutomation.Repository.Mongo.Tests** (`dotnet/AnointedAutomation.Repository.Mongo.Tests/`)
 - **AnointedAutomation.Concepts.Tests** (`dotnet/AnointedAutomation.Concepts.Tests/`)
 - **AnointedAutomation.Mathematics.Tests** (`dotnet/AnointedAutomation.Mathematics.Tests/`)
+- **AnointedAutomation.SSO.Tests**, **AnointedAutomation.SSO.UI.Tests** (xunit + bUnit), **AnointedAutomation.SSO.Owin.Tests**
 
 ### JavaScript Packages (`js/`)
 - **@anointedautomation/sso** (`js/anointed-sso/`) - "Sign in with Anointed Automation" OpenID Connect
@@ -54,6 +62,24 @@ All test projects are organized under a "Tests" solution folder:
   (browser safe, no secrets; the server uses `@anointedautomation/sso`).
 - **@anointedautomation/sso-next** (`js/anointed-sso-next/`) - Next.js App Router `start` / `callback` /
   `backchannelLogout` route handlers built on `@anointedautomation/sso`.
+- **@anointedautomation/sso-vue** (`js/anointed-sso-vue/`) - Vue 3 sign-in button and `useAnointedSignIn` composable
+  (browser safe, no secrets).
+- **@anointedautomation/sso-nuxt** (`js/anointed-sso-nuxt/`) - Nuxt 3/4 server routes (start, callback, logout,
+  back-channel logout) built on `@anointedautomation/sso`.
+- **@anointedautomation/sso-angular** (`js/anointed-sso-angular/`) - Angular 17+ standalone button,
+  `AnointedSignInService`, `provideAnointedSignIn()`; built with ng-packagr.
+- **@anointedautomation/sso-sveltekit** (`js/anointed-sso-sveltekit/`) - SvelteKit handle hook / `+server.js`
+  handlers built on `@anointedautomation/sso`, plus a Svelte 5 button (`./client`).
+- **@anointedautomation/sso-react-native** (`js/anointed-sso-react-native/`) - React Native / Expo button and
+  `useAnointedSignIn` hook (system auth session, deep-link callback, no secrets in the app).
+
+### Python Package (`python/`)
+- **anointedautomation-sso** (`python/anointed-sso/`) - server-side OIDC kit (code + PKCE) for Python 3.9+ with
+  Django, FastAPI/Starlette and Flask adapters. CI: `python-anointed-sso.yml`; publish: `pypi-publish.yml`.
+
+### PHP Package (`php/`)
+- **anointedautomation/sso** (`php/anointed-sso/`) - PHP 8.1+ and Laravel kit (code + PKCE, ID token checks,
+  logout, back-channel logout). CI: `php-anointed-sso.yml`; split mirror: `php-split.yml`.
 
 ### Swift Package (`swift/`)
 - **AnointedSSO** (`swift/AnointedSSO/`, `Package.swift` at the repo root) - "Sign in with Anointed Automation"

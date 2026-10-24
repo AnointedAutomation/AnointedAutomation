@@ -427,6 +427,25 @@ All billing models include complete XML documentation
 - `Json/`: JsonElementExtensions (lenient never-throwing readers), ResponseJson.
 - Consumers: Shopify, Objects, Objects.API, Repository.Mongo. Repository.Mongo 1.3.0 adds namespace `AnointedAutomation.Repository.Mongo.Bson` (BsonValueExtensions, HybridCasing, BsonToleranceRegistrar, LenientStringSerializer); Shopify adds ShopifyGid and ShopifyMoney.
 
+### 13. AnointedAutomation.SSO.UI v1.0.0 (`dotnet/AnointedAutomation.SSO.UI/`)
+Razor class library on top of AnointedAutomation.SSO. `AnointedSignInTagHelper` / `AnointedSignOutTagHelper`
+(`<anointed-sign-in start-url>`, `<anointed-sign-out action>`), Blazor `AnointedSignInButton` /
+`AnointedSignOutButton`, and `MapAnointedAutomationAuth(prefix)` (`AnointedAuthEndpoints`): `GET start`,
+`POST sign-out` (antiforgery form or `X-Anointed-CSRF` header), `GET user` (`AnointedUserInfo`, no tokens).
+Sign-out clears the cookie scheme and, when the challenge scheme is OpenID Connect and discovery has
+`end_session_endpoint`, signs out that scheme too (RP-initiated logout; scripts get `{"redirect": url}`).
+`AnointedAuthEndpointOptions.SignOutOfProvider` (default true) turns that off. Tests: xunit + bUnit.
+
+### 14. AnointedAutomation.SSO.Owin v1.0.0 (`dotnet/AnointedAutomation.SSO.Owin/`)
+net472 kit for classic ASP.NET on OWIN/Katana: `AnointedAutomationAppBuilderExtensions` (OIDC preset, code + PKCE
+S256, verified email only), `AnointedBackchannelLogoutMiddleware` with `AnointedLogoutTokenValidator` and replay
+store, `AnointedSessionStatusClient`, `AnointedSignInButton` HTML helper. Tests: net10.0 on all OSes, plus net48
+on Windows (`test-owin-windows` CI job).
+
+### 15. AnointedAutomation.Templates v1.0.0 (`dotnet/templates/AnointedAutomation.Templates/`)
+`dotnet new` template pack: `anointed-razor`, `anointed-blazor`. `content/*/*.csproj` pin SSO and SSO.UI; the
+version-increment workflow keeps those pins current.
+
 ## JavaScript Packages (`js/`)
 
 ### @anointedautomation/sso v0.1.0 (`js/anointed-sso/`)
@@ -469,6 +488,30 @@ Next.js App Router helpers on top of `@anointedautomation/sso` (dependency; reus
 - `index.d.ts`: TypeScript definitions.
 - Tests: `test/routeHandlers.test.js` against `../anointed-sso/test/helpers/fakeIdp.js`; `scripts/link-sibling.mjs`
   links `../anointed-sso` for `npm test` while the registry copy is absent.
+
+### Framework kits (`js/anointed-sso-vue`, `-nuxt`, `-angular`, `-sveltekit`, `-react-native`), all v0.1.0
+- **sso-vue**: `AnointedSignInButton`, `useAnointedSignIn`, `buildStartUrl`. Peer `vue >= 3.3`.
+- **sso-nuxt**: `createAnointedEventHandlers` (start, callback, logout via `client.buildLogoutUrl`, back-channel
+  logout), `redirectTo`. Depends on `@anointedautomation/sso`; peer `h3`.
+- **sso-angular**: `AnointedSignInButtonComponent`, `AnointedSignInService`, `provideAnointedSignIn`. Built with
+  ng-packagr on `npm test` (needs Node 20.19+ to build).
+- **sso-sveltekit**: `createAnointedHandle`, `createAnointedHandlers`, `redirectTo`; `./client` exports the
+  Svelte 5 `AnointedSignInButton`. Depends on `@anointedautomation/sso`.
+- **sso-react-native**: `AnointedSignInButton`, `useAnointedSignIn`, `createAnointedSignIn`, `createExpoOpener`,
+  `createLinkingOpener`. Peers `react`, `react-native`, `expo-web-browser`.
+- Each: `index.d.ts` (not angular), node:test suites, CI workflow `js-anointed-sso-<kit>.yml`.
+
+## Python Package (`python/`)
+
+### anointedautomation-sso v0.1.0 (`python/anointed-sso/`)
+`AnointedClient`, `SessionStatusClient`, `process_backchannel_logout`, `safe_return_to`, `require_env`; adapters
+for Django, FastAPI/Starlette and Flask. Tests: pytest. Version also lives in `anointedautomation_sso.__version__`.
+
+## PHP Package (`php/`)
+
+### anointedautomation/sso (`php/anointed-sso/`)
+`Client`, `SsoConfig`, `BackchannelLogoutHandler`, `SessionStatusClient`; Laravel `AnointedSsoServiceProvider` and
+`AnointedSsoController`. Tests: PHPUnit (`core` and `laravel` suites).
 
 ## Swift Package (`swift/`)
 

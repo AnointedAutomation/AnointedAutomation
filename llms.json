@@ -433,6 +433,74 @@
         "Refund"
       ],
       "notes": "Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package."
+    },
+    {
+      "id": "AnointedAutomation.SSO.UI",
+      "version": "1.0.0",
+      "targetFramework": "net10.0",
+      "description": "Front end for Sign in with Anointed Automation in ASP.NET Core: brand-styled sign-in and sign-out buttons as a Tag Helper (Razor Pages, MVC) and Blazor components, plus MapAnointedAutomationAuth() BFF routes (start, sign-out, user info). Cookie only, no tokens in the browser; sign-out also runs RP-initiated logout when the provider publishes end_session_endpoint.",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.SSO.UI",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.UI",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.SSO.UI/README.md",
+      "dependencies": {
+        "nuget": [],
+        "anointed": [
+          "AnointedAutomation.SSO"
+        ]
+      },
+      "keyNamespaces": [
+        "AnointedAutomation.SSO.UI"
+      ],
+      "keyTypes": [
+        "AnointedAuthEndpoints",
+        "AnointedAuthEndpointOptions",
+        "AnointedSignInTagHelper",
+        "AnointedSignOutTagHelper",
+        "AnointedUserInfo",
+        "AnointedReturnTo"
+      ]
+    },
+    {
+      "id": "AnointedAutomation.SSO.Owin",
+      "version": "1.0.0",
+      "targetFramework": "net472",
+      "description": "Sign in with Anointed Automation for classic ASP.NET (.NET Framework 4.7.2+, MVC 5 and Web Forms on OWIN/Katana): OpenID Connect middleware preset (code + PKCE S256, verified email only), back-channel logout with Logout Token validation and replay protection, a session status client, and a sign-in button for Razor and Web Forms.",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.SSO.Owin",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.Owin",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.SSO.Owin/README.md",
+      "dependencies": {
+        "nuget": [],
+        "anointed": []
+      },
+      "keyNamespaces": [
+        "AnointedAutomation.SSO.Owin"
+      ],
+      "keyTypes": [
+        "AnointedAutomationAppBuilderExtensions",
+        "AnointedAutomationOptions",
+        "AnointedBackchannelLogoutMiddleware",
+        "AnointedLogoutTokenValidator",
+        "AnointedSessionStatusClient",
+        "AnointedSignInButton"
+      ]
+    },
+    {
+      "id": "AnointedAutomation.Templates",
+      "version": "1.0.0",
+      "targetFramework": "net10.0",
+      "description": "dotnet new templates: anointed-razor (Razor Pages) and anointed-blazor (Blazor Web App, interactive server), wired to AnointedAutomation.SSO and AnointedAutomation.SSO.UI with the client id and secret in user-secrets.",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.Templates",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/templates/AnointedAutomation.Templates",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/templates/AnointedAutomation.Templates/README.md",
+      "dependencies": {
+        "nuget": [],
+        "anointed": [
+          "AnointedAutomation.SSO",
+          "AnointedAutomation.SSO.UI"
+        ]
+      },
+      "keyNamespaces": [],
+      "keyTypes": []
     }
   ],
   "support": {
@@ -514,6 +582,88 @@
         "redirectTo"
       ],
       "notes": "On first sign-in call client.takeNewUserPassword(sub) and store a hash; never create a null-password account. Env vars: ANOINTED_OAUTH_ISSUER, ANOINTED_OAUTH_CLIENT_ID, ANOINTED_OAUTH_CLIENT_SECRET, ANOINTED_OAUTH_REDIRECT_URI."
+    },
+    {
+      "id": "@anointedautomation/sso-vue",
+      "version": "0.1.0",
+      "runtime": "Vue 3 (browser)",
+      "published": false,
+      "description": "Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-vue/README.md",
+      "dependencies": [],
+      "keyExports": [
+        "AnointedSignInButton",
+        "useAnointedSignIn",
+        "buildStartUrl"
+      ]
+    },
+    {
+      "id": "@anointedautomation/sso-nuxt",
+      "version": "0.1.0",
+      "runtime": "Nuxt 3 and 4 (Nitro/h3 server)",
+      "published": false,
+      "description": "Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-nuxt",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-nuxt/README.md",
+      "dependencies": [
+        "@anointedautomation/sso"
+      ],
+      "keyExports": [
+        "createAnointedEventHandlers",
+        "redirectTo"
+      ]
+    },
+    {
+      "id": "@anointedautomation/sso-angular",
+      "version": "0.1.0",
+      "runtime": "Angular 17+ (browser)",
+      "published": false,
+      "description": "Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-angular/README.md",
+      "dependencies": [],
+      "keyExports": [
+        "AnointedSignInButtonComponent",
+        "AnointedSignInService",
+        "provideAnointedSignIn",
+        "buildStartUrl"
+      ]
+    },
+    {
+      "id": "@anointedautomation/sso-sveltekit",
+      "version": "0.1.0",
+      "runtime": "SvelteKit 2 + Svelte 5",
+      "published": false,
+      "description": "SvelteKit start, callback, logout and back-channel logout handlers (handle hook or +server.js) built on @anointedautomation/sso, plus a sign-in button (./client).",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-sveltekit",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-sveltekit/README.md",
+      "dependencies": [
+        "@anointedautomation/sso"
+      ],
+      "keyExports": [
+        "createAnointedHandle",
+        "createAnointedHandlers",
+        "redirectTo",
+        "AnointedSignInButton"
+      ]
+    },
+    {
+      "id": "@anointedautomation/sso-react-native",
+      "version": "0.1.0",
+      "runtime": "React Native / Expo",
+      "published": false,
+      "description": "React Native and Expo sign-in button and useAnointedSignIn hook: open the partner server's start route in a system auth session and read the deep-link callback. No secrets in the app.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react-native",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-react-native/README.md",
+      "dependencies": [],
+      "keyExports": [
+        "AnointedSignInButton",
+        "useAnointedSignIn",
+        "createAnointedSignIn",
+        "createExpoOpener",
+        "createLinkingOpener"
+      ]
     }
   ],
   "swiftPackages": [
@@ -535,6 +685,41 @@
         "AnointedSignInError"
       ],
       "notes": "Never put the client secret in the app. .https callbacks need iOS 17.4+; .scheme(_, via:) needs an https bounce route on the server."
+    }
+  ],
+  "pythonPackages": [
+    {
+      "id": "anointedautomation-sso",
+      "version": "0.1.0",
+      "runtime": "Python 3.9+ (server only)",
+      "published": false,
+      "description": "Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/python/anointed-sso/README.md",
+      "keyExports": [
+        "AnointedClient",
+        "SessionStatusClient",
+        "process_backchannel_logout",
+        "safe_return_to",
+        "require_env"
+      ]
+    }
+  ],
+  "phpPackages": [
+    {
+      "id": "anointedautomation/sso",
+      "runtime": "PHP 8.1+, Laravel optional",
+      "published": false,
+      "description": "Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout.",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/php/anointed-sso/README.md",
+      "keyClasses": [
+        "Client",
+        "SsoConfig",
+        "BackchannelLogoutHandler",
+        "SessionStatusClient",
+        "AnointedSsoServiceProvider"
+      ]
     }
   ]
 }

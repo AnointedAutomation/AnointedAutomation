@@ -370,6 +370,10 @@ Based on the .NET nature of the project:
 - Test (from `dotnet/`): `~/.dotnet/dotnet test`
 - Individual project testing (from `dotnet/`): `~/.dotnet/dotnet test AnointedAutomation.{LibraryName}.Tests/`
 - JS React / Next kits: `cd js/anointed-sso-react && npm test`; `cd js/anointed-sso-next && npm test` (Request objects against the core kit fake IdP).
+- JS Vue / Nuxt / Angular / SvelteKit / React Native kits: `cd js/anointed-sso-<kit> && npm test` (installs or links what it needs on first run).
+- Python kit: `cd python/anointed-sso && python -m venv .venv && .venv/bin/pip install -e ".[test]" && .venv/bin/python -m pytest`.
+- PHP kit: `cd php/anointed-sso && composer install && vendor/bin/phpunit`.
+- SSO.UI tests use xunit + bUnit; SSO.Owin tests also run on net48 on Windows.
 - JS SSO kit: `cd js/anointed-sso && npm test` (unit tests + mocked end-to-end flow against
   `test/helpers/fakeIdp.js`), Deno: `deno test --allow-net --no-check test/deno/smoke.ts`
 - Swift SSO kit: `swift test` from the repo root (XCTest, `swift/AnointedSSO/Tests`); CI also builds for iOS

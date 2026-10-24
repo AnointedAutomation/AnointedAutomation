@@ -147,6 +147,11 @@ relative to `dotnet/`.
 - **React / Next kits**: `.github/workflows/js-anointed-sso-react.yml` and `js-anointed-sso-next.yml` (Node 18-24 `npm test`,
   `tsc` type check); also triggered by changes under `js/anointed-sso/`. Local: `cd js/anointed-sso-react && npm test`
   (installs react on first run), `cd js/anointed-sso-next && npm test` (links `../anointed-sso`).
+- **Vue / Nuxt / Angular / SvelteKit / React Native kits**: `js-anointed-sso-{vue,nuxt,angular,sveltekit,react-native}.yml`
+  (same shape; Angular runs Node 20-24 and has no d.ts job because ng-packagr emits its types).
+- **Python**: `python-anointed-sso.yml` (pytest), `pypi-publish.yml` (Trusted Publishing on master).
+- **PHP**: `php-anointed-sso.yml` (PHPUnit core + Laravel), `php-split.yml`.
+- **.NET Framework**: `build-and-test.yml` job `test-owin-windows` runs SSO.Owin tests on net48 + net10.0.
 - **Publishing**: `.github/workflows/npm-publish.yml` on push to `master` (paths `js/**`): for each non-private
   `js/*/package.json` whose version is not on npm, `npm test` then `npm publish --access public` over npm
   Trusted Publishing (OIDC, `id-token: write`, npm 11.5.1+). First publish of a new package is manual, then

@@ -1,8 +1,10 @@
 # AnointedAutomation (open source libraries)
 
 ## What this is
-MIT licensed libraries from Anointed Automation: .NET 10 NuGet packages (`dotnet/`), the `@anointedautomation/sso`
-npm package (`js/anointed-sso/`) and the AnointedSSO Swift package (`swift/`, `Package.swift` at root).
+MIT licensed libraries from Anointed Automation: .NET 10 NuGet packages (`dotnet/`, plus the net472
+`AnointedAutomation.SSO.Owin` and the `dotnet/templates/AnointedAutomation.Templates` pack), the
+`@anointedautomation/sso*` npm packages (`js/`), the Python kit (`python/anointed-sso/`), the PHP kit
+(`php/anointed-sso/`) and the AnointedSSO Swift package (`swift/`, `Package.swift` at root).
 Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 
 ## Inputs
@@ -12,7 +14,10 @@ Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 ## Process
 - .NET (run from `dotnet/`): `dotnet restore`, `dotnet build --configuration Release`,
   `dotnet test <Project>.Tests/<Project>.Tests.csproj --configuration Release` (solution: `dotnet/AnointedAutomation.sln`).
-- JS (`js/anointed-sso/`, `js/anointed-sso-react/`, `js/anointed-sso-next/`): `npm test` (runs `node --test test/*.test.js`).
+- JS (every `js/*` package: sso, -react, -next, -vue, -nuxt, -angular, -sveltekit, -react-native): `npm test`
+  (runs `node --test test/*.test.js`; pretest installs or links what it needs).
+- Python (`python/anointed-sso/`): venv (`.venv`, gitignored), `pip install -e ".[test]"`, `python -m pytest`.
+- PHP (`php/anointed-sso/`): `composer install && vendor/bin/phpunit`.
 - Swift (repo root): `swift test`.
 - Android (`android/AnointedSSO/`): `gradle :anointedsso:testDebugUnitTest`.
 - Every source file starts with the Anointed copyright header and ends it with "Jesus is King" (see `CONTRIBUTING.md`).
@@ -45,7 +50,9 @@ Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 ## Landmines
 - Any change under `js/` bumps and republishes the npm package; do not touch `js/anointed-sso/README.md` casually.
 - Adding a package: update the lists in `version-increment.yml`, `nuget-publish.yml`, `dotnet/publish-packages.sh`, root README, and `dotnet/PUBLISHING.md`.
+- Templates pin SSO and SSO.UI versions in `dotnet/templates/AnointedAutomation.Templates/content/*/*.csproj`; version-increment syncs them.
+- SSO.Owin is net472: its tests run net10.0 on Linux and net48 only on Windows (`test-owin-windows` job). All .NET tests use xunit.
 - When packages, versions, or public types change, update `llms.txt`, `llms.md`, `llms.json` in the same change.
-- Publish order matters: Serialization, Shopify, Objects, Repository.Mongo, Objects.API.
+- Publish order matters: Serialization, Shopify, Objects, Repository.Mongo, Objects.API, SSO, SSO.UI, Templates.
 - NuGet README links must be absolute (relative links do not resolve on NuGet.org).
 - Consumers use TreatWarningsAsErrors: do not mark shims `[Obsolete]`.

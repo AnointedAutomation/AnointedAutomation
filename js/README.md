@@ -10,6 +10,11 @@ its own README, tests and CI workflow. The .NET libraries live in [`../dotnet`](
 | [@anointedautomation/sso](./anointed-sso) | "Sign in with Anointed Automation": a dependency-free OpenID Connect client (code + PKCE) for Node 18+, Deno (Base44) and edge runtimes, with Express and Web (Next.js, Base44) adapters |
 | [@anointedautomation/sso-react](./anointed-sso-react) | React sign-in button and `useAnointedSignIn` hook that send the browser to your server's start route (no secrets client side) |
 | [@anointedautomation/sso-next](./anointed-sso-next) | Next.js App Router `start` / `callback` / `backchannelLogout` route handlers built on `@anointedautomation/sso` |
+| [@anointedautomation/sso-vue](./anointed-sso-vue) | Vue 3 sign-in button and `useAnointedSignIn` composable that send the browser to your server's start route (no secrets client side) |
+| [@anointedautomation/sso-nuxt](./anointed-sso-nuxt) | Nuxt 3 and 4 server routes (start, callback, logout, back-channel logout) built on `@anointedautomation/sso` |
+| [@anointedautomation/sso-angular](./anointed-sso-angular) | Angular 17+ standalone sign-in button, `AnointedSignInService` and `provideAnointedSignIn()` (no secrets client side) |
+| [@anointedautomation/sso-sveltekit](./anointed-sso-sveltekit) | SvelteKit (Svelte 5) start, callback, logout and back-channel logout handlers built on `@anointedautomation/sso`, plus a sign-in button |
+| [@anointedautomation/sso-react-native](./anointed-sso-react-native) | React Native and Expo sign-in button and `useAnointedSignIn` hook: opens your server's start route in a system auth session |
 
 ## Publishing
 
