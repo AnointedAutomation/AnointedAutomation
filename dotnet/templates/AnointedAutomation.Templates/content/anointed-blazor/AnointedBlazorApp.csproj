@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <UserSecretsId>7d1c3f0a-5b2e-4c9a-9f3e-a11ce0a0b002</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AnointedAutomation.SSO" Version="1.0.2" />
+    <PackageReference Include="AnointedAutomation.SSO.UI" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
