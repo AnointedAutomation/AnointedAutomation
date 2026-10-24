@@ -506,7 +506,7 @@ React Native and Expo sign-in button and useAnointedSignIn hook: open the partne
 ### anointedautomation-sso 0.1.0
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso
-- Runtime: Python 3.9+, server only. Not on PyPI yet.
+- Runtime: Python 3.10+, server only. Not on PyPI yet.
 
 Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client. Key exports: `AnointedClient`, `SessionStatusClient`, `process_backchannel_logout`, `safe_return_to`.
 

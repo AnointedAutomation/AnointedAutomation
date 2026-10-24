@@ -711,7 +711,7 @@
     {
       "id": "anointedautomation-sso",
       "version": "0.1.0",
-      "runtime": "Python 3.9+ (server only)",
+      "runtime": "Python 3.10+ (server only)",
       "published": false,
       "description": "Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso",

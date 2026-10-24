@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Sign in with Anointed Automation: a server-side OpenID Connect kit (auth code + PKCE) for Python, with Django, FastAPI/Starlette and Flask adapters."
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [{ name = "Anointed Automation, LLC." }]
 keywords = ["anointed-automation", "oidc", "openid-connect", "oauth2", "sso", "pkce", "django", "fastapi", "flask"]
 classifiers = [

@@ -18,7 +18,7 @@
   ],
   "sideEffects": false,
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "scripts": {
     "pretest": "node scripts/ensure-deps.mjs",

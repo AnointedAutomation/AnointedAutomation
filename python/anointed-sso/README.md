@@ -5,7 +5,7 @@ Jesus is King ✝️
 "Sign in with Anointed Automation" for Python: a server-side OpenID Connect kit with a framework-neutral core and thin
 adapters for Django, FastAPI/Starlette and Flask. Authorization code + PKCE (S256), `state`, `nonce`, RS256 ID token
 verification through the issuer's JWKS, refresh, revoke, userinfo, logout, back-channel logout (validation plus replay
-protection) and a fail-open session status client. Python 3.9+, MIT.
+protection) and a fail-open session status client. Python 3.10+, MIT.
 
 Server only: the client holds your client secret and does the token exchange. Never ship it to a browser or a mobile app.
 Get your `client_id` and `client_secret` from the partner portal; the full guide is
