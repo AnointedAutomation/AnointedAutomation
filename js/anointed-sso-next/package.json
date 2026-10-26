@@ -1,6 +1,6 @@
 {
   "name": "@anointedautomation/sso-next",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sign in with Anointed Automation for the Next.js App Router: start, callback and back-channel logout route handlers built on @anointedautomation/sso. Server only.",
   "type": "module",
   "main": "./src/index.js",

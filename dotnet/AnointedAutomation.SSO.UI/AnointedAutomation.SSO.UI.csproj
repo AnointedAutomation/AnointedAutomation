@@ -13,7 +13,7 @@
     <Copyright>Copyright © 2026 Anointed Automation Corporation All rights reserved.</Copyright>
     <Description>Front end for Sign in with Anointed Automation in ASP.NET Core: brand-styled accessible sign-in and sign-out buttons as a Tag Helper (Razor Pages, MVC) and Blazor components, plus MapAnointedAutomationAuth() minimal API routes (start, sign-out, user info) in the BFF style: cookie only, no tokens in the browser.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <PackageTags>aspnetcore;blazor;razor;taghelper;openid-connect;oidc;sso;sign-in-button;bff;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.SSO.UI</PackageReleaseNotes>
     <Authors>Anointed Automation Corporation, Alexander Fields</Authors>

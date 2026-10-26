@@ -5,7 +5,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <PackageId>AnointedAutomation.Templates</PackageId>
     <Title>AnointedAutomation.Templates</Title>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
     <Copyright>Copyright © 2026 Anointed Automation Corporation All rights reserved.</Copyright>

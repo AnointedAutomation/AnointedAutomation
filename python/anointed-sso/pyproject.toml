@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anointedautomation-sso"
-version = "0.1.0"
+version = "0.1.1"
 description = "Sign in with Anointed Automation: a server-side OpenID Connect kit (auth code + PKCE) for Python, with Django, FastAPI/Starlette and Flask adapters."
 readme = "README.md"
 license = { text = "MIT" }
