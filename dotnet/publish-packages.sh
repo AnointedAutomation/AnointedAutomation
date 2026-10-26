@@ -53,6 +53,7 @@ get_version() {
 # Define packages to check
 declare -A PACKAGES=(
     ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="anointedautomation.algorithms"
+    ["AnointedAutomation.Search/AnointedAutomation.Search.csproj"]="anointedautomation.search"
     ["AnointedAutomation.Imaging/AnointedAutomation.Imaging.csproj"]="anointedautomation.imaging"
     ["AnointedAutomation.Enums/AnointedAutomation.Enums.csproj"]="anointedautomation.enums"
     ["AnointedAutomation.Logging/AnointedAutomation.Logging.csproj"]="anointedautomation.logging"

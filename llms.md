@@ -39,6 +39,19 @@ bool topLeftDark = matrix.IsDark(0, 0); // finder pattern corner
 int size = matrix.Size;
 ```
 
+
+### AnointedAutomation.Search 1.0.0
+
+Full-text search in-process, without Lucene.NET or Elasticsearch. In-process full-text search for .NET with no dependencies: Apache Lucene and tantivy translated to C# (analysis, KStem, synonyms, inverted index, BM25, boolean, phrase and fuzzy queries with a Levenshtein automaton, fast field filters and sorts).
+
+- Namespaces: `AnointedAutomation.Search`, `.Analysis`, `.Index`, `.Query`, `.Scoring`, `.Fuzzy`
+- Depends on: NuGet none; AnointedAutomation none
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Search (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Search/README.md)
+
+```bash
+dotnet add package AnointedAutomation.Search
+```
+
 ### AnointedAutomation.APIMiddlewares 1.0.7
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.

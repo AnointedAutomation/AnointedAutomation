@@ -33,6 +33,37 @@
       "notes": "QrEncoder.Encode(text, ecc) returns a QrMatrix (Size, IsDark(x, y)). Pair with Imaging to render."
     },
     {
+      "id": "AnointedAutomation.Search",
+      "version": "1.0.0",
+      "targetFramework": "net10.0",
+      "description": "In-process full-text search for .NET with no dependencies: Apache Lucene and tantivy translated to C# (analysis, KStem, synonyms, inverted index, BM25, boolean, phrase and fuzzy queries with a Levenshtein automaton, fast field filters and sorts).",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.Search",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Search",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Search/README.md",
+      "dependencies": {
+        "nuget": [],
+        "anointed": []
+      },
+      "keyNamespaces": [
+        "AnointedAutomation.Search",
+        "AnointedAutomation.Search.Analysis",
+        "AnointedAutomation.Search.Index",
+        "AnointedAutomation.Search.Query",
+        "AnointedAutomation.Search.Scoring",
+        "AnointedAutomation.Search.Fuzzy"
+      ],
+      "keyTypes": [
+        "SearchIndex",
+        "SearchSchema",
+        "TextAnalyzer",
+        "TermClause",
+        "PhraseClause",
+        "FuzzyClause",
+        "FastFieldFilter"
+      ],
+      "notes": "new SearchIndex<T>(schema).Rebuild(docs), then Search(new SearchRequest<T>(limit, offset) with TermClause/PhraseClause/FuzzyClause). Lucene and tantivy ports only; no product ranking rules."
+    },
+    {
       "id": "AnointedAutomation.APIMiddlewares",
       "version": "1.0.7",
       "targetFramework": "net10.0",
