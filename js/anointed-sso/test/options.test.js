@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // 0.2.0 options: returnTo origin allowlist, per-request redirect URI, configurable return parameter, secret
 // needed only at the token endpoint, normalized email, and start handlers that need no onSignedIn.
 

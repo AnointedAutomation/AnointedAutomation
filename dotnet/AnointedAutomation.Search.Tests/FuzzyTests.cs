@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Several cases are taken from tantivy levenshtein_automata src/tests.rs (test_damerau, test_simple,
 // test_dead_state, test_prefix, test_prefix_dfa_1_lev, test_issue_3), translated from Rust to C#.
 

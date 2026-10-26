@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy columnar/src/column/ (Column: one value per doc, optional index) and
 // columnar/src/column_values/ with the dictionary encoded string column (columnar/src/column/dictionary_encoded.rs).
 // Translated from Rust to C#: plain arrays indexed by doc id instead of bitpacked codecs.

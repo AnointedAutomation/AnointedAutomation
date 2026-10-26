@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Test-only helper (not shipped): in this monorepo the dependency @anointedautomation/sso lives next door in
 // ../anointed-sso. When it is not installed from the registry yet, link the sibling into node_modules so
 // `npm test` runs against the code in this repository. Does nothing when the dependency already resolves.

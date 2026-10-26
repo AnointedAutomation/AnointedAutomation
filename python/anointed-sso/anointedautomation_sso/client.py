@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 """Sign in with Anointed Automation: a server-side OpenID Connect client.
 
 Authorization code + PKCE S256, state and nonce, RS256 ID token verification via JWKS, refresh, revoke,

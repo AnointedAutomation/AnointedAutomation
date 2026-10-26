@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Open-redirect safe return targets. By default only same-site absolute paths ("/account") are kept. A site
 // can additionally trust absolute URLs on origins it names (`allowedReturnOrigins`, e.g. "https://*.example.com")
 // or decides itself (`isAllowedReturnTo`). Even then: https only (http only for a loopback host), no

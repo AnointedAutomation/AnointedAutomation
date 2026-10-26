@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from Apache Lucene lucene/analysis/common/src/java/org/apache/lucene/analysis/synonym/SynonymMap.java
 // (SynonymMap.Builder). Translated from Java to C#: the FST of input word sequences became a dictionary
 // keyed by the space joined analyzed words, with the longest input length kept for greedy matching.

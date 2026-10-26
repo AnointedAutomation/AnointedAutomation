@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Hybrid element-name convention for MongoDB serialization. Mirrors the API's System.Text.Json
 // JsonCasingConvention so the DB and the JSON wire follow the SAME rule while C# code keeps idiomatic

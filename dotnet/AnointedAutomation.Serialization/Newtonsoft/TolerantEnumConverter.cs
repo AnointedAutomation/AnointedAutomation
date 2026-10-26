@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // One tolerant enum converter replacing ShopifySharp's NullableEnumConverter (null on unknown, [EnumMember]-aware)
 // and Objects' AppleNotificationEventTypeConverter (unknown -> 0/Unknown). A new vendor value must never break parsing.

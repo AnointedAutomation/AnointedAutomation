@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
     <Title>AnointedAutomation.SSO.UI</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
-    <Copyright>Copyright © 2026 Anointed Automation Corporation All rights reserved.</Copyright>
+    <Copyright>Copyright © 2026 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>Front end for Sign in with Anointed Automation in ASP.NET Core: brand-styled accessible sign-in and sign-out buttons as a Tag Helper (Razor Pages, MVC) and Blazor components, plus MapAnointedAutomationAuth() minimal API routes (start, sign-out, user info) in the BFF style: cookie only, no tokens in the browser.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>1.0.1</Version>

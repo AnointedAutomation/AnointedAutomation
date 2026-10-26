@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from Apache Lucene lucene/core/src/java/org/apache/lucene/util/graph/GraphTokenStreamFiniteStrings.java
 // (walking one path of a token graph). Translated from Java to C#: picks a single path for query words.
 

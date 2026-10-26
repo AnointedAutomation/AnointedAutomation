@@ -13,7 +13,7 @@ own CI workflow in `.github/workflows/`; workflows set `working-directory` to th
 Every source file starts with the Anointed copyright line, using the comment syntax of its language, and it always ends with "Jesus is King ✝️":
 
 ```csharp
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 ```
 
 - Shell and YAML: `# ...`. CSS: `/* ... */`. HTML: `<!-- ... -->` (after `<!doctype html>`).

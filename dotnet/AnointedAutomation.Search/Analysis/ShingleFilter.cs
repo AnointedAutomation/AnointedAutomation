@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from Apache Lucene lucene/analysis/common/src/java/org/apache/lucene/analysis/shingle/ShingleFilter.java.
 // Translated from Java to C#: shingles are built over consecutive positions of the token list (the first
 // token at each position), joined by the separator, spanning their positions. Filler tokens for position

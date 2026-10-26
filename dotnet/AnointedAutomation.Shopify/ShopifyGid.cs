@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Shopify global id (gid://shopify/<Resource>/<id>) formatting and parsing. Moved from the Anointed API
 // (Services/Shopify/ShopifyGid.cs + Services/Tracking/FulfillmentGid.cs) and widened into the superset of every

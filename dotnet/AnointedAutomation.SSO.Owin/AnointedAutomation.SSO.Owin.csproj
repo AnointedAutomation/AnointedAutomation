@@ -10,7 +10,7 @@
     <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
     <Title>AnointedAutomation.SSO.Owin</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
-    <Copyright>Copyright © 2026 Anointed Automation Corporation All rights reserved.</Copyright>
+    <Copyright>Copyright © 2026 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>Sign in with Anointed Automation for classic ASP.NET (.NET Framework 4.7.2+, MVC 5 and Web Forms on OWIN/Katana): an OpenID Connect middleware preset (authorization code + PKCE S256, verified email only), a back-channel logout endpoint with Logout Token validation and replay protection, a fail-open session status client, and a brand sign-in button for Razor and Web Forms.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>1.0.1</Version>

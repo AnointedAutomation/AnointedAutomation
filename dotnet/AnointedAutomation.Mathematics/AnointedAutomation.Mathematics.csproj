@@ -9,7 +9,7 @@
 		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
 		<Title>AnointedAutomation.Mathematics</Title>
 		<Company>Anointed Automation Corporation - Alexander Fields</Company>
-		<Copyright>Copyright © 2023 Anointed Automation Corporation All rights reserved.</Copyright>
+		<Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.0.5</Version>

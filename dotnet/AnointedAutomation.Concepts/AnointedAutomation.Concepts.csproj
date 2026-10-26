@@ -9,7 +9,7 @@
 		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
 		<Title>AnointedAutomation.Concepts</Title>
 		<Company>Anointed Automation Corporation - Alexander Fields</Company>
-		<Copyright>Copyright © 2023 Anointed Automation Corporation All rights reserved.</Copyright>
+		<Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.1.1</Version>

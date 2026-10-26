@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from Apache Lucene lucene/analysis/common/src/java/org/apache/lucene/analysis/en/KStemData3.java
 // (Apache-2.0; KStem data Copyright 2003 Center for Intelligent Information Retrieval, University of
 // Massachusetts, Amherst, BSD-style license reproduced in NOTICE.md). Translated from Java to C#.

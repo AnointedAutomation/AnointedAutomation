@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
     <Title>AnointedAutomation.Optimization</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
-    <Copyright>Copyright © 2024 Anointed Automation Corporation All rights reserved.</Copyright>
+    <Copyright>Copyright © 2024 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>Reusable optimization utilities: CSV/DataTable/DataReader helpers, chunking, string helpers, Roman numerals, JSON flattening, file management, and null-safe JsonElement/BsonDocument field accessors.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>1.0.3</Version>

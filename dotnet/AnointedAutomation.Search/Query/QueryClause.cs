@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from Apache Lucene lucene/core/src/java/org/apache/lucene/search/ (BooleanClause.Occur, TermQuery,
 // PhraseQuery, FuzzyQuery) and tantivy src/query/ (Occur, TermQuery, PhraseQuery, FuzzyTermQuery).
 // Translated from Java and Rust to C# as a small typed query model.

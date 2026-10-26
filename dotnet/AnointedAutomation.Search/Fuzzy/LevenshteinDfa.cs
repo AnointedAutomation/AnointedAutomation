@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy levenshtein_automata src/dfa.rs by Paul Masurel (MIT). Translated from Rust to C#:
 // transitions are per char (UTF-16) instead of per UTF-8 byte; state 0 is the sink, as in dfa.rs.
 

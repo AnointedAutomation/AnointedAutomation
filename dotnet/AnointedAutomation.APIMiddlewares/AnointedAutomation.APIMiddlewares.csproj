@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
     <Title>AnointedAutomation.APIMiddlewares</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
-    <Copyright>Copyright © 2023 Anointed Automation Corporation All rights reserved.</Copyright>
+    <Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>1.0.9</Version>

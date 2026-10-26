@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy src/reader/mod.rs (IndexReader::reload swapping the searcher pool atomically) and
 // src/collector/top_score_collector.rs (TopDocs with limit, offset and order by fast field), with Apache
 // Lucene lucene/core/src/java/org/apache/lucene/search/SearcherManager.java (acquire a searcher, swap on

@@ -8,7 +8,7 @@
   "nugetProfile": "https://www.nuget.org/profiles/roku674",
   "install": "dotnet add package <PackageId>",
   "publishing": "Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org.",
-  "fileHeader": "// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
+  "fileHeader": "// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
   "packages": [
     {
       "id": "AnointedAutomation.Algorithms",

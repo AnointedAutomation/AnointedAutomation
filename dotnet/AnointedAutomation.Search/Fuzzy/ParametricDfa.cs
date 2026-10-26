@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy levenshtein_automata src/parametric_dfa.rs and src/alphabet.rs by Paul Masurel (MIT).
 // Translated from Rust to C#: the UTF-8 byte DFA (src/dfa.rs Utf8DFABuilder) became a char DFA, since .NET
 // strings are UTF-16 and terms are compared char by char.

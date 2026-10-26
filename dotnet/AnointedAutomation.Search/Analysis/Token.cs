@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from Apache Lucene (CharTermAttribute, PositionIncrementAttribute, PositionLengthAttribute,
 // OffsetAttribute, TypeAttribute in lucene/core/src/java/org/apache/lucene/analysis/tokenattributes/) and
 // tantivy tokenizer-api/src/lib.rs (Token). Translated from Java and Rust to C#: the attribute set is one

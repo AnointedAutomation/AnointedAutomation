@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Web-standard (Request -> Response) route handlers. One adapter covers every fetch-style runtime:
 // Next.js App Router route handlers, Base44 / Deno `Deno.serve`, Cloudflare Workers, Bun, Hono.
 

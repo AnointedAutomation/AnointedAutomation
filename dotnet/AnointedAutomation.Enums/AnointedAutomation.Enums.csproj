@@ -9,7 +9,7 @@
 		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
 		<Title>AnointedAutomation.Enums</Title>
 		<Company>Anointed Automation Corporation - Alexander Fields</Company>
-		<Copyright>Copyright © 2023 Anointed Automation Corporation All rights reserved.</Copyright>
+		<Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>Shared enumerations for AnointedAutomation packages: payment types, providers, transaction and subscription statuses, payment operations, card types, webhook events, and moderation categories.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>1.0.7</Version>

@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy src/schema/schema.rs (SchemaBuilder: fixed fields declared up front, text vs fast
 // fields) and src/schema/numeric_options.rs. Translated from Rust to C#: fields read from the caller's own
 // document type through getters instead of a dynamic Document.

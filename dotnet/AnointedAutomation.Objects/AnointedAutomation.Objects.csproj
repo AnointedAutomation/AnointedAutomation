@@ -9,7 +9,7 @@
 		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
 		<Title>AnointedAutomation.Objects</Title>
 		<Company>Anointed Automation Corporation - Alexander Fields</Company>
-		<Copyright>Copyright © 2023 Anointed Automation Corporation All rights reserved.</Copyright>
+		<Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Discord, GitHub, LinkedIn, Twitch, Yahoo, Amazon, Reddit, Shopify), and standard API response envelopes.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
 		<Version>2.7.1</Version>

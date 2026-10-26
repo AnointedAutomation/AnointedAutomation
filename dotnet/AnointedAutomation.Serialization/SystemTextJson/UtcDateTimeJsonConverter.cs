@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Every DateTime on the Anointed wire is UTC. System.Text.Json only appends the 'Z' designator when a value's
 // Kind is Utc, so an Unspecified value goes out WITHOUT it and browsers read it as local time. This converter

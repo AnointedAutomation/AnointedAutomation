@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy levenshtein_automata src/lib.rs (LevenshteinAutomatonBuilder) by Paul Masurel (MIT),
 // with the caching role of Apache Lucene lucene/core/src/java/org/apache/lucene/util/automaton/LevenshteinAutomata.java
 // (one parametric description per distance and transposition setting). Translated from Rust and Java to C#.

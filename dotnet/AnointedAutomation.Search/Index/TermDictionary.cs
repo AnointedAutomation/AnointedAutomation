@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy src/termdict/ (TermDictionary: sorted terms, range by prefix) and Apache Lucene
 // lucene/core/src/java/org/apache/lucene/index/TermsEnum.java (seekCeil). Translated from Rust and Java to
 // C#: a sorted string array with binary search replaces the FST/sstable, ample for in-memory indexes.

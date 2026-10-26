@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from Apache Lucene lucene/core/src/java/org/apache/lucene/search/FuzzyTermsEnum.java (prefix
 // length, max edits, transpositions) and tantivy src/query/fuzzy_query.rs with src/query/automaton_weight.rs
 // (running a Levenshtein DFA over the term dictionary). Translated from Java and Rust to C#: the FST walk

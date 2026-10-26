@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Pure core: builds one sign-in attempt (start URL + state) and checks the callback. Same contract as the
 // Swift and Android kits: the app opens YOUR server's start route with returnTo=<callback + aa_state>,
 // and the callback must carry the same aa_state back. No secrets, no network, no platform imports.

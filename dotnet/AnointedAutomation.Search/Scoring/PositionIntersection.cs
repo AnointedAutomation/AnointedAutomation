@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy src/query/phrase_query/phrase_scorer.rs (intersection_exists,
 // intersection_count_with_slop) and Apache Lucene lucene/core/src/java/org/apache/lucene/search/SloppyPhraseMatcher.java
 // (slop as allowed position distance). Translated from Rust and Java to C#.

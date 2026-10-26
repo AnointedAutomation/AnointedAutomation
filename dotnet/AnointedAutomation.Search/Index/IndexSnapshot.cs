@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy src/core/searcher.rs (Searcher: an immutable snapshot of segment readers) and
 // src/core/segment_reader.rs, with Apache Lucene lucene/core/src/java/org/apache/lucene/index/DirectoryReader.java
 // (point in time reader). Translated from Rust and Java to C#: one in-memory segment holding the documents,

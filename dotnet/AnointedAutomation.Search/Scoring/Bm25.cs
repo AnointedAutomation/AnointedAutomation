@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation Corporation., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Ported from tantivy src/query/bm25.rs (idf, cached_tf_component, Bm25Weight::tf_factor/score) and
 // Apache Lucene lucene/core/src/java/org/apache/lucene/search/similarities/BM25Similarity.java (k1 1.2,
 // b 0.75, per-field configurable). Translated from Rust and Java to C#, in decimal: the per document
