@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 # Swift packages are published by a semver git tag. When swift/AnointedSSO/VERSION changes on master, tag that
 # commit with the version (once). Swift Package Index picks the new tag up by itself.
 name: Swift AnointedSSO release

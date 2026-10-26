@@ -272,8 +272,8 @@ Every kit keeps the client secret on your server and follows the rules above. Ea
 | Angular 17+ (button / service) | `@anointedautomation/sso-angular` | [js/anointed-sso-angular](../js/anointed-sso-angular) |
 | SvelteKit (handlers + button) | `@anointedautomation/sso-sveltekit` | [js/anointed-sso-sveltekit](../js/anointed-sso-sveltekit) |
 | React Native / Expo | `@anointedautomation/sso-react-native` | [js/anointed-sso-react-native](../js/anointed-sso-react-native) |
-| Android (Kotlin) | `AnointedSSO` | [android/AnointedSSO](../android/AnointedSSO) |
-| Python (Django, FastAPI, Flask) | `anointedautomation-sso` | [python/anointed-sso](../python/anointed-sso) |
+| Android (Kotlin) | `com.anointedautomation:anointedsso` (Maven Central) | [android/AnointedSSO](../android/AnointedSSO) |
+| Python (Django, FastAPI, Flask) | `anointedautomation-sso` (PyPI) | [python/anointed-sso](../python/anointed-sso) |
 | PHP 8.1+ / Laravel | `anointedautomation/sso` (Packagist) | [php/anointed-sso](../php/anointed-sso) |
 | ASP.NET Core UI | `AnointedAutomation.SSO.UI` | [dotnet/AnointedAutomation.SSO.UI](../dotnet/AnointedAutomation.SSO.UI) |
 | `dotnet new` templates | `AnointedAutomation.Templates` | [dotnet/templates/AnointedAutomation.Templates](../dotnet/templates/AnointedAutomation.Templates) |

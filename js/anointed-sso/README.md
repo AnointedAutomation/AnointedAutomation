@@ -340,4 +340,4 @@ never call api.anointedautomation.net.
 
 ## License
 
-[MIT](../../LICENSE). Copyright © Anointed Automation, LLC. Stewarded by Alexander Fields. Jesus is King ✝️
+[MIT](../../LICENSE). Copyright © Anointed Automation Corporation. Stewarded by Alexander Fields. Jesus is King ✝️

@@ -8,14 +8,14 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
     <Title>AnointedAutomation.Serialization</Title>
-    <Company>Anointed Automation LLC - Alexander Fields</Company>
-    <Copyright>Copyright © 2026 Anointed Automation, LLC. Portions Copyright (c) 2015 Joshua Harms (ShopifySharp, MIT).</Copyright>
+    <Company>Anointed Automation Corporation - Alexander Fields</Company>
+    <Copyright>Copyright © 2026 Anointed Automation Corporation. Portions Copyright (c) 2015 Joshua Harms (ShopifySharp, MIT).</Copyright>
     <Description>Shared serialization helpers: naming rules (camel, Pascal, snake and the hybrid value/reference casing rule), System.Text.Json casing convention, presets and UTC DateTime converter, tolerant Newtonsoft.Json converters, and lenient JsonElement readers. No MongoDB dependency.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <PackageTags>serialization;json;system-text-json;newtonsoft;naming;casing;converters;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Serialization</PackageReleaseNotes>
-    <Authors>Anointed Automation LLC, Alexander Fields</Authors>
+    <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>

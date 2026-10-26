@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Reads a BSON field as string even when older writers stored it numerically (e.g. a Python-built corpus storing
 // productId as Int32 while the native pipeline writes Shopify gid strings). Without it, deserializing such a document

@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2024. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-10-12 14:24:21 Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-10-12 14:24:21 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 //Stewarded by Alexander Fields
 
@@ -51,7 +51,7 @@ namespace AnointedAutomation.Objects
         /// <summary>
         /// Gets or sets the copyright and attribution information.
         /// </summary>
-        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net stewarded by Alexander Fields https://www.alexanderfields.me";
+        public string Copyright { get; set; } = "Anointed Automation Corporation https://www.anointedautomation.net stewarded by Alexander Fields https://www.alexanderfields.me";
         /// <summary>
         /// Gets or sets the response data payload.
         /// </summary>
@@ -108,7 +108,7 @@ namespace AnointedAutomation.Objects
         /// <summary>
         /// Gets or sets the copyright and attribution information.
         /// </summary>
-        public string Copyright { get; set; } = "Anointed Automation, LLC https://www.anointedautomation.net stewarded by Alexander Fields https://www.alexanderfields.me";
+        public string Copyright { get; set; } = "Anointed Automation Corporation https://www.anointedautomation.net stewarded by Alexander Fields https://www.alexanderfields.me";
         /// <summary>
         /// Gets or sets the response data payload.
         /// </summary>

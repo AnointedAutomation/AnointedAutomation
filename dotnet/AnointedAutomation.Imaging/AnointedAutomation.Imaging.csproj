@@ -8,14 +8,14 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
 		<Title>AnointedAutomation.Imaging</Title>
-		<Company>Anointed Automation LLC - Alexander Fields</Company>
-		<Copyright>Copyright © 2026 Anointed Automation, LLC All rights reserved.</Copyright>
+		<Company>Anointed Automation Corporation - Alexander Fields</Company>
+		<Copyright>Copyright © 2026 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>Renders QR codes from AnointedAutomation.Algorithms to SVG and PNG using only the .NET base class library, with no third party image dependency.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.4</Version>
+		<Version>1.0.5</Version>
 		<PackageTags>imaging;qrcode;qr;svg;png;image-generation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Imaging</PackageReleaseNotes>
-		<Authors>Anointed Automation LLC, Alexander Fields</Authors>
+		<Authors>Anointed Automation Corporation, Alexander Fields</Authors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>

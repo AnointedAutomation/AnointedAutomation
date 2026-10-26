@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 """FastAPI / Starlette adapter: an ``APIRouter`` (FastAPI) or a list of Starlette ``Route`` objects.
 
 The blocking core runs in a worker thread so the event loop is never blocked. Callbacks may be sync or async.

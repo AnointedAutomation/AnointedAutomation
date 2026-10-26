@@ -1,6 +1,6 @@
 {
   "name": "@anointedautomation/sso-nuxt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sign in with Anointed Automation for Nuxt 3 and 4: start, callback, logout and back-channel logout server routes built on @anointedautomation/sso. Server only.",
   "type": "module",
   "main": "./src/index.js",
@@ -48,7 +48,7 @@
     "h3",
     "vue"
   ],
-  "author": "Anointed Automation, LLC.",
+  "author": "Anointed Automation Corporation.",
   "license": "MIT",
   "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-nuxt#readme",
   "repository": {

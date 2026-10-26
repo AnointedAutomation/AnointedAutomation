@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Base44 backend function `anointedCallback`. Register its URL as your redirect URI:
 //   https://<your-app-domain>/functions/anointedCallback
 // Validates the sign-in, upserts an `AnointedUser` entity keyed on `sub`, and sets YOUR signed session cookie.

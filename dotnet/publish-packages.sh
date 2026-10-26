@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40 Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2025. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40 Jesus is King ✝️
 # Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 
 # Manual NuGet Package Publisher
@@ -53,6 +53,7 @@ get_version() {
 # Define packages to check
 declare -A PACKAGES=(
     ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="anointedautomation.algorithms"
+    ["AnointedAutomation.Search/AnointedAutomation.Search.csproj"]="anointedautomation.search"
     ["AnointedAutomation.Imaging/AnointedAutomation.Imaging.csproj"]="anointedautomation.imaging"
     ["AnointedAutomation.Enums/AnointedAutomation.Enums.csproj"]="anointedautomation.enums"
     ["AnointedAutomation.Logging/AnointedAutomation.Logging.csproj"]="anointedautomation.logging"

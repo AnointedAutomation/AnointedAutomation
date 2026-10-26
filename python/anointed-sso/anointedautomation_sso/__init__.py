@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 """Sign in with Anointed Automation for Python: a server-side OpenID Connect kit.
 
 Framework-neutral core here; thin adapters live in ``anointedautomation_sso.adapters.{django,fastapi,flask}``.
@@ -27,7 +27,7 @@ from .replay import InMemoryLogoutReplayStore, LogoutReplayStore
 from .return_to import create_return_to_validator
 from .session_status import SessionCheck, SessionOutcome, SessionStatusClient
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def require_env(name: str) -> str:

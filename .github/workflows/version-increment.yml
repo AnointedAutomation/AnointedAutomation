@@ -1,4 +1,4 @@
-# Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-10-17 Jesus is King ✝️
+# Copyright © Anointed Automation Corporation., 2025. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-10-17 Jesus is King ✝️
 name: Auto-Increment Version on PR
 
 on:
@@ -49,6 +49,7 @@ jobs:
           # Define all project files and their directories to check
           declare -A PROJECTS=(
             ["AnointedAutomation.Algorithms/AnointedAutomation.Algorithms.csproj"]="AnointedAutomation.Algorithms"
+            ["AnointedAutomation.Search/AnointedAutomation.Search.csproj"]="AnointedAutomation.Search"
             ["AnointedAutomation.Imaging/AnointedAutomation.Imaging.csproj"]="AnointedAutomation.Imaging"
             ["AnointedAutomation.Enums/AnointedAutomation.Enums.csproj"]="AnointedAutomation.Enums"
             ["AnointedAutomation.Logging/AnointedAutomation.Logging.csproj"]="AnointedAutomation.Logging"

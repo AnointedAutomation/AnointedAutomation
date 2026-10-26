@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 //
 // Central JSON naming convention for AnointedAutomation APIs. The Mongo layer
 // (AnointedAutomation.Repository.Mongo.HybridElementNameConvention) applies the SAME rule via NamingRules.

@@ -3,6 +3,7 @@
 The repository ships these packages to [NuGet.org](https://www.nuget.org/profiles/roku674):
 
 - [AnointedAutomation.Algorithms](https://www.nuget.org/packages/AnointedAutomation.Algorithms/)
+- [AnointedAutomation.Search](https://www.nuget.org/packages/AnointedAutomation.Search/)
 - [AnointedAutomation.APIMiddlewares](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares/)
 - [AnointedAutomation.Concepts](https://www.nuget.org/packages/AnointedAutomation.Concepts/)
 - [AnointedAutomation.Enums](https://www.nuget.org/packages/AnointedAutomation.Enums/)

@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2025. All Rights Reserved. Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2025. Open source, provided "as is" without warranty (see LICENSE). Jesus is King ✝️
 
 // =============================================================================
 // NAMING CONVENTION:

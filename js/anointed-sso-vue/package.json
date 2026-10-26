@@ -1,6 +1,6 @@
 {
   "name": "@anointedautomation/sso-vue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sign in with Anointed Automation for Vue 3: an accessible brand-styled sign-in button and a useAnointedSignIn composable that send the browser to your server's start route. No secrets client side.",
   "type": "module",
   "main": "./src/index.js",
@@ -40,7 +40,7 @@
     "nuxt",
     "vite"
   ],
-  "author": "Anointed Automation, LLC.",
+  "author": "Anointed Automation Corporation.",
   "license": "MIT",
   "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue#readme",
   "repository": {

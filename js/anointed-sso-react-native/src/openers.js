@@ -1,4 +1,4 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 // Openers: how the start route is shown to the person and how the callback URL comes back.
 // An opener is `(startUrl, callbackUrl, options) => Promise<{type: "success", url} | {type: "cancel"} | {type: "dismiss"}>`,
 // which is exactly what expo-web-browser's openAuthSessionAsync and react-native-inappbrowser-reborn's openAuth return.

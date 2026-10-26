@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Apache Lucene and tantivy translated to C#. Only ported code lives here; see NOTICE.md for credits and licenses. -->
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+		<Title>AnointedAutomation.Search</Title>
+		<Company>Anointed Automation Corporation - Alexander Fields</Company>
+		<Copyright>Copyright © 2026 Anointed Automation Corporation</Copyright>
+		<Description>In-process full-text search for .NET with no dependencies: Apache Lucene and tantivy translated to C# (analysis, KStem, synonyms, inverted index, BM25, boolean, phrase and fuzzy queries with a Levenshtein automaton, fast field filters and sorts).</Description>
+		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
+		<Version>1.0.0</Version>
+		<PackageTags>search;full-text;lucene;tantivy;bm25;fuzzy;levenshtein;stemming;kstem;inverted-index</PackageTags>
+		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Search</PackageReleaseNotes>
+		<Authors>Anointed Automation Corporation, Alexander Fields</Authors>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseExpression>Apache-2.0 AND MIT</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="README.md" Pack="true" PackagePath="/" />
+	  <None Include="NOTICE.md" Pack="true" PackagePath="/" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <InternalsVisibleTo Include="AnointedAutomation.Search.Tests" />
+	</ItemGroup>
+
+</Project>

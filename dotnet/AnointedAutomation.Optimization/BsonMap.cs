@@ -1,5 +1,5 @@
-// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
-// Copyright 2026 Anointed Automation, LLC. All Rights Reserved.
+// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
+// Copyright 2026 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).
 // Coded by Alexander Fields https://www.alexanderfields.me
 // Standardization primitive (#2 of the 2026-07-30 backend duplication audit): typed, null-safe
 // BsonDocument field accessors replacing the ~500 hand-rolled "doc["x"].AsString / .AsInt32" reads

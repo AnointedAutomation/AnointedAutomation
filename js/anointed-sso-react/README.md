@@ -71,4 +71,4 @@ npm test   # installs the dev dependencies on first run, then node:test with rea
 
 ## License
 
-[MIT](../../LICENSE). Copyright © Anointed Automation, LLC. Stewarded by Alexander Fields. Jesus is King ✝️
+[MIT](../../LICENSE). Copyright © Anointed Automation Corporation. Stewarded by Alexander Fields. Jesus is King ✝️

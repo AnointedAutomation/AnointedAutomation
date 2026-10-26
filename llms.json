@@ -1,14 +1,14 @@
 {
   "name": "Anointed Automation",
   "faith": "Jesus is King ✝️",
-  "summary": "Open-source .NET / NuGet libraries by Anointed Automation, LLC, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light C# packages published to NuGet under the AnointedAutomation.* prefix.",
+  "summary": "Open-source .NET / NuGet libraries by Anointed Automation Corporation, stewarded by Alexander Fields. This repository (github.com/AnointedAutomation/AnointedAutomation) is a collection of small, focused, dependency-light C# packages published to NuGet under the AnointedAutomation.* prefix.",
   "site": "https://anointedautomation.net",
   "repository": "https://github.com/AnointedAutomation/AnointedAutomation",
   "license": "MIT. AnointedAutomation.Shopify (and portions of AnointedAutomation.Serialization) are derived from ShopifySharp, MIT, Copyright (c) 2015 Joshua Harms.",
   "nugetProfile": "https://www.nuget.org/profiles/roku674",
   "install": "dotnet add package <PackageId>",
   "publishing": "Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org.",
-  "fileHeader": "// Copyright © Anointed Automation, LLC., 2026. All Rights Reserved. Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
+  "fileHeader": "// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
   "packages": [
     {
       "id": "AnointedAutomation.Algorithms",
@@ -31,6 +31,37 @@
         "QrErrorCorrectionLevel"
       ],
       "notes": "QrEncoder.Encode(text, ecc) returns a QrMatrix (Size, IsDark(x, y)). Pair with Imaging to render."
+    },
+    {
+      "id": "AnointedAutomation.Search",
+      "version": "1.0.0",
+      "targetFramework": "net10.0",
+      "description": "In-process full-text search for .NET with no dependencies: Apache Lucene and tantivy translated to C# (analysis, KStem, synonyms, inverted index, BM25, boolean, phrase and fuzzy queries with a Levenshtein automaton, fast field filters and sorts).",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.Search",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Search",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Search/README.md",
+      "dependencies": {
+        "nuget": [],
+        "anointed": []
+      },
+      "keyNamespaces": [
+        "AnointedAutomation.Search",
+        "AnointedAutomation.Search.Analysis",
+        "AnointedAutomation.Search.Index",
+        "AnointedAutomation.Search.Query",
+        "AnointedAutomation.Search.Scoring",
+        "AnointedAutomation.Search.Fuzzy"
+      ],
+      "keyTypes": [
+        "SearchIndex",
+        "SearchSchema",
+        "TextAnalyzer",
+        "TermClause",
+        "PhraseClause",
+        "FuzzyClause",
+        "FastFieldFilter"
+      ],
+      "notes": "new SearchIndex<T>(schema).Rebuild(docs), then Search(new SearchRequest<T>(limit, offset) with TermClause/PhraseClause/FuzzyClause). Lucene and tantivy ports only; no product ranking rules."
     },
     {
       "id": "AnointedAutomation.APIMiddlewares",
@@ -551,10 +582,10 @@
   "jsPackages": [
     {
       "id": "@anointedautomation/sso",
-      "version": "0.1.0",
+      "version": "0.2.4",
       "runtime": "Node 18+, Deno (Base44), edge runtimes",
-      "published": false,
-      "install": "composer require anointedautomation/sso (after the owner submits the repo on packagist.org)",
+      "published": true,
+      "install": "npm install @anointedautomation/sso",
       "description": "Sign in with Anointed Automation: a dependency-free, server-only OpenID Connect client (authorization code + PKCE S256, state, nonce, RS256 ID token validation via JWKS) with Express and Web (Next.js App Router, Base44, Workers) adapters.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso/README.md",
@@ -568,13 +599,14 @@
         "DEFAULT_SCOPE",
         "safeReturnTo"
       ],
-      "notes": "Issuer https://api.anointedautomation.net/. Default scope openid email; profile forces users without a handle to pick a username. Key users on sub. client_id is aa_<partner key id>; the secret stays server side."
+      "notes": "Issuer https://api.anointedautomation.net/. Default scope openid email; profile forces users without a handle to pick a username. Key users on sub. client_id is aa_<partner key id>; the secret stays server side.",
+      "registry": "npm"
     },
     {
       "id": "@anointedautomation/sso-react",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "Browser and SSR, React 18+ (peer dependency)",
-      "published": false,
+      "published": true,
       "description": "React companion for Sign in with Anointed Automation: an accessible sign-in button and a useAnointedSignIn hook that navigate the browser to the partner server's start route. No secrets client side.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-react/README.md",
@@ -584,13 +616,15 @@
         "useAnointedSignIn",
         "buildStartUrl"
       ],
-      "notes": "startUrl is required (no default). The server side is @anointedautomation/sso."
+      "notes": "startUrl is required (no default). The server side is @anointedautomation/sso.",
+      "registry": "npm",
+      "install": "npm install @anointedautomation/sso-react"
     },
     {
       "id": "@anointedautomation/sso-next",
       "version": "0.1.0",
       "runtime": "Next.js App Router, Node 18+ (server only)",
-      "published": false,
+      "published": true,
       "description": "Next.js App Router start, callback and back-channel logout route handlers built on @anointedautomation/sso.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-next",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-next/README.md",
@@ -601,13 +635,15 @@
         "createAnointedRouteHandlers",
         "redirectTo"
       ],
-      "notes": "On first sign-in call client.takeNewUserPassword(sub) and store a hash; never create a null-password account. Env vars: ANOINTED_OAUTH_ISSUER, ANOINTED_OAUTH_CLIENT_ID, ANOINTED_OAUTH_CLIENT_SECRET, ANOINTED_OAUTH_REDIRECT_URI."
+      "notes": "On first sign-in call client.takeNewUserPassword(sub) and store a hash; never create a null-password account. Env vars: ANOINTED_OAUTH_ISSUER, ANOINTED_OAUTH_CLIENT_ID, ANOINTED_OAUTH_CLIENT_SECRET, ANOINTED_OAUTH_REDIRECT_URI.",
+      "registry": "npm",
+      "install": "npm install @anointedautomation/sso-next"
     },
     {
       "id": "@anointedautomation/sso-vue",
       "version": "0.1.0",
       "runtime": "Vue 3 (browser)",
-      "published": false,
+      "published": true,
       "description": "Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-vue/README.md",
@@ -616,13 +652,15 @@
         "AnointedSignInButton",
         "useAnointedSignIn",
         "buildStartUrl"
-      ]
+      ],
+      "registry": "npm",
+      "install": "npm install @anointedautomation/sso-vue"
     },
     {
       "id": "@anointedautomation/sso-nuxt",
       "version": "0.1.0",
       "runtime": "Nuxt 3 and 4 (Nitro/h3 server)",
-      "published": false,
+      "published": true,
       "description": "Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-nuxt",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-nuxt/README.md",
@@ -632,13 +670,15 @@
       "keyExports": [
         "createAnointedEventHandlers",
         "redirectTo"
-      ]
+      ],
+      "registry": "npm",
+      "install": "npm install @anointedautomation/sso-nuxt"
     },
     {
       "id": "@anointedautomation/sso-angular",
       "version": "0.1.0",
       "runtime": "Angular 17+ (browser)",
-      "published": false,
+      "published": true,
       "description": "Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-angular/README.md",
@@ -648,13 +688,15 @@
         "AnointedSignInService",
         "provideAnointedSignIn",
         "buildStartUrl"
-      ]
+      ],
+      "registry": "npm",
+      "install": "npm install @anointedautomation/sso-angular"
     },
     {
       "id": "@anointedautomation/sso-sveltekit",
       "version": "0.1.0",
       "runtime": "SvelteKit 2 + Svelte 5",
-      "published": false,
+      "published": true,
       "description": "SvelteKit start, callback, logout and back-channel logout handlers (handle hook or +server.js) built on @anointedautomation/sso, plus a sign-in button (./client).",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-sveltekit",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-sveltekit/README.md",
@@ -666,13 +708,15 @@
         "createAnointedHandlers",
         "redirectTo",
         "AnointedSignInButton"
-      ]
+      ],
+      "registry": "npm",
+      "install": "npm install @anointedautomation/sso-sveltekit"
     },
     {
       "id": "@anointedautomation/sso-react-native",
       "version": "0.1.0",
       "runtime": "React Native / Expo",
-      "published": false,
+      "published": true,
       "description": "React Native and Expo sign-in button and useAnointedSignIn hook: open the partner server's start route in a system auth session and read the deep-link callback. No secrets in the app.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react-native",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/js/anointed-sso-react-native/README.md",
@@ -683,19 +727,21 @@
         "createAnointedSignIn",
         "createExpoOpener",
         "createLinkingOpener"
-      ]
+      ],
+      "registry": "npm",
+      "install": "npm install @anointedautomation/sso-react-native"
     }
   ],
   "swiftPackages": [
     {
       "id": "AnointedSSO",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "iOS 15+, macOS 12+ (Swift Package Manager)",
       "published": true,
       "description": "Sign in with Anointed Automation for iOS and macOS apps: opens the partner's own server start route in ASWebAuthenticationSession; the server (using @anointedautomation/sso) keeps the client secret and redirects back. State check and SwiftUI button included.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/swift/AnointedSSO/README.md",
-      "install": "https://github.com/AnointedAutomation/AnointedAutomation (product AnointedSSO)",
+      "install": "https://github.com/AnointedAutomation/AnointedAutomation (git tag 0.1.1, product AnointedSSO)",
       "dependencies": [],
       "keyExports": [
         "AnointedSignIn",
@@ -704,7 +750,8 @@
         "AnointedSignInButton",
         "AnointedSignInError"
       ],
-      "notes": "Never put the client secret in the app. .https callbacks need iOS 17.4+; .scheme(_, via:) needs an https bounce route on the server."
+      "notes": "Never put the client secret in the app. .https callbacks need iOS 17.4+; .scheme(_, via:) needs an https bounce route on the server.",
+      "registry": "Swift Package Manager (git tag)"
     }
   ],
   "pythonPackages": [
@@ -712,7 +759,7 @@
       "id": "anointedautomation-sso",
       "version": "0.1.0",
       "runtime": "Python 3.10+ (server only)",
-      "published": false,
+      "published": true,
       "description": "Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/python/anointed-sso/README.md",
@@ -722,14 +769,16 @@
         "process_backchannel_logout",
         "safe_return_to",
         "require_env"
-      ]
+      ],
+      "registry": "PyPI",
+      "install": "pip install anointedautomation-sso"
     }
   ],
   "phpPackages": [
     {
       "id": "anointedautomation/sso",
       "runtime": "PHP 8.1+, Laravel optional",
-      "published": false,
+      "published": true,
       "description": "Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/php/anointed-sso/README.md",
@@ -739,7 +788,10 @@
         "BackchannelLogoutHandler",
         "SessionStatusClient",
         "AnointedSsoServiceProvider"
-      ]
+      ],
+      "registry": "Packagist",
+      "version": "0.1.1",
+      "install": "composer require anointedautomation/sso"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "name": "@anointedautomation/sso-react",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Sign in with Anointed Automation for React: an accessible brand-styled sign-in button and a useAnointedSignIn hook that send the browser to your server's start route. No secrets client side.",
   "type": "module",
   "main": "./src/index.js",
@@ -42,7 +42,7 @@
     "remix",
     "vite"
   ],
-  "author": "Anointed Automation, LLC.",
+  "author": "Anointed Automation Corporation.",
   "license": "MIT",
   "homepage": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react#readme",
   "repository": {
