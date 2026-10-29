@@ -37,7 +37,8 @@ namespace AnointedAutomation.APIMiddleware.Filters
             // Try to retrieve the API key from the request headers
             if (!context.HttpContext.Request.Headers.TryGetValue(apiKeyHeaderName, out potentialKey))
             {
-                IPBlacklistMiddleware.AddLog(LogMessage.Warning($"API Key not found in header '{apiKeyHeaderName}' from IP {clientIP}!")); // Log warning with IP and the attempted header name if key is missing
+                // A missing key is an ordinary client 401 (Info); a wrong key is worth a Warning.
+                IPBlacklistMiddleware.AddLog(LogMessage.Info($"API Key not found in header '{apiKeyHeaderName}' from IP {clientIP} ({APIUtility.DescribeRequest(context.HttpContext)})"));
                 context.Result = new UnauthorizedResult();
                 return;
             }
@@ -47,7 +48,8 @@ namespace AnointedAutomation.APIMiddleware.Filters
             // Check if the provided key matches the correct key
             if (!correctApiKey.Equals(potentialKey))
             {
-                IPBlacklistMiddleware.AddLog(LogMessage.Warning($"IP {clientIP} provided incorrect key '{potentialKey}' in header '{apiKeyHeaderName}'!")); // Log warning with IP, the attempted key, and the header name if key is incorrect
+                // Never log the key that was sent: it may be a real secret (another environment's key, a typo of ours).
+                IPBlacklistMiddleware.AddLog(LogMessage.Warning($"IP {clientIP} provided an incorrect key ({potentialKey.ToString().Length} chars) in header '{apiKeyHeaderName}' for {APIUtility.DescribeRequest(context.HttpContext)}"));
                 context.Result = new UnauthorizedResult();
                 return;
             }

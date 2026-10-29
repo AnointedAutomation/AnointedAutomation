@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AnointedAutomation.Optimization.Logging;
 
 namespace AnointedAutomation.Optimization
 {
@@ -69,7 +70,7 @@ namespace AnointedAutomation.Optimization
             }
         }
 
-        /// <summary>Deletes a directory if it exists, returning any exception instead of throwing.</summary>
+        /// <summary>Deletes a directory if it exists, returning any exception instead of throwing. A failure is also logged as a Warning.</summary>
         /// <returns>The exception that was raised, or null on success.</returns>
         public static Exception? DeleteDirectoryTry(string path, bool deleteContents)
         {
@@ -79,6 +80,7 @@ namespace AnointedAutomation.Optimization
             }
             catch (Exception e)
             {
+                LogMessage.Warning($"FileManagement.DeleteDirectoryTry: could not delete directory '{path}' (deleteContents={deleteContents})", e);
                 return e;
             }
             return null;
@@ -93,7 +95,7 @@ namespace AnointedAutomation.Optimization
             }
         }
 
-        /// <summary>Deletes a file if it exists, returning any exception instead of throwing.</summary>
+        /// <summary>Deletes a file if it exists, returning any exception instead of throwing. A failure is also logged as a Warning.</summary>
         /// <returns>The exception that was raised, or null on success.</returns>
         public static Exception? DeleteFileTry(string path)
         {
@@ -103,6 +105,7 @@ namespace AnointedAutomation.Optimization
             }
             catch (Exception e)
             {
+                LogMessage.Warning($"FileManagement.DeleteFileTry: could not delete file '{path}'", e);
                 return e;
             }
             return null;

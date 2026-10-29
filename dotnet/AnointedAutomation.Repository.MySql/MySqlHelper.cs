@@ -19,6 +19,9 @@ namespace AnointedAutomation.Repository.MySql
     /// </summary>
     public class MySqlHelper : IMySqlHelper
     {
+        /// <summary>The most log messages kept in the in-memory buffer; older ones are dropped first.</summary>
+        public const int MaxBufferedLogs = 1000;
+
         private static readonly ConcurrentQueue<LogMessage> mysqlLogs = new ConcurrentQueue<LogMessage>();
 
         /// <summary>
@@ -125,12 +128,12 @@ namespace AnointedAutomation.Repository.MySql
                 bool connected = mySqlHelper.TestConnection();
                 if (!connected)
                 {
-                    AddLog(LogMessage.Error("Failed to connect to MySQL database"));
+                    AddLog(LogMessage.Error($"MySqlHelper.MySqlHelperConnector: could not connect to {DescribeTarget(connectionString)}"));
                 }
             }
             catch (Exception ex)
             {
-                AddLog(LogMessage.Error(ex.Message));
+                AddLog(LogMessage.Error($"MySqlHelper.MySqlHelperConnector: connect to {DescribeTarget(connectionString)} failed", ex));
             }
 
             return mySqlHelper;
@@ -332,13 +335,13 @@ namespace AnointedAutomation.Repository.MySql
                 bool canConnect = Database.Database.CanConnect();
                 if (canConnect)
                 {
-                    AddLog(LogMessage.Success("Successfully connected to MySQL database"));
+                    AddLog(LogMessage.Info("Successfully connected to MySQL database"));
                 }
                 return canConnect;
             }
             catch (Exception ex)
             {
-                AddLog(LogMessage.Error("Was unable to properly connect to the database! " + ex.ToString()));
+                AddLog(LogMessage.Error($"MySqlHelper.TestConnection: could not connect to {DescribeTarget(ConnectionString)}", ex));
                 return false;
             }
         }
@@ -378,11 +381,40 @@ namespace AnointedAutomation.Repository.MySql
         }
 
         /// <summary>
+        /// "database 'x' on server 'y:port'" for log lines, read from a connection string WITHOUT the user or password.
+        /// Never throws.
+        /// </summary>
+        /// <param name="connectionString">The connection string, or null.</param>
+        /// <returns>The description.</returns>
+        internal static string DescribeTarget(string connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return "(no connection string)";
+            }
+            try
+            {
+                System.Data.Common.DbConnectionStringBuilder builder = new System.Data.Common.DbConnectionStringBuilder { ConnectionString = connectionString };
+                string database = builder.TryGetValue("Database", out object db) ? Convert.ToString(db, System.Globalization.CultureInfo.InvariantCulture) : "(unset)";
+                string server = builder.TryGetValue("Server", out object srv) ? Convert.ToString(srv, System.Globalization.CultureInfo.InvariantCulture) : "(unset)";
+                string port = builder.TryGetValue("Port", out object prt) ? ":" + Convert.ToString(prt, System.Globalization.CultureInfo.InvariantCulture) : string.Empty;
+                return $"database '{database}' on server '{server}{port}'";
+            }
+            catch (ArgumentException)
+            {
+                return "(unparseable connection string)";
+            }
+        }
+
+        /// <summary>
         /// Adds a log message to the MySQL operation logs.
         /// </summary>
         protected static void AddLog(LogMessage logMessage)
         {
             mysqlLogs.Enqueue(logMessage);
+            while (mysqlLogs.Count > MaxBufferedLogs && mysqlLogs.TryDequeue(out LogMessage _))
+            {
+            }
             LogAdded?.Invoke(null, new LogMessageEventArgs(logMessage));
         }
     }

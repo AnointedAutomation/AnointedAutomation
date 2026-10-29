@@ -12,7 +12,7 @@
     <Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.6</Version>
+    <Version>1.0.7</Version>
     <PackageTags>logging;log;diagnostics;events;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Logging</PackageReleaseNotes>
 	  <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
@@ -31,6 +31,10 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="AnointedAutomation.Logging.Tests" />
   </ItemGroup>
 
 </Project>

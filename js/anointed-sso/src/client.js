@@ -54,6 +54,20 @@ function isPlainObject(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/** Longest error-body excerpt kept on an AnointedSsoError (`bodySnippet`). */
+const BODY_SNIPPET_LENGTH = 300;
+
+/**
+ * @summary    The start of an error response body, on one line, for logs (an HTML 502 page is recognizable from it).
+ * @param {string} text
+ * @returns {string}
+ */
+function bodySnippet(text) {
+  const flat = text.replace(/\s+/g, " ").trim();
+  if (flat === "") return "(empty body)";
+  return flat.length <= BODY_SNIPPET_LENGTH ? flat : `${flat.slice(0, BODY_SNIPPET_LENGTH)}...`;
+}
+
 /**
  * @summary    A non-empty string claim, or null.
  * @param {unknown} value
@@ -315,6 +329,7 @@ export function createAnointedClient(config) {
       throw new AnointedSsoError(failCode, `${url} -> ${response.status}${detail}`, {
         status: response.status,
         oauthError,
+        bodySnippet: bodySnippet(text),
       });
     }
     return body;
@@ -723,12 +738,19 @@ export function createAnointedClient(config) {
     }
     if (response.status === 404) return null;
     const text = await response.text();
-    if (!response.ok) throw new AnointedSsoError("http", `${url} -> ${response.status}`, { status: response.status });
+    if (!response.ok) {
+      throw new AnointedSsoError("http", `${url} -> ${response.status}`, { status: response.status, bodySnippet: bodySnippet(text) });
+    }
     let envelope;
     try {
       envelope = JSON.parse(text);
-    } catch {
-      throw new AnointedSsoError("http", `${url} returned invalid JSON`);
+    } catch (err) {
+      // No snippet here: a 2xx body from this endpoint carries the new user's password, even when truncated.
+      const type = response.headers.get("content-type");
+      throw new AnointedSsoError("http", `${url} returned invalid JSON (${text.length} chars, content-type ${type === null ? "none" : type})`, {
+        status: response.status,
+        cause: err,
+      });
     }
     const data = isPlainObject(envelope) ? envelope.Data : undefined;
     const password = isPlainObject(data) ? data.Password : undefined;

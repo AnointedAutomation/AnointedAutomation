@@ -37,6 +37,32 @@ async function toRequest(event) {
 }
 
 /**
+ * @summary    The default logger: one console line per failure.
+ * @param {"warn" | "error"} level
+ * @param {string} message
+ * @param {Record<string, unknown>} details
+ * @returns {void}
+ */
+function consoleLogger(level, message, details) {
+  if (level === "warn") {
+    console.warn(message, details);
+  } else {
+    console.error(message, details);
+  }
+}
+
+/**
+ * @summary    What a log line needs from a failure (code and message for kit errors, name, message and stack otherwise).
+ * @param {unknown} error
+ * @returns {Record<string, unknown>}
+ */
+function describeFailure(error) {
+  if (error instanceof AnointedSsoError) return { code: error.code, message: error.message };
+  if (error instanceof Error) return { name: error.name, message: error.message, stack: error.stack };
+  return { value: String(error) };
+}
+
+/**
  * @summary    Validate the options object of `createAnointedEventHandlers` (fail fast, no defaults).
  * @param {unknown} options
  * @returns {void}
@@ -44,12 +70,13 @@ async function toRequest(event) {
  */
 function validateOptions(options) {
   if (typeof options !== "object" || options === null) throw new AnointedSsoError("config", "options must be an object");
-  const { client, onSignedIn, onSignOut, postLogoutRedirectUri } = options;
+  const { client, onSignedIn, onSignOut, postLogoutRedirectUri, logger } = options;
   if (typeof client !== "object" || client === null || typeof client.createAuthorizeRequest !== "function" || typeof client.handleCallback !== "function") {
     throw new AnointedSsoError("config", "client must be the result of createAnointedClient()");
   }
   if (typeof onSignedIn !== "function") throw new AnointedSsoError("config", "onSignedIn is required");
   if (onSignOut !== undefined && typeof onSignOut !== "function") throw new AnointedSsoError("config", "onSignOut must be a function");
+  if (logger !== undefined && typeof logger !== "function") throw new AnointedSsoError("config", "logger must be a function");
   if (postLogoutRedirectUri !== undefined && (typeof postLogoutRedirectUri !== "string" || postLogoutRedirectUri === "")) {
     throw new AnointedSsoError("config", "postLogoutRedirectUri must be a non-empty string");
   }
@@ -71,18 +98,22 @@ function validateOptions(options) {
  *   (if you kept it) as `idTokenHint`. The browser is then sent to Anointed Automation's end-session endpoint.
  * @param {string} [options.postLogoutRedirectUri]  https URL to come back to after the provider signs out. Register it first.
  * @param {string} [options.returnToParam]  Query parameter `start` reads. Default `returnTo`.
+ * @param {(level: "warn" | "error", message: string, details: Record<string, unknown>) => void} [options.logger]
+ *   Receives every failure before `onError` runs. Default: the console.
  * @returns {{start: (event: any) => Promise<Response>, callback: (event: any) => Promise<Response>, logout: (event: any) => Promise<Response>, backchannelLogout: (event: any) => Promise<Response>}}
  * @throws {AnointedSsoError} `config` on a missing or invalid option
  */
 export function createAnointedEventHandlers(options) {
   validateOptions(options);
-  const { client, onSignedIn, onError, onLogout, onSignOut, postLogoutRedirectUri, returnToParam } = options;
+  const { client, onSignedIn, onError, onLogout, onSignOut, postLogoutRedirectUri, returnToParam, logger } = options;
+  const log = logger === undefined ? consoleLogger : logger;
   // The event reaches onSignedIn through a per-request holder keyed by the Request object.
   const events = new WeakMap();
   const webOptions = { onSignedIn: (result, request) => onSignedIn(result, request, { client, event: events.get(request) }) };
   if (onError !== undefined) webOptions.onError = onError;
   if (onLogout !== undefined) webOptions.onLogout = onLogout;
   if (returnToParam !== undefined) webOptions.returnToParam = returnToParam;
+  if (logger !== undefined) webOptions.logger = logger;
   const handlers = createWebHandlers(client, webOptions);
 
   /**
@@ -128,6 +159,7 @@ export function createAnointedEventHandlers(options) {
       const target = await client.buildLogoutUrl(logoutOptions);
       return redirectTo(request, target, outcome.setCookies === undefined ? [] : outcome.setCookies);
     } catch (error) {
+      log("error", "anointed-sso-nuxt sign-out failed", describeFailure(error));
       if (onError === undefined) {
         return new Response("Sign out failed. Please try again.", { status: 400, headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } });
       }

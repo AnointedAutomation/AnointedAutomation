@@ -3,10 +3,12 @@
 // Vendor-neutral GraphQL response envelope reader. Consolidates the duplicated top-level errors[]
 // checks and data.{mutation}.userErrors[] parsers that were hand-rolled across consuming apps
 // (the shape matches Shopify Admin GraphQL, but nothing here is Shopify-specific).
+// Edited 2026-10-28: errors carry codes, paths, userError fields, HTTP status and a body snippet for log readers.
 
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using AnointedAutomation.Serialization.Json;
 
 namespace AnointedAutomation.Objects.API
 {
@@ -45,7 +47,7 @@ namespace AnointedAutomation.Objects.API
     }
 
     /// <summary>
-    /// Parsed view over a GraphQL response body. Obtain via <see cref="GraphQlEnvelope.Read(string)"/>.
+    /// Parsed view over a GraphQL response body. Obtain via <see cref="GraphQlEnvelope.Read(string, int?)"/>.
     /// </summary>
     public sealed class GraphQlResult
     {
@@ -114,19 +116,123 @@ namespace AnointedAutomation.Objects.API
         }
 
         /// <summary>
-        /// The first error message for the mutation: transport errors first, then user errors.
+        /// Like <see cref="UserErrors(string)"/>, but each entry also names the userError's <c>field</c> and
+        /// <c>code</c> when present: <c>"Title cannot be blank [field=title] [code=BLANK]"</c>.
         /// </summary>
         /// <param name="mutationField">Name of the mutation field under "data"</param>
-        /// <returns>The first error message, or null when there are none</returns>
+        /// <returns>Described user errors, or an empty list when none exist</returns>
+        public IReadOnlyList<string> UserErrorDetails(string mutationField)
+        {
+            JsonElement? payload = Payload(mutationField);
+            if (!payload.HasValue || payload.Value.ValueKind != JsonValueKind.Object
+                || !payload.Value.TryGetProperty("userErrors", out JsonElement userErrors)
+                || userErrors.ValueKind != JsonValueKind.Array)
+            {
+                return EmptyMessages;
+            }
+
+            List<string> described = new List<string>();
+            foreach (JsonElement error in userErrors.EnumerateArray())
+            {
+                if (error.ValueKind != JsonValueKind.Object
+                    || !error.TryGetProperty("message", out JsonElement message)
+                    || message.ValueKind != JsonValueKind.String)
+                {
+                    continue;
+                }
+                string text = message.GetString();
+                if (error.TryGetProperty("field", out JsonElement field) && field.ValueKind != JsonValueKind.Null && field.ValueKind != JsonValueKind.Undefined)
+                {
+                    text += " [field=" + DescribeField(field) + "]";
+                }
+                if (error.TryGetProperty("code", out JsonElement code) && code.ValueKind == JsonValueKind.String)
+                {
+                    text += " [code=" + code.GetString() + "]";
+                }
+                described.Add(text);
+            }
+            return described;
+        }
+
+        /// <summary>
+        /// The first error for the mutation, transport errors first, then user errors. The message carries what a
+        /// log reader needs to act: the GraphQL <c>extensions.code</c> (THROTTLED, ACCESS_DENIED...) and <c>path</c>
+        /// for a transport error, <c>field</c> and <c>code</c> for a userError, and how many more errors there were.
+        /// A message with none of those is returned unchanged.
+        /// </summary>
+        /// <param name="mutationField">Name of the mutation field under "data"</param>
+        /// <returns>The first error, or null when there are none</returns>
         public string FirstError(string mutationField)
         {
             if (TransportErrors.Count > 0)
             {
-                return TransportErrors[0];
+                string first = TransportErrors[0];
+                if (Errors.Count > 0)
+                {
+                    GraphQlError error = Errors[0];
+                    string code = ExtensionsCode(error.Extensions);
+                    if (code != null)
+                    {
+                        first += " [code=" + code + "]";
+                    }
+                    if (error.Path != null)
+                    {
+                        first += " [path=" + error.Path + "]";
+                    }
+                }
+                return TransportErrors.Count > 1 ? first + " (+" + (TransportErrors.Count - 1) + " more)" : first;
             }
 
-            IReadOnlyList<string> userErrors = UserErrors(mutationField);
-            return userErrors.Count > 0 ? userErrors[0] : null;
+            IReadOnlyList<string> userErrors = UserErrorDetails(mutationField);
+            if (userErrors.Count == 0)
+            {
+                return null;
+            }
+            return userErrors.Count > 1 ? userErrors[0] + " (+" + (userErrors.Count - 1) + " more)" : userErrors[0];
+        }
+
+        /// <summary>A userError field: a JSON array of path segments joined with dots, or the raw text.</summary>
+        /// <param name="field">The field element.</param>
+        /// <returns>The description.</returns>
+        private static string DescribeField(JsonElement field)
+        {
+            if (field.ValueKind != JsonValueKind.Array)
+            {
+                return field.ValueKind == JsonValueKind.String ? field.GetString() : field.GetRawText();
+            }
+            List<string> parts = new List<string>();
+            foreach (JsonElement part in field.EnumerateArray())
+            {
+                parts.Add(part.ValueKind == JsonValueKind.String ? part.GetString() : part.GetRawText());
+            }
+            return string.Join(".", parts);
+        }
+
+        /// <summary>extensions.code from a raw extensions object, or null.</summary>
+        /// <param name="extensions">Raw JSON of the extensions object, or null.</param>
+        /// <returns>The code, or null.</returns>
+        private static string ExtensionsCode(string extensions)
+        {
+            if (string.IsNullOrEmpty(extensions))
+            {
+                return null;
+            }
+            try
+            {
+                using (JsonDocument document = JsonDocument.Parse(extensions))
+                {
+                    return document.RootElement.ValueKind == JsonValueKind.Object
+                        && document.RootElement.TryGetProperty("code", out JsonElement code)
+                        && code.ValueKind == JsonValueKind.String
+                            ? code.GetString()
+                            : null;
+                }
+            }
+            catch (JsonException)
+            {
+                // Raw text came from a parsed document, so this cannot happen; no code is the honest answer.
+                return null;
+            }
         }
 
         /// <summary>
@@ -173,12 +279,26 @@ namespace AnointedAutomation.Objects.API
         /// <returns>The parsed result</returns>
         public static GraphQlResult Read(string body)
         {
+            return Read(body, null);
+        }
+
+        /// <summary>
+        /// Parses a GraphQL response body. Never throws. A parse-failure entry names the HTTP status (when given),
+        /// the byte where JSON parsing stopped and a short single-line snippet of the body (an HTML 502 or a
+        /// Cloudflare page is recognizable from it).
+        /// </summary>
+        /// <param name="body">Raw HTTP response body; may be null, empty, or malformed</param>
+        /// <param name="httpStatus">The HTTP status code of the response, or null when unknown</param>
+        /// <returns>The parsed result</returns>
+        public static GraphQlResult Read(string body, int? httpStatus)
+        {
+            string status = httpStatus.HasValue ? " (HTTP " + httpStatus.Value + ")" : string.Empty;
             if (string.IsNullOrWhiteSpace(body))
             {
                 return new GraphQlResult(
                     default,
                     false,
-                    new string[] { "GraphQL response body was empty" },
+                    new string[] { "GraphQL response body was empty" + status },
                     Array.Empty<GraphQlError>());
             }
 
@@ -187,12 +307,12 @@ namespace AnointedAutomation.Objects.API
             {
                 document = JsonDocument.Parse(body);
             }
-            catch (JsonException)
+            catch (JsonException ex)
             {
                 return new GraphQlResult(
                     default,
                     false,
-                    new string[] { "GraphQL response body was not valid JSON" },
+                    new string[] { "GraphQL response body was not valid JSON" + status + " at line " + ex.LineNumber + " byte " + ex.BytePositionInLine + ": " + ResponseJson.Snippet(body) },
                     Array.Empty<GraphQlError>());
             }
 
@@ -204,7 +324,7 @@ namespace AnointedAutomation.Objects.API
                     return new GraphQlResult(
                         default,
                         false,
-                        new string[] { "GraphQL response body was not a JSON object" },
+                        new string[] { "GraphQL response body was not a JSON object" + status + ": " + ResponseJson.Snippet(body) },
                         Array.Empty<GraphQlError>());
                 }
 

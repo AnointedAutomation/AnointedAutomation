@@ -162,6 +162,33 @@ namespace AnointedAutomation.SSO.Owin.Tests
         }
 
         [Fact]
+        public async Task FailOpen_Failures_WarnOncePerWindowWithSuppressedCount()
+        {
+            StatusResponder = request => Task.FromException<HttpResponseMessage>(new HttpRequestException("down"));
+            TestLogger logger = new TestLogger();
+            AnointedSessionStatusOptions options = new AnointedSessionStatusOptions
+            {
+                ApiKey = "partner-key",
+                AppName = "Test App",
+                BaseAddress = new Uri("https://api.test/"),
+                Timeout = TimeSpan.FromSeconds(3),
+            };
+            AnointedSessionStatusClient client = new AnointedSessionStatusClient(new HttpClient(_http), options, _cache, _clock, logger);
+
+            await client.CheckAsync("u1", true, CancellationToken.None);
+            await client.CheckAsync("u2", true, CancellationToken.None);
+            await client.CheckAsync("u3", true, CancellationToken.None);
+            _clock.Advance(AnointedSessionStatusCache.FailureLogWindow);
+            await client.CheckAsync("u4", true, CancellationToken.None);
+
+            List<string> warnings = logger.Messages.FindAll(m => m.StartsWith("Warning:", StringComparison.Ordinal));
+            Assert.Equal(2, warnings.Count);
+            Assert.Contains("0 similar failure(s)", warnings[0]);
+            Assert.Contains("2 similar failure(s)", warnings[1]);
+            Assert.Equal(2, logger.Messages.FindAll(m => m.StartsWith("Verbose:", StringComparison.Ordinal)).Count);
+        }
+
+        [Fact]
         public async Task FailOpen_Timeout_Unknown()
         {
             StatusResponder = request => new TaskCompletionSource<HttpResponseMessage>().Task;

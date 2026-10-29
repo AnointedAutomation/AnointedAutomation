@@ -4,7 +4,7 @@
 
 import { AnointedSsoError } from "../errors.js";
 import { parseCookieHeader } from "../cookies.js";
-import { requireOnSignedIn, validateCommonOptions } from "./options.js";
+import { defaultFailureStatus, describeError, levelOf, requireOnSignedIn, resolveLogger, validateCommonOptions } from "./options.js";
 
 /**
  * @summary    Copy a Response so headers are mutable, and append one Set-Cookie value.
@@ -21,11 +21,13 @@ function withSetCookie(response, setCookie) {
 
 /**
  * @summary    The response sent when sign-in fails and no `onError` was supplied. Never leaks the cause.
+ * @description 502 when the provider or the network to it failed (`http`, `discovery`), 400 otherwise.
+ * @param {unknown} err
  * @returns {Response}
  */
-function defaultErrorResponse() {
+function defaultErrorResponse(err) {
   return new Response("Sign in with Anointed Automation failed. Please try again.", {
-    status: 400,
+    status: defaultFailureStatus(err),
     headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" },
   });
 }
@@ -38,7 +40,9 @@ function defaultErrorResponse() {
  *   Required by `callback` only. Create YOUR session from `result.user.sub` and return the response
  *   (usually a redirect to `result.returnTo`). The flow cookie is cleared for you.
  * @param {(error: unknown, request: Request) => Response | Promise<Response>} [options.onError]
- *   Default: a plain 400. Branch on `error.code` (see AnointedSsoError); never echo `error.message` to users.
+ *   Default: a plain 400 (502 when the provider failed). Branch on `error.code` (see AnointedSsoError); never echo `error.message` to users.
+ * @param {(level: "warn" | "error", message: string, details: Record<string, unknown>) => void} [options.logger]
+ *   Receives every failure (before `onError` runs): "warn" for user-caused codes, "error" for the rest. Default: the console.
  * @param {(logout: Awaited<ReturnType<import("../client.js").AnointedClient["verifyLogoutToken"]>>, request: Request) => void | Promise<void>} [options.onLogout]
  *   Enables `backchannelLogout`: end every session for `logout.sub` / `logout.sid`, skip a repeated `jti`.
  * @param {string} [options.returnToParam]  Query parameter `start` reads the return target from. Default `returnTo`.
@@ -47,6 +51,19 @@ function defaultErrorResponse() {
 export function createWebHandlers(client, options = {}) {
   const returnToParam = validateCommonOptions(options);
   const onError = options.onError === undefined ? defaultErrorResponse : options.onError;
+  const logger = resolveLogger(options);
+
+  /**
+   * @summary    Record a sign-in failure, then answer it through `onError`.
+   * @param {string} step
+   * @param {unknown} err
+   * @param {Request} request
+   * @returns {Promise<Response>}
+   */
+  async function fail(step, err, request) {
+    logger(levelOf(err), `anointed-sso ${step} failed`, describeError(err));
+    return onError(err, request);
+  }
 
   /**
    * @summary    GET handler: redirect to Anointed Automation and set the flow cookie.
@@ -63,7 +80,7 @@ export function createWebHandlers(client, options = {}) {
         headers: { location: auth.url, "set-cookie": auth.setCookieHeader, "cache-control": "no-store" },
       });
     } catch (err) {
-      return onError(err, request);
+      return fail("start", err, request);
     }
   }
 
@@ -80,7 +97,7 @@ export function createWebHandlers(client, options = {}) {
       const result = await client.handleCallback({ url: request.url, cookieValue, request });
       return withSetCookie(await options.onSignedIn(result, request), clear);
     } catch (err) {
-      return withSetCookie(await onError(err, request), clear);
+      return withSetCookie(await fail("callback", err, request), clear);
     }
   }
 
@@ -104,11 +121,13 @@ export function createWebHandlers(client, options = {}) {
       verified = await client.verifyLogoutToken(logoutToken);
     } catch (err) {
       const status = err instanceof AnointedSsoError && err.code === "logout_token_invalid" ? 400 : 500;
+      logger(levelOf(err), "anointed-sso back-channel logout verify failed", { ...describeError(err), answered: status });
       return new Response(null, { status, headers: noStore });
     }
     try {
       await options.onLogout(verified, request);
-    } catch {
+    } catch (err) {
+      logger("error", "anointed-sso onLogout handler threw", { jti: verified.jti, ...describeError(err) });
       return new Response(null, { status: 500, headers: noStore });
     }
     return new Response(null, { status: 200, headers: noStore });

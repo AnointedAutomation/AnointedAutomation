@@ -62,7 +62,7 @@ namespace AnointedAutomation.SSO
 
             if (!context.Request.HasFormContentType)
             {
-                _logger.LogWarning("Anointed back-channel logout rejected: the request is not a form post.");
+                _logger.LogInformation("Anointed back-channel logout rejected: the request is not a form post.");
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
             }
@@ -70,7 +70,7 @@ namespace AnointedAutomation.SSO
             StringValues values = form[AnointedAutomationDefaults.LogoutTokenFormField];
             if (values.Count != 1 || string.IsNullOrWhiteSpace(values[0]))
             {
-                _logger.LogWarning("Anointed back-channel logout rejected: logout_token is missing or repeated.");
+                _logger.LogInformation("Anointed back-channel logout rejected: logout_token is missing or repeated.");
                 context.Response.StatusCode = StatusCodes.Status400BadRequest;
                 return;
             }

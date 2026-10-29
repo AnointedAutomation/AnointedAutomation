@@ -4,7 +4,7 @@
 
 import { AnointedSsoError } from "../errors.js";
 import { parseCookieHeader } from "../cookies.js";
-import { requireOnSignedIn, validateCommonOptions } from "./options.js";
+import { defaultFailureStatus, describeError, levelOf, requireOnSignedIn, resolveLogger, validateCommonOptions } from "./options.js";
 
 const MAX_LOGOUT_BODY_BYTES = 64 * 1024;
 
@@ -85,7 +85,9 @@ async function readLogoutToken(req) {
  * @param {(result: Awaited<ReturnType<import("../client.js").AnointedClient["handleCallback"]>>, req: any, res: any) => void | Promise<void>} [options.onSignedIn]
  *   Required by `callback` only. Create YOUR session from `result.user.sub` and send the response (usually a redirect to `result.returnTo`).
  * @param {(error: unknown, req: any, res: any) => void | Promise<void>} [options.onError]
- *   Default: a plain 400. Branch on `error.code`; never echo `error.message` to users.
+ *   Default: a plain 400 (502 when the provider failed). Branch on `error.code`; never echo `error.message` to users.
+ * @param {(level: "warn" | "error", message: string, details: Record<string, unknown>) => void} [options.logger]
+ *   Receives every failure (before `onError` runs): "warn" for user-caused codes, "error" for the rest. Default: the console.
  * @param {(logout: Awaited<ReturnType<import("../client.js").AnointedClient["verifyLogoutToken"]>>, req: any) => void | Promise<void>} [options.onLogout]
  *   Enables `backchannelLogout`: end every session for `logout.sub` / `logout.sid`, skip a repeated `jti`.
  * @param {string} [options.returnToParam]  Query parameter `start` reads the return target from. Default `returnTo`.
@@ -93,17 +95,20 @@ async function readLogoutToken(req) {
  */
 export function createExpressHandlers(client, options = {}) {
   const returnToParam = validateCommonOptions(options);
+  const logger = resolveLogger(options);
 
   /**
-   * @summary    Route a failure to `onError`, or answer a generic 400.
+   * @summary    Record a failure, then route it to `onError` or answer a generic 400 (502 when the provider failed).
+   * @param {string} step
    * @param {unknown} err
    * @param {any} req
    * @param {any} res
    * @returns {Promise<void>}
    */
-  async function fail(err, req, res) {
+  async function fail(step, err, req, res) {
+    logger(levelOf(err), `anointed-sso ${step} failed`, describeError(err));
     if (options.onError === undefined) {
-      sendStatus(res, 400, "Sign in with Anointed Automation failed. Please try again.");
+      sendStatus(res, defaultFailureStatus(err), "Sign in with Anointed Automation failed. Please try again.");
       return;
     }
     await options.onError(err, req, res);
@@ -123,7 +128,7 @@ export function createExpressHandlers(client, options = {}) {
       res.setHeader("location", auth.url);
       sendStatus(res, 302);
     } catch (err) {
-      await fail(err, req, res);
+      await fail("start", err, req, res);
     }
   }
 
@@ -141,7 +146,7 @@ export function createExpressHandlers(client, options = {}) {
       const result = await client.handleCallback({ query: requestQuery(req), cookieValue, request: req });
       await options.onSignedIn(result, req, res);
     } catch (err) {
-      await fail(err, req, res);
+      await fail("callback", err, req, res);
     }
   }
 
@@ -168,12 +173,15 @@ export function createExpressHandlers(client, options = {}) {
     try {
       verified = await client.verifyLogoutToken(logoutToken);
     } catch (err) {
-      sendStatus(res, err instanceof AnointedSsoError && err.code === "logout_token_invalid" ? 400 : 500);
+      const status = err instanceof AnointedSsoError && err.code === "logout_token_invalid" ? 400 : 500;
+      logger(levelOf(err), "anointed-sso back-channel logout verify failed", { ...describeError(err), answered: status });
+      sendStatus(res, status);
       return;
     }
     try {
       await options.onLogout(verified, req);
-    } catch {
+    } catch (err) {
+      logger("error", "anointed-sso onLogout handler threw", { jti: verified.jti, ...describeError(err) });
       sendStatus(res, 500);
       return;
     }

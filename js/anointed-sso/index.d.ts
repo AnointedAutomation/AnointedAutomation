@@ -26,7 +26,7 @@ export type AnointedSsoErrorCode =
   | "http";
 
 export declare class AnointedSsoError extends Error {
-  constructor(code: AnointedSsoErrorCode, message: string, details?: { status?: number; oauthError?: string; cause?: unknown });
+  constructor(code: AnointedSsoErrorCode, message: string, details?: { status?: number; oauthError?: string; bodySnippet?: string; cause?: unknown });
   readonly name: "AnointedSsoError";
   /** Stable code to branch on. */
   readonly code: AnointedSsoErrorCode;
@@ -34,7 +34,15 @@ export declare class AnointedSsoError extends Error {
   readonly status?: number;
   /** OAuth `error` value, e.g. `invalid_grant`. */
   readonly oauthError?: string;
+  /** Start of the provider's error response body (one line, at most 300 chars), for logs only. */
+  readonly bodySnippet?: string;
 }
+
+/**
+ * Receives every adapter failure before `onError` runs: "warn" for user-caused codes (stale tab, declined consent),
+ * "error" for configuration, provider or network failures. Default: the console.
+ */
+export type AnointedSsoLogger = (level: "warn" | "error", message: string, details: Record<string, unknown>) => void;
 
 export interface AnointedClientConfig {
   /** `https://api.anointedautomation.net/` (use ANOINTED_ISSUER). */
@@ -219,8 +227,10 @@ export interface WebHandlerOptions {
    * `result.user.sub` and return the response. The flow cookie is cleared for you.
    */
   onSignedIn?: (result: CallbackResult, request: Request) => Response | Promise<Response>;
-  /** Default: a generic 400. Branch on `error.code`; never show `error.message` to users. */
+  /** Default: a generic 400 (502 when the provider failed). Branch on `error.code`; never show `error.message` to users. */
   onError?: (error: unknown, request: Request) => Response | Promise<Response>;
+  /** Where failures are recorded. Default: the console. */
+  logger?: AnointedSsoLogger;
   /** Enables `backchannelLogout`. */
   onLogout?: (logout: LogoutNotice, request: Request) => void | Promise<void>;
   /** Query parameter `start` reads the return target from. Default `returnTo`. */
@@ -255,8 +265,10 @@ export interface NodeResponseLike {
 export interface ExpressHandlerOptions<Req extends NodeRequestLike = NodeRequestLike, Res extends NodeResponseLike = NodeResponseLike> {
   /** Required by `callback` only (it throws a `config` error without one). Create YOUR session and respond. */
   onSignedIn?: (result: CallbackResult, req: Req, res: Res) => void | Promise<void>;
-  /** Default: a generic 400. Branch on `error.code`; never show `error.message` to users. */
+  /** Default: a generic 400 (502 when the provider failed). Branch on `error.code`; never show `error.message` to users. */
   onError?: (error: unknown, req: Req, res: Res) => void | Promise<void>;
+  /** Where failures are recorded. Default: the console. */
+  logger?: AnointedSsoLogger;
   /** Enables `backchannelLogout`. */
   onLogout?: (logout: LogoutNotice, req: Req) => void | Promise<void>;
   /** Query parameter `start` reads the return target from. Default `returnTo`. */

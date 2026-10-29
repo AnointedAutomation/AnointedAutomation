@@ -13,7 +13,7 @@ dotnet add package AnointedAutomation.Memory
 ```
 
 - Target framework: `net10.0`
-- Dependencies: none
+- Dependencies: `AnointedAutomation.Logging` (a refused no-GC region is logged as a Warning)
 
 Note that the namespace is `AnointedAutomation.Optimization.Memory`, not the package id.
 

@@ -33,6 +33,12 @@ LogMessage.LogAdded += (sender, e) =>
 LogMessage.Info("Application started.");
 LogMessage.Warning(42, "Cache miss rate is high.");
 LogMessage.Error("Could not reach the payment provider.");
+
+try { /* ... */ }
+catch (Exception ex)
+{
+    LogMessage.Error("Order 1001 capture failed", ex); // keeps the type, inner exceptions and stack
+}
 ```
 
 Note the namespace: the types live in `AnointedAutomation.Optimization.Logging`, not `AnointedAutomation.Logging`.
@@ -45,19 +51,22 @@ All types are in the `AnointedAutomation.Optimization.Logging` namespace.
 
 | Member | Description |
 |---|---|
-| `LogMessage()` | Empty instance (no event raised). |
-| `LogMessage(MessageType messageType, string message)` | Sets `timeStamp` (`DateTime.Now`), `messageSource`, `localOperationName` and raises `LogAdded`. |
-| `LogMessage(int id, MessageType messageType, string message)` | Same as above, with an id. |
+| `LogMessage()` | Empty instance for object initializers. **Raises no event and stamps nothing: a message built this way never reaches a `LogAdded` subscriber (your log store or alerts).** |
+| `LogMessage(MessageType messageType, string message)` | Sets `timeStamp` (`DateTime.UtcNow`), `messageSource`, `localOperationName` (stack walk) and raises `LogAdded`. |
+| `LogMessage(long id, MessageType messageType, string message)` | Same as above, with an id. |
 | `static string MessageSourceSetter` | Program name copied into every new message's `messageSource`. |
-| `static event LogAddedEventHandler LogAdded` | Raised whenever a message is constructed with a type and text. |
+| `static event LogAddedEventHandler LogAdded` | Raised whenever a message is constructed with a type and text. Each subscriber runs in isolation: one that throws is reported on `Console.Error` and never breaks the caller. |
 | `long id` | Optional identifier. |
-| `string localOperationName` | Calling method, resolved from the stack trace (`Namespace.Class.Method`). Async state machines and lambdas are unwrapped to the real method name. |
+| `string localOperationName` | Factories: the exact call site as `File.Member:line` (compiler caller info, no stack walk). Typed constructors: the calling method from the stack (`Namespace.Class.Method`). |
 | `string message` | The log text. |
 | `string messageSource` | Program name (from `MessageSourceSetter`). |
 | `MessageType messageType` | Severity. |
-| `DateTime timeStamp` | Local creation time. |
+| `DateTime timeStamp` | UTC creation time. |
+| `string exceptionType` | Full type name of the exception passed to an exception overload. |
+| `string callerMemberName` / `callerFilePath` / `int callerLineNumber` | Call site recorded by the factories. |
+| `string category` / `storeSlug` / `properties` | Optional context for bridges and multi-tenant apps (category, tenant, JSON properties). |
 
-Static factory methods, each with a `(string message)` and an `(int id, string message)` overload:
+Static factory methods, each with a `(string message)` and a `(long id, string message)` overload. `Critical`, `Error` and `Warning` also take `(string message, Exception exception)`, which appends the full exception (type, inner exceptions, stack with file:line) to the message:
 
 | Factory | Produces |
 |---|---|
@@ -90,7 +99,8 @@ Static factory methods, each with a `(string message)` and an `(int id, string m
 ## Notes
 
 - `LogAdded` is a static event. Every `LogMessage` created anywhere in the process reaches every subscriber, so subscribe once and unsubscribe when your listener goes away.
-- Creating a message captures a `StackTrace`, which is relatively expensive; avoid creating messages in very hot loops.
+- The factories record the caller with `[CallerMemberName]`/`[CallerFilePath]`/`[CallerLineNumber]` at no runtime cost; only the typed constructors capture a `StackTrace`.
+- Since 1.0.7 the package ships an embedded portable PDB, so stack traces through it show file and line.
 
 ## Related packages
 

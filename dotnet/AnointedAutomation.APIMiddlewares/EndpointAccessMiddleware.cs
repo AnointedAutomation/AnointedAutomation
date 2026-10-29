@@ -1,6 +1,7 @@
 // Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-10-15 18:02:13 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
-﻿using AnointedAutomation.Optimization.Memory;
+﻿using AnointedAutomation.Optimization.Logging;
+using AnointedAutomation.Optimization.Memory;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Concurrent;
@@ -103,9 +104,17 @@ namespace AnointedAutomation.APIMiddleware
         /// <param name="state">The state object (unused).</param>
         private void CheckForGarbageCollection(object state)
         {
-            if (_timeout.HasValue && AreAllEndpointsIdle())
+            // A timer callback that throws crashes the process, so every failure is caught and logged here.
+            try
             {
-                _garbageCollection.PerformGarbageCollection(null);
+                if (_timeout.HasValue && AreAllEndpointsIdle())
+                {
+                    _garbageCollection.PerformGarbageCollection(null);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogMessage.Error($"EndpointAccessMiddleware.CheckForGarbageCollection: idle GC check failed (timeout {_timeout}, {_lastAccessed.Count} tracked endpoint(s))", ex);
             }
         }
     }

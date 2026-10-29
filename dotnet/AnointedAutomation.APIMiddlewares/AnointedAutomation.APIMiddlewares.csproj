@@ -12,7 +12,7 @@
     <Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.9</Version>
+    <Version>1.0.10</Version>
     <PackageTags>aspnetcore;middleware;api-key;security;ip-blacklist;authentication;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.APIMiddlewares</PackageReleaseNotes>
     <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
@@ -31,6 +31,10 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="AnointedAutomation.APIMiddlewares.Tests" />
   </ItemGroup>
 
 </Project>

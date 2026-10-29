@@ -91,13 +91,27 @@ namespace AnointedAutomation.SSO
             }
             catch (Exception ex) when (ex is HttpRequestException || ex is OperationCanceledException || ex is JsonException || ex is AnointedSessionStatusException)
             {
-                _logger.LogWarning(ex, "Anointed session status check failed; keeping the session (fail open).");
+                if (_cache.TryStartFailureLogWindow(_timeProvider.GetUtcNow(), out int suppressed))
+                {
+                    _logger.LogWarning(ex, "Anointed session status check failed; keeping the session (fail open). {Suppressed} similar failure(s) in the previous window were not logged.", suppressed);
+                }
+                else
+                {
+                    _logger.LogDebug(ex, "Anointed session status check failed; keeping the session (fail open).");
+                }
                 return AnointedSessionCheck.Unknown(ex.GetType().Name + ": " + ex.Message);
             }
 
             if (answer.Outcome == AnointedSessionOutcome.Unknown)
             {
-                _logger.LogWarning("Anointed session status gave no answer ({Error}); keeping the session (fail open).", answer.Error);
+                if (_cache.TryStartFailureLogWindow(_timeProvider.GetUtcNow(), out int suppressed))
+                {
+                    _logger.LogWarning("Anointed session status gave no answer ({Error}); keeping the session (fail open). {Suppressed} similar failure(s) in the previous window were not logged.", answer.Error, suppressed);
+                }
+                else
+                {
+                    _logger.LogDebug("Anointed session status gave no answer ({Error}); keeping the session (fail open).", answer.Error);
+                }
                 return answer;
             }
             _cache.SetAnswer(cacheKey, answer, _timeProvider.GetUtcNow(), _options.AnswerCacheDuration);
@@ -329,6 +343,36 @@ namespace AnointedAutomation.SSO
     public class AnointedSessionStatusCache
     {
         private readonly ConcurrentDictionary<string, CachedAnswer> _answers = new ConcurrentDictionary<string, CachedAnswer>(StringComparer.Ordinal);
+
+        private readonly object _failureLogGate = new object();
+        private DateTimeOffset _failureLogWindowStart = DateTimeOffset.MinValue;
+        private int _suppressedFailureLogs;
+
+        /// <summary>How long one logged fail-open warning covers; the rest in that window are counted, not logged.</summary>
+        internal static readonly TimeSpan FailureLogWindow = TimeSpan.FromMinutes(5);
+
+        /// <summary>
+        /// True for the first fail-open failure in a window (log it as a Warning); false for the rest (counted).
+        /// </summary>
+        /// <param name="now">The current time.</param>
+        /// <param name="suppressedBefore">On true: how many failures were not logged in the previous window.</param>
+        /// <returns>True to log at Warning.</returns>
+        internal bool TryStartFailureLogWindow(DateTimeOffset now, out int suppressedBefore)
+        {
+            lock (_failureLogGate)
+            {
+                if (now - _failureLogWindowStart >= FailureLogWindow)
+                {
+                    suppressedBefore = _suppressedFailureLogs;
+                    _suppressedFailureLogs = 0;
+                    _failureLogWindowStart = now;
+                    return true;
+                }
+                _suppressedFailureLogs++;
+                suppressedBefore = 0;
+                return false;
+            }
+        }
 
         /// <summary>Serializes machine token exchanges.</summary>
         internal SemaphoreSlim TokenGate { get; } = new SemaphoreSlim(1, 1);

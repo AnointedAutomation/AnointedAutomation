@@ -22,6 +22,9 @@ namespace AnointedAutomation.Repository.Mongo
     /// </summary>
     public class MongoHelper : IMongoHelper
     {
+        /// <summary>The most log messages kept in the in-memory buffer; older ones are dropped first.</summary>
+        public const int MaxBufferedLogs = 1000;
+
         private static readonly ConcurrentQueue<LogMessage> mongoLogs = new ConcurrentQueue<LogMessage>();
 
         /// <summary>
@@ -175,7 +178,7 @@ namespace AnointedAutomation.Repository.Mongo
             }
             catch (System.Exception theseHands)
             {
-                AddLog(LogMessage.Error(theseHands.Message));
+                AddLog(LogMessage.Error($"MongoHelperConnector: connection test to db '{dbName}' on cluster '{cluster}' failed", theseHands));
             }
 
             mongoHelper.dbName = dbName;
@@ -681,12 +684,16 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <summary>
-        /// Adds a log message to the MongoDB operation logs.
+        /// Adds a log message to the MongoDB operation logs. The buffer keeps at most <see cref="MaxBufferedLogs"/>
+        /// messages (oldest dropped first); every message also reaches <see cref="LogMessage.LogAdded"/> when created.
         /// </summary>
         /// <param name="logMessage">The log message to add.</param>
         protected static void AddLog(LogMessage logMessage)
         {
             mongoLogs.Enqueue(logMessage);
+            while (mongoLogs.Count > MaxBufferedLogs && mongoLogs.TryDequeue(out LogMessage _))
+            {
+            }
             LogAdded?.Invoke(null, new LogMessageEventArgs(logMessage));
         }
 

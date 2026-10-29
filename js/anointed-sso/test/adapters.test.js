@@ -299,3 +299,123 @@ test("express adapter: options are validated", () => {
   assert.throws(() => createExpressHandlers(client, { onSignedIn: () => {}, onLogout: 2 }), (err) => err.code === "config");
   assert.equal(createExpressHandlers(client, { onSignedIn: () => {} }).backchannelLogout, undefined);
 });
+
+/**
+ * @summary    A logger that records every call.
+ * @returns {{calls: Array<{level: string, message: string, details: Record<string, unknown>}>, logger: Function}}
+ */
+function recordingLogger() {
+  const calls = [];
+  return { calls, logger: (level, message, details) => calls.push({ level, message, details }) };
+}
+
+test("web adapter: provider unreachable is logged as an error and answered 502 by default", async () => {
+  const broken = createAnointedClient({
+    issuer: idp.issuer,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    redirectUri: REDIRECT_URI,
+    fetch: async () => {
+      throw new TypeError("fetch failed");
+    },
+  });
+  const rec = recordingLogger();
+  const handlers = createWebHandlers(broken, { onSignedIn: () => new Response("x"), logger: rec.logger });
+  const res = await handlers.start(new Request("http://localhost:3000/auth/anointed/start"));
+  assert.equal(res.status, 502);
+  assert.equal(rec.calls.length, 1);
+  assert.equal(rec.calls[0].level, "error");
+  assert.equal(rec.calls[0].message, "anointed-sso start failed");
+  assert.equal(rec.calls[0].details.code, "discovery");
+  assert.equal(rec.calls[0].details.cause, "TypeError: fetch failed");
+});
+
+test("web adapter: a user-caused failure is logged at warn and still answered 400", async () => {
+  const rec = recordingLogger();
+  const handlers = createWebHandlers(client, { onSignedIn: () => new Response("x"), logger: rec.logger });
+  const res = await handlers.callback(new Request(`${REDIRECT_URI}?code=x&state=y`));
+  assert.equal(res.status, 400);
+  assert.equal(rec.calls.length, 1);
+  assert.equal(rec.calls[0].level, "warn");
+  assert.equal(rec.calls[0].details.code, "flow_missing");
+});
+
+test("web adapter: back-channel failures are logged (invalid token at warn, onLogout throw at error with jti)", async () => {
+  const rec = recordingLogger();
+  const handlers = createWebHandlers(client, {
+    onSignedIn: () => new Response("x"),
+    onLogout: () => {
+      throw new Error("store down");
+    },
+    logger: rec.logger,
+  });
+  const post = (body) =>
+    handlers.backchannelLogout(
+      new Request("http://localhost:3000/auth/anointed/backchannel-logout", {
+        method: "POST",
+        headers: { "content-type": "application/x-www-form-urlencoded" },
+        body,
+      }),
+    );
+  assert.equal((await post(`logout_token=${logoutToken({ nonce: "n" })}`)).status, 400);
+  assert.equal(rec.calls[0].level, "warn");
+  assert.equal(rec.calls[0].message, "anointed-sso back-channel logout verify failed");
+  assert.equal(rec.calls[0].details.answered, 400);
+  assert.equal((await post(`logout_token=${logoutToken()}`)).status, 500);
+  assert.equal(rec.calls[1].level, "error");
+  assert.equal(rec.calls[1].message, "anointed-sso onLogout handler threw");
+  assert.equal(typeof rec.calls[1].details.jti, "string");
+  assert.equal(rec.calls[1].details.message, "store down");
+});
+
+test("adapters: logger must be a function", () => {
+  assert.throws(() => createWebHandlers(client, { logger: "console" }), (err) => err.code === "config");
+  assert.throws(() => createExpressHandlers(client, { logger: 1 }), (err) => err.code === "config");
+});
+
+test("express adapter: provider unreachable is logged and answered 502 by default", async () => {
+  const broken = createAnointedClient({
+    issuer: idp.issuer,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    redirectUri: REDIRECT_URI,
+    fetch: async () => {
+      throw new TypeError("fetch failed");
+    },
+  });
+  const rec = recordingLogger();
+  const handlers = createExpressHandlers(broken, { onSignedIn: () => undefined, logger: rec.logger });
+  const app = await serve((req, res) => handlers.start(req, res));
+  try {
+    const res = await fetch(`${app.base}/auth/anointed/start`, { redirect: "manual" });
+    assert.equal(res.status, 502);
+    assert.equal(rec.calls[0].level, "error");
+    assert.equal(rec.calls[0].details.code, "discovery");
+  } finally {
+    await app.close();
+  }
+});
+
+test("client: an HTTP error keeps a one-line body snippet; invalid JSON with a password never does", async () => {
+  let answer = () => new Response("<html>\n<body>502 Bad Gateway</body></html>", { status: 502, headers: { "content-type": "text/html" } });
+  const stubbed = createAnointedClient({
+    issuer: idp.issuer,
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+    redirectUri: REDIRECT_URI,
+    fetch: async () => answer(),
+  });
+  await assert.rejects(stubbed.takeNewUserPassword("sub-1"), (err) => {
+    assert.equal(err.code, "http");
+    assert.equal(err.status, 502);
+    assert.equal(err.bodySnippet, "<html> <body>502 Bad Gateway</body></html>");
+    return true;
+  });
+  answer = () => new Response('{"Data":{"Password":"hunter2-secret', { status: 200, headers: { "content-type": "application/json" } });
+  await assert.rejects(stubbed.takeNewUserPassword("sub-1"), (err) => {
+    assert.equal(err.bodySnippet, undefined);
+    assert.equal(err.message.includes("hunter2"), false);
+    assert.match(err.message, /invalid JSON \(\d+ chars, content-type application\/json\)/);
+    return true;
+  });
+});

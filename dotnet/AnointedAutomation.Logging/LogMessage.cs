@@ -1,6 +1,8 @@
 // Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-06-12 11:23:55 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
+// Edited 2026-10-28: UTC timestamps, caller file:line, exception overloads, isolated LogAdded subscribers, long ids.
 //Stewarded by Alexander Fields
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -76,62 +78,124 @@ namespace AnointedAutomation.Optimization.Logging
         }
 
         /// <summary>
-        /// Default Constructor
+        /// Default constructor for object initializers and deserializers.
+        /// IMPORTANT: this constructor does NOT stamp a time, source or operation and does NOT raise
+        /// <see cref="LogAdded"/>, so a message built this way never reaches any subscriber (log store, alerting).
+        /// Use a factory (<see cref="Error(string, string, string, int)"/> and friends) or a typed constructor to emit a log.
         /// </summary>
         public LogMessage()
         {
         }
 
         /// <summary>
-        /// Partial Constructor
-        /// </summary>
-        /// <param name="localOperationName"></param>
-        /// <param name="messageType"></param>
-        /// <param name="message"></param>
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogMessage"/> class with a message type and content.
+        /// Initializes a new instance of the <see cref="LogMessage"/> class with a message type and content,
+        /// resolves the calling method from the stack and raises <see cref="LogAdded"/>.
+        /// Prefer the static factories: they record the exact caller file and line at no runtime cost.
         /// </summary>
         /// <param name="messageType">The type of log message.</param>
         /// <param name="message">The log message content.</param>
         public LogMessage(MessageType messageType, string message)
         {
-            timeStamp = System.DateTime.Now;
+            timeStamp = DateTime.UtcNow;
             messageSource = MessageSourceSetter;
-
-            StackTrace stackTrace = new StackTrace();
-            localOperationName = GetMethodNameFromStackTrace(stackTrace);
-
+            localOperationName = GetMethodNameFromStackTrace(new StackTrace());
             this.messageType = messageType;
             this.message = message;
-            LogAdded?.Invoke(this, new LogMessageEventArgs(this));
+            RaiseLogAdded(this);
         }
 
         /// <summary>
-        /// Full Constructor
+        /// Initializes a new instance of the <see cref="LogMessage"/> class with an ID, message type and content,
+        /// resolves the calling method from the stack and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="timeStamp"></param>
-        /// <param name="localOperationName"></param>
-        /// <param name="messageType"></param>
-        /// <param name="message"></param>
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LogMessage"/> class with an ID, message type, and content.
-        /// </summary>
-        /// <param name="id">The unique identifier for the log message.</param>
+        /// <param name="id">The identifier for the log message.</param>
         /// <param name="messageType">The type of log message.</param>
         /// <param name="message">The log message content.</param>
-        public LogMessage(int id, MessageType messageType, string message)
+        public LogMessage(long id, MessageType messageType, string message)
         {
             this.id = id;
-            timeStamp = System.DateTime.Now;
+            timeStamp = DateTime.UtcNow;
             messageSource = MessageSourceSetter;
-
-            StackTrace stackTrace = new StackTrace();
-            localOperationName = GetMethodNameFromStackTrace(stackTrace);
-
+            localOperationName = GetMethodNameFromStackTrace(new StackTrace());
             this.messageType = messageType;
             this.message = message;
-            LogAdded?.Invoke(this, new LogMessageEventArgs(this));
+            RaiseLogAdded(this);
+        }
+
+        /// <summary>
+        /// Factory constructor: uses the compiler-supplied caller information instead of a stack walk.
+        /// </summary>
+        private LogMessage(long id, MessageType messageType, string message, Exception exception, string callerMemberName, string callerFilePath, int callerLineNumber)
+        {
+            this.id = id;
+            timeStamp = DateTime.UtcNow;
+            messageSource = MessageSourceSetter;
+            this.callerMemberName = callerMemberName;
+            this.callerFilePath = callerFilePath;
+            this.callerLineNumber = callerLineNumber;
+            localOperationName = FormatOperationName(callerMemberName, callerFilePath, callerLineNumber);
+            if (localOperationName == null)
+            {
+                localOperationName = GetMethodNameFromStackTrace(new StackTrace());
+            }
+            this.messageType = messageType;
+            if (exception == null)
+            {
+                this.message = message;
+            }
+            else
+            {
+                // The full ToString keeps the type, inner exceptions and the stack with file:line, so the message alone is complete.
+                this.message = message + Environment.NewLine + exception.ToString();
+                exceptionType = exception.GetType().FullName;
+            }
+            RaiseLogAdded(this);
+        }
+
+        /// <summary>
+        /// Builds "File.Member:line" from caller information, or null when the compiler supplied none.
+        /// </summary>
+        /// <param name="member">The calling member.</param>
+        /// <param name="file">The calling source file.</param>
+        /// <param name="line">The calling line.</param>
+        /// <returns>The operation name, or null.</returns>
+        internal static string FormatOperationName(string member, string file, int line)
+        {
+            if (string.IsNullOrEmpty(member) || string.IsNullOrEmpty(file))
+            {
+                return null;
+            }
+            int slash = Math.Max(file.LastIndexOf('/'), file.LastIndexOf('\\'));
+            string fileName = slash >= 0 ? file.Substring(slash + 1) : file;
+            int dot = fileName.LastIndexOf('.');
+            string stem = dot > 0 ? fileName.Substring(0, dot) : fileName;
+            return line > 0 ? $"{stem}.{member}:{line}" : $"{stem}.{member}";
+        }
+
+        /// <summary>
+        /// Raises <see cref="LogAdded"/> for each subscriber separately. A subscriber that throws is reported on
+        /// <see cref="Console.Error"/> and never propagates into the code that merely logged.
+        /// </summary>
+        /// <param name="log">The new message.</param>
+        private static void RaiseLogAdded(LogMessage log)
+        {
+            LogAddedEventHandler handlers = LogAdded;
+            if (handlers == null)
+            {
+                return;
+            }
+            LogMessageEventArgs args = new LogMessageEventArgs(log);
+            foreach (Delegate handler in handlers.GetInvocationList())
+            {
+                try
+                {
+                    ((LogAddedEventHandler)handler)(log, args);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"[AnointedAutomation.Logging] LogAdded subscriber {handler.Method.DeclaringType?.FullName}.{handler.Method.Name} threw while handling a {log.messageType} log from {log.localOperationName}: {ex}");
+                }
+            }
         }
 
         // Define the delegate and event
@@ -143,13 +207,11 @@ namespace AnointedAutomation.Optimization.Logging
         public delegate void LogAddedEventHandler(object sender, LogMessageEventArgs e);
 
         /// <summary>
-        /// Event triggered when a new log message is added.
+        /// Event triggered when a new log message is added. Each subscriber is invoked in isolation: an exception in
+        /// one subscriber is written to <see cref="Console.Error"/> and does not reach the logging caller or other subscribers.
         /// </summary>
         public static event LogAddedEventHandler LogAdded;
 
-        /// <summary>
-        /// This is the program that is running
-        /// </summary>
         /// <summary>
         /// Gets or sets the default message source for all log messages.
         /// Default value indicates that the program name hasn't been set.
@@ -161,11 +223,13 @@ namespace AnointedAutomation.Optimization.Logging
         /// </summary>
         public long id { get; set; }
         /// <summary>
-        /// Gets or sets the name of the operation or method that generated the log.
+        /// Gets or sets the name of the operation that generated the log. From a factory it is "File.Member:line"
+        /// (exact call site); from a typed constructor it is "Namespace.Class.Method" resolved from the stack.
         /// </summary>
         public string localOperationName { get; set; }
         /// <summary>
-        /// Gets or sets the log message content.
+        /// Gets or sets the log message content. Exception overloads append the full exception text (type, message,
+        /// inner exceptions and stack trace).
         /// </summary>
         public string message { get; set; }
         /// <summary>
@@ -177,175 +241,297 @@ namespace AnointedAutomation.Optimization.Logging
         /// </summary>
         public MessageType messageType { get; set; }
         /// <summary>
-        /// Gets or sets the timestamp when the log message was created.
+        /// Gets or sets the UTC timestamp when the log message was created.
         /// </summary>
-        public System.DateTime timeStamp { get; set; }
+        public DateTime timeStamp { get; set; }
+        /// <summary>
+        /// Gets or sets the full type name of the exception passed to an exception overload, or null.
+        /// </summary>
+        public string exceptionType { get; set; }
+        /// <summary>
+        /// Gets or sets the calling member supplied by the compiler (factories only), or null.
+        /// </summary>
+        public string callerMemberName { get; set; }
+        /// <summary>
+        /// Gets or sets the calling source file supplied by the compiler (factories only), or null.
+        /// </summary>
+        public string callerFilePath { get; set; }
+        /// <summary>
+        /// Gets or sets the calling source line supplied by the compiler (factories only), or 0.
+        /// </summary>
+        public int callerLineNumber { get; set; }
+        /// <summary>
+        /// Gets or sets an optional logger category (for bridges such as an ILogger provider), or null.
+        /// </summary>
+        public string category { get; set; }
+        /// <summary>
+        /// Gets or sets an optional tenant or store identifier the log belongs to, or null.
+        /// </summary>
+        public string storeSlug { get; set; }
+        /// <summary>
+        /// Gets or sets optional structured properties (for example a JSON object of ids), or null.
+        /// </summary>
+        public string properties { get; set; }
 
         /// <summary>
-        /// Static method to create a celebrate log message
+        /// Creates a celebrate log message (MessageType.Celebrate) and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="message">The celebrate message</param>
-        /// <returns>A LogMessage instance with MessageType.Celebrate</returns>
-        public static LogMessage Celebrate(string message)
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Celebrate.</returns>
+        public static LogMessage Celebrate(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(MessageType.Celebrate, message);
+            return new LogMessage(0, MessageType.Celebrate, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a celebrate log message
+        /// Creates a celebrate log message (MessageType.Celebrate) with an id and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">ID of the log message</param>
-        /// <param name="message">The celebrate message</param>
-        /// <returns>A LogMessage instance with MessageType.Celebrate</returns>
-        public static LogMessage Celebrate(int id, string message)
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Celebrate.</returns>
+        public static LogMessage Celebrate(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Celebrate, message);
+            return new LogMessage(id, MessageType.Celebrate, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a critical log message
+        /// Creates a critical log message (MessageType.Critical) and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="message">The critical message</param>
-        /// <returns>A LogMessage instance with MessageType.Critical</returns>
-        public static LogMessage Critical(string message)
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Critical.</returns>
+        public static LogMessage Critical(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(MessageType.Critical, message);
+            return new LogMessage(0, MessageType.Critical, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a critical log message
+        /// Creates a critical log message (MessageType.Critical) with an id and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">id of the log message</param>
-        /// <param name="message">The critical message</param>
-        /// <returns>A LogMessage instance with MessageType.Critical</returns>
-        public static LogMessage Critical(int id, string message)
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Critical.</returns>
+        public static LogMessage Critical(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Critical, message);
+            return new LogMessage(id, MessageType.Critical, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create an error log message
+        /// Creates a critical log message (MessageType.Critical) that carries the full exception (type, message, inner
+        /// exceptions and stack trace with file:line) appended to <paramref name="message"/>, and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="message">The error message</param>
-        /// <returns>A LogMessage instance with MessageType.Error</returns>
-        public static LogMessage Error(string message)
+        /// <param name="message">What failed and the ids needed to act on it.</param>
+        /// <param name="exception">The exception; null logs the message alone.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Critical.</returns>
+        public static LogMessage Critical(string message, Exception exception, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(MessageType.Error, message);
+            return new LogMessage(0, MessageType.Critical, message, exception, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create an error log message with an ID
+        /// Creates an error log message (MessageType.Error) and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">ID of the log message</param>
-        /// <param name="message">The error message</param>
-        /// <returns>A LogMessage instance with MessageType.Error</returns>
-        public static LogMessage Error(int id, string message)
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Error.</returns>
+        public static LogMessage Error(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Error, message);
+            return new LogMessage(0, MessageType.Error, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create an informational log message
+        /// Creates an error log message (MessageType.Error) with an id and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="message">The informational message</param>
-        /// <returns>A LogMessage instance with MessageType.Informational</returns>
-        public static LogMessage Info(string message)
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Error.</returns>
+        public static LogMessage Error(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(MessageType.Informational, message);
+            return new LogMessage(id, MessageType.Error, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create an informational log message
+        /// Creates an error log message (MessageType.Error) that carries the full exception (type, message, inner
+        /// exceptions and stack trace with file:line) appended to <paramref name="message"/>, and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">ID of the log message</param>
-        /// <param name="message">The informational message</param>
-        /// <returns>A LogMessage instance with MessageType.Informational</returns>
-        public static LogMessage Info(int id, string message)
+        /// <param name="message">What failed and the ids needed to act on it.</param>
+        /// <param name="exception">The exception; null logs the message alone.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Error.</returns>
+        public static LogMessage Error(string message, Exception exception, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Informational, message);
-        }
-        /// <summary>
-        /// Static method to create an informational log message
-        /// </summary>
-        /// <param name="message">The informational message</param>
-        /// <returns>A LogMessage instance with MessageType.Informational</returns>
-        public static LogMessage Informational(string message)
-        {
-            return new LogMessage(MessageType.Informational, message);
+            return new LogMessage(0, MessageType.Error, message, exception, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create an informational log message
+        /// Creates an informational log message (MessageType.Informational) and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">ID of the log message</param>
-        /// <param name="message">The informational message</param>
-        /// <returns>A LogMessage instance with MessageType.Informational</returns>
-        public static LogMessage Informational(int id, string message)
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Informational.</returns>
+        public static LogMessage Info(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Informational, message);
+            return new LogMessage(0, MessageType.Informational, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a message log message
+        /// Creates an informational log message (MessageType.Informational) with an id and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="message">The message</param>
-        /// <returns>A LogMessage instance with MessageType.Message</returns>
-        public static LogMessage Message(string message)
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Informational.</returns>
+        public static LogMessage Info(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(MessageType.Message, message);
+            return new LogMessage(id, MessageType.Informational, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a message log message
+        /// Creates an informational log message (MessageType.Informational) and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">ID of the log message</param>
-        /// <param name="message">The message</param>
-        /// <returns>A LogMessage instance with MessageType.Message</returns>
-        public static LogMessage Message(int id, string message)
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Informational.</returns>
+        public static LogMessage Informational(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Message, message);
+            return new LogMessage(0, MessageType.Informational, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a success log message
+        /// Creates an informational log message (MessageType.Informational) with an id and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="message">The success message</param>
-        /// <returns>A LogMessage instance with MessageType.Success</returns>
-        public static LogMessage Success(string message)
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Informational.</returns>
+        public static LogMessage Informational(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(MessageType.Success, message);
+            return new LogMessage(id, MessageType.Informational, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a success log message with an ID
+        /// Creates a message log message (MessageType.Message) and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">ID of the log message</param>
-        /// <param name="message">The success message</param>
-        /// <returns>A LogMessage instance with MessageType.Success</returns>
-        public static LogMessage Success(int id, string message)
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Message.</returns>
+        public static LogMessage Message(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Success, message);
+            return new LogMessage(0, MessageType.Message, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a warning log message
+        /// Creates a message log message (MessageType.Message) with an id and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="message">The warning message</param>
-        /// <returns>A LogMessage instance with MessageType.Warning</returns>
-        public static LogMessage Warning(string message)
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Message.</returns>
+        public static LogMessage Message(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(MessageType.Warning, message);
+            return new LogMessage(id, MessageType.Message, message, null, callerMemberName, callerFilePath, callerLineNumber);
         }
 
         /// <summary>
-        /// Static method to create a warning log message
+        /// Creates a success log message (MessageType.Success) and raises <see cref="LogAdded"/>.
         /// </summary>
-        /// <param name="id">ID of the log message</param>
-        /// <param name="message">The warning message</param>
-        /// <returns>A LogMessage instance with MessageType.Warning</returns>
-        public static LogMessage Warning(int id, string message)
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Success.</returns>
+        public static LogMessage Success(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
         {
-            return new LogMessage(id, MessageType.Warning, message);
+            return new LogMessage(0, MessageType.Success, message, null, callerMemberName, callerFilePath, callerLineNumber);
+        }
+
+        /// <summary>
+        /// Creates a success log message (MessageType.Success) with an id and raises <see cref="LogAdded"/>.
+        /// </summary>
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Success.</returns>
+        public static LogMessage Success(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        {
+            return new LogMessage(id, MessageType.Success, message, null, callerMemberName, callerFilePath, callerLineNumber);
+        }
+
+        /// <summary>
+        /// Creates a warning log message (MessageType.Warning) and raises <see cref="LogAdded"/>.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Warning.</returns>
+        public static LogMessage Warning(string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        {
+            return new LogMessage(0, MessageType.Warning, message, null, callerMemberName, callerFilePath, callerLineNumber);
+        }
+
+        /// <summary>
+        /// Creates a warning log message (MessageType.Warning) with an id and raises <see cref="LogAdded"/>.
+        /// </summary>
+        /// <param name="id">ID of the log message.</param>
+        /// <param name="message">The message.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Warning.</returns>
+        public static LogMessage Warning(long id, string message, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        {
+            return new LogMessage(id, MessageType.Warning, message, null, callerMemberName, callerFilePath, callerLineNumber);
+        }
+
+        /// <summary>
+        /// Creates a warning log message (MessageType.Warning) that carries the full exception (type, message, inner
+        /// exceptions and stack trace with file:line) appended to <paramref name="message"/>, and raises <see cref="LogAdded"/>.
+        /// </summary>
+        /// <param name="message">What failed and the ids needed to act on it.</param>
+        /// <param name="exception">The exception; null logs the message alone.</param>
+        /// <param name="callerMemberName">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerFilePath">Supplied by the compiler; do not pass.</param>
+        /// <param name="callerLineNumber">Supplied by the compiler; do not pass.</param>
+        /// <returns>A LogMessage instance with MessageType.Warning.</returns>
+        public static LogMessage Warning(string message, Exception exception, [CallerMemberName] string callerMemberName = "", [CallerFilePath] string callerFilePath = "", [CallerLineNumber] int callerLineNumber = 0)
+        {
+            return new LogMessage(0, MessageType.Warning, message, exception, callerMemberName, callerFilePath, callerLineNumber);
         }
     }
 

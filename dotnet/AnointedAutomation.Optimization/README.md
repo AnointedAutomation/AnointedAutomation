@@ -13,7 +13,7 @@ dotnet add package AnointedAutomation.Optimization
 ```
 
 - Target framework: `net10.0`
-- Dependencies: `MongoDB.Bson` (used only by the `BsonMap` accessors)
+- Dependencies: `MongoDB.Bson` (used only by the `BsonMap` accessors), `AnointedAutomation.Logging` (conversion and delete failures are logged as Warnings)
 
 Namespace: `AnointedAutomation.Optimization`.
 

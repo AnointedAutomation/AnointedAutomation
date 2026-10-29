@@ -1,6 +1,8 @@
 // Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-10-15 18:02:13 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
+// Edited 2026-10-28: a refused no-GC region is logged instead of swallowed.
 ﻿using System;
+using AnointedAutomation.Optimization.Logging;
 
 // Stewarded by Alexander Fields
 
@@ -63,9 +65,10 @@ namespace AnointedAutomation.Optimization.Memory
                         GC.EndNoGCRegion();
                     }
                 }
-                catch (InvalidOperationException)
+                catch (Exception ex) when (ex is InvalidOperationException || ex is ArgumentOutOfRangeException)
                 {
-                    //Log the failure
+                    // ArgumentOutOfRangeException: the heap is larger than the runtime allows for a no-GC region.
+                    LogMessage.Warning($"GarbageCollection.ReturnUnusedMemoryToOS: no-GC region of {memorySize} bytes refused", ex);
                 }
             }
         }

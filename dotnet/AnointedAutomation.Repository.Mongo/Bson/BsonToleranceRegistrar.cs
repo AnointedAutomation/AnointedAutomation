@@ -64,7 +64,7 @@ namespace AnointedAutomation.Repository.Mongo.Bson
                 }
                 catch (Exception ex)
                 {
-                    LogMessage.Warning($"BsonToleranceRegistrar.RegisterIgnoreExtraElements: skipping type {mapped.FullName} that could not be automapped: {ex.Message}");
+                    LogMessage.Warning($"BsonToleranceRegistrar.RegisterIgnoreExtraElements: skipping type {mapped.FullName} that could not be automapped", ex);
                 }
             }
         }

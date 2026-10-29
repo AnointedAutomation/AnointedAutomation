@@ -35,6 +35,8 @@ export interface AnointedEventHandlerOptions {
   postLogoutRedirectUri?: string;
   /** Query parameter `start` reads the return target from. Default "returnTo". */
   returnToParam?: string;
+  /** Receives every failure before `onError` runs ("warn" for user-caused codes, "error" otherwise). Default: the console. */
+  logger?: (level: "warn" | "error", message: string, details: Record<string, unknown>) => void;
 }
 
 export interface AnointedEventHandlers {

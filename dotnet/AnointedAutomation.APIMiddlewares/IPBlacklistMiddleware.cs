@@ -18,6 +18,9 @@ namespace AnointedAutomation.APIMiddleware
     /// </summary>
     public class IPBlacklistMiddleware
     {
+        /// <summary>The most log messages kept in the in-memory buffer; older ones are dropped first.</summary>
+        public const int MaxBufferedLogs = 1000;
+
         private static readonly ConcurrentQueue<LogMessage> middlewareLogs = new ConcurrentQueue<LogMessage>();
         private readonly RequestDelegate _next;
 
@@ -41,13 +44,26 @@ namespace AnointedAutomation.APIMiddleware
         public static event EventHandler LogCleared;
 
         /// <summary>
-        /// Adds a log message to the middleware logs.
+        /// Adds a log message to the middleware logs. The buffer keeps at most <see cref="MaxBufferedLogs"/> messages
+        /// (oldest dropped first); every message also reaches <see cref="LogMessage.LogAdded"/> when it is created.
         /// </summary>
         /// <param name="logMessage">The log message to add.</param>
         public static void AddLog(LogMessage logMessage)
         {
             middlewareLogs.Enqueue(logMessage);
+            while (middlewareLogs.Count > MaxBufferedLogs && middlewareLogs.TryDequeue(out LogMessage _))
+            {
+            }
             LogAdded?.Invoke(null, new LogMessageEventArgs(logMessage));
+        }
+
+        /// <summary>
+        /// Empties the buffer only, keeping every subscriber (used by the periodic cleanup, which must not detach
+        /// the host's log handlers the way <see cref="ClearLogs"/> does for test isolation).
+        /// </summary>
+        internal static void ClearBuffer()
+        {
+            middlewareLogs.Clear();
         }
 
         /// <summary>

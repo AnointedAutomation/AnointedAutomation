@@ -222,5 +222,48 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Filters
             Assert.False(nextCalled, "Next delegate should not be called with invalid API key");
             Assert.IsType<UnauthorizedResult>(context.Result);
         }
+
+        [Fact]
+        /// <summary>
+        /// The rejected key may be a real secret, so the warning names the header and length, never the value.
+        /// </summary>
+        /// <returns>A task representing the asynchronous test operation.</returns>
+        public async Task OnActionExecutionAsync_WithInvalidKey_NeverLogsTheKeyValue()
+        {
+            string sentKey = "sent-key-" + Guid.NewGuid().ToString("N");
+            List<AnointedAutomation.Optimization.Logging.LogMessage> seen = new List<AnointedAutomation.Optimization.Logging.LogMessage>();
+            AnointedAutomation.Optimization.Logging.LogMessage.LogAddedEventHandler handler = (sender, e) =>
+            {
+                if (e.log.message != null && e.log.message.Contains("incorrect key", StringComparison.Ordinal))
+                {
+                    lock (seen)
+                    {
+                        seen.Add(e.log);
+                    }
+                }
+            };
+            AnointedAutomation.Optimization.Logging.LogMessage.LogAdded += handler;
+            try
+            {
+                APIKeyAttribute attribute = new APIKeyAttribute();
+                DefaultHttpContext httpContext = new DefaultHttpContext();
+                httpContext.Request.Headers[TestApiKeyName] = sentKey;
+                httpContext.Connection.RemoteIpAddress = System.Net.IPAddress.Parse("192.168.1.2");
+                ActionContext actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+                List<IFilterMetadata> filters = new List<IFilterMetadata>();
+                Mock<ControllerBase> controllerMock = new Mock<ControllerBase>();
+                ActionExecutingContext context = new ActionExecutingContext(actionContext, filters, new Dictionary<string, object>(), controllerMock.Object);
+                ActionExecutionDelegate next = () => Task.FromResult(new ActionExecutedContext(actionContext, filters, controllerMock.Object));
+
+                await attribute.OnActionExecutionAsync(context, next);
+
+                Assert.NotEmpty(seen);
+                Assert.All(seen, log => Assert.DoesNotContain(sentKey, log.message));
+            }
+            finally
+            {
+                AnointedAutomation.Optimization.Logging.LogMessage.LogAdded -= handler;
+            }
+        }
     }
 }
