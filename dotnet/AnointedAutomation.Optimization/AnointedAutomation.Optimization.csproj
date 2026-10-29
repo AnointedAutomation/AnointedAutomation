@@ -12,7 +12,7 @@
     <Copyright>Copyright © 2024 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>Reusable optimization utilities: CSV/DataTable/DataReader helpers, chunking, string helpers, Roman numerals, JSON flattening, file management, and null-safe JsonElement/BsonDocument field accessors.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <PackageTags>optimization;utility;csv;datatable;datareader;json;bson;roman;filemanagement</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Optimization</PackageReleaseNotes>
 	  <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
@@ -27,6 +27,10 @@
 
   <ItemGroup>
     <PackageReference Include="MongoDB.Bson" Version="3.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
   </ItemGroup>
 
 </Project>

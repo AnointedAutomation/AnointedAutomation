@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AnointedAutomation.Optimization.Logging;
 
 namespace AnointedAutomation.Optimization
 {
@@ -541,6 +542,8 @@ namespace AnointedAutomation.Optimization
             }
             catch (Exception ex) when (ex is InvalidCastException or FormatException or OverflowException or ArgumentException)
             {
+                // The value is dropped, so say which property lost it and why (the value itself may be data, so only its type).
+                LogMessage.Warning($"Utility.AssignProperty: {typeof(T).Name}.{prop.Name} could not take a {value.GetType().Name} value as {prop.PropertyType.Name}; set to null", ex);
                 prop.SetValue(obj, null);
             }
         }

@@ -156,6 +156,22 @@ test("logout failures go to onError or a plain 400", async () => {
   assert.deepEqual(codes, ["config"]);
 });
 
+test("logout failures are logged before they are answered", async () => {
+  const calls = [];
+  const handlers = createAnointedEventHandlers({
+    client,
+    onSignedIn: (_r, request) => redirectTo(request, "/"),
+    onSignOut: () => null,
+    logger: (level, message, details) => calls.push({ level, message, details }),
+  });
+  assert.equal((await handlers.logout(eventFor("http://localhost:3000/x"))).status, 400);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].level, "error");
+  assert.equal(calls[0].message, "anointed-sso-nuxt sign-out failed");
+  assert.equal(calls[0].details.code, "config");
+  assert.throws(() => createAnointedEventHandlers({ client, onSignedIn: () => null, logger: "console" }), (err) => err.code === "config");
+});
+
 test("a real h3 v1 app: the start route works through toWebRequest and a returned Response", async () => {
   const handlers = createAnointedEventHandlers({ client, onSignedIn: (_r, request) => redirectTo(request, "/") });
   const app = createApp();

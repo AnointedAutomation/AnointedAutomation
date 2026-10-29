@@ -26,7 +26,7 @@ export class AnointedSsoError extends Error {
    * @summary    Create a coded error.
    * @param {string} code     One of the codes listed on the class.
    * @param {string} message  Log-only detail.
-   * @param {{status?: number, oauthError?: string, cause?: unknown}} [details]
+   * @param {{status?: number, oauthError?: string, bodySnippet?: string, cause?: unknown}} [details]
    */
   constructor(code, message, details = {}) {
     super(message, details.cause === undefined ? undefined : { cause: details.cause });
@@ -34,5 +34,6 @@ export class AnointedSsoError extends Error {
     this.code = code;
     if (details.status !== undefined) this.status = details.status;
     if (details.oauthError !== undefined) this.oauthError = details.oauthError;
+    if (details.bodySnippet !== undefined) this.bodySnippet = details.bodySnippet;
   }
 }

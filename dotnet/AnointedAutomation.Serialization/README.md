@@ -15,7 +15,7 @@ builder.Services.ConfigureHttpJsonOptions(o => AnointedJson.ConfigureApi(o.Seria
 ```
 
 - Target framework: `net10.0`
-- Dependencies: `Newtonsoft.Json`
+- Dependencies: `Newtonsoft.Json`, `AnointedAutomation.Logging` (`NullOnErrorConverter` logs each value it drops)
 
 ## License
 

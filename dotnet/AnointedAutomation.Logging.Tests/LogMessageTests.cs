@@ -735,11 +735,11 @@ namespace AnointedAutomation.Logging.Tests
         public void Constructor_SetsTimestampToCurrentTime()
         {
             // Arrange
-            DateTime before = DateTime.Now;
+            DateTime before = DateTime.UtcNow;
 
             // Act
             LogMessage logMessage = new LogMessage(MessageType.Informational, "Timestamp test");
-            DateTime after = DateTime.Now;
+            DateTime after = DateTime.UtcNow;
 
             // Assert
             Assert.True(logMessage.timeStamp >= before, "Timestamp should be >= time before creation");

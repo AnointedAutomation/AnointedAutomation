@@ -41,9 +41,10 @@ namespace AnointedAutomation.Objects.API.Tests
 
             Assert.False(result.HasData);
             Assert.Single(result.TransportErrors);
-            Assert.Equal("GraphQL response body was not valid JSON", result.TransportErrors[0]);
+            Assert.StartsWith("GraphQL response body was not valid JSON at line 0 byte 0: ", result.TransportErrors[0]);
+            Assert.EndsWith("<html>502 Bad Gateway</html>", result.TransportErrors[0]);
             Assert.False(result.Succeeded(Mutation));
-            Assert.Equal("GraphQL response body was not valid JSON", result.FirstError(Mutation));
+            Assert.Equal(result.TransportErrors[0], result.FirstError(Mutation));
         }
 
         [Fact]
@@ -71,7 +72,7 @@ namespace AnointedAutomation.Objects.API.Tests
             Assert.Equal(2, result.UserErrors(Mutation).Count);
             Assert.Equal("Title cannot be blank", result.UserErrors(Mutation)[0]);
             Assert.False(result.Succeeded(Mutation));
-            Assert.Equal("Title cannot be blank", result.FirstError(Mutation));
+            Assert.Equal("Title cannot be blank [field=title] (+1 more)", result.FirstError(Mutation));
         }
 
         [Fact]
@@ -103,7 +104,7 @@ namespace AnointedAutomation.Objects.API.Tests
             Assert.Null(result.Errors[1].Path);
             Assert.Null(result.Errors[1].Extensions);
             Assert.False(result.Succeeded(Mutation));
-            Assert.Equal("Throttled", result.FirstError(Mutation));
+            Assert.Equal("Throttled [code=THROTTLED] [path=[\"productUpdate\"]] (+1 more)", result.FirstError(Mutation));
         }
 
         [Fact]
@@ -197,6 +198,55 @@ namespace AnointedAutomation.Objects.API.Tests
 
             Assert.Equal("transport problem", result.FirstError(Mutation));
             Assert.False(result.Succeeded(Mutation));
+        }
+
+        #endregion
+
+        #region Diagnostics (2026-10-28)
+
+        [Fact]
+        public void Read_EmptyBodyWithStatus_NamesStatus()
+        {
+            GraphQlResult result = GraphQlEnvelope.Read("", 502);
+
+            Assert.Equal("GraphQL response body was empty (HTTP 502)", result.TransportErrors[0]);
+        }
+
+        [Fact]
+        public void Read_NotJsonWithStatus_NamesStatusPositionAndSnippet()
+        {
+            GraphQlResult result = GraphQlEnvelope.Read("<html>\n<body>Bad gateway</body></html>", 502);
+
+            Assert.StartsWith("GraphQL response body was not valid JSON (HTTP 502) at line 0 byte 0: ", result.TransportErrors[0]);
+            Assert.Contains("<html> <body>Bad gateway</body></html>", result.TransportErrors[0]);
+        }
+
+        [Fact]
+        public void Read_NotAnObject_IncludesSnippet()
+        {
+            GraphQlResult result = GraphQlEnvelope.Read("[1,2]");
+
+            Assert.Equal("GraphQL response body was not a JSON object: [1,2]", result.TransportErrors[0]);
+        }
+
+        [Fact]
+        public void FirstError_UserErrorWithFieldAndCode_DescribesBoth()
+        {
+            string body = "{\"data\":{\"productUpdate\":{\"userErrors\":[{\"field\":[\"variants\",\"0\",\"price\"],\"message\":\"Price is invalid\",\"code\":\"INVALID\"}]}}}";
+
+            GraphQlResult result = GraphQlEnvelope.Read(body);
+
+            Assert.Equal("Price is invalid [field=variants.0.price] [code=INVALID]", result.FirstError(Mutation));
+            Assert.Equal("Price is invalid", result.UserErrors(Mutation)[0]);
+            Assert.Single(result.UserErrorDetails(Mutation));
+        }
+
+        [Fact]
+        public void FirstError_PlainSingleError_IsUnchanged()
+        {
+            GraphQlResult result = GraphQlEnvelope.Read("{\"errors\":[{\"message\":\"boom\"}]}");
+
+            Assert.Equal("boom", result.FirstError(Mutation));
         }
 
         #endregion

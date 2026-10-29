@@ -164,6 +164,54 @@ namespace AnointedAutomation.SSO.Tests
         }
 
         [Fact]
+        public async Task FailOpen_Failures_WarnOncePerWindowWithSuppressedCount()
+        {
+            StatusResponder = request => Task.FromException<HttpResponseMessage>(new HttpRequestException("down"));
+            RecordingLogger logger = new RecordingLogger();
+            AnointedSessionStatusOptions options = new AnointedSessionStatusOptions
+            {
+                ApiKey = "partner-key",
+                AppName = "Test App",
+                BaseAddress = new Uri("https://api.test/"),
+                Timeout = TimeSpan.FromSeconds(3),
+            };
+            AnointedSessionStatusClient client = new AnointedSessionStatusClient(new HttpClient(_http), options, _cache, _clock, logger);
+
+            await client.CheckAsync("u1", true, CancellationToken.None);
+            await client.CheckAsync("u2", true, CancellationToken.None);
+            await client.CheckAsync("u3", true, CancellationToken.None);
+            _clock.Advance(AnointedSessionStatusCache.FailureLogWindow);
+            await client.CheckAsync("u4", true, CancellationToken.None);
+
+            List<string> warnings = logger.Entries.FindAll(e => e.StartsWith("Warning:", StringComparison.Ordinal));
+            Assert.Equal(2, warnings.Count);
+            Assert.Contains("0 similar failure(s)", warnings[0]);
+            Assert.Contains("2 similar failure(s)", warnings[1]);
+            Assert.Equal(2, logger.Entries.FindAll(e => e.StartsWith("Debug:", StringComparison.Ordinal)).Count);
+        }
+
+        /// <summary>Records every log entry as "Level: message".</summary>
+        private sealed class RecordingLogger : Microsoft.Extensions.Logging.ILogger<AnointedSessionStatusClient>
+        {
+            public List<string> Entries { get; } = new List<string>();
+
+            public IDisposable BeginScope<TState>(TState state) where TState : notnull
+            {
+                return null;
+            }
+
+            public bool IsEnabled(Microsoft.Extensions.Logging.LogLevel logLevel)
+            {
+                return true;
+            }
+
+            public void Log<TState>(Microsoft.Extensions.Logging.LogLevel logLevel, Microsoft.Extensions.Logging.EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+            {
+                Entries.Add(logLevel.ToString() + ": " + formatter(state, exception));
+            }
+        }
+
+        [Fact]
         public async Task FailOpen_Timeout_Unknown()
         {
             StatusResponder = request => new TaskCompletionSource<HttpResponseMessage>().Task;

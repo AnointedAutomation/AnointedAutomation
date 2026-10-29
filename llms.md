@@ -52,7 +52,7 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.0.7
+### AnointedAutomation.APIMiddlewares 1.0.10
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
@@ -142,14 +142,14 @@ string svg = QrRenderer.ToSvg(matrix);
 byte[] png = QrRenderer.ToPng(matrix, moduleSize: 10);
 ```
 
-### AnointedAutomation.Logging 1.0.4
+### AnointedAutomation.Logging 1.0.7
 
 A tiny log record plus a static event you can route to any sink. A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.
 
 - Depends on: NuGet none; AnointedAutomation none
 - Namespaces: `AnointedAutomation.Optimization.Logging`
 - Key types: `LogMessage`, `MessageType`, `LogMessageEventArgs`
-- Notes: Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational.
+- Notes: Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational; Error/Warning/Critical also take (message, Exception). Timestamps are UTC; factories record caller file:line. Embedded PDBs.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Logging (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Logging/README.md)
 
 ```bash
@@ -184,11 +184,11 @@ using AnointedAutomation.Mathematics;
 EpistemicLedger ledger = new EpistemicLedger(UniversalLaws.All);
 ```
 
-### AnointedAutomation.Memory 1.0.5
+### AnointedAutomation.Memory 1.0.8
 
 Force a full GC and memory trim after a large batch job. On demand garbage collection helper that forces a full collection and tries to return unused memory to the operating system.
 
-- Depends on: NuGet none; AnointedAutomation none
+- Depends on: NuGet none; AnointedAutomation AnointedAutomation.Logging
 - Namespaces: `AnointedAutomation.Optimization.Memory`
 - Key types: `GarbageCollection`
 - Notes: Used by APIMiddlewares EndpointAccessMiddleware for idle time cleanup.
@@ -228,7 +228,7 @@ bool hasGoogle = user.SSO.Google != null;
 bool hasShopify = user.SSO.Shopify != null;
 ```
 
-### AnointedAutomation.Objects.API 1.3.0
+### AnointedAutomation.Objects.API 1.3.3
 
 Web host helpers: test-friendly IFormFile, the hybrid casing rule, GraphQL envelope parsing. ASP.NET Core helpers: an in memory IFormFile, a hybrid casing System.Text.Json naming convention, and a GraphQL response envelope reader.
 
@@ -249,11 +249,11 @@ builder.Services.AddControllers()
     .AddJsonOptions(o => JsonCasingConvention.Configure(o.JsonSerializerOptions));
 ```
 
-### AnointedAutomation.Optimization 1.0.1
+### AnointedAutomation.Optimization 1.0.4
 
 Everyday data helpers: chunking, CSV and DataTable, JSON flattening, safe field reads. Reusable optimization utilities: CSV/DataTable/DataReader helpers, chunking, string helpers, Roman numerals, JSON flattening, file management, and null-safe JsonElement/BsonDocument field accessors.
 
-- Depends on: NuGet MongoDB.Bson 3.12.0; AnointedAutomation none
+- Depends on: NuGet MongoDB.Bson 3.12.0; AnointedAutomation AnointedAutomation.Logging
 - Namespaces: `AnointedAutomation.Optimization`
 - Key types: `Utility`, `Roman`, `JsonFlattener`, `JsonElementExtensions`, `BsonMap`, `ChunkDataReader`, `FileManagement`
 - Notes: ToChunks<T>(chunkSize) is an extension on IEnumerable<T>.
@@ -271,7 +271,7 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 1.3.0
+### AnointedAutomation.Repository.Mongo 1.3.3
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 
@@ -296,7 +296,7 @@ HybridCasing.Register("AnointedAutomation", Array.Empty<string>(),
 IMongoHelper mongo = new MongoHelper("mydb", connectionString);
 ```
 
-### AnointedAutomation.Repository.MySql 1.0.5
+### AnointedAutomation.Repository.MySql 1.0.8
 
 Generic EF Core repository for MySQL via Pomelo. A generic repository and helper for MySQL over Entity Framework Core and the Pomelo provider.
 
@@ -317,11 +317,11 @@ GenericRepository<Customer> repo = new GenericRepository<Customer>(dbContext);
 Customer c = await repo.FindSingleAsync(x => x.Email == "a@b.com");
 ```
 
-### AnointedAutomation.Serialization 1.0.0
+### AnointedAutomation.Serialization 1.0.2
 
 One home for naming rules, JSON presets and tolerant converters, shared by the other packages. Shared serialization helpers: naming rules (camel, Pascal, snake and the hybrid value/reference casing rule), System.Text.Json casing convention, presets and UTC DateTime converter, tolerant Newtonsoft.Json converters, and lenient JsonElement readers. No MongoDB dependency.
 
-- Depends on: NuGet Newtonsoft.Json 13.0.4; AnointedAutomation none
+- Depends on: NuGet Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Logging
 - Namespaces: `AnointedAutomation.Serialization.Naming`, `AnointedAutomation.Serialization.SystemTextJson`, `AnointedAutomation.Serialization.Newtonsoft`, `AnointedAutomation.Serialization.Json`
 - Key types: `AnointedJson`, `JsonPresets`, `JsonCasingConvention`, `NamingRules`, `TolerantEnumConverter`, `NullOnErrorConverter`
 - Notes: JsonPresets exposes frozen options (SnakeCase, CamelCase, CaseInsensitive, IgnoreNulls, Api and more). AnointedJson.ConfigureApi applies the full API wire config to a host.
@@ -362,7 +362,7 @@ Customer customer = JsonConvert.DeserializeObject<Customer>(json);
 long? id = customer.Id;
 ```
 
-### AnointedAutomation.SSO 1.0.2
+### AnointedAutomation.SSO 1.0.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO
 - Target: net10.0. Depends on Microsoft.AspNetCore.Authentication.OpenIdConnect, Microsoft.IdentityModel.Protocols.OpenIdConnect.
@@ -387,7 +387,7 @@ app.MapAnointedAutomationAuth("/auth/anointed"); // GET start, POST sign-out, GE
 // Razor: <anointed-sign-in start-url="/auth/anointed/start" />  <anointed-sign-out action="/auth/anointed/sign-out" />
 ```
 
-### AnointedAutomation.SSO.Owin 1.0.0
+### AnointedAutomation.SSO.Owin 1.0.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.Owin
 - Target: net472.
@@ -408,7 +408,7 @@ dotnet new anointed-razor -n MyApp   # or anointed-blazor
 
 ## JavaScript packages
 
-### @anointedautomation/sso 0.2.4
+### @anointedautomation/sso 0.2.6
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso
 - Runtime: Node 18+, Deno (Base44 backend functions), edge runtimes. Zero dependencies. Server only.
@@ -486,7 +486,7 @@ const anointed = createAnointedRouteHandlers({
 
 Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side. Key exports: `AnointedSignInButton`, `useAnointedSignIn`, `buildStartUrl`.
 
-### @anointedautomation/sso-nuxt 0.1.0
+### @anointedautomation/sso-nuxt 0.1.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-nuxt
 - Runtime: Nuxt 3 and 4 (Nitro/h3 server). Depends on @anointedautomation/sso. On npm: `npm install @anointedautomation/sso-nuxt`.

@@ -140,7 +140,8 @@ namespace AnointedAutomation.APIMiddleware
             {
                 _failedAttempts.Clear(); // Clears the dictionary of failed attempts
                 _lastCleanup = System.DateTime.UtcNow; // Reset the last cleanup time
-                IPBlacklistMiddleware.ClearLogs();
+                // Buffer only: ClearLogs() would also detach the host's LogAdded subscribers.
+                IPBlacklistMiddleware.ClearBuffer();
                 IPBlacklistMiddleware.AddLog(LogMessage.Informational($"_failedAttempts and logs was cleared out!"));
             }
         }
@@ -155,7 +156,7 @@ namespace AnointedAutomation.APIMiddleware
             if (requestedPath.EndsWith(".env"))
             {
                 IPBlacklist.AddBannedIP(ipAddress, $"Blocked for unauthorized access attempt onto secure path: {requestedPath}.");
-                IPBlacklistMiddleware.AddLog(LogMessage.Informational($"{ipAddress} tried to access {requestedPath} which ended in '.env'. IP has been banned."));
+                IPBlacklistMiddleware.AddLog(LogMessage.Warning($"IP {ipAddress} banned: requested {requestedPath} (.env probe)."));
                 return;
             }
 
@@ -183,6 +184,11 @@ namespace AnointedAutomation.APIMiddleware
                 IPBlacklist.AddBannedIP(
                     ipAddress,
                     $"Blocked after repeated unauthorized attempts on paths: {allPaths}. Total failed attempts: {_failedAttempts[ipAddress].Count}."
+                );
+                IPBlacklistMiddleware.AddLog(
+                    LogMessage.Warning(
+                        $"IP {ipAddress} banned after {_failedAttempts[ipAddress].Count} failed attempts on {_failedAttempts[ipAddress].Paths.Count} distinct path(s): {allPaths}"
+                    )
                 );
             }
         }

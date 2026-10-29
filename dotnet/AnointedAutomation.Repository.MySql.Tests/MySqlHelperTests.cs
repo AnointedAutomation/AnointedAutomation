@@ -1803,4 +1803,27 @@ namespace AnointedAutomation.Repository.MySql.Tests
             Assert.Equal("conn2", helper.ConnectionString);
         }
     }
+
+    /// <summary>2026-10-28 logging audit: connection failures name the target, never the credentials.</summary>
+    public class MySqlDescribeTargetTests
+    {
+        [Fact]
+        public void DescribeTarget_NamesDatabaseServerAndPort_WithoutCredentials()
+        {
+            string cs = MySqlHelper.ConnectionStringBuilder("db.example.test", "shop", "admin", "s3cret-pass", 3307);
+
+            string described = MySqlHelper.DescribeTarget(cs);
+
+            Assert.Equal("database 'shop' on server 'db.example.test:3307'", described);
+            Assert.DoesNotContain("s3cret-pass", described);
+            Assert.DoesNotContain("admin", described);
+        }
+
+        [Fact]
+        public void DescribeTarget_EmptyOrBroken_NeverThrows()
+        {
+            Assert.Equal("(no connection string)", MySqlHelper.DescribeTarget(null));
+            Assert.Equal("(unparseable connection string)", MySqlHelper.DescribeTarget("no-equals-sign"));
+        }
+    }
 }

@@ -84,7 +84,7 @@ namespace AnointedAutomation.APIMiddleware.Objects
             if (blacklistedIPs.ContainsKey(ipAddress))
             {
                 string reason = blacklistedIPs[ipAddress];
-                IPBlacklistMiddleware.AddLog(LogMessage.Warning($"{ipAddress} was already blocked! Reason: {reason}"));
+                IPBlacklistMiddleware.AddLog(LogMessage.Info($"{ipAddress} was already blocked! Reason: {reason}"));
                 return true;
             }
             return false;

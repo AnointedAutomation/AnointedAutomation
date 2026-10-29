@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AnointedAutomation.SSO" Version="1.0.3" />
+    <PackageReference Include="AnointedAutomation.SSO" Version="1.0.4" />
     <PackageReference Include="AnointedAutomation.SSO.UI" Version="1.0.1" />
   </ItemGroup>
 

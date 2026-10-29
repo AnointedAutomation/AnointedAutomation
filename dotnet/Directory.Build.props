@@ -1,6 +1,8 @@
 <Project>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <DebugType>none</DebugType>
+  <!-- Portable PDBs embedded in every assembly (Release included) so stack traces from package frames carry file:line.
+       The .NET SDK adds Source Link for GitHub automatically, so embedded sources map back to the repo commit. -->
+  <PropertyGroup>
+    <DebugType>embedded</DebugType>
     <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
 

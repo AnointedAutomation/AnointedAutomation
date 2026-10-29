@@ -143,5 +143,35 @@ namespace AnointedAutomation.Serialization.Tests
             Assert.Equal(4, good.Number);
             Assert.False(new NullOnErrorConverter().CanWrite);
         }
+
+        [Fact]
+        public void NullOnError_LogsEachDroppedValueWithItsPath_ButNotShopifyZeroDates()
+        {
+            System.Collections.Generic.List<AnointedAutomation.Optimization.Logging.LogMessage> seen = new System.Collections.Generic.List<AnointedAutomation.Optimization.Logging.LogMessage>();
+            AnointedAutomation.Optimization.Logging.LogMessage.LogAddedEventHandler handler = (sender, e) =>
+            {
+                if (e.log.message != null && e.log.message.StartsWith("NullOnErrorConverter:", StringComparison.Ordinal))
+                {
+                    lock (seen)
+                    {
+                        seen.Add(e.log);
+                    }
+                }
+            };
+            AnointedAutomation.Optimization.Logging.LogMessage.LogAdded += handler;
+            try
+            {
+                JsonConvert.DeserializeObject<ErrorHolder>("{\"At\":\"0000-12-31T18:09:24-05:50\",\"Number\":\"xyz-dropped\",\"Text\":\"ok\"}");
+
+                AnointedAutomation.Optimization.Logging.LogMessage only = Assert.Single(seen, l => l.message.Contains("'Number'", StringComparison.Ordinal));
+                Assert.Equal(AnointedAutomation.Optimization.Logging.MessageType.Warning, only.messageType);
+                Assert.Contains("Int32 at path 'Number'", only.message);
+                Assert.DoesNotContain(seen, l => l.message.Contains("'At'", StringComparison.Ordinal));
+            }
+            finally
+            {
+                AnointedAutomation.Optimization.Logging.LogMessage.LogAdded -= handler;
+            }
+        }
     }
 }

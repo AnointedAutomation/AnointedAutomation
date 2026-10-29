@@ -562,6 +562,14 @@ namespace AnointedAutomation.Repository.Mongo.Bson
             return long.TryParse(tail, NumberStyles.Integer, CultureInfo.InvariantCulture, out long id) ? id : (long?)null;
         }
 
+        /// <summary>
+        /// Tolerant numeric read: null (never an exception) for a missing value, a non-numeric type, a non-finite
+        /// number, or a value outside the long range, including a Decimal128 that overflows decimal. This is silent
+        /// by design (tolerant reader), so a caller for which a dropped number matters must log the field name itself.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="includeDecimal128">True to accept Decimal128 values.</param>
+        /// <returns>The truncated long, or null.</returns>
         private static long? AsInt64TruncOrNull(this BsonValue value, bool includeDecimal128)
         {
             if (value == null)
