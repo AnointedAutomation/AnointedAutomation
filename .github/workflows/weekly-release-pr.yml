@@ -5,7 +5,7 @@ name: Weekly release PR
 # Promote release workflow (promote-release.yml) merges it once that review approves its current head commit.
 on:
   schedule:
-    - cron: '0 13 * * 1'
+    - cron: '0 10 * * 1'  # 10:00 UTC Monday, so the Claude review (5 to 15 min) is done before the 8 AM New York promote check
   workflow_dispatch:
   push:
     branches: [develop]
