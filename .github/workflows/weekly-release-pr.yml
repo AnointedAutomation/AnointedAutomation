@@ -2,7 +2,7 @@
 name: Weekly release PR
 
 # Opens the develop -> default branch release PR once a week. The cloud Claude reviewer reviews it, and the
-# daily Claude promoter routine merges it once that review approves its current head commit.
+# Promote release workflow (promote-release.yml) merges it once that review approves its current head commit.
 on:
   schedule:
     - cron: '0 13 * * 1'
@@ -47,23 +47,39 @@ jobs:
             fi
           fi
 
-          # Commit count alone is not enough: after a squash merge develop can be commits ahead with no changes
-          compare=$(gh api "repos/$REPO/compare/$default_branch...develop" --jq '"\(.ahead_by) \(.files | length)"')
-          read -r ahead changed_files <<< "$compare"
-          if [ "$ahead" -eq 0 ] || [ "$changed_files" -eq 0 ]; then
-            echo "develop has no changes that $default_branch lacks (ahead $ahead, files $changed_files)."
+          # Commit count alone is not enough: after a squash merge develop can be commits ahead with identical content,
+          # and a three-dot compare still lists the squashed files (it diffs from the merge base), so compare head trees
+          develop_tree=$(gh api "repos/$REPO/commits/develop" --jq .commit.tree.sha)
+          default_tree=$(gh api "repos/$REPO/commits/$default_branch" --jq .commit.tree.sha)
+          if [ "$develop_tree" = "$default_tree" ]; then
+            echo "develop and $default_branch have identical content."
+            exit 0
+          fi
+          ahead=$(gh api "repos/$REPO/compare/$default_branch...develop" --jq .ahead_by)
+          if [ "$ahead" -eq 0 ]; then
+            echo "develop has no commits that $default_branch lacks."
             exit 0
           fi
           if [ "$ahead" -eq 1 ]; then commit_word="commit"; else commit_word="commits"; fi
 
-          open=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number --jq length)
-          if [ "$open" -ne 0 ]; then
-            echo "A develop -> $default_branch PR is already open."
+          open=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number,isCrossRepository \
+            --jq '[.[] | select(.isCrossRepository == false) | .number] | first')
+          if [ "$open" != "null" ]; then
+            # A failed review request leaves the PR with neither a pending request nor a review: request it again
+            requested=$(gh api "repos/$REPO/pulls/$open/requested_reviewers" --jq '[.users[] | select(.login == "roku674")] | length')
+            reviewed=$(gh api "repos/$REPO/pulls/$open/reviews?per_page=100" --paginate --slurp | jq '[add[] | select(.user.login == "roku674")] | length')
+            if [ "$requested" -eq 0 ] && [ "$reviewed" -eq 0 ]; then
+              gh pr edit "$open" -R "$REPO" --add-reviewer roku674
+              echo "PR #$open was open with no review request; requested roku674."
+            else
+              echo "A develop -> $default_branch PR (#$open) is already open."
+            fi
             exit 0
           fi
 
-          # The reviewer goes in the create call so the PR never exists without the review request
+          # gh pr create sends the review request right after creating the PR (two API calls, not atomic); if the
+          # request fails, the next run's already-open check above requests it again
           url=$(gh pr create -R "$REPO" --base "$default_branch" --head develop --reviewer roku674 \
             --title "Weekly release $(date -u +%Y-%m-%d)" \
-            --body "Weekly promotion of develop ($ahead $commit_word, $changed_files files) to $default_branch. A PR opened by GITHUB_TOKEN starts no pull_request workflows, so the checks that count are the ones the develop push ran on the head commit. The Promote release workflow merges only after the Claude review approves the current head commit with no open comments and those checks are green.")
+            --body "Weekly promotion of develop ($ahead $commit_word) to $default_branch. A PR opened by GITHUB_TOKEN starts no pull_request workflows, so the checks that count are the ones the develop push ran on the head commit. The Promote release workflow merges only after the Claude review approves the current head commit with no open comments and those checks are green.")
           echo "Opened $url"

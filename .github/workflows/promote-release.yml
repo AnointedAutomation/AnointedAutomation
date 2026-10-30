@@ -5,14 +5,15 @@ name: Promote release
 # roku674) approved its CURRENT head commit, every check on that commit passed, no review thread is open and
 # the PR is cleanly mergeable. Anything else leaves the PR alone. Squash when the PR has more than one commit,
 # merge commit when it has exactly one.
-# Deploys land at 8 AM America/New_York year-round: cron fires at 12:00 and 13:00 UTC and the run only acts when the
-# New York hour is 8, which covers DST. workflow_dispatch skips the time check (still requires the approval). Scheduled
+# Deploys land at 8 AM America/New_York year-round: crons fire at 12:07 and 13:07 UTC (off the busy top of the hour)
+# and the run acts only on the cron that is 8 AM in New York at today's UTC offset, which covers DST.
+# workflow_dispatch skips the time check (still requires the approval). Scheduled
 # runs only read this file from the default branch, so the first promotion per repo is manual. MERGE_TOKEN (roku674
 # fine-grained PAT) is required: a GITHUB_TOKEN merge starts no workflows, so master push workflows would not run.
 on:
   schedule:
-    - cron: '0 12 * * *'
-    - cron: '0 13 * * *'
+    - cron: '7 12 * * *'
+    - cron: '7 13 * * *'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +33,7 @@ jobs:
       REPO: ${{ github.repository }}
       REVIEWER: roku674
       EVENT: ${{ github.event_name }}
+      SCHEDULE: ${{ github.event.schedule }}
     steps:
       - name: Merge the release PR only if approved
         shell: bash
@@ -41,16 +43,22 @@ jobs:
             echo "::error::MERGE_TOKEN secret is not set"
             exit 1
           fi
+          # Act on WHICH cron fired, not the wall clock, so a delayed run still promotes: 12 UTC is 8 AM New York in
+          # summer (EDT, -0400), 13 UTC in winter (EST, -0500)
           if [ "$EVENT" = "schedule" ]; then
-            ny_hour=$(TZ=America/New_York date +%H)
-            if [ "$ny_hour" != "08" ]; then
-              echo "New York hour is $ny_hour, not 08; the other cron covers 8 AM."
-              exit 0
-            fi
+            ny_offset=$(TZ=America/New_York date +%z)
+            cron_hour=$(awk '{print $2}' <<< "$SCHEDULE")
+            case "$ny_offset:$cron_hour" in
+              -0400:12|-0500:13) echo "Cron '$SCHEDULE' is the 8 AM New York slot." ;;
+              -0400:13|-0500:12) echo "Cron '$SCHEDULE' is not the 8 AM New York slot today; the other cron covers it."; exit 0 ;;
+              *) echo "::error::Unexpected cron '$SCHEDULE' or New York offset $ny_offset"; exit 1 ;;
+            esac
           fi
           default_branch=$(gh api "repos/$REPO" --jq .default_branch)
-          pr=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number --jq '.[0].number')
-          if [ -z "$pr" ]; then
+          # Same-repo develop only: a fork's branch named develop must never be promoted
+          pr=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number,isCrossRepository \
+            --jq '[.[] | select(.isCrossRepository == false) | .number] | first')
+          if [ "$pr" = "null" ]; then
             echo "No open develop -> $default_branch PR."
             exit 0
           fi
@@ -59,9 +67,11 @@ jobs:
           echo "PR #$pr head $head_sha draft=$draft commits=$commits mergeable_state=$mergeable_state"
 
           # Only the reviewer account's LAST review carrying the marker for the CURRENT head counts
-          verdict=$(gh api "repos/$REPO/pulls/$pr/reviews?per_page=100" --paginate \
-            --jq "[.[] | select(.user.login == \"$REVIEWER\" and (.body | contains(\"<!-- claude-review sha=$head_sha -->\")))] | last | .body" \
-            | head -n 1)
+          # APPROVED on others' PRs, COMMENTED on the reviewer's own (GitHub forbids self-approval); DISMISSED never counts.
+          # --slurp joins every page so `last` really is the newest matching review.
+          verdict=$(gh api "repos/$REPO/pulls/$pr/reviews?per_page=100" --paginate --slurp \
+            | jq -r --arg reviewer "$REVIEWER" --arg marker "<!-- claude-review sha=$head_sha -->" \
+              '[add[] | select(.user.login == $reviewer and (.state == "APPROVED" or .state == "COMMENTED") and (.body | contains($marker)))] | last | if . == null then "none" else (.body | split("\n")[0]) end')
           case "$verdict" in
             "✅ Claude review: approved"*) echo "Claude review approved $head_sha." ;;
             *) echo "Not promoting: no approving Claude review for $head_sha (got: ${verdict:-none})."; exit 0 ;;
@@ -75,8 +85,8 @@ jobs:
           # Every check on the head commit (except this workflow's own run) must have passed or been skipped
           if ! checks=$(gh pr checks "$pr" -R "$REPO" --json name,bucket,workflow 2>&1); then
             if ! grep -q '^\[' <<< "$checks"; then
-              echo "Not promoting: could not read checks: $checks"
-              exit 0
+              echo "::error::Could not read checks: $checks"
+              exit 1
             fi
           fi
           others=$(jq -c '[.[] | select(.workflow != "Promote release")]' <<< "$checks")
