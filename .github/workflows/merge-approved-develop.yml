@@ -32,7 +32,6 @@ jobs:
       GH_TOKEN: ${{ secrets.MERGE_TOKEN }}
       REPO: ${{ github.repository }}
       REVIEWER: roku674
-      REQUIRE_CHECKS: 'true'
     steps:
       - name: Merge every approved, green, up-to-date PR into develop
         shell: bash
@@ -87,8 +86,9 @@ jobs:
               continue
             fi
 
-            # Every check on the head commit except the merge housekeeping runs must have passed or been skipped, and
-            # (unless REQUIRE_CHECKS is false, for repos with no CI) at least one must have passed
+            # Every check on the head commit except the merge housekeeping runs must have passed or been skipped. No
+            # build is required here: the CI of these repos skips human PRs by design (it runs on the develop push),
+            # the Claude review runs the relevant tests itself, and the release PR gate requires the real CI to pass.
             if ! checks=$(gh pr checks "$pr" -R "$REPO" --json name,bucket,workflow 2>&1); then
               if ! grep -q '^\[' <<< "$checks"; then
                 echo "::error::Could not read checks for PR #$pr: $checks"
@@ -97,10 +97,9 @@ jobs:
               fi
             fi
             others=$(jq -c '[.[] | select(.workflow != "Merge approved into develop" and .workflow != "Promote release")]' <<< "$checks")
-            passed=$(jq '[.[] | select(.bucket == "pass")] | length' <<< "$others")
             not_green=$(jq -r '[.[] | select(.bucket != "pass" and .bucket != "skipping") | "\(.name)=\(.bucket)"] | join(", ")' <<< "$others")
-            if [ -n "$not_green" ] || { [ "$passed" -eq 0 ] && [ "$REQUIRE_CHECKS" = "true" ]; }; then
-              echo "  skip: checks not green (passed $passed; ${not_green:-none failing})"
+            if [ -n "$not_green" ]; then
+              echo "  skip: checks not green ($not_green)"
               continue
             fi
 

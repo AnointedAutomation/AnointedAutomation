@@ -32,6 +32,8 @@ jobs:
       GH_TOKEN: ${{ secrets.MERGE_TOKEN }}
       REPO: ${{ github.repository }}
       REVIEWER: roku674
+      # This repo's real CI; each must have passed on the release head. Empty = the repo has no CI.
+      REQUIRED_CHECKS: '.NET Test'
       EVENT: ${{ github.event_name }}
       SCHEDULE: ${{ github.event.schedule }}
     steps:
@@ -86,8 +88,8 @@ jobs:
             exit 0
           fi
 
-          # Every check on the head commit except the merge housekeeping runs must have passed or been skipped, and at
-          # least one must have passed (an all-skipped set means nothing was built or tested)
+          # Every check on the head commit except the merge housekeeping runs must have passed or been skipped, and each
+          # REQUIRED_CHECKS entry (this repo's real CI, matched by workflow or check name) must be present and passed
           if ! checks=$(gh pr checks "$pr" -R "$REPO" --json name,bucket,workflow 2>&1); then
             if ! grep -q '^\[' <<< "$checks"; then
               echo "::error::Could not read checks: $checks"
@@ -95,10 +97,20 @@ jobs:
             fi
           fi
           others=$(jq -c '[.[] | select(.workflow != "Promote release" and .workflow != "Merge approved into develop")]' <<< "$checks")
-          passed=$(jq '[.[] | select(.bucket == "pass")] | length' <<< "$others")
           not_green=$(jq -r '[.[] | select(.bucket != "pass" and .bucket != "skipping") | "\(.name)=\(.bucket)"] | join(", ")' <<< "$others")
-          if [ "$passed" -eq 0 ] || [ -n "$not_green" ]; then
-            echo "Not promoting: checks not green (passed $passed; ${not_green:-none failing})."
+          if [ -n "$not_green" ]; then
+            echo "Not promoting: checks not green ($not_green)."
+            exit 0
+          fi
+          missing=""
+          IFS=';' read -ra required <<< "$REQUIRED_CHECKS"
+          for req in "${required[@]}"; do
+            [ -z "$req" ] && continue
+            hits=$(jq --arg req "$req" '[.[] | select((.workflow == $req or .name == $req) and .bucket == "pass")] | length' <<< "$others")
+            if [ "$hits" -eq 0 ]; then missing="$missing '$req'"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "Not promoting: required checks not passed on $head_sha:$missing."
             exit 0
           fi
 
