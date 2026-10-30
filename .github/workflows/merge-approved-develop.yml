@@ -87,7 +87,7 @@ jobs:
             fi
 
             # Every check on the head commit except the merge housekeeping runs must have passed or been skipped. No
-            # build is required here: the CI of these repos skips human PRs by design (it runs on the develop push),
+            # build is required here: in most of these repos CI skips human PRs by design (it runs on the develop push),
             # the Claude review runs the relevant tests itself, and the release PR gate requires the real CI to pass.
             if ! checks=$(gh pr checks "$pr" -R "$REPO" --json name,bucket,workflow 2>&1); then
               if ! grep -q '^\[' <<< "$checks"; then
