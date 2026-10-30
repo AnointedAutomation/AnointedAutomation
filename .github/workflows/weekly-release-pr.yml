@@ -36,17 +36,25 @@ jobs:
           # Scheduled runs only use the copy on the default branch, so pushes to develop bootstrap the first
           # release PR. Once this file is on the default branch, pushes stop opening PRs and the schedule rules.
           if [ "$EVENT" = "push" ]; then
-            if gh api "repos/$REPO/contents/.github/workflows/weekly-release-pr.yml?ref=$default_branch" >/dev/null 2>&1; then
+            if probe=$(gh api "repos/$REPO/contents/.github/workflows/weekly-release-pr.yml?ref=$default_branch" --jq .sha 2>&1); then
               echo "Workflow is on $default_branch; the weekly schedule opens release PRs."
               exit 0
+            elif grep -q 'HTTP 404' <<< "$probe"; then
+              echo "Workflow is not on $default_branch yet; bootstrapping the first release PR."
+            else
+              echo "::error::Could not check $default_branch for this workflow: $probe"
+              exit 1
             fi
           fi
 
-          ahead=$(gh api "repos/$REPO/compare/$default_branch...develop" --jq .ahead_by)
-          if [ "$ahead" -eq 0 ]; then
-            echo "develop has no commits that $default_branch lacks."
+          # Commit count alone is not enough: after a squash merge develop can be commits ahead with no changes
+          compare=$(gh api "repos/$REPO/compare/$default_branch...develop" --jq '"\(.ahead_by) \(.files | length)"')
+          read -r ahead changed_files <<< "$compare"
+          if [ "$ahead" -eq 0 ] || [ "$changed_files" -eq 0 ]; then
+            echo "develop has no changes that $default_branch lacks (ahead $ahead, files $changed_files)."
             exit 0
           fi
+          if [ "$ahead" -eq 1 ]; then commit_word="commit"; else commit_word="commits"; fi
 
           open=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number --jq length)
           if [ "$open" -ne 0 ]; then
@@ -54,8 +62,8 @@ jobs:
             exit 0
           fi
 
-          url=$(gh pr create -R "$REPO" --base "$default_branch" --head develop \
+          # The reviewer goes in the create call so the PR never exists without the review request
+          url=$(gh pr create -R "$REPO" --base "$default_branch" --head develop --reviewer roku674 \
             --title "Weekly release $(date -u +%Y-%m-%d)" \
-            --body "Weekly promotion of develop ($ahead commits) to $default_branch. Merged by the daily Claude promoter only after the Claude review approves the current head commit with no open comments and CI is green.")
+            --body "Weekly promotion of develop ($ahead $commit_word, $changed_files files) to $default_branch. A PR opened by GITHUB_TOKEN starts no pull_request workflows, so the checks that count are the ones the develop push ran on the head commit. The daily Claude promoter merges only after the Claude review approves the current head commit with no open comments and those checks are green.")
           echo "Opened $url"
-          gh pr edit "$url" --add-reviewer roku674
