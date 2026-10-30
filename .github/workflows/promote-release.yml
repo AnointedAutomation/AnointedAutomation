@@ -5,13 +5,14 @@ name: Promote release
 # roku674) approved its CURRENT head commit, every check on that commit passed, no review thread is open and
 # the PR is cleanly mergeable. Anything else leaves the PR alone. Squash when the PR has more than one commit,
 # merge commit when it has exactly one.
-# pull_request_review runs this from the PR head, so it works before the file reaches the default branch.
+# Deploys land at 8 AM America/New_York year-round: cron fires at 12:00 and 13:00 UTC and the run only acts when the
+# New York hour is 8, which covers DST. workflow_dispatch skips the time check (still requires the approval). Scheduled
+# runs only read this file from the default branch, so the first promotion per repo is manual.
 on:
   schedule:
-    - cron: '0 15 * * *'
+    - cron: '0 12 * * *'
+    - cron: '0 13 * * *'
   workflow_dispatch:
-  pull_request_review:
-    types: [submitted]
 
 permissions:
   contents: write
@@ -23,18 +24,25 @@ concurrency:
 
 jobs:
   promote:
-    if: github.event_name != 'pull_request_review' || (github.event.pull_request.head.ref == 'develop' && github.event.pull_request.base.ref == github.event.repository.default_branch)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPO: ${{ github.repository }}
       REVIEWER: roku674
+      EVENT: ${{ github.event_name }}
     steps:
       - name: Merge the release PR only if approved
         shell: bash
         run: |
           set -euo pipefail
+          if [ "$EVENT" = "schedule" ]; then
+            ny_hour=$(TZ=America/New_York date +%H)
+            if [ "$ny_hour" != "08" ]; then
+              echo "New York hour is $ny_hour, not 08; the other cron covers 8 AM."
+              exit 0
+            fi
+          fi
           default_branch=$(gh api "repos/$REPO" --jq .default_branch)
           pr=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number --jq '.[0].number')
           if [ -z "$pr" ]; then
