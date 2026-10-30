@@ -7,7 +7,8 @@ name: Promote release
 # merge commit when it has exactly one.
 # Deploys land at 8 AM America/New_York year-round: cron fires at 12:00 and 13:00 UTC and the run only acts when the
 # New York hour is 8, which covers DST. workflow_dispatch skips the time check (still requires the approval). Scheduled
-# runs only read this file from the default branch, so the first promotion per repo is manual.
+# runs only read this file from the default branch, so the first promotion per repo is manual. MERGE_TOKEN (roku674
+# fine-grained PAT) is required: a GITHUB_TOKEN merge starts no workflows, so master push workflows would not run.
 on:
   schedule:
     - cron: '0 12 * * *'
@@ -15,8 +16,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
+  pull-requests: read
 
 concurrency:
   group: promote-release
@@ -27,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.MERGE_TOKEN }}
       REPO: ${{ github.repository }}
       REVIEWER: roku674
       EVENT: ${{ github.event_name }}
@@ -36,6 +37,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::MERGE_TOKEN secret is not set"
+            exit 1
+          fi
           if [ "$EVENT" = "schedule" ]; then
             ny_hour=$(TZ=America/New_York date +%H)
             if [ "$ny_hour" != "08" ]; then

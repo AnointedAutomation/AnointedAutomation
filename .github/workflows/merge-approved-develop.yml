@@ -1,0 +1,119 @@
+# Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me
+name: Merge approved into develop
+
+# Squash merges an open PR into develop IF AND ONLY IF the cloud Claude reviewer (posting as roku674) approved its
+# CURRENT head commit, every check on that commit passed, no review thread is open, it is not a draft, it is
+# cleanly mergeable and it is up to date with develop. A Dependabot PR that is behind develop gets one
+# "@dependabot rebase" comment per 24 hours instead; the rebase is a new commit that the reviewer re-reviews.
+# MERGE_TOKEN (roku674 fine-grained PAT) is required: merges made with GITHUB_TOKEN start no workflows, so the
+# develop push CI that release PRs depend on would never run.
+on:
+  pull_request_review:
+    types: [submitted]
+  push:
+    branches: [develop]
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: merge-approved-develop
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ secrets.MERGE_TOKEN }}
+      REPO: ${{ github.repository }}
+      REVIEWER: roku674
+    steps:
+      - name: Merge every approved, green, up-to-date PR into develop
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::MERGE_TOKEN secret is not set"
+            exit 1
+          fi
+          owner=${REPO%/*}
+          name=${REPO#*/}
+          failed=0
+          for pr in $(gh pr list -R "$REPO" --base develop --state open --json number --jq '.[].number'); do
+            read -r head_sha draft mergeable_state author <<< "$(gh api "repos/$REPO/pulls/$pr" --jq '"\(.head.sha) \(.draft) \(.mergeable_state) \(.user.login)"')"
+            echo "PR #$pr by $author head $head_sha draft=$draft mergeable_state=$mergeable_state"
+
+            # Only the reviewer account's LAST review carrying the marker for the CURRENT head counts
+            verdict=$(gh api "repos/$REPO/pulls/$pr/reviews?per_page=100" --paginate \
+              --jq "[.[] | select(.user.login == \"$REVIEWER\" and (.body | contains(\"<!-- claude-review sha=$head_sha -->\")))] | last | .body" \
+              | head -n 1)
+            case "$verdict" in
+              "✅ Claude review: approved"*) ;;
+              *) echo "  skip: no approving Claude review for $head_sha (got: ${verdict:-none})"; continue ;;
+            esac
+            if [ "$draft" != "false" ]; then
+              echo "  skip: draft"
+              continue
+            fi
+
+            behind=$(gh api "repos/$REPO/compare/develop...$head_sha" --jq .behind_by)
+            if [ "$behind" -ne 0 ]; then
+              if [ "$author" = "dependabot[bot]" ]; then
+                since=$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+                asked=$(gh api "repos/$REPO/issues/$pr/comments?per_page=100&since=$since" --jq '[.[] | select(.body | startswith("@dependabot rebase"))] | length')
+                if [ "$asked" -eq 0 ]; then
+                  gh pr comment "$pr" -R "$REPO" --body "@dependabot rebase"
+                  echo "  $behind commits behind develop: asked Dependabot to rebase"
+                else
+                  echo "  $behind commits behind develop: rebase already requested in the last 24 hours"
+                fi
+              else
+                echo "  skip: $behind commits behind develop; the author must update the branch"
+              fi
+              continue
+            fi
+
+            # Every check on the head commit (except this workflow's own run) must have passed or been skipped
+            if ! checks=$(gh pr checks "$pr" -R "$REPO" --json name,bucket,workflow 2>&1); then
+              if ! grep -q '^\[' <<< "$checks"; then
+                echo "  skip: could not read checks: $checks"
+                continue
+              fi
+            fi
+            others=$(jq -c '[.[] | select(.workflow != "Merge approved into develop")]' <<< "$checks")
+            total=$(jq 'length' <<< "$others")
+            not_green=$(jq -r '[.[] | select(.bucket != "pass" and .bucket != "skipping") | "\(.name)=\(.bucket)"] | join(", ")' <<< "$others")
+            if [ "$total" -eq 0 ] || [ -n "$not_green" ]; then
+              echo "  skip: checks not green (total $total; ${not_green:-none listed})"
+              continue
+            fi
+
+            open_threads=$(gh api graphql -f owner="$owner" -f name="$name" -F pr="$pr" -f query='
+              query($owner: String!, $name: String!, $pr: Int!) {
+                repository(owner: $owner, name: $name) {
+                  pullRequest(number: $pr) { reviewThreads(first: 100) { nodes { isResolved } } }
+                }
+              }' --jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false)] | length')
+            if [ "$open_threads" -ne 0 ]; then
+              echo "  skip: $open_threads unresolved review threads"
+              continue
+            fi
+
+            if [ "$mergeable_state" != "clean" ]; then
+              echo "  skip: mergeable_state is $mergeable_state"
+              continue
+            fi
+
+            if gh pr merge "$pr" -R "$REPO" --squash --match-head-commit "$head_sha"; then
+              echo "  merged into develop"
+            else
+              echo "::error::Merge of PR #$pr into develop failed"
+              failed=1
+            fi
+          done
+          exit "$failed"
