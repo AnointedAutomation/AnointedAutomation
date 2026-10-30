@@ -1,0 +1,61 @@
+# Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me
+name: Weekly release PR
+
+# Opens the develop -> default branch release PR once a week. The cloud Claude reviewer reviews it, and the
+# daily Claude promoter routine merges it once that review approves its current head commit.
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: weekly-release-pr
+  cancel-in-progress: false
+
+jobs:
+  open-release-pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      EVENT: ${{ github.event_name }}
+    steps:
+      - name: Open the release PR when develop is ahead
+        shell: bash
+        run: |
+          set -euo pipefail
+          default_branch=$(gh api "repos/$REPO" --jq .default_branch)
+
+          # Scheduled runs only use the copy on the default branch, so pushes to develop bootstrap the first
+          # release PR. Once this file is on the default branch, pushes stop opening PRs and the schedule rules.
+          if [ "$EVENT" = "push" ]; then
+            if gh api "repos/$REPO/contents/.github/workflows/weekly-release-pr.yml?ref=$default_branch" >/dev/null 2>&1; then
+              echo "Workflow is on $default_branch; the weekly schedule opens release PRs."
+              exit 0
+            fi
+          fi
+
+          ahead=$(gh api "repos/$REPO/compare/$default_branch...develop" --jq .ahead_by)
+          if [ "$ahead" -eq 0 ]; then
+            echo "develop has no commits that $default_branch lacks."
+            exit 0
+          fi
+
+          open=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number --jq length)
+          if [ "$open" -ne 0 ]; then
+            echo "A develop -> $default_branch PR is already open."
+            exit 0
+          fi
+
+          url=$(gh pr create -R "$REPO" --base "$default_branch" --head develop \
+            --title "Weekly release $(date -u +%Y-%m-%d)" \
+            --body "Weekly promotion of develop ($ahead commits) to $default_branch. Merged by the daily Claude promoter only after the Claude review approves the current head commit with no open comments and CI is green.")
+          echo "Opened $url"
+          gh pr edit "$url" --add-reviewer roku674
