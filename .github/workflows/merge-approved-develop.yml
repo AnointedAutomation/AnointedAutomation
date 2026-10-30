@@ -32,6 +32,7 @@ jobs:
       GH_TOKEN: ${{ secrets.MERGE_TOKEN }}
       REPO: ${{ github.repository }}
       REVIEWER: roku674
+      REQUIRE_CHECKS: 'true'
     steps:
       - name: Merge every approved, green, up-to-date PR into develop
         shell: bash
@@ -44,18 +45,22 @@ jobs:
           owner=${REPO%/*}
           name=${REPO#*/}
           failed=0
-          # Same-repo PRs only; fork PRs are never auto-merged
-          for pr in $(gh pr list -R "$REPO" --base develop --state open --json number,isCrossRepository \
-            --jq '.[] | select(.isCrossRepository == false) | .number'); do
-            read -r head_sha draft mergeable_state author <<< "$(gh api "repos/$REPO/pulls/$pr" --jq '"\(.head.sha) \(.draft) \(.mergeable_state) \(.user.login)"')"
+          # Same-repo PRs only; fork PRs are never auto-merged. Values are assigned before use because set -e does not
+          # see a failure inside a for word list or a here-string.
+          prs=$(gh pr list -R "$REPO" --base develop --state open --json number,isCrossRepository \
+            --jq '.[] | select(.isCrossRepository == false) | .number')
+          for pr in $prs; do
+            info=$(gh api "repos/$REPO/pulls/$pr" --jq '"\(.head.sha) \(.draft) \(.mergeable_state) \(.user.login)"')
+            read -r head_sha draft mergeable_state author <<< "$info"
             echo "PR #$pr by $author head $head_sha draft=$draft mergeable_state=$mergeable_state"
 
             # Only the reviewer account's LAST review carrying the marker for the CURRENT head counts
-            # APPROVED on others' PRs, COMMENTED on the reviewer's own (GitHub forbids self-approval); DISMISSED never counts.
+            # Every state but DISMISSED counts, so a newer CHANGES_REQUESTED outranks an older approval (on its own PRs the
+            # reviewer posts COMMENTED, because GitHub forbids self-approval).
             # --slurp joins every page so `last` really is the newest matching review.
             verdict=$(gh api "repos/$REPO/pulls/$pr/reviews?per_page=100" --paginate --slurp \
               | jq -r --arg reviewer "$REVIEWER" --arg marker "<!-- claude-review sha=$head_sha -->" \
-                '[add[] | select(.user.login == $reviewer and (.state == "APPROVED" or .state == "COMMENTED") and (.body | contains($marker)))] | last | if . == null then "none" else (.body | split("\n")[0]) end')
+                '[add[] | select(.user.login == $reviewer and .state != "DISMISSED" and (.body | contains($marker)))] | last | if . == null then "none" else (.body | split("\n")[0]) end')
             case "$verdict" in
               "✅ Claude review: approved"*) ;;
               *) echo "  skip: no approving Claude review for $head_sha (got: ${verdict:-none})"; continue ;;
@@ -82,7 +87,8 @@ jobs:
               continue
             fi
 
-            # Every check on the head commit (except this workflow's own run) must have passed or been skipped
+            # Every check on the head commit except the merge housekeeping runs must have passed or been skipped, and
+            # (unless REQUIRE_CHECKS is false, for repos with no CI) at least one must have passed
             if ! checks=$(gh pr checks "$pr" -R "$REPO" --json name,bucket,workflow 2>&1); then
               if ! grep -q '^\[' <<< "$checks"; then
                 echo "::error::Could not read checks for PR #$pr: $checks"
@@ -90,11 +96,11 @@ jobs:
                 continue
               fi
             fi
-            others=$(jq -c '[.[] | select(.workflow != "Merge approved into develop")]' <<< "$checks")
-            total=$(jq 'length' <<< "$others")
+            others=$(jq -c '[.[] | select(.workflow != "Merge approved into develop" and .workflow != "Promote release")]' <<< "$checks")
+            passed=$(jq '[.[] | select(.bucket == "pass")] | length' <<< "$others")
             not_green=$(jq -r '[.[] | select(.bucket != "pass" and .bucket != "skipping") | "\(.name)=\(.bucket)"] | join(", ")' <<< "$others")
-            if [ "$total" -eq 0 ] || [ -n "$not_green" ]; then
-              echo "  skip: checks not green (total $total; ${not_green:-none listed})"
+            if [ -n "$not_green" ] || { [ "$passed" -eq 0 ] && [ "$REQUIRE_CHECKS" = "true" ]; }; then
+              echo "  skip: checks not green (passed $passed; ${not_green:-none failing})"
               continue
             fi
 
@@ -109,7 +115,13 @@ jobs:
               continue
             fi
 
-            if [ "$mergeable_state" != "clean" ]; then
+            # GitHub computes mergeability lazily; read once more if it was not ready
+            if [ "$mergeable_state" = "unknown" ]; then
+              sleep 5
+              mergeable_state=$(gh api "repos/$REPO/pulls/$pr" --jq .mergeable_state)
+            fi
+            # unstable only means some check is not green, and the gate above proved those are only the housekeeping runs
+            if [ "$mergeable_state" != "clean" ] && [ "$mergeable_state" != "unstable" ]; then
               echo "  skip: mergeable_state is $mergeable_state"
               continue
             fi

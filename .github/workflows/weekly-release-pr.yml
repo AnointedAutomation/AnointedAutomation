@@ -64,7 +64,8 @@ jobs:
 
           open=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number,isCrossRepository \
             --jq '[.[] | select(.isCrossRepository == false) | .number] | first')
-          if [ "$open" != "null" ]; then
+          # gh --jq prints nothing for a null result
+          if [ -n "$open" ] && [ "$open" != "null" ]; then
             # A failed review request leaves the PR with neither a pending request nor a review: request it again
             requested=$(gh api "repos/$REPO/pulls/$open/requested_reviewers" --jq '[.users[] | select(.login == "roku674")] | length')
             reviewed=$(gh api "repos/$REPO/pulls/$open/reviews?per_page=100" --paginate --slurp | jq '[add[] | select(.user.login == "roku674")] | length')
