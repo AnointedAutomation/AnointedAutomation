@@ -65,5 +65,5 @@ jobs:
           # The reviewer goes in the create call so the PR never exists without the review request
           url=$(gh pr create -R "$REPO" --base "$default_branch" --head develop --reviewer roku674 \
             --title "Weekly release $(date -u +%Y-%m-%d)" \
-            --body "Weekly promotion of develop ($ahead $commit_word, $changed_files files) to $default_branch. A PR opened by GITHUB_TOKEN starts no pull_request workflows, so the checks that count are the ones the develop push ran on the head commit. The daily Claude promoter merges only after the Claude review approves the current head commit with no open comments and those checks are green.")
+            --body "Weekly promotion of develop ($ahead $commit_word, $changed_files files) to $default_branch. A PR opened by GITHUB_TOKEN starts no pull_request workflows, so the checks that count are the ones the develop push ran on the head commit. The Promote release workflow merges only after the Claude review approves the current head commit with no open comments and those checks are green.")
           echo "Opened $url"
