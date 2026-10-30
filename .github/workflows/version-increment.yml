@@ -1,10 +1,14 @@
 # Copyright © Anointed Automation Corporation., 2025. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-10-17 Jesus is King ✝️
-name: Auto-Increment Version on PR
+name: Auto-Increment Version on develop
 
+# Runs on every push to develop (release PRs into master are opened by github-actions[bot], which starts no
+# pull_request workflows). A package whose code changed since master but whose version still equals master's gets a
+# patch bump committed to develop, so the weekly release PR carries the new versions. The push uses MERGE_TOKEN so the
+# bump commit starts CI; the run it starts is a no-op because the versions now differ from master.
 on:
-  pull_request:
-    branches: [master]
-    types: [opened, synchronize, reopened]
+  push:
+    branches: [develop]
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -17,16 +21,26 @@ jobs:
       run:
         working-directory: dotnet
     permissions:
-      contents: write
-      pull-requests: write
+      contents: read
 
     steps:
-      - name: Checkout PR branch
+      # checkout treats an empty token as unset and falls back to GITHUB_TOKEN, whose push would start no CI
+      - name: Require MERGE_TOKEN
+        working-directory: .
+        env:
+          MERGE_TOKEN: ${{ secrets.MERGE_TOKEN }}
+        run: |
+          if [ -z "$MERGE_TOKEN" ]; then
+            echo "::error::MERGE_TOKEN secret is not set"
+            exit 1
+          fi
+
+      - name: Checkout develop
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
+          ref: develop
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MERGE_TOKEN }}
 
       - name: Configure Git Identity
         run: |
@@ -339,34 +353,20 @@ jobs:
         if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         run: |
           git add -A
-          git commit -m "Auto-increment versions for PR to master"
-          git push origin ${{ github.event.pull_request.head.ref }}
+          git commit -m "Auto-increment versions for the next release"
+          git push origin develop
 
-      - name: Comment on PR with version updates
+      - name: Report version updates
         if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const updatedProjects = `${{ steps.version-check.outputs.updated_projects }}${{ steps.template-pins.outputs.updated_projects }}${{ steps.js-version-check.outputs.updated_projects }}${{ steps.py-version-check.outputs.updated_projects }}${{ steps.file-version-check.outputs.updated_projects }}`;
-            const count = String(Number('${{ steps.version-check.outputs.versions_updated }}') + Number('${{ steps.template-pins.outputs.versions_updated }}') + Number('${{ steps.js-version-check.outputs.versions_updated }}') + Number('${{ steps.py-version-check.outputs.versions_updated }}') + Number('${{ steps.file-version-check.outputs.versions_updated }}'));
-
-            const comment = `## 🔢 Version Auto-Increment
-
-            **${count} project(s) had versions automatically incremented** to resolve conflicts with master branch:
-
-            ${updatedProjects}
-
-            These changes have been committed to this PR branch automatically.
-
-            ---
-            *🤖 Automated by version-increment workflow*`;
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: comment
-            });
+        working-directory: .
+        env:
+          UPDATED: ${{ steps.version-check.outputs.updated_projects }}${{ steps.template-pins.outputs.updated_projects }}${{ steps.js-version-check.outputs.updated_projects }}${{ steps.py-version-check.outputs.updated_projects }}${{ steps.file-version-check.outputs.updated_projects }}
+        run: |
+          {
+            echo "## Version auto-increment"
+            echo "Bumped on develop for the next release:"
+            echo -e "$UPDATED"
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: No version updates needed
         if: steps.version-check.outputs.versions_updated == '0' && steps.js-version-check.outputs.versions_updated == '0' && steps.template-pins.outputs.versions_updated == '0' && steps.py-version-check.outputs.versions_updated == '0' && steps.file-version-check.outputs.versions_updated == '0'
