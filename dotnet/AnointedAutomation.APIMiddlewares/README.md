@@ -106,6 +106,83 @@ API_KEY=your-secret-key
 
 `ApiKeyAuthMiddleware` is the newer option: it takes its values as arguments instead of reading environment variables, and compares keys in constant time.
 
+## Honeypot and bot defense
+
+Reusable, opt in pieces. Nothing is active until you turn it on, and every block is logged at Warning with the IP, the rule and the path (no silent drops).
+
+### Middleware: honeypot routes, User-Agent rules, rate limits
+
+```json
+{
+  "BotDefense": {
+    "Enabled": true,
+    "ExemptPaths": [ "/health" ],
+    "HoneypotPaths": { "Enabled": true, "BanDuration": "1.00:00:00" },
+    "UserAgent": { "Enabled": true, "BlockEmpty": false },
+    "RateLimit": {
+      "Enabled": true,
+      "PerIpLimit": 300,
+      "PerIpWindow": "00:01:00",
+      "Routes": [ { "PathPrefix": "/api/auth", "Limit": 10, "Window": "00:05:00" } ]
+    },
+    "ClientIp": { "TrustedProxyProviders": [ "Cloudflare" ], "HonorCfConnectingIp": true }
+  }
+}
+```
+
+```csharp
+using AnointedAutomation.APIMiddleware.BotDefense;
+
+builder.Services.AddBotDefense(builder.Configuration.GetSection("BotDefense"));
+app.UseBotDefense();
+```
+
+- Order: exempt paths, verified crawlers, ban check, honeypot routes, User-Agent rules, rate limits.
+- Lists you configure (`HoneypotPaths.Paths`, `HoneypotPaths.FileNames`, `UserAgent.GoodCrawlers`) REPLACE the built-in defaults; leave one empty to use the defaults.
+- Honeypot routes: a hit on `/wp-admin`, `/wp-login.php`, `/xmlrpc.php`, `/phpmyadmin`, `/.git`, `/cgi-bin` (set `Paths`) or on a file named `.env`, `.git` or `.aws` at any depth (set `FileNames`) bans that IP for `BanDuration` and answers `ResponseStatus` (404). Paths match by segment, so `/wp-administrator` is not a hit. Only enable this on routes your own site never uses.
+- User-Agent rules: blocks a built-in list of scanner tools (sqlmap, nikto, nmap, masscan, nuclei and similar; generic clients such as curl and python-requests are deliberately not listed), your own `BlockedFragments`, and optionally an empty User-Agent. `GoodCrawlers` (Googlebot, Bingbot, Applebot, YandexBot, Baiduspider by default) pass every rule, honeypots and bans included, only after reverse DNS confirms them (the PTR name must end in the crawler's documented domain and resolve forward to the same IP; results are cached for 12 hours, at most 10,000 entries). A request that claims to be one but fails the check is blocked as spoofed. A DNS failure is logged at Warning and counts as unverified.
+- Rate limits: fixed window per IP (`PerIpLimit`) and per route prefix (longest matching prefix wins). Over the limit returns `429` with `Retry-After`. The table is capped at 50,000 keys; when it is full of live windows, expired ones are swept (at most every 30 seconds), and new keys are admitted uncounted with a logged Warning rather than growing memory.
+- Ban store: `IBanStore` (`GetBanAsync`, `BanAsync`, `UnbanAsync`). The default `InMemoryBanStore` is per process and capped at 100,000 bans. For bans that survive restarts or are shared between instances, implement `IBanStore` over Mongo, Redis or any store and register it before `AddBotDefense`. If the store throws, the failure is logged at Error and `BlockWhenBanStoreFails` decides (false lets the request through, true answers `503`).
+- Client IP and exempt paths follow the same trusted proxy rules as the IP allowlist.
+
+### Form honeypot field and timing check
+
+```csharp
+builder.Services.AddFormBotGuard(options =>
+{
+    options.Enabled = true;
+    options.HoneypotFieldName = "website";
+    options.MinSubmitSeconds = 3;
+    options.SigningKey = Environment.GetEnvironmentVariable("FORM_GUARD_KEY"); // at least 16 characters, from your secret store
+});
+
+// Render: put guard.CreateTimingToken() in a hidden "t" field, and a "website" input hidden with CSS.
+// Submit:
+FormBotCheckResult result = guard.Check(HttpContext, form["website"], form["t"]);
+if (result != FormBotCheckResult.Ok)
+{
+    return Ok(new { success = true }); // fake success: the bot learns nothing. The attempt is already logged.
+}
+```
+
+A filled honeypot field is a bot, a form submitted faster than `MinSubmitSeconds` is a bot, and a missing, forged (HMAC signed) or expired timing token counts as a bot when the timing check is on.
+
+### Captcha verification
+
+```csharp
+builder.Services.AddCaptchaVerifier(options =>
+{
+    options.Provider = CaptchaProvider.ReCaptchaV3; // or Turnstile, HCaptcha
+    options.SecretKey = Environment.GetEnvironmentVariable("CAPTCHA_SECRET");
+    options.MinScore = 0.5;
+});
+
+CaptchaResult verdict = await captcha.VerifyAsync(token, remoteIp, cancellationToken);
+if (!verdict.Success) { /* reject, verdict.Reason says why */ }
+```
+
+reCAPTCHA v3, Cloudflare Turnstile and hCaptcha share the same siteverify protocol, so `ICaptchaVerifier` covers all three. When the provider returns a score (reCAPTCHA v3 always does) it must be at or above `MinScore`. A provider outage, HTTP error or unreadable answer logs at Error and fails closed.
+
 ## Persisting and observing bans
 
 The blacklist is in memory and is lost on restart. Use the events to persist bans and reload them at startup:

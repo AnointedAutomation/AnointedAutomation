@@ -82,6 +82,7 @@
       },
       "keyNamespaces": [
         "AnointedAutomation.APIMiddleware",
+        "AnointedAutomation.APIMiddleware.BotDefense",
         "AnointedAutomation.APIMiddleware.Filters",
         "AnointedAutomation.APIMiddleware.Objects",
         "AnointedAutomation.APIMiddleware.Security",
@@ -98,6 +99,14 @@
         "CountryBlockExtensions",
         "ICountryLookup",
         "RirDelegatedCountryLookup",
+        "BotDefenseMiddleware",
+        "BotDefenseOptions",
+        "BotDefenseExtensions",
+        "FormBotGuard",
+        "IBanStore",
+        "ICrawlerVerifier",
+        "ICaptchaVerifier",
+        "CaptchaVerifier",
         "APIKeyAttribute",
         "IPBlacklist"
       ],
