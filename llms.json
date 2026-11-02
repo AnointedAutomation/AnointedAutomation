@@ -91,6 +91,7 @@
         "IPBlacklistMiddleware",
         "InvalidEndpointTrackerMiddleware",
         "EndpointAccessMiddleware",
+        "IpAllowlistMiddleware",
         "APIKeyAttribute",
         "IPBlacklist"
       ],

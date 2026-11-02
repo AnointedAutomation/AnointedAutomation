@@ -129,6 +129,47 @@ IPBlacklistMiddleware.AddLog(LogMessage.Warning("Suspicious activity detected.")
 
 Note that `IPBlacklistMiddleware.ClearLogs()` and `IPBlacklist.ClearBlacklist()` also remove every event subscriber, and `InvalidEndpointTrackerMiddleware` calls `ClearLogs()` during its 24 hour reset, so resubscribe to `IPBlacklistMiddleware.LogAdded` if you rely on it long term.
 
+## IP allowlist (`IpAllowlistMiddleware`)
+
+Blocks every request from an IP that is not on the allowlist (`403`, logged at Warning with the IP, method, path and reason). Off by default. Entries are single IPs or CIDR ranges, IPv4 and IPv6, and you can add provider presets for CDNs.
+
+```json
+{
+  "IpAllowlist": {
+    "Enabled": true,
+    "Allowlist": [ "203.0.113.0/24", "2001:db8::/32" ],
+    "Providers": [ "Cloudflare" ],
+    "ExemptPaths": [ "/health", "/api/webhooks" ],
+    "ClientIp": { "TrustedProxyProviders": [ "Cloudflare" ], "HonorCfConnectingIp": true },
+    "RefreshEnabled": true,
+    "RefreshInterval": "1.00:00:00"
+  }
+}
+```
+
+```csharp
+using AnointedAutomation.APIMiddleware.Security;
+
+builder.Services.AddIpAllowlist(builder.Configuration.GetSection("IpAllowlist"));
+// or: builder.Services.AddIpAllowlist(options => { options.Enabled = true; options.Allowlist.Add("203.0.113.7"); });
+
+app.UseIpAllowlist(); // first in the pipeline
+```
+
+- Enabled with an empty `Allowlist` and no `Providers`, an invalid entry or an unknown provider throws when `UseIpAllowlist()` runs, so a bad configuration crashes at startup instead of failing open or blocking everyone silently.
+- Provider presets (shipped ranges, with the source URL and fetch date in `Security/IpProviderPresets.Data.cs`):
+
+| Preset | Official source |
+|---|---|
+| `Cloudflare` | https://www.cloudflare.com/ips-v4 and https://www.cloudflare.com/ips-v6 |
+| `Fastly` | https://api.fastly.com/public-ip-list |
+| `CloudFront` | https://ip-ranges.amazonaws.com/ip-ranges.json (service `CLOUDFRONT`) |
+
+  Evaluated and not shipped: Google Cloud (`cloud.json` lists every Google Cloud customer address, not just the CDN, so it is far too broad for an allowlist), Akamai, Vercel and Railway (no official public range list found). Add those through `Allowlist` yourself.
+- Scheduled refresh (`RefreshEnabled`, `RefreshInterval`, `RefreshTimeout`): the shipped list is the starting set; each interval the provider's published list is downloaded and swapped in only if the whole download parses. Any failure (network, HTTP status, malformed or empty list) is logged at Error with the exception and the last good list stays in use. It never empties the list and never allows everyone.
+- Client IP: `X-Forwarded-For` and `CF-Connecting-IP` are honored only when the direct peer is in `ClientIp.TrustedProxies` or one of the `ClientIp.TrustedProxyProviders` ranges. `X-Forwarded-For` is read from the right, skipping trusted hops, so a client cannot forge an earlier entry. With no trusted proxies configured the headers are never used. A request with no resolvable client address is blocked.
+- `ExemptPaths` are path prefixes matched by segment, case-insensitively (`/health` matches `/health/live`, not `/healthz`).
+
 ## Notes
 
 - The client IP comes from `X-Forwarded-For` when present. Only trust it behind a reverse proxy that sets it.
