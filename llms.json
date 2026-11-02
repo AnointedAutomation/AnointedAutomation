@@ -103,6 +103,8 @@
         "BotDefenseOptions",
         "BotDefenseExtensions",
         "FormBotGuard",
+        "HoneypotPathOptions",
+        "ZipBomb",
         "IBanStore",
         "ICrawlerVerifier",
         "ICaptchaVerifier",

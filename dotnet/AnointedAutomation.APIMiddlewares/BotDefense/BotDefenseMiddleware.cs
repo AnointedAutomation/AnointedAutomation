@@ -55,6 +55,10 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
             {
                 _honeypotFileNames.Add(fileName);
             }
+            if (_options.HoneypotPaths.Enabled && _options.HoneypotPaths.ServeEnvZipBomb)
+            {
+                WarmZipBomb();
+            }
             _goodCrawlers = _options.UserAgent.ResolveGoodCrawlers();
             if (_options.UserAgent.BlockKnownBad)
             {
@@ -168,6 +172,19 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
                 }
             }
             return null;
+        }
+
+        private void WarmZipBomb()
+        {
+            try
+            {
+                ZipBomb.Get(_options.HoneypotPaths.ZipBombExpandedBytes);
+            }
+            catch (Exception ex)
+            {
+                IPBlacklistMiddleware.AddLog(LogMessage.Warning(
+                    "BotDefense could not prebuild the " + _options.HoneypotPaths.ZipBombExpandedBytes + " byte zip bomb; it will be retried on the first .env probe.", ex));
+            }
         }
 
         private static bool IsEnvFile(PathString path)

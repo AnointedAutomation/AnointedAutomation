@@ -97,6 +97,14 @@ namespace AnointedAutomation.APIMiddlewares.Tests.BotDefense
         }
 
         [Fact]
+        public void Construction_PrebuildsBombWhenEnabled()
+        {
+            long size = 3L * 1024 * 1024 + 7;
+            Build(o => { o.HoneypotPaths.ServeEnvZipBomb = true; o.HoneypotPaths.ZipBombExpandedBytes = size; }, out InMemoryBanStore bans);
+            Assert.Same(ZipBomb.Get(size), ZipBomb.Get(size));
+        }
+
+        [Fact]
         public async Task NonEnvHoneypot_StillGetsPlainResponseWhenBombEnabled()
         {
             BotDefenseMiddleware middleware = Build(o => o.HoneypotPaths.ServeEnvZipBomb = true, out InMemoryBanStore bans);
