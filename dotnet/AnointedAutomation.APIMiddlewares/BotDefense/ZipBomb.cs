@@ -32,6 +32,11 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
             return Cache.GetOrAdd(expandedBytes, Build);
         }
 
+        internal static bool IsCached(long expandedBytes)
+        {
+            return Cache.ContainsKey(expandedBytes);
+        }
+
         private static byte[] Build(long expandedBytes)
         {
             byte[] zeros = new byte[ChunkBytes];

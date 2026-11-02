@@ -100,8 +100,17 @@ namespace AnointedAutomation.APIMiddlewares.Tests.BotDefense
         public void Construction_PrebuildsBombWhenEnabled()
         {
             long size = 3L * 1024 * 1024 + 7;
+            Assert.False(ZipBomb.IsCached(size));
             Build(o => { o.HoneypotPaths.ServeEnvZipBomb = true; o.HoneypotPaths.ZipBombExpandedBytes = size; }, out InMemoryBanStore bans);
-            Assert.Same(ZipBomb.Get(size), ZipBomb.Get(size));
+            Assert.True(ZipBomb.IsCached(size));
+        }
+
+        [Fact]
+        public void Construction_DoesNotBuildBombWhenOff()
+        {
+            long size = 2L * 1024 * 1024 + 11;
+            Build(o => o.HoneypotPaths.ZipBombExpandedBytes = size, out InMemoryBanStore bans);
+            Assert.False(ZipBomb.IsCached(size));
         }
 
         [Fact]
