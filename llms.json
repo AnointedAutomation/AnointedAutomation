@@ -84,6 +84,7 @@
         "AnointedAutomation.APIMiddleware",
         "AnointedAutomation.APIMiddleware.Filters",
         "AnointedAutomation.APIMiddleware.Objects",
+        "AnointedAutomation.APIMiddleware.Security",
         "AnointedAutomation.APIMiddleware.Utility"
       ],
       "keyTypes": [

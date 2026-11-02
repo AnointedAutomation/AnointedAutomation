@@ -98,7 +98,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             (int status, bool nextCalled) result = await Run(On(), "198.51.100.7", "/secret");
             Assert.False(result.nextCalled);
             Assert.Equal(403, result.status);
-            LogMessage log = IPBlacklistMiddleware.GetLogs().Single();
+            LogMessage log = SecurityTestLogs.Get().Single();
             Assert.Equal(MessageType.Warning, log.messageType);
             Assert.Contains("198.51.100.7", log.message);
             Assert.Contains("/secret", log.message);
@@ -135,11 +135,35 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
         }
 
         [Fact]
+        public async Task ProviderPreset_MatchesDirectPeerNotForwardedClient()
+        {
+            IpAllowlistOptions options = new IpAllowlistOptions { Enabled = true };
+            options.Providers.Add("Cloudflare");
+            options.ClientIp.TrustedProxyProviders.Add("Cloudflare");
+            options.ClientIp.HonorCfConnectingIp = true;
+            // Arrives through Cloudflare: allowed whatever the visitor is.
+            Assert.True((await Run(options, "173.245.48.9", "/x", cf: "198.51.100.7")).nextCalled);
+            // Not through Cloudflare, forging the header with a Cloudflare address: still blocked.
+            Assert.False((await Run(options, "198.51.100.9", "/x", cf: "173.245.48.9", xff: "173.245.48.9")).nextCalled);
+        }
+
+        [Fact]
+        public async Task AllowlistEntry_StillMatchesResolvedClient()
+        {
+            IpAllowlistOptions options = On();
+            options.Providers.Add("Cloudflare");
+            options.ClientIp.TrustedProxyProviders.Add("Cloudflare");
+            options.ClientIp.HonorCfConnectingIp = true;
+            Assert.True((await Run(options, "198.51.100.9", "/x", cf: "203.0.113.5")).nextCalled == false);
+            Assert.True((await Run(options, "173.245.48.9", "/x", cf: "203.0.113.5")).nextCalled);
+        }
+
+        [Fact]
         public void State_ReportsProviderRuleAsMatch()
         {
             IpAllowlistOptions options = new IpAllowlistOptions { Enabled = true };
             options.Providers.Add("cloudflare");
-            Assert.Equal("Cloudflare:173.245.48.0/20", new IpAllowlistState(options).FindAllowingRule(IPAddress.Parse("173.245.48.9")));
+            Assert.Equal("Cloudflare:173.245.48.0/20", new IpAllowlistState(options).FindAllowingRule(IPAddress.Parse("173.245.48.9"), IPAddress.Parse("173.245.48.9")));
         }
 
         [Fact]

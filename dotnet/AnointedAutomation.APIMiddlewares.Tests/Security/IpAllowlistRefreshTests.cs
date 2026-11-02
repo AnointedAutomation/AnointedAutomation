@@ -19,9 +19,11 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
         {
             public Dictionary<string, string> Bodies = new Dictionary<string, string>();
             public Exception Throw;
+            public int Calls;
 
             public Task<string> FetchAsync(string url, CancellationToken cancellationToken)
             {
+                Calls++;
                 if (Throw != null)
                 {
                     throw Throw;
@@ -38,6 +40,11 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
         public void Dispose()
         {
             IPBlacklistMiddleware.ClearLogs();
+        }
+
+        private static string Rule(IpAllowlistState state, string address)
+        {
+            return state.FindAllowingRule(IPAddress.Parse(address), IPAddress.Parse(address));
         }
 
         private static IpAllowlistState Cloudflare()
@@ -62,9 +69,9 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             FakeFetcher fetcher = GoodCloudflare("198.18.0.0/15\n", "2001:db8::/32");
             int failures = await new IpAllowlistRefresher(state, fetcher).RefreshAllAsync(CancellationToken.None);
             Assert.Equal(0, failures);
-            Assert.NotNull(state.FindAllowingRule(IPAddress.Parse("198.18.1.1")));
-            Assert.Null(state.FindAllowingRule(IPAddress.Parse("173.245.48.9")));
-            Assert.Empty(IPBlacklistMiddleware.GetLogs());
+            Assert.NotNull(Rule(state, "198.18.1.1"));
+            Assert.Null(Rule(state, "173.245.48.9"));
+            Assert.Empty(SecurityTestLogs.Get());
         }
 
         [Fact]
@@ -74,9 +81,9 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             FakeFetcher fetcher = new FakeFetcher { Throw = new HttpRequestExceptionForTest() };
             int failures = await new IpAllowlistRefresher(state, fetcher).RefreshAllAsync(CancellationToken.None);
             Assert.Equal(1, failures);
-            Assert.NotNull(state.FindAllowingRule(IPAddress.Parse("173.245.48.9")));
-            Assert.Null(state.FindAllowingRule(IPAddress.Parse("198.51.100.1")));
-            LogMessage log = IPBlacklistMiddleware.GetLogs().Single();
+            Assert.NotNull(Rule(state, "173.245.48.9"));
+            Assert.Null(Rule(state, "198.51.100.1"));
+            LogMessage log = SecurityTestLogs.Get().Single();
             Assert.Equal(MessageType.Error, log.messageType);
             Assert.Contains("Cloudflare", log.message);
             Assert.Contains("HttpRequestExceptionForTest", log.exceptionType + log.message);
@@ -94,8 +101,8 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             int failures = await new IpAllowlistRefresher(state, GoodCloudflare(v4, v6)).RefreshAllAsync(CancellationToken.None);
             Assert.Equal(1, failures);
             Assert.Equal(before, state.GetProviderRangeCount("Cloudflare"));
-            Assert.NotNull(state.FindAllowingRule(IPAddress.Parse("173.245.48.9")));
-            Assert.Equal(MessageType.Error, IPBlacklistMiddleware.GetLogs().Single().messageType);
+            Assert.NotNull(Rule(state, "173.245.48.9"));
+            Assert.Equal(MessageType.Error, SecurityTestLogs.Get().Single().messageType);
         }
 
         [Fact]
@@ -108,7 +115,22 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
                 FakeFetcher fetcher = new FakeFetcher { Throw = new OperationCanceledException(cts.Token) };
                 await Assert.ThrowsAsync<OperationCanceledException>(() => new IpAllowlistRefresher(state, fetcher).RefreshAllAsync(cts.Token));
             }
-            Assert.Empty(IPBlacklistMiddleware.GetLogs());
+            Assert.Empty(SecurityTestLogs.Get());
+        }
+
+        [Fact]
+        public async Task TrustedProxyProvider_IsRefreshedToo()
+        {
+            IpAllowlistOptions options = new IpAllowlistOptions { Enabled = true };
+            options.Allowlist.Add("203.0.113.0/24");
+            options.ClientIp.TrustedProxyProviders.Add("Cloudflare");
+            IpAllowlistState state = new IpAllowlistState(options);
+            Assert.Contains("Cloudflare", state.ProviderNames);
+            Assert.True(state.TrustedProxies.Contains(IPAddress.Parse("173.245.48.9")));
+            int failures = await new IpAllowlistRefresher(state, GoodCloudflare("198.18.0.0/15", "2001:db8::/32")).RefreshAllAsync(CancellationToken.None);
+            Assert.Equal(0, failures);
+            Assert.True(state.TrustedProxies.Contains(IPAddress.Parse("198.18.1.1")));
+            Assert.False(state.TrustedProxies.Contains(IPAddress.Parse("173.245.48.9")));
         }
 
         [Fact]
@@ -152,7 +174,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             IpAllowlistRefreshService service = new IpAllowlistRefreshService(state, new IpAllowlistRefresher(state, fetcher));
             await service.StartAsync(CancellationToken.None);
             await service.StopAsync(CancellationToken.None);
-            Assert.Empty(IPBlacklistMiddleware.GetLogs());
+            Assert.Equal(0, fetcher.Calls);
         }
 
         [Fact]
@@ -164,12 +186,12 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             FakeFetcher fetcher = GoodCloudflare("198.18.0.0/15", "2001:db8::/32");
             IpAllowlistRefreshService service = new IpAllowlistRefreshService(state, new IpAllowlistRefresher(state, fetcher));
             await service.StartAsync(CancellationToken.None);
-            for (int i = 0; i < 100 && state.FindAllowingRule(IPAddress.Parse("198.18.1.1")) == null; i++)
+            for (int i = 0; i < 100 && Rule(state, "198.18.1.1") == null; i++)
             {
                 await Task.Delay(50);
             }
             await service.StopAsync(CancellationToken.None);
-            Assert.NotNull(state.FindAllowingRule(IPAddress.Parse("198.18.1.1")));
+            Assert.NotNull(Rule(state, "198.18.1.1"));
         }
 
         private sealed class HttpRequestExceptionForTest : Exception

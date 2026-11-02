@@ -45,7 +45,7 @@ namespace AnointedAutomation.APIMiddleware.Security
                 Block(context, "(no client address)", "no client address");
                 return;
             }
-            string rule = _state.FindAllowingRule(client);
+            string rule = _state.FindAllowingRule(client, context.Connection.RemoteIpAddress);
             if (rule == null)
             {
                 Block(context, client.ToString(), "no allowlist rule matched");

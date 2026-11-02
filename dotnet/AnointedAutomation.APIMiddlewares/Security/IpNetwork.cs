@@ -52,6 +52,12 @@ namespace AnointedAutomation.APIMiddleware.Security
                 }
                 prefix = parsedPrefix;
             }
+            // IPAddress.TryParse accepts legacy short IPv4 forms ("10" is 0.0.0.10, "10.1" is 10.0.0.1), which would turn a
+            // config typo into a silently wrong rule. IPv4 must be a full dotted quad.
+            if (addressPart.IndexOf(':') < 0 && addressPart.Split('.').Length != 4)
+            {
+                return false;
+            }
             IPAddress address;
             if (!IPAddress.TryParse(addressPart, out address))
             {

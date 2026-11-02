@@ -60,6 +60,12 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
         [InlineData("10.0.0.0/abc")]
         [InlineData("2001:db8::/129")]
         [InlineData("300.1.1.1")]
+        [InlineData("10")]
+        [InlineData("10.1")]
+        [InlineData("203.0.113")]
+        [InlineData("10/8")]
+        [InlineData("10.1/16")]
+        [InlineData("1.2.3.4.5")]
         [InlineData("::ffff:10.0.0.0/64")]
         public void TryParse_RejectsInvalid(string text)
         {

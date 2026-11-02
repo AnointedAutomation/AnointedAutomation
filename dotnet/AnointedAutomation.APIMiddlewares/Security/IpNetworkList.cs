@@ -34,6 +34,12 @@ namespace AnointedAutomation.APIMiddleware.Security
             get { return _networks.Length; }
         }
 
+        /// <summary>Gets all networks in the list.</summary>
+        public IReadOnlyList<IpNetwork> All
+        {
+            get { return _networks; }
+        }
+
         /// <summary>
         /// Parses every entry (address or CIDR) and throws on the first invalid one.
         /// </summary>
