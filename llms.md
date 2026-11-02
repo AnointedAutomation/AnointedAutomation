@@ -58,7 +58,7 @@ Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/
 
 - Depends on: NuGet Microsoft.AspNetCore.App (framework reference); AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Memory
 - Namespaces: `AnointedAutomation.APIMiddleware`, `AnointedAutomation.APIMiddleware.Filters`, `AnointedAutomation.APIMiddleware.Objects`, `AnointedAutomation.APIMiddleware.Security`, `AnointedAutomation.APIMiddleware.Utility`
-- Key types: `ApiKeyAuthMiddleware`, `IPBlacklistMiddleware`, `InvalidEndpointTrackerMiddleware`, `EndpointAccessMiddleware`, `IpAllowlistMiddleware`, `APIKeyAttribute`, `IPBlacklist`
+- Key types: `ApiKeyAuthMiddleware`, `IPBlacklistMiddleware`, `InvalidEndpointTrackerMiddleware`, `EndpointAccessMiddleware`, `IpAllowlistMiddleware`, `CountryBlockMiddleware`, `CountryBlockOptions`, `CountryBlockExtensions`, `ICountryLookup`, `RirDelegatedCountryLookup`, `APIKeyAttribute`, `IPBlacklist`
 - Notes: Note the namespace is AnointedAutomation.APIMiddleware (singular) while the package id is plural.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.APIMiddlewares (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.APIMiddlewares/README.md)
 
