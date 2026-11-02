@@ -18,14 +18,14 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
     [Collection("Sequential")]
     public class IpAllowlistMiddlewareTests : IDisposable
     {
+        private readonly SecurityTestLogs.Window _logs = new SecurityTestLogs.Window();
+
         public IpAllowlistMiddlewareTests()
         {
-            IPBlacklistMiddleware.ClearLogs();
         }
 
         public void Dispose()
         {
-            IPBlacklistMiddleware.ClearLogs();
         }
 
         private static async Task<(int status, bool nextCalled)> Run(IpAllowlistOptions options, string peer, string path, string xff = null, string cf = null)
@@ -98,7 +98,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             (int status, bool nextCalled) result = await Run(On(), "198.51.100.7", "/secret");
             Assert.False(result.nextCalled);
             Assert.Equal(403, result.status);
-            LogMessage log = SecurityTestLogs.Get().Single();
+            LogMessage log = _logs.Get().Single();
             Assert.Equal(MessageType.Warning, log.messageType);
             Assert.Contains("198.51.100.7", log.message);
             Assert.Contains("/secret", log.message);

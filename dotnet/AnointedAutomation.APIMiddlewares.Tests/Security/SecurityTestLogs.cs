@@ -15,6 +15,31 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
     {
         private static readonly string[] Prefixes = new string[] { "IpAllowlist", "CountryBlock", "BotDefense", "FormBotGuard", "Captcha" };
 
+        /// <summary>
+        /// A view of the security log entries written after the window was created, so a test sees only its own
+        /// entries without clearing the shared buffer (clearing would also detach other tests' log handlers).
+        /// </summary>
+        public sealed class Window
+        {
+            private readonly LogMessage _last;
+
+            /// <summary>Starts a window at the current end of the buffer.</summary>
+            public Window()
+            {
+                List<LogMessage> all = SecurityTestLogs.Get();
+                _last = all.Count == 0 ? null : all[all.Count - 1];
+            }
+
+            /// <summary>Gets the entries added since the window started.</summary>
+            /// <returns>The entries.</returns>
+            public List<LogMessage> Get()
+            {
+                List<LogMessage> all = SecurityTestLogs.Get();
+                int index = _last == null ? -1 : all.FindIndex(l => object.ReferenceEquals(l, _last));
+                return all.Skip(index + 1).ToList();
+            }
+        }
+
         /// <summary>Gets the buffered entries written by the security middlewares.</summary>
         /// <returns>The entries.</returns>
         public static List<LogMessage> Get()
