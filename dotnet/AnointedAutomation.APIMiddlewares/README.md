@@ -176,6 +176,38 @@ app.UseIpAllowlist(); // first in the pipeline
 - The client IP comes from `X-Forwarded-For` when present. Only trust it behind a reverse proxy that sets it.
 - All state (blacklist, attempt counts, logs) is static and per process.
 
+## Country blocking (`CountryBlockMiddleware`)
+
+Blocks (`403`) requests by country of origin. Off by default. `Mode` and `UnknownCountry` have no default: when enabled you must choose them, so the behavior for unknown countries is always an explicit decision. Every block is logged at Warning with the IP, country and path.
+
+```json
+{
+  "CountryBlock": {
+    "Enabled": true,
+    "Mode": "Block",
+    "Countries": [ "RU", "KP" ],
+    "UnknownCountry": "Allow",
+    "ExemptPaths": [ "/health" ],
+    "UseCfIpCountryHeader": true,
+    "ClientIp": { "TrustedProxyProviders": [ "Cloudflare" ], "HonorCfConnectingIp": true }
+  }
+}
+```
+
+```csharp
+using AnointedAutomation.APIMiddleware.Security;
+
+builder.Services.AddCountryBlock(builder.Configuration.GetSection("CountryBlock"));
+app.UseCountryBlock();
+```
+
+- `Mode`: `Block` blocks the listed countries; `AllowOnly` allows only the listed ones. `Countries` are ISO 3166-1 alpha-2 codes (case-insensitive). `UnknownCountry`: `Block` or `Allow`, for requests whose country cannot be determined (including a request with no client address and, until the first data load, every request).
+- Data source: the public "delegated extended" statistics files that the five Regional Internet Registries publish (ARIN, RIPE NCC, APNIC, LACNIC, AFRINIC). No key, no account, and nothing is committed to this repository: the package downloads them at startup and then every `RefreshInterval` (7 days by default; `RetryInterval` 15 minutes while nothing has loaded). Set `DataUrls` to use mirrors: whatever you list there replaces the five defaults (leave it out to use the defaults). The lookup is built in memory (about 240k IPv4 and 55k IPv6 ranges, a couple of seconds to build). The country is where the registry allocated the block, which is coarser than commercial geolocation: it is good for blocking whole countries, not for finding a city, and a block can be used abroad.
+- Failure handling: if any file fails to download or has no ranges, the whole refresh is discarded, logged at Error with the exception, and the last good data keeps serving. Until a first successful load the `UnknownCountry` setting decides.
+- Other data sources considered: MaxMind GeoLite2 (free, but needs an account and license key to download, and its EULA restricts redistribution), DB-IP Lite (CC BY 4.0, needs attribution), IP2Location LITE (account and attribution). To use one, implement `ICountryLookup` (one method, `string Lookup(IPAddress)`), register it before `AddCountryBlock`, and set `DownloadRirData` to false. Keep any database file out of source control and point your implementation at its path from your own configuration.
+- `UseCfIpCountryHeader`: behind Cloudflare, uses the `CF-IPCountry` header, but only when the direct peer is a trusted proxy (`ClientIp.TrustedProxies` or `TrustedProxyProviders`); from any other peer the header is ignored. `XX` and `T1` mean unknown and fall back to the lookup.
+- Client IP resolution, `ExemptPaths` and trusted proxy rules are the same as the IP allowlist (`ClientIp`, `ExemptPaths`). Loopback and private-network clients have no country and skip the check unless you set `AllowPrivateAddresses` to false.
+
 ## Related packages
 
 - [AnointedAutomation.Logging](https://www.nuget.org/packages/AnointedAutomation.Logging): the `LogMessage` type used for the middleware log buffer.

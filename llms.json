@@ -93,6 +93,11 @@
         "InvalidEndpointTrackerMiddleware",
         "EndpointAccessMiddleware",
         "IpAllowlistMiddleware",
+        "CountryBlockMiddleware",
+        "CountryBlockOptions",
+        "CountryBlockExtensions",
+        "ICountryLookup",
+        "RirDelegatedCountryLookup",
         "APIKeyAttribute",
         "IPBlacklist"
       ],
