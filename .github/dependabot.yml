@@ -40,7 +40,8 @@ updates:
         update-types:
           - major
 
-  # Security audit #240: the other package ecosystems in this repo.
+  # Security audit #240: the other package ecosystems in this repo. Composer is left out on purpose: php/anointed-sso
+  # and the root composer.json must stay identical (php-anointed-sso.yml sync check), which a one-directory bump breaks.
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso"
     schedule:
@@ -155,20 +156,6 @@ updates:
           - patch
   - package-ecosystem: "pip"
     directory: "/python/anointed-sso"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    target-branch: "develop"
-    labels:
-      - "dependencies"
-      - "automated pr"
-    groups:
-      minor-and-patch:
-        update-types:
-          - minor
-          - patch
-  - package-ecosystem: "composer"
-    directory: "/php/anointed-sso"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
