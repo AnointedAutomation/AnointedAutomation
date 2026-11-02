@@ -55,6 +55,10 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
             {
                 _honeypotFileNames.Add(fileName);
             }
+            if (_options.HoneypotPaths.Enabled && _options.HoneypotPaths.ServeEnvZipBomb)
+            {
+                WarmZipBomb();
+            }
             _goodCrawlers = _options.UserAgent.ResolveGoodCrawlers();
             if (_options.UserAgent.BlockKnownBad)
             {
@@ -111,6 +115,11 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
             if (_options.HoneypotPaths.Enabled && IsHoneypot(context.Request.Path))
             {
                 await BanAsync(ip, "honeypot path " + context.Request.Path.Value);
+                if (_options.HoneypotPaths.ServeEnvZipBomb && IsEnvFile(context.Request.Path))
+                {
+                    await ServeZipBombAsync(context, ip);
+                    return;
+                }
                 Block(context, _options.HoneypotPaths.ResponseStatus, ip, "honeypot path hit, IP banned for " + _options.HoneypotPaths.BanDuration);
                 return;
             }
@@ -163,6 +172,42 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
                 }
             }
             return null;
+        }
+
+        private void WarmZipBomb()
+        {
+            try
+            {
+                ZipBomb.Get(_options.HoneypotPaths.ZipBombExpandedBytes);
+            }
+            catch (Exception ex)
+            {
+                IPBlacklistMiddleware.AddLog(LogMessage.Warning(
+                    "BotDefense could not prebuild the " + _options.HoneypotPaths.ZipBombExpandedBytes + " byte zip bomb; it will be retried on the first .env probe.", ex));
+            }
+        }
+
+        private static bool IsEnvFile(PathString path)
+        {
+            string value = path.Value;
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+            string last = value.TrimEnd('/');
+            return last.Substring(last.LastIndexOf('/') + 1).StartsWith(".env", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private async Task ServeZipBombAsync(HttpContext context, string ip)
+        {
+            byte[] bomb = ZipBomb.Get(_options.HoneypotPaths.ZipBombExpandedBytes);
+            context.Response.StatusCode = StatusCodes.Status200OK;
+            context.Response.ContentType = "application/zip";
+            context.Response.ContentLength = bomb.Length;
+            IPBlacklistMiddleware.AddLog(LogMessage.Warning(
+                "BotDefense served zip bomb (" + bomb.Length + " bytes, expands to " + _options.HoneypotPaths.ZipBombExpandedBytes + ") to "
+                + (ip == null ? "(no client address)" : ip) + " " + APIUtility.DescribeRequest(context) + ": honeypot .env probe, IP banned for " + _options.HoneypotPaths.BanDuration + "."));
+            await context.Response.Body.WriteAsync(bomb, 0, bomb.Length, context.RequestAborted);
         }
 
         private bool IsHoneypot(PathString path)

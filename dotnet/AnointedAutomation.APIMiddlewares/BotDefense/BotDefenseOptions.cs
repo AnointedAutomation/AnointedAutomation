@@ -49,6 +49,15 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
 
         /// <summary>Gets or sets the status code the bot sees on the honeypot request.</summary>
         public int ResponseStatus { get; set; } = 404;
+
+        /// <summary>
+        /// Gets or sets whether a honeypot hit on a file whose name starts with ".env" is answered with a generated zip
+        /// bomb (<see cref="ZipBomb"/>) instead of an empty <see cref="ResponseStatus"/>. The IP is banned either way. Off by default.
+        /// </summary>
+        public bool ServeEnvZipBomb { get; set; }
+
+        /// <summary>Gets or sets the expanded size of the zip bomb in bytes (default 512 MiB; about 0.5 MB on the wire).</summary>
+        public long ZipBombExpandedBytes { get; set; } = 512L * 1024 * 1024;
     }
 
     /// <summary>User-Agent rules.</summary>
@@ -184,6 +193,10 @@ namespace AnointedAutomation.APIMiddleware.BotDefense
                 if (HoneypotPaths.BanDuration <= TimeSpan.Zero)
                 {
                     throw new InvalidOperationException("BotDefense HoneypotPaths.BanDuration must be positive.");
+                }
+                if (HoneypotPaths.ServeEnvZipBomb && (HoneypotPaths.ZipBombExpandedBytes <= 0 || HoneypotPaths.ZipBombExpandedBytes > ZipBomb.MaxExpandedBytes))
+                {
+                    throw new InvalidOperationException("BotDefense HoneypotPaths.ZipBombExpandedBytes must be between 1 and " + ZipBomb.MaxExpandedBytes + ".");
                 }
                 if (HoneypotPaths.ResponseStatus < 100 || HoneypotPaths.ResponseStatus > 599)
                 {
