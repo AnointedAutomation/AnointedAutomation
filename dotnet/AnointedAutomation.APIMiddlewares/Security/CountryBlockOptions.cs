@@ -59,7 +59,7 @@ namespace AnointedAutomation.APIMiddleware.Security
         /// <summary>Gets or sets whether loopback and private-network clients skip the check (they have no country).</summary>
         public bool AllowPrivateAddresses { get; set; } = true;
 
-        /// <summary>Gets or sets whether the CF-IPCountry header is used when the direct peer is a trusted proxy.</summary>
+        /// <summary>Gets or sets whether the CF-IPCountry header is used when the direct peer is a trusted proxy that is also a Cloudflare edge address.</summary>
         public bool UseCfIpCountryHeader { get; set; }
 
         /// <summary>Gets or sets path prefixes (health checks, webhooks) that skip the check.</summary>

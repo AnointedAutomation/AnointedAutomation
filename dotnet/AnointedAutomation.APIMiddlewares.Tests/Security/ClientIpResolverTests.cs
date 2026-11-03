@@ -1,4 +1,5 @@
 // Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-11-02 00:00:00 Jesus is King ✝️
+using System;
 using System.Net;
 using AnointedAutomation.APIMiddleware.Security;
 using Microsoft.AspNetCore.Http;
@@ -157,6 +158,22 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             Assert.True(list.Contains(IPAddress.Parse("10.1.1.1")));
             Assert.True(list.Contains(IPAddress.Parse("173.245.48.5")));
             Assert.False(list.Contains(IPAddress.Parse("8.8.8.8")));
+        }
+
+        [Fact]
+        public void IsPeerCloudflare_RequiresTrustedPeerInsideCloudflareRanges()
+        {
+            IpNetworkList trusted = IpNetworkList.Parse(new string[] { "10.0.0.1", "173.245.48.0/20" });
+            // Trusted and a Cloudflare edge.
+            Assert.True(ClientIpResolver.IsPeerCloudflare(Make("173.245.48.9", null, null), trusted, ClientIpResolver.CloudflareEdge));
+            // Trusted but not Cloudflare.
+            Assert.False(ClientIpResolver.IsPeerCloudflare(Make("10.0.0.1", null, null), trusted, ClientIpResolver.CloudflareEdge));
+            // Cloudflare but not trusted.
+            Assert.False(ClientIpResolver.IsPeerCloudflare(Make("173.245.48.9", null, null), IpNetworkList.Parse(new string[] { "10.0.0.1" }), ClientIpResolver.CloudflareEdge));
+            // No peer, no trusted list.
+            Assert.False(ClientIpResolver.IsPeerCloudflare(Make(null, null, null), trusted, ClientIpResolver.CloudflareEdge));
+            Assert.False(ClientIpResolver.IsPeerCloudflare(Make("173.245.48.9", null, null), null, ClientIpResolver.CloudflareEdge));
+            Assert.Throws<ArgumentNullException>(() => ClientIpResolver.IsPeerCloudflare(Make("173.245.48.9", null, null), trusted, null));
         }
     }
 }

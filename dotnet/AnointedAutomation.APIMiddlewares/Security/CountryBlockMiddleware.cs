@@ -29,6 +29,7 @@ namespace AnointedAutomation.APIMiddleware.Security
         private readonly HashSet<string> _countries;
         private readonly PathExemptions _exemptions;
         private readonly IpNetworkList _trustedProxies;
+        private readonly Func<IpNetworkList> _cloudflareEdge;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CountryBlockMiddleware"/> class.
@@ -37,7 +38,21 @@ namespace AnointedAutomation.APIMiddleware.Security
         /// <param name="options">The options (validated here).</param>
         /// <param name="lookup">The IP to country source.</param>
         public CountryBlockMiddleware(RequestDelegate next, CountryBlockOptions options, ICountryLookup lookup)
+            : this(next, options, lookup, () => ClientIpResolver.CloudflareEdge)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CountryBlockMiddleware"/> class with a live source of
+        /// Cloudflare edge ranges (for example the refreshed list held by the IP allowlist).
+        /// </summary>
+        /// <param name="next">The next middleware.</param>
+        /// <param name="options">The options (validated here).</param>
+        /// <param name="lookup">The IP to country source.</param>
+        /// <param name="cloudflareEdge">Returns the current Cloudflare edge ranges; read on every request.</param>
+        public CountryBlockMiddleware(RequestDelegate next, CountryBlockOptions options, ICountryLookup lookup, Func<IpNetworkList> cloudflareEdge)
+        {
+            _cloudflareEdge = cloudflareEdge ?? throw new ArgumentNullException(nameof(cloudflareEdge));
             _next = next;
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _lookup = lookup ?? throw new ArgumentNullException(nameof(lookup));
@@ -59,13 +74,14 @@ namespace AnointedAutomation.APIMiddleware.Security
                 await _next(context);
                 return;
             }
-            IPAddress client = ClientIpResolver.Resolve(context, _trustedProxies, _options.ClientIp.HonorCfConnectingIp);
+            IpNetworkList cloudflareEdge = _cloudflareEdge();
+            IPAddress client = ClientIpResolver.Resolve(context, _trustedProxies, _options.ClientIp.HonorCfConnectingIp, cloudflareEdge);
             if (client != null && _options.AllowPrivateAddresses && NonRoutable.Contains(client))
             {
                 await _next(context);
                 return;
             }
-            string country = ResolveCountry(context, client);
+            string country = ResolveCountry(context, client, cloudflareEdge);
             string reason = Decide(country);
             if (reason != null)
             {
@@ -78,9 +94,10 @@ namespace AnointedAutomation.APIMiddleware.Security
             await _next(context);
         }
 
-        private string ResolveCountry(HttpContext context, IPAddress client)
+        private string ResolveCountry(HttpContext context, IPAddress client, IpNetworkList cloudflareEdge)
         {
-            if (_options.UseCfIpCountryHeader && ClientIpResolver.IsPeerTrusted(context, _trustedProxies))
+            // Only a Cloudflare edge sets CF-IPCountry; any other trusted proxy may relay a client's forged copy.
+            if (_options.UseCfIpCountryHeader && ClientIpResolver.IsPeerCloudflare(context, _trustedProxies, cloudflareEdge))
             {
                 string header = context.Request.Headers["CF-IPCountry"].ToString().Trim();
                 // Cloudflare sends XX when it does not know and T1 for Tor; neither is a country.

@@ -48,7 +48,13 @@ namespace AnointedAutomation.APIMiddleware.Security
         {
             CountryBlockOptions options = app.ApplicationServices.GetRequiredService<IOptions<CountryBlockOptions>>().Value;
             options.Validate();
-            return app.UseMiddleware<CountryBlockMiddleware>(options);
+            // When the IP allowlist is registered its refreshed Cloudflare list decides which peers are Cloudflare;
+            // otherwise the ranges shipped with the package do.
+            IpAllowlistState allowlist = app.ApplicationServices.GetService<IpAllowlistState>();
+            Func<IpNetworkList> cloudflareEdge = allowlist == null
+                ? () => ClientIpResolver.CloudflareEdge
+                : () => allowlist.CloudflareEdge;
+            return app.UseMiddleware<CountryBlockMiddleware>(options, cloudflareEdge);
         }
 
         private static IServiceCollection AddCore(IServiceCollection services)
