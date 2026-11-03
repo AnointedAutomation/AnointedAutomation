@@ -65,6 +65,47 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
         }
 
         [Fact]
+        public void TrustedNonCloudflarePeer_IgnoresCfConnectingIp()
+        {
+            // 172.16.0.5 is a trusted proxy (a load balancer or another CDN) but not a Cloudflare edge, so a client
+            // could have set CF-Connecting-IP itself; only X-Forwarded-For is believed.
+            DefaultHttpContext context = Make("172.16.0.5", "203.0.113.1", "203.0.113.2");
+            Assert.Equal("203.0.113.1", ClientIpResolver.Resolve(context, Proxies, true).ToString());
+        }
+
+        [Fact]
+        public void TrustedNonCloudflarePeer_WithOnlyCfHeader_ReturnsPeer()
+        {
+            DefaultHttpContext context = Make("172.16.0.5", null, "203.0.113.2");
+            Assert.Equal("172.16.0.5", ClientIpResolver.Resolve(context, Proxies, true).ToString());
+        }
+
+        [Fact]
+        public void CustomCloudflareRanges_DecideWhichPeerIsBelieved()
+        {
+            IpNetworkList cloudflare = IpNetworkList.Parse(new string[] { "172.16.0.0/24" });
+            DefaultHttpContext inRange = Make("172.16.0.5", "203.0.113.1", "203.0.113.2");
+            Assert.Equal("203.0.113.2", ClientIpResolver.Resolve(inRange, Proxies, true, cloudflare).ToString());
+            DefaultHttpContext shippedEdge = Make("2400:cb00::1", "203.0.113.1", "203.0.113.2");
+            Assert.Equal("203.0.113.1", ClientIpResolver.Resolve(shippedEdge, Proxies, true, cloudflare).ToString());
+        }
+
+        [Fact]
+        public void HonoringCfWithNullCloudflareRanges_Throws()
+        {
+            DefaultHttpContext context = Make("2400:cb00::1", "203.0.113.1", "203.0.113.2");
+            Assert.Throws<System.ArgumentNullException>(() => ClientIpResolver.Resolve(context, Proxies, true, null));
+            Assert.Equal("203.0.113.1", ClientIpResolver.Resolve(context, Proxies, false, null).ToString());
+        }
+
+        [Fact]
+        public void CloudflareEdge_HoldsShippedCloudflareRanges()
+        {
+            Assert.True(ClientIpResolver.CloudflareEdge.Contains(IPAddress.Parse("2400:cb00::1")));
+            Assert.False(ClientIpResolver.CloudflareEdge.Contains(IPAddress.Parse("172.16.0.5")));
+        }
+
+        [Fact]
         public void TrustedPeer_InvalidCfHeaderFallsBackToForwardedFor()
         {
             DefaultHttpContext context = Make("2400:cb00::1", "203.0.113.1", "garbage");

@@ -16,7 +16,7 @@ namespace AnointedAutomation.APIMiddleware.Security
         /// <summary>Gets or sets preset names (for example "Cloudflare") whose shipped ranges count as trusted proxies.</summary>
         public List<string> TrustedProxyProviders { get; set; } = new List<string>();
 
-        /// <summary>Gets or sets whether a trusted proxy's CF-Connecting-IP header is used before X-Forwarded-For.</summary>
+        /// <summary>Gets or sets whether CF-Connecting-IP is used before X-Forwarded-For. It is believed only when the direct peer is both a trusted proxy and a Cloudflare edge address.</summary>
         public bool HonorCfConnectingIp { get; set; }
 
         /// <summary>

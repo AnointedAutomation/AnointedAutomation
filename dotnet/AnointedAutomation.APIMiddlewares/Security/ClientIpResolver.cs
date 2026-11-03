@@ -10,9 +10,13 @@ namespace AnointedAutomation.APIMiddleware.Security
     /// </summary>
     public static class ClientIpResolver
     {
+        /// <summary>Gets Cloudflare's edge ranges as shipped with the package, the only peers whose CF-Connecting-IP is used by default.</summary>
+        public static IpNetworkList CloudflareEdge { get; } = IpNetworkList.Parse(IpProviderPresets.GetShippedRanges(IpProviderPresets.Cloudflare));
+
         /// <summary>
         /// Resolves the client IP. The direct peer is the answer unless it is a trusted proxy; then
-        /// CF-Connecting-IP (when enabled) or the right-most untrusted X-Forwarded-For entry is used.
+        /// CF-Connecting-IP (when enabled and the peer is a Cloudflare edge, see <see cref="CloudflareEdge"/>) or the
+        /// right-most untrusted X-Forwarded-For entry is used.
         /// </summary>
         /// <param name="context">The request.</param>
         /// <param name="trustedProxies">The trusted proxies.</param>
@@ -20,12 +24,33 @@ namespace AnointedAutomation.APIMiddleware.Security
         /// <returns>The client IP, or null when the request has no peer address.</returns>
         public static IPAddress Resolve(HttpContext context, IpNetworkList trustedProxies, bool honorCfConnectingIp)
         {
+            return Resolve(context, trustedProxies, honorCfConnectingIp, CloudflareEdge);
+        }
+
+        /// <summary>
+        /// Resolves the client IP. The direct peer is the answer unless it is a trusted proxy; then
+        /// CF-Connecting-IP (when enabled and the peer is in <paramref name="cloudflareRanges"/>) or the right-most
+        /// untrusted X-Forwarded-For entry is used. Any other trusted proxy (another CDN, a load balancer) passes the
+        /// header through from the client, so it is only believed from Cloudflare itself.
+        /// </summary>
+        /// <param name="context">The request.</param>
+        /// <param name="trustedProxies">The trusted proxies.</param>
+        /// <param name="honorCfConnectingIp">Whether CF-Connecting-IP may be used.</param>
+        /// <param name="cloudflareRanges">The Cloudflare edge ranges (for example a refreshed list).</param>
+        /// <returns>The client IP, or null when the request has no peer address.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when CF-Connecting-IP is honored and <paramref name="cloudflareRanges"/> is null.</exception>
+        public static IPAddress Resolve(HttpContext context, IpNetworkList trustedProxies, bool honorCfConnectingIp, IpNetworkList cloudflareRanges)
+        {
+            if (honorCfConnectingIp && cloudflareRanges == null)
+            {
+                throw new ArgumentNullException(nameof(cloudflareRanges));
+            }
             IPAddress peer = context.Connection.RemoteIpAddress;
             if (peer == null || trustedProxies == null || !trustedProxies.Contains(peer))
             {
                 return peer;
             }
-            if (honorCfConnectingIp)
+            if (honorCfConnectingIp && cloudflareRanges.Contains(peer))
             {
                 string cf = context.Request.Headers["CF-Connecting-IP"].ToString();
                 IPAddress cfAddress;

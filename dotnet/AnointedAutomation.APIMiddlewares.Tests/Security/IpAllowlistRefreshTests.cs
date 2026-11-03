@@ -15,6 +15,8 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
     [Collection("Sequential")]
     public class IpAllowlistRefreshTests : IDisposable
     {
+        private readonly SecurityTestLogs.Window _logs = new SecurityTestLogs.Window();
+
         private sealed class FakeFetcher : IProviderRangeFetcher
         {
             public Dictionary<string, string> Bodies = new Dictionary<string, string>();
@@ -34,12 +36,10 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
 
         public IpAllowlistRefreshTests()
         {
-            IPBlacklistMiddleware.ClearLogs();
         }
 
         public void Dispose()
         {
-            IPBlacklistMiddleware.ClearLogs();
         }
 
         private static string Rule(IpAllowlistState state, string address)
@@ -71,7 +71,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             Assert.Equal(0, failures);
             Assert.NotNull(Rule(state, "198.18.1.1"));
             Assert.Null(Rule(state, "173.245.48.9"));
-            Assert.Empty(SecurityTestLogs.Get());
+            Assert.Empty(_logs.Get());
         }
 
         [Fact]
@@ -83,7 +83,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             Assert.Equal(1, failures);
             Assert.NotNull(Rule(state, "173.245.48.9"));
             Assert.Null(Rule(state, "198.51.100.1"));
-            LogMessage log = SecurityTestLogs.Get().Single();
+            LogMessage log = _logs.Get().Single();
             Assert.Equal(MessageType.Error, log.messageType);
             Assert.Contains("Cloudflare", log.message);
             Assert.Contains("HttpRequestExceptionForTest", log.exceptionType + log.message);
@@ -102,7 +102,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             Assert.Equal(1, failures);
             Assert.Equal(before, state.GetProviderRangeCount("Cloudflare"));
             Assert.NotNull(Rule(state, "173.245.48.9"));
-            Assert.Equal(MessageType.Error, SecurityTestLogs.Get().Single().messageType);
+            Assert.Equal(MessageType.Error, _logs.Get().Single().messageType);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
                 FakeFetcher fetcher = new FakeFetcher { Throw = new OperationCanceledException(cts.Token) };
                 await Assert.ThrowsAsync<OperationCanceledException>(() => new IpAllowlistRefresher(state, fetcher).RefreshAllAsync(cts.Token));
             }
-            Assert.Empty(SecurityTestLogs.Get());
+            Assert.Empty(_logs.Get());
         }
 
         [Fact]
@@ -131,6 +131,28 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             Assert.Equal(0, failures);
             Assert.True(state.TrustedProxies.Contains(IPAddress.Parse("198.18.1.1")));
             Assert.False(state.TrustedProxies.Contains(IPAddress.Parse("173.245.48.9")));
+        }
+
+        [Fact]
+        public async Task CloudflareEdge_FollowsRefreshedCloudflareList()
+        {
+            IpAllowlistOptions options = new IpAllowlistOptions { Enabled = true };
+            options.Allowlist.Add("203.0.113.0/24");
+            options.ClientIp.TrustedProxyProviders.Add("Cloudflare");
+            IpAllowlistState state = new IpAllowlistState(options);
+            Assert.True(state.CloudflareEdge.Contains(IPAddress.Parse("173.245.48.9")));
+            await new IpAllowlistRefresher(state, GoodCloudflare("198.18.0.0/15", "2001:db8::/32")).RefreshAllAsync(CancellationToken.None);
+            Assert.True(state.CloudflareEdge.Contains(IPAddress.Parse("198.18.1.1")));
+            Assert.False(state.CloudflareEdge.Contains(IPAddress.Parse("173.245.48.9")));
+        }
+
+        [Fact]
+        public void CloudflareEdge_UsesShippedRangesWhenCloudflareNotInUse()
+        {
+            IpAllowlistOptions options = new IpAllowlistOptions { Enabled = true };
+            options.Allowlist.Add("203.0.113.0/24");
+            IpAllowlistState state = new IpAllowlistState(options);
+            Assert.Same(ClientIpResolver.CloudflareEdge, state.CloudflareEdge);
         }
 
         [Fact]

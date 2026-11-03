@@ -18,14 +18,14 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
     [Collection("Sequential")]
     public class IpAllowlistMiddlewareTests : IDisposable
     {
+        private readonly SecurityTestLogs.Window _logs = new SecurityTestLogs.Window();
+
         public IpAllowlistMiddlewareTests()
         {
-            IPBlacklistMiddleware.ClearLogs();
         }
 
         public void Dispose()
         {
-            IPBlacklistMiddleware.ClearLogs();
         }
 
         private static async Task<(int status, bool nextCalled)> Run(IpAllowlistOptions options, string peer, string path, string xff = null, string cf = null)
@@ -98,7 +98,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             (int status, bool nextCalled) result = await Run(On(), "198.51.100.7", "/secret");
             Assert.False(result.nextCalled);
             Assert.Equal(403, result.status);
-            LogMessage log = SecurityTestLogs.Get().Single();
+            LogMessage log = _logs.Get().Single();
             Assert.Equal(MessageType.Warning, log.messageType);
             Assert.Contains("198.51.100.7", log.message);
             Assert.Contains("/secret", log.message);
@@ -190,6 +190,18 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             options.ClientIp.HonorCfConnectingIp = true;
             Assert.True((await Run(options, "173.245.48.9", "/x", cf: "203.0.113.5")).nextCalled);
             Assert.False((await Run(options, "198.51.100.9", "/x", cf: "203.0.113.5")).nextCalled);
+        }
+
+        [Fact]
+        public async Task CfConnectingIp_IgnoredFromTrustedNonCloudflareProxy()
+        {
+            IpAllowlistOptions options = On();
+            options.ClientIp.TrustedProxies.Add("10.0.0.0/8");
+            options.ClientIp.HonorCfConnectingIp = true;
+            // A trusted load balancer passes the client's own CF-Connecting-IP through, so it must not be believed.
+            Assert.False((await Run(options, "10.0.0.4", "/x", cf: "203.0.113.5")).nextCalled);
+            Assert.False((await Run(options, "10.0.0.4", "/x", cf: "203.0.113.5", xff: "198.51.100.5")).nextCalled);
+            Assert.True((await Run(options, "10.0.0.4", "/x", cf: "198.51.100.5", xff: "203.0.113.5")).nextCalled);
         }
 
         [Fact]
