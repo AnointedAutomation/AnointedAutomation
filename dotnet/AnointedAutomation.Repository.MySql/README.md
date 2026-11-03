@@ -15,8 +15,9 @@ dotnet add package AnointedAutomation.Repository.MySql
 - Target framework: `net10.0`
 - Dependencies:
   - [AnointedAutomation.Logging](https://www.nuget.org/packages/AnointedAutomation.Logging)
-  - [Microsoft.EntityFrameworkCore](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore) 10.0.12
+  - [Microsoft.EntityFrameworkCore](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore) 10.0.14
   - [Pomelo.EntityFrameworkCore.MySql](https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql) 9.0.0
+  - [MySqlConnector](https://www.nuget.org/packages/MySqlConnector) 2.6.2 (pinned past GHSA-473q-m89c-ghf8)
 
 ## Quick start
 

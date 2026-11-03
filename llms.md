@@ -300,7 +300,7 @@ IMongoHelper mongo = new MongoHelper("mydb", connectionString);
 
 Generic EF Core repository for MySQL via Pomelo. A generic repository and helper for MySQL over Entity Framework Core and the Pomelo provider.
 
-- Depends on: NuGet Microsoft.EntityFrameworkCore 10.0.12, Pomelo.EntityFrameworkCore.MySql 9.0.0; AnointedAutomation AnointedAutomation.Logging
+- Depends on: NuGet Microsoft.EntityFrameworkCore 10.0.14, Pomelo.EntityFrameworkCore.MySql 9.0.0, MySqlConnector 2.6.2; AnointedAutomation AnointedAutomation.Logging
 - Namespaces: `AnointedAutomation.Repository.MySql`
 - Key types: `GenericRepository<T>`, `IGenericRepository<T>`, `MySqlHelper`, `IMySqlHelper`, `MySqlHelperFactory`, `DynamicDbContext`
 - Notes: GenericRepository<T> wraps any DbContext: GetByIdAsync, GetAllAsync, FindAsync, FindSingleAsync.
