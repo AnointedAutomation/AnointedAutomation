@@ -74,10 +74,22 @@ namespace AnointedAutomation.Repository.Mongo
         /// Gets all document IDs from the specified collection WITHOUT loading full documents.
         /// This is the SAFE alternative to GetAllDocumentsAsync - use this when you need to
         /// iterate over all documents but don't need the full document data immediately.
+        /// Ids are returned as strings (an ObjectId becomes its 24-char hex form). This still reads every id,
+        /// so for large collections use <see cref="GetDocumentIdsPageAsync"/>.
         /// </summary>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>A list of all document IDs in the collection.</returns>
         Task<List<string>> GetAllDocumentIdsAsync(string collectionName);
+
+        /// <summary>
+        /// Gets one page of document IDs ordered by _id, without loading full documents.
+        /// Ids are returned as strings (an ObjectId becomes its 24-char hex form).
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="skip">The number of ids to skip (0 or more).</param>
+        /// <param name="limit">The maximum number of ids to return (1 or more).</param>
+        /// <returns>The page of document IDs.</returns>
+        Task<List<string>> GetDocumentIdsPageAsync(string collectionName, int skip, int limit);
 
         /// <summary>
         /// Gets documents from the specified collection that match the filter.
@@ -162,7 +174,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="filter">The filter to match.</param>
         /// <param name="sort">The sort definition, or null for natural order.</param>
         /// <param name="skip">The number of documents to skip (offset).</param>
-        /// <param name="limit">The maximum number of documents to return.</param>
+        /// <param name="limit">The maximum number of documents to return (1 or more; 0 or less throws).</param>
         /// <returns>The page of matching documents.</returns>
         Task<List<T>> GetPagedAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int skip, int limit);
 

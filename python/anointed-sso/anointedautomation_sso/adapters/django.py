@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Callable, List, Optional
 
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
@@ -18,6 +19,8 @@ from ..backchannel import LOGOUT_TOKEN_FIELD, process_backchannel_logout
 from ..client import AnointedClient, LogoutToken, SignInResult
 from ..errors import AnointedSsoError
 from ..replay import InMemoryLogoutReplayStore, LogoutReplayStore
+
+_log = logging.getLogger("anointedautomation_sso")
 
 
 class AnointedViews:
@@ -71,7 +74,11 @@ class AnointedViews:
             )
             response = self._on_signed_in(request, result)
         except AnointedSsoError as err:
+            _log.warning("sign-in callback rejected: %s (%s)", err.code, err, exc_info=err)
             response = self._on_error(request, err) if self._on_error is not None else HttpResponse("Sign-in failed.", status=400)
+        except Exception:
+            _log.exception("sign-in callback failed unexpectedly")
+            raise
         return self._apply_cookie(response, "", self._client.clear_flow_cookie_options())
 
     def _backchannel_logout(self, request: HttpRequest) -> HttpResponse:

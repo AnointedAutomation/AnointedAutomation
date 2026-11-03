@@ -9,6 +9,7 @@ The blocking core runs in a worker thread so the event loop is never blocked. Ca
 from __future__ import annotations
 
 import inspect
+import logging
 from typing import Any, Awaitable, Callable, List, Optional
 from urllib.parse import parse_qs
 
@@ -22,6 +23,8 @@ from ..backchannel import LOGOUT_TOKEN_FIELD, process_backchannel_logout
 from ..client import AnointedClient, LogoutToken, SignInResult
 from ..errors import AnointedSsoError
 from ..replay import InMemoryLogoutReplayStore, LogoutReplayStore
+
+_log = logging.getLogger("anointedautomation_sso")
 
 
 async def _await(value: Awaitable[Any]) -> Any:
@@ -80,12 +83,16 @@ def create_routes(
             if inspect.isawaitable(response):
                 response = await response
         except AnointedSsoError as err:
+            _log.warning("sign-in callback rejected: %s (%s)", err.code, err, exc_info=err)
             if on_error is None:
                 response = PlainTextResponse("Sign-in failed.", status_code=400)
             else:
                 response = on_error(request, err)
                 if inspect.isawaitable(response):
                     response = await response
+        except Exception:
+            _log.exception("sign-in callback failed unexpectedly")
+            raise
         return apply_cookie(response, "", client.clear_flow_cookie_options())
 
     async def backchannel_logout(request: Request) -> Response:

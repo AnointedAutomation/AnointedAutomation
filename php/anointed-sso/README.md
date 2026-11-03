@@ -93,7 +93,7 @@ use AnointedAutomation\Sso\BackchannelLogoutHandler;
 
 $handler = new BackchannelLogoutHandler($sso, function (\AnointedAutomation\Sso\LogoutToken $logout): void {
     // End every session for $logout->sub (or $logout->sid).
-}, $replayStore); // see "Shared stores" below
+}, $replayStore, $logger); // shared stores: see below; $logger: any PSR-3 logger (Monolog, ...)
 
 http_response_code($handler->handle(file_get_contents('php://input')));
 ```

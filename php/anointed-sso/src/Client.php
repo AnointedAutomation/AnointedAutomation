@@ -441,6 +441,10 @@ final class Client
         $keys = JWK::parseKeySet(['keys' => $this->rsaKeys($jwks)], 'RS256');
         $keyArg = isset($header['kid']) ? $keys : reset($keys);
 
+        // firebase/php-jwt only takes the clock and leeway as process-wide statics, so they are set for this one
+        // decode and restored in finally. JWT::decode is synchronous and never yields a fiber or coroutine, so
+        // within one PHP worker nothing else can observe the temporary values. Known limitation: a runtime that
+        // shares PHP statics across truly parallel threads (ZTS with parallel/pthreads) could see them.
         $previousTimestamp = JWT::$timestamp;
         $previousLeeway = JWT::$leeway;
         JWT::$timestamp = ($this->clock)();

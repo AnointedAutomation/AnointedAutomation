@@ -402,5 +402,55 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             Assert.Equal(42, deleted.Value);
             Assert.Equal(0, await _helper.CountAsync(coll, FilterDefinition<TestDoc>.Empty));
         }
+    
+
+        [Fact]
+        public async Task GetAllDocumentIdsAsync_ReturnsObjectIdsAsHexStrings()
+        {
+            string coll = NewCollection();
+            string first = ObjectId.GenerateNewId().ToString();
+            string second = ObjectId.GenerateNewId().ToString();
+            await SeedAsync(coll,
+                new TestDoc { Id = first, Name = "a", Value = 1 },
+                new TestDoc { Id = second, Name = "b", Value = 2 });
+
+            List<string> ids = await _helper.GetAllDocumentIdsAsync(coll);
+
+            Assert.Equal(new[] { first, second }.OrderBy(x => x, StringComparer.Ordinal), ids.OrderBy(x => x, StringComparer.Ordinal));
+        }
+
+        [Fact]
+        public async Task GetDocumentIdsPageAsync_PagesInIdOrder()
+        {
+            string coll = NewCollection();
+            List<string> all = Enumerable.Range(0, 5).Select(_ => ObjectId.GenerateNewId().ToString()).ToList();
+            await SeedAsync(coll, all.Select((id, n) => new TestDoc { Id = id, Name = "n" + n, Value = n }).ToArray());
+            List<string> sorted = all.OrderBy(x => x, StringComparer.Ordinal).ToList();
+
+            List<string> page1 = await _helper.GetDocumentIdsPageAsync(coll, 0, 2);
+            List<string> page3 = await _helper.GetDocumentIdsPageAsync(coll, 4, 2);
+
+            Assert.Equal(sorted.Take(2), page1);
+            Assert.Equal(sorted.Skip(4), page3);
+        }
+
+        [Theory]
+        [InlineData(0, 0)]
+        [InlineData(0, -1)]
+        [InlineData(-1, 10)]
+        public async Task GetDocumentIdsPageAsync_RejectsInvalidPage(int skip, int limit)
+        {
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _helper.GetDocumentIdsPageAsync(NewCollection(), skip, limit));
+        }
+
+        [Theory]
+        [InlineData(0, 0)]
+        [InlineData(0, -5)]
+        [InlineData(-1, 10)]
+        public async Task GetPagedAsync_RejectsInvalidPage(int skip, int limit)
+        {
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+                _helper.GetPagedAsync(NewCollection(), FilterDefinition<TestDoc>.Empty, null, skip, limit));
+        }
     }
 }

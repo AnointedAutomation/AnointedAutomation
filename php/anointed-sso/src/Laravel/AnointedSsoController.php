@@ -14,6 +14,7 @@ use AnointedAutomation\Sso\LogoutReplayStore;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -62,7 +63,7 @@ final class AnointedSsoController extends Controller
     public function backchannelLogout(Request $request, Client $client, LogoutReplayStore $replay): Response
     {
         $handler = $this->handler('logout_handler', LogoutHandler::class);
-        $status = (new BackchannelLogoutHandler($client, [$handler, 'handle'], $replay))->handle($request->getContent());
+        $status = (new BackchannelLogoutHandler($client, [$handler, 'handle'], $replay, app(LoggerInterface::class)))->handle($request->getContent());
         return response('', $status)->header('Cache-Control', 'no-store');
     }
 

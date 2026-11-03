@@ -18,10 +18,15 @@ public class FalseToNullConverter : JsonConverter
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        if (reader.Value is null || reader.Value?.ToString() == "")
+        object rawValue = reader.Value;
+        if (rawValue == null)
             return false;
 
-        if (reader.Value is not null && bool.TryParse(reader.Value.ToString(), out var output))
+        string text = rawValue.ToString();
+        if (string.Equals(text, string.Empty, StringComparison.Ordinal))
+            return false;
+
+        if (bool.TryParse(text, out bool output))
             return output;
 
         throw new JsonReaderException("Unable to convert JSON value.");
@@ -29,13 +34,13 @@ public class FalseToNullConverter : JsonConverter
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
-        if (value is null)
+        if (value == null)
         {
             writer.WriteNull();
             return;
         }
 
-        if (!bool.TryParse(value.ToString(), out var parsedBool))
+        if (!bool.TryParse(value.ToString(), out bool parsedBool))
             throw new JsonWriterException("Unable to convert JSON value.");
 
         if (parsedBool == false)

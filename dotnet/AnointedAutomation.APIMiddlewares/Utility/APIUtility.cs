@@ -86,7 +86,7 @@ namespace AnointedAutomation.APIMiddleware.Utility
                     return UnknownClientIp;
                 }
 
-                if (ipAddress == "::1")
+                if (string.Equals(ipAddress, "::1", StringComparison.Ordinal))
                 {
                     // Localhost loopback = a real but local connection (dev / same-host health checks); benign.
                     IPBlacklistMiddleware.AddLog(
