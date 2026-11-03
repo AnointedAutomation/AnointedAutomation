@@ -271,14 +271,14 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 1.3.3
+### AnointedAutomation.Repository.Mongo 2.0.0
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 
 - Depends on: NuGet MongoDB.Bson 3.12.0, MongoDB.Driver 3.12.0, MongoDB.Libmongocrypt 1.12.0, Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Objects, AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Repository.Mongo`, `AnointedAutomation.Repository.Mongo.Bson`
 - Key types: `MongoHelper`, `IMongoHelper`, `MongoRepository<TDoc>`, `MongoDocument`, `TimestampedMongoRepository<TDoc>`, `HybridCasing`, `BsonClassMapRegistrar`
-- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name).
+- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.Mongo (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.Mongo/README.md)
 
 ```bash

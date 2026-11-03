@@ -212,6 +212,12 @@ vendor/bin/phpunit --testsuite core
 composer require --dev orchestra/testbench:^10.0 --with-all-dependencies && vendor/bin/phpunit --testsuite laravel
 ```
 
+## Upgrading to 0.2.0
+
+`BackchannelLogoutHandler` now takes a required PSR-3 logger as its 4th argument
+(`new BackchannelLogoutHandler($sso, $onLogout, $replayStore, $logger)`), so rejected and failed logouts are never
+silent. Pass Monolog or any `Psr\Log\LoggerInterface`; the Laravel routes pass Laravel's logger for you.
+
 ## Releases
 
 Packagist reads this package's versions from git tags on the monorepo root (`composer.json` at the repo root is the manifest;

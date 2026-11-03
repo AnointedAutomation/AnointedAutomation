@@ -402,7 +402,6 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             Assert.Equal(42, deleted.Value);
             Assert.Equal(0, await _helper.CountAsync(coll, FilterDefinition<TestDoc>.Empty));
         }
-    
 
         [Fact]
         public async Task GetAllDocumentIdsAsync_ReturnsObjectIdsAsHexStrings()
