@@ -39,7 +39,7 @@ namespace AnointedAutomation.APIMiddleware.Security
                 await _next(context);
                 return;
             }
-            IPAddress client = ClientIpResolver.Resolve(context, _state.TrustedProxies, _state.Options.ClientIp.HonorCfConnectingIp);
+            IPAddress client = ClientIpResolver.Resolve(context, _state.TrustedProxies, _state.Options.ClientIp.HonorCfConnectingIp, _state.CloudflareEdge);
             if (client == null)
             {
                 Block(context, "(no client address)", "no client address");

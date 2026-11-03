@@ -134,6 +134,28 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
         }
 
         [Fact]
+        public async Task CloudflareEdge_FollowsRefreshedCloudflareList()
+        {
+            IpAllowlistOptions options = new IpAllowlistOptions { Enabled = true };
+            options.Allowlist.Add("203.0.113.0/24");
+            options.ClientIp.TrustedProxyProviders.Add("Cloudflare");
+            IpAllowlistState state = new IpAllowlistState(options);
+            Assert.True(state.CloudflareEdge.Contains(IPAddress.Parse("173.245.48.9")));
+            await new IpAllowlistRefresher(state, GoodCloudflare("198.18.0.0/15", "2001:db8::/32")).RefreshAllAsync(CancellationToken.None);
+            Assert.True(state.CloudflareEdge.Contains(IPAddress.Parse("198.18.1.1")));
+            Assert.False(state.CloudflareEdge.Contains(IPAddress.Parse("173.245.48.9")));
+        }
+
+        [Fact]
+        public void CloudflareEdge_UsesShippedRangesWhenCloudflareNotInUse()
+        {
+            IpAllowlistOptions options = new IpAllowlistOptions { Enabled = true };
+            options.Allowlist.Add("203.0.113.0/24");
+            IpAllowlistState state = new IpAllowlistState(options);
+            Assert.Same(ClientIpResolver.CloudflareEdge, state.CloudflareEdge);
+        }
+
+        [Fact]
         public void ReplaceProvider_RejectsEmptyListAndInactiveProvider()
         {
             IpAllowlistState state = Cloudflare();

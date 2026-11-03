@@ -59,6 +59,23 @@ namespace AnointedAutomation.APIMiddleware.Security
             get { return Volatile.Read(ref _trusted); }
         }
 
+        /// <summary>
+        /// Gets the Cloudflare edge ranges used to decide whether CF-Connecting-IP is believed: the refreshed
+        /// Cloudflare list when the Cloudflare preset is in use here, otherwise the ranges shipped with the package.
+        /// </summary>
+        public IpNetworkList CloudflareEdge
+        {
+            get
+            {
+                IpNetworkList refreshed;
+                if (_lists.TryGetValue(IpProviderPresets.Cloudflare, out refreshed))
+                {
+                    return refreshed;
+                }
+                return ClientIpResolver.CloudflareEdge;
+            }
+        }
+
         /// <summary>Gets the names of every provider preset in use (allowed or trusted as proxy), the ones a refresh covers.</summary>
         public IReadOnlyCollection<string> ProviderNames
         {

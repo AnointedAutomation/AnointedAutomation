@@ -193,6 +193,18 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
         }
 
         [Fact]
+        public async Task CfConnectingIp_IgnoredFromTrustedNonCloudflareProxy()
+        {
+            IpAllowlistOptions options = On();
+            options.ClientIp.TrustedProxies.Add("10.0.0.0/8");
+            options.ClientIp.HonorCfConnectingIp = true;
+            // A trusted load balancer passes the client's own CF-Connecting-IP through, so it must not be believed.
+            Assert.False((await Run(options, "10.0.0.4", "/x", cf: "203.0.113.5")).nextCalled);
+            Assert.False((await Run(options, "10.0.0.4", "/x", cf: "203.0.113.5", xff: "198.51.100.5")).nextCalled);
+            Assert.True((await Run(options, "10.0.0.4", "/x", cf: "198.51.100.5", xff: "203.0.113.5")).nextCalled);
+        }
+
+        [Fact]
         public void Validate_EnabledWithNothingAllowed_Throws()
         {
             Assert.Throws<InvalidOperationException>(() => new IpAllowlistState(new IpAllowlistOptions { Enabled = true }));
