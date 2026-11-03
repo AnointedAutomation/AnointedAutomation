@@ -96,6 +96,26 @@ namespace AnointedAutomation.APIMiddleware.Security
         }
 
         /// <summary>
+        /// Whether the direct peer is both a trusted proxy and a Cloudflare edge address, the only peer whose
+        /// Cloudflare headers (CF-Connecting-IP, CF-IPCountry) are believed. Any other proxy may pass a client's
+        /// forged copy through unchanged.
+        /// </summary>
+        /// <param name="context">The request.</param>
+        /// <param name="trustedProxies">The trusted proxies.</param>
+        /// <param name="cloudflareRanges">The Cloudflare edge ranges (for example a refreshed list).</param>
+        /// <returns>True when the peer is a trusted Cloudflare edge.</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="cloudflareRanges"/> is null.</exception>
+        public static bool IsPeerCloudflare(HttpContext context, IpNetworkList trustedProxies, IpNetworkList cloudflareRanges)
+        {
+            if (cloudflareRanges == null)
+            {
+                throw new ArgumentNullException(nameof(cloudflareRanges));
+            }
+            IPAddress peer = context.Connection.RemoteIpAddress;
+            return IsPeerTrusted(context, trustedProxies) && cloudflareRanges.Contains(peer);
+        }
+
+        /// <summary>
         /// Parses one header entry, tolerating a port ("1.2.3.4:80", "[2001:db8::1]:80").
         /// </summary>
         /// <param name="text">The entry.</param>

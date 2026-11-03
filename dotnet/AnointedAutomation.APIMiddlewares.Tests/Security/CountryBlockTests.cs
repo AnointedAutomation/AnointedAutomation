@@ -99,10 +99,13 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             return options;
         }
 
-        private static async Task<(int status, bool nextCalled)> Run(CountryBlockOptions options, ICountryLookup lookup, string peer, string path = "/x", string cfCountry = null, string xff = null)
+        private static async Task<(int status, bool nextCalled)> Run(CountryBlockOptions options, ICountryLookup lookup, string peer, string path = "/x", string cfCountry = null, string xff = null, Func<IpNetworkList> cloudflareEdge = null)
         {
             bool nextCalled = false;
-            CountryBlockMiddleware middleware = new CountryBlockMiddleware(context => { nextCalled = true; return Task.CompletedTask; }, options, lookup);
+            RequestDelegate next = context => { nextCalled = true; return Task.CompletedTask; };
+            CountryBlockMiddleware middleware = cloudflareEdge == null
+                ? new CountryBlockMiddleware(next, options, lookup)
+                : new CountryBlockMiddleware(next, options, lookup, cloudflareEdge);
             DefaultHttpContext http = new DefaultHttpContext();
             if (peer != null)
             {
@@ -218,6 +221,88 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Security
             // Feature off: header ignored even from a trusted peer.
             options.UseCfIpCountryHeader = false;
             Assert.True((await Run(options, lookup, "173.245.48.9", cfCountry: "DE", xff: "203.0.113.5")).nextCalled);
+        }
+
+        [Fact]
+        public async Task CfIpCountryHeader_IgnoredFromTrustedNonCloudflareProxy()
+        {
+            FakeLookup lookup = new FakeLookup();
+            lookup.Map["203.0.113.5"] = "US";
+            CountryBlockOptions options = Options(CountryBlockMode.Block, UnknownCountryAction.Allow, "DE");
+            options.UseCfIpCountryHeader = true;
+            options.ClientIp.TrustedProxies.Add("10.0.0.1");
+            options.ClientIp.TrustedProxyProviders.Add("Cloudflare");
+
+            // A trusted load balancer that is not Cloudflare relays a client's forged header: ignored, lookup (US) decides.
+            Assert.True((await Run(options, lookup, "10.0.0.1", cfCountry: "DE", xff: "203.0.113.5")).nextCalled);
+            // Forged the other way (claims an allowed country): the lookup still blocks.
+            lookup.Map["203.0.113.5"] = "DE";
+            Assert.False((await Run(options, lookup, "10.0.0.1", cfCountry: "US", xff: "203.0.113.5")).nextCalled);
+            // The real Cloudflare edge is still believed.
+            Assert.True((await Run(options, lookup, "173.245.48.9", cfCountry: "US", xff: "203.0.113.5")).nextCalled);
+        }
+
+        [Fact]
+        public async Task CfIpCountryHeader_UsesSuppliedCloudflareRangesReadPerRequest()
+        {
+            FakeLookup lookup = new FakeLookup();
+            lookup.Map["203.0.113.5"] = "US";
+            CountryBlockOptions options = Options(CountryBlockMode.Block, UnknownCountryAction.Allow, "DE");
+            options.UseCfIpCountryHeader = true;
+            options.ClientIp.TrustedProxies.Add("192.0.2.0/24");
+            IpNetworkList current = IpNetworkList.Parse(new string[] { "192.0.2.0/25" });
+            Func<IpNetworkList> source = () => current;
+
+            // Peer inside the supplied (refreshed) Cloudflare list: header believed.
+            Assert.False((await Run(options, lookup, "192.0.2.10", cfCountry: "DE", xff: "203.0.113.5", cloudflareEdge: source)).nextCalled);
+            // Peer trusted but outside it: header ignored.
+            Assert.True((await Run(options, lookup, "192.0.2.200", cfCountry: "DE", xff: "203.0.113.5", cloudflareEdge: source)).nextCalled);
+            // The list changes (a refresh drops the range): the next request sees it.
+            current = IpNetworkList.Parse(new string[] { "198.51.100.0/24" });
+            Assert.True((await Run(options, lookup, "192.0.2.10", cfCountry: "DE", xff: "203.0.113.5", cloudflareEdge: source)).nextCalled);
+        }
+
+        [Fact]
+        public void Constructor_RejectsNullCloudflareSource()
+        {
+            CountryBlockOptions options = Options(CountryBlockMode.Block, UnknownCountryAction.Allow, "DE");
+            Assert.Throws<ArgumentNullException>(() => new CountryBlockMiddleware(context => Task.CompletedTask, options, new FakeLookup(), null));
+        }
+
+        [Fact]
+        public async Task Extensions_UseRefreshedCloudflareListFromIpAllowlist()
+        {
+            ServiceCollection services = new ServiceCollection();
+            services.AddIpAllowlist(options => options.ClientIp.TrustedProxyProviders.Add("Cloudflare"));
+            FakeLookup lookup = new FakeLookup();
+            lookup.Map["203.0.113.5"] = "US";
+            services.AddSingleton<ICountryLookup>(lookup);
+            services.AddCountryBlock(options =>
+            {
+                options.Enabled = true;
+                options.Mode = CountryBlockMode.Block;
+                options.UnknownCountry = UnknownCountryAction.Allow;
+                options.Countries.Add("DE");
+                options.UseCfIpCountryHeader = true;
+                options.ClientIp.TrustedProxies.Add("192.0.2.0/24");
+                options.ClientIp.TrustedProxyProviders.Add("Cloudflare");
+            });
+            ServiceProvider provider = services.BuildServiceProvider();
+            IpAllowlistState state = provider.GetRequiredService<IpAllowlistState>();
+            state.ReplaceProvider("Cloudflare", IpNetworkList.Parse(new string[] { "192.0.2.0/24" }));
+            ApplicationBuilder app = new ApplicationBuilder(provider);
+            bool nextCalled = false;
+            app.UseCountryBlock();
+            app.Run(context => { nextCalled = true; return Task.CompletedTask; });
+            RequestDelegate pipeline = app.Build();
+            DefaultHttpContext http = new DefaultHttpContext { RequestServices = provider };
+            http.Connection.RemoteIpAddress = IPAddress.Parse("192.0.2.10");
+            http.Request.Path = "/x";
+            http.Request.Headers["CF-IPCountry"] = "DE";
+            http.Request.Headers["X-Forwarded-For"] = "203.0.113.5";
+            await pipeline(http);
+            Assert.False(nextCalled);
+            Assert.Equal(403, http.Response.StatusCode);
         }
 
         [Theory]
