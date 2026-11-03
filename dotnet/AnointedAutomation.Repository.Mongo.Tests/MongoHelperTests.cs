@@ -254,55 +254,69 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         }
 
         [Fact]
-        public void MongoHelperConnector_SetsUpMongoHelper_WithValidCredentials()
+        public void MongoHelperConnector_SetsUpMongoHelper_WhenConnectionTestSucceeds()
         {
-            // Arrange
-            IMongoHelper mongoHelper = new MongoHelper();
-            string dbName = "test-db";
-            string username = "testuser";
-            string password = "testpass";
-            string cluster = "testcluster";
-            string region = "testregion";
-
-            MongoHelper.ClearLogs();
-
-            // Act
-            IMongoHelper result = MongoHelper.MongoHelperConnector(
-                mongoHelper, dbName, username, password, cluster, region);
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.NotNull(result.database);
-            Assert.Equal(dbName, result.dbName);
-        }
-
-        [Fact]
-        public void MongoHelperConnector_LogsError_WhenConnectionFails()
-        {
-            // Arrange
             Mock<IMongoHelper> mockHelper = new Mock<IMongoHelper>();
-
-            // Setup CreateMongoDbInstance to return a mock database
             Mock<IMongoDatabase> mockDatabase = new Mock<IMongoDatabase>();
             mockHelper.Setup(x => x.CreateMongoDbInstance(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(mockDatabase.Object);
             mockHelper.SetupProperty(x => x.database);
             mockHelper.SetupProperty(x => x.dbName);
+            mockHelper.Setup(x => x.TestConnection()).Returns(new List<string> { "users" });
 
-            // Setup TestConnection to throw exception
-            mockHelper.Setup(x => x.TestConnection())
-                .Throws(new Exception("Connection failed"));
-
-            MongoHelper.ClearLogs();
-
-            // Act
             IMongoHelper result = MongoHelper.MongoHelperConnector(
                 mockHelper.Object, "test-db", "user", "pass", "cluster", "region");
 
-            // Assert
-            Assert.NotNull(result);
+            Assert.Same(mockDatabase.Object, result.database);
+            Assert.Equal("test-db", result.dbName);
+        }
+
+        [Fact]
+        public void MongoHelperConnector_LogsAndThrows_WhenConnectionTestThrows()
+        {
+            Mock<IMongoHelper> mockHelper = new Mock<IMongoHelper>();
+            Mock<IMongoDatabase> mockDatabase = new Mock<IMongoDatabase>();
+            mockHelper.Setup(x => x.CreateMongoDbInstance(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockDatabase.Object);
+            mockHelper.SetupProperty(x => x.database);
+            mockHelper.SetupProperty(x => x.dbName);
+            Exception cause = new Exception("Connection failed");
+            mockHelper.Setup(x => x.TestConnection()).Throws(cause);
+
+            MongoHelper.ClearLogs();
+
+            InvalidOperationException thrown = Assert.Throws<InvalidOperationException>(() => MongoHelper.MongoHelperConnector(
+                mockHelper.Object, "test-db", "user", "pass", "cluster", "region"));
+
+            Assert.Same(cause, thrown.InnerException);
             IList<LogMessage> logs = MongoHelper.GetLogs();
             Assert.True(logs.Count > 0, "Error should be logged when connection fails");
+        }
+
+        [Fact]
+        public void MongoHelperConnector_LogsAndThrows_WhenConnectionTestReturnsNull()
+        {
+            Mock<IMongoHelper> mockHelper = new Mock<IMongoHelper>();
+            Mock<IMongoDatabase> mockDatabase = new Mock<IMongoDatabase>();
+            mockHelper.Setup(x => x.CreateMongoDbInstance(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(mockDatabase.Object);
+            mockHelper.SetupProperty(x => x.database);
+            mockHelper.SetupProperty(x => x.dbName);
+            mockHelper.Setup(x => x.TestConnection()).Returns((List<string>)null);
+
+            MongoHelper.ClearLogs();
+
+            Assert.Throws<InvalidOperationException>(() => MongoHelper.MongoHelperConnector(
+                mockHelper.Object, "test-db", "user", "pass", "cluster", "region"));
+            Assert.True(MongoHelper.GetLogs().Count > 0, "Error should be logged when the connection test fails");
+        }
+
+        [Fact]
+        public void ConnectionStringBuilder_EscapesUsernameAndSpaces()
+        {
+            string connectionString = MongoHelper.ConnectionStringBuilder("us@er:/x", "pa ss", "cluster", "region");
+
+            Assert.Equal("mongodb+srv://us%40er%3A%2Fx:pa%20ss@cluster.region.mongodb.net/?retryWrites=true&w=majority", connectionString);
         }
 
         [Fact]

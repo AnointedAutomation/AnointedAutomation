@@ -33,10 +33,10 @@ namespace AnointedAutomation.Optimization.Logging
                 string methodName = method.Name;
 
                 // Skip LogMessage constructors
-                if (method.DeclaringType?.Name == "LogMessage") continue;
+                if (method.DeclaringType != null && string.Equals(method.DeclaringType.Name, "LogMessage", StringComparison.Ordinal)) continue;
 
                 // Check if this is an async state machine generated method
-                if (methodName == "MoveNext" && declaringTypeName.Contains("+<") && declaringTypeName.Contains(">d"))
+                if (string.Equals(methodName, "MoveNext", StringComparison.Ordinal) && declaringTypeName.Contains("+<") && declaringTypeName.Contains(">d"))
                 {
                     // Extract the actual method name from the compiler-generated type name
                     // Format: Namespace.Class+<MethodName>d__XX

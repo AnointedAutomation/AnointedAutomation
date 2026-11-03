@@ -5,6 +5,7 @@ using AnointedAutomation.APIMiddleware.Objects;
 using AnointedAutomation.APIMiddleware.Utility;
 using AnointedAutomation.Optimization.Logging;
 using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -104,7 +105,7 @@ namespace AnointedAutomation.APIMiddleware
             // - Exclude root path "/" as it's valid to hit even without an explicit endpoint
             bool isNonExistentEndpoint = context.Response.StatusCode == StatusCodes.Status404NotFound &&
                                          originalResponseLength == 0 &&
-                                         requestedPath != "/";
+                                         !string.Equals(requestedPath, "/", StringComparison.Ordinal);
 
             // Only track if we believe this is a non-existent endpoint
             if (isNonExistentEndpoint)

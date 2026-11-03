@@ -10,15 +10,19 @@ use AnointedAutomation\Sso\BackchannelLogoutHandler;
 use AnointedAutomation\Sso\InMemoryLogoutReplayStore;
 use AnointedAutomation\Sso\LogoutToken;
 use AnointedAutomation\Sso\Tests\Support\Provider;
+use AnointedAutomation\Sso\Tests\Support\RecordingLogger;
 use PHPUnit\Framework\TestCase;
 
 final class LogoutTokenTest extends TestCase
 {
     private Provider $provider;
 
+    private RecordingLogger $log;
+
     protected function setUp(): void
     {
         $this->provider = new Provider();
+        $this->log = new RecordingLogger();
     }
 
     public function testValidToken(): void
@@ -72,7 +76,7 @@ final class LogoutTokenTest extends TestCase
         $seen = [];
         $handler = new BackchannelLogoutHandler($this->provider->client(), function (LogoutToken $t) use (&$seen): void {
             $seen[] = $t->sub;
-        }, new InMemoryLogoutReplayStore());
+        }, new InMemoryLogoutReplayStore(), $this->log);
         $body = http_build_query(['logout_token' => $this->provider->logoutToken()]);
 
         $this->assertSame(200, $handler->handle($body));
@@ -83,11 +87,15 @@ final class LogoutTokenTest extends TestCase
     public function testHandlerStatusCodes(): void
     {
         $handler = new BackchannelLogoutHandler($this->provider->client(), static function (): void {
-        }, new InMemoryLogoutReplayStore());
+        }, new InMemoryLogoutReplayStore(), $this->log);
         $this->assertSame(400, $handler->handle(''));
         $this->assertSame(400, $handler->handle('logout_token='));
         $this->assertSame(400, $handler->handle('logout_token=garbage'));
         $this->assertSame(400, $handler->handle(http_build_query(['logout_token' => $this->provider->logoutToken(['nonce' => 'n'])])));
+        $warnings = $this->log->at('warning');
+        $this->assertCount(4, $warnings, 'every rejected logout must be logged');
+        $this->assertSame('logout_token_invalid', $warnings[3]['context']['code']);
+        $this->assertInstanceOf(AnointedSsoException::class, $warnings[3]['context']['exception']);
     }
 
     public function testFailedCallbackIsRetriable(): void
@@ -97,10 +105,26 @@ final class LogoutTokenTest extends TestCase
             if (++$calls === 1) {
                 throw new \RuntimeException('db down');
             }
-        }, new InMemoryLogoutReplayStore());
+        }, new InMemoryLogoutReplayStore(), $this->log);
         $body = http_build_query(['logout_token' => $this->provider->logoutToken()]);
         $this->assertSame(500, $handler->handle($body));
+        $errors = $this->log->at('error');
+        $this->assertCount(1, $errors, 'a failed logout callback must be logged as an error');
+        $this->assertSame('jti-1', $errors[0]['context']['jti']);
+        $this->assertInstanceOf(\RuntimeException::class, $errors[0]['context']['exception']);
         $this->assertSame(200, $handler->handle($body));
         $this->assertSame(2, $calls);
+    }
+
+    public function testUnreadableProviderKeysAreLoggedAsError(): void
+    {
+        $this->provider->http->route('GET', \AnointedAutomation\Sso\SsoConfig::ISSUER . 'connect/jwks', 'down', 503);
+        $handler = new BackchannelLogoutHandler($this->provider->client(), static function (): void {
+        }, new InMemoryLogoutReplayStore(), $this->log);
+
+        $this->assertSame(500, $handler->handle(http_build_query(['logout_token' => $this->provider->logoutToken()])));
+        $errors = $this->log->at('error');
+        $this->assertCount(1, $errors);
+        $this->assertArrayHasKey('exception', $errors[0]['context']);
     }
 }

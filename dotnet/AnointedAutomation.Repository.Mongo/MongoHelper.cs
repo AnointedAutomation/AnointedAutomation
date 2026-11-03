@@ -94,11 +94,12 @@ namespace AnointedAutomation.Repository.Mongo
             string region
         )
         {
-            string encodedPassword = System.Net.WebUtility.UrlEncode(password);
+            // Uri.EscapeDataString percent-encodes everything a Mongo URI reserves (space -> %20, '@', ':', '/').
+            string encodedUsername = System.Uri.EscapeDataString(username);
+            string encodedPassword = System.Uri.EscapeDataString(password);
 
-            //string connectionString = $"mongodb+srv://{username}:{encodedPassword}@{cluster}.vc4onns.mongodb.net/?retryWrites=true&w=majority";
             string connectionString =
-                $"mongodb+srv://{username}:{encodedPassword}@{cluster}.{region}.mongodb.net/?retryWrites=true&w=majority";
+                $"mongodb+srv://{encodedUsername}:{encodedPassword}@{cluster}.{region}.mongodb.net/?retryWrites=true&w=majority";
             return connectionString;
         }
 
@@ -160,6 +161,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="cluster"></param>
         /// <param name="region">I have no idea if it's actually the region its just an assumption but its different on like all my databases</param>
         /// <returns>mongo helper</returns>
+        /// <exception cref="System.InvalidOperationException">The connection test failed (bad credentials, unreachable cluster).</exception>
         public static IMongoHelper MongoHelperConnector(
             IMongoHelper mongoHelper,
             string dbName,
@@ -172,13 +174,22 @@ namespace AnointedAutomation.Repository.Mongo
             string connectionString = ConnectionStringBuilder(username, password, cluster, region);
 
             mongoHelper.database = mongoHelper.CreateMongoDbInstance(dbName, connectionString);
+            List<string> collections;
             try
             {
-                List<string> collections = mongoHelper.TestConnection();
+                collections = mongoHelper.TestConnection();
             }
             catch (System.Exception theseHands)
             {
                 AddLog(LogMessage.Error($"MongoHelperConnector: connection test to db '{dbName}' on cluster '{cluster}' failed", theseHands));
+                throw new System.InvalidOperationException($"MongoHelperConnector: connection test to db '{dbName}' on cluster '{cluster}' failed", theseHands);
+            }
+
+            if (collections == null)
+            {
+                // TestConnection already logged the full exception.
+                AddLog(LogMessage.Error($"MongoHelperConnector: connection test to db '{dbName}' on cluster '{cluster}' returned no result"));
+                throw new System.InvalidOperationException($"MongoHelperConnector: could not connect to db '{dbName}' on cluster '{cluster}'; see MongoHelper.GetLogs() for the cause");
             }
 
             mongoHelper.dbName = dbName;
@@ -259,7 +270,41 @@ namespace AnointedAutomation.Repository.Mongo
             List<MongoDB.Bson.BsonDocument> documents = await collection.Find(FilterDefinition<MongoDB.Bson.BsonDocument>.Empty)
                 .Project(projection)
                 .ToListAsync();
-            return documents.ConvertAll(doc => doc["_id"].AsString);
+            return documents.ConvertAll(doc => doc["_id"].ToString());
+        }
+
+        /// <summary>
+        /// Gets one page of document IDs ordered by _id, without loading full documents.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="skip">The number of ids to skip (0 or more).</param>
+        /// <param name="limit">The maximum number of ids to return (1 or more).</param>
+        /// <returns>The page of document IDs as strings.</returns>
+        public async Task<List<string>> GetDocumentIdsPageAsync(string collectionName, int skip, int limit)
+        {
+            ValidatePage(skip, limit);
+            IMongoCollection<MongoDB.Bson.BsonDocument> collection = database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName);
+            ProjectionDefinition<MongoDB.Bson.BsonDocument> projection = Builders<MongoDB.Bson.BsonDocument>.Projection.Include("_id");
+            SortDefinition<MongoDB.Bson.BsonDocument> sort = Builders<MongoDB.Bson.BsonDocument>.Sort.Ascending("_id");
+            List<MongoDB.Bson.BsonDocument> documents = await collection.Find(FilterDefinition<MongoDB.Bson.BsonDocument>.Empty)
+                .Sort(sort)
+                .Skip(skip)
+                .Limit(limit)
+                .Project(projection)
+                .ToListAsync();
+            return documents.ConvertAll(doc => doc["_id"].ToString());
+        }
+
+        private static void ValidatePage(int skip, int limit)
+        {
+            if (skip < 0)
+            {
+                throw new System.ArgumentOutOfRangeException(nameof(skip), skip, "skip must be 0 or more");
+            }
+            if (limit <= 0)
+            {
+                throw new System.ArgumentOutOfRangeException(nameof(limit), limit, "limit must be 1 or more; a limit of 0 would read the whole collection");
+            }
         }
 
         /// <summary>
@@ -307,11 +352,7 @@ namespace AnointedAutomation.Repository.Mongo
             }
             catch (System.Exception e)
             {
-                AddLog(
-                    LogMessage.Error(
-                        "Was unable to properly connect to the database!" + e.ToString()
-                    )
-                );
+                AddLog(LogMessage.Error($"TestConnection: was unable to connect to database '{dbName}'", e));
                 return null;
             }
         }
@@ -402,6 +443,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The page of matching documents.</returns>
         public async Task<List<T>> GetPagedAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int skip, int limit)
         {
+            ValidatePage(skip, limit);
             IFindFluent<T, T> find = GetCollection<T>(collectionName).Find(filter);
             if (sort != null)
             {

@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any, Callable, Optional
 
 from flask import Blueprint, make_response, redirect, request
@@ -15,6 +16,8 @@ from ..backchannel import LOGOUT_TOKEN_FIELD, process_backchannel_logout
 from ..client import AnointedClient, LogoutToken, SignInResult
 from ..errors import AnointedSsoError
 from ..replay import InMemoryLogoutReplayStore, LogoutReplayStore
+
+_log = logging.getLogger("anointedautomation_sso")
 
 
 def create_blueprint(
@@ -67,7 +70,11 @@ def create_blueprint(
             result = client.handle_callback(query=request.args.to_dict(), cookie_value=request.cookies.get(client.cookie_name), request=request)
             response = make_response(on_signed_in(result))
         except AnointedSsoError as err:
+            _log.warning("sign-in callback rejected: %s (%s)", err.code, err, exc_info=err)
             response = make_response(on_error(err) if on_error is not None else ("Sign-in failed.", 400))
+        except Exception:
+            _log.exception("sign-in callback failed unexpectedly")
+            raise
         response.headers["Cache-Control"] = "no-store"
         return apply_cookie(response, "", client.clear_flow_cookie_options())
 

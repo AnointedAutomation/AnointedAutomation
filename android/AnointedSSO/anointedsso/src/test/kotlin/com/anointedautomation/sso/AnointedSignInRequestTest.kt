@@ -109,6 +109,11 @@ class AnointedSignInRequestTest {
         }
     }
 
+    @Test fun parseCallbackRejectsMalformedPercentEncoding() {
+        val r = AnointedSignInRequest(start, AnointedCallback.Scheme("myapp", via), "abc")
+        assertEquals(AnointedSignInException.INVALID_CALLBACK, code { r.parseCallback("myapp://anointed-sign-in?aa_state=abc&code=%zz") })
+    }
+
     @Test fun errorWithWrongStateIsAStateMismatch() {
         val r = AnointedSignInRequest(start, AnointedCallback.Scheme("myapp", via), "abc")
         assertEquals(AnointedSignInException.STATE_MISMATCH, code { r.parseCallback("myapp://anointed-sign-in?aa_state=bad&error=x") })
