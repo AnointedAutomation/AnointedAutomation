@@ -403,8 +403,9 @@
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.MySql/README.md",
       "dependencies": {
         "nuget": [
-          "Microsoft.EntityFrameworkCore 10.0.12",
-          "Pomelo.EntityFrameworkCore.MySql 9.0.0"
+          "Microsoft.EntityFrameworkCore 10.0.14",
+          "Pomelo.EntityFrameworkCore.MySql 9.0.0",
+          "MySqlConnector 2.6.2"
         ],
         "anointed": [
           "AnointedAutomation.Logging"
