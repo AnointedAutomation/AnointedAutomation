@@ -27,7 +27,7 @@ from .replay import InMemoryLogoutReplayStore, LogoutReplayStore
 from .return_to import create_return_to_validator
 from .session_status import SessionCheck, SessionOutcome, SessionStatusClient
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 
 def require_env(name: str) -> str:
