@@ -100,7 +100,7 @@ final class SessionStatusClient
 
     private function machineToken(?string $rejected): string
     {
-        $key = 'anointed_sso.machine_token.' . md5($this->apiKey);
+        $key = 'anointed_sso.machine_token.' . hash('sha256', $this->apiKey);
         $cached = $rejected === null ? $this->cache->get($key) : null;
         if ($cached !== null && isset($cached['token']) && is_string($cached['token'])) {
             return $cached['token'];
