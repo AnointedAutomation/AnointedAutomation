@@ -17,7 +17,7 @@ Open-source .NET / NuGet libraries by Anointed Automation Corporation, stewarded
 
 ## Packages
 
-### AnointedAutomation.Algorithms 1.0.3
+### AnointedAutomation.Algorithms 1.0.5
 
 Encode QR codes in pure C# with no native or third party dependency. Algorithms for .NET with no dependencies, starting with a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction and automatic version and mask selection.
 
@@ -52,7 +52,7 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.0.10
+### AnointedAutomation.APIMiddlewares 1.1.0
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
@@ -74,7 +74,7 @@ app.UseMiddleware<InvalidEndpointTrackerMiddleware>();
 app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 ```
 
-### AnointedAutomation.Concepts 1.1.0
+### AnointedAutomation.Concepts 1.1.1
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
@@ -98,7 +98,7 @@ Situation situation = new Situation("A stranger lies beaten by the road.")
 LoveAction action = agape.Decide(situation);
 ```
 
-### AnointedAutomation.Enums 1.0.5
+### AnointedAutomation.Enums 1.0.7
 
 One shared set of payment and moderation enums so models and services agree. Shared enumerations for AnointedAutomation packages: payment types, providers, transaction and subscription statuses, payment operations, card types, webhook events, and moderation categories.
 
@@ -119,7 +119,7 @@ PaymentProvider provider = PaymentProvider.Stripe;
 TransactionStatus status = TransactionStatus.Succeeded;
 ```
 
-### AnointedAutomation.Imaging 1.0.3
+### AnointedAutomation.Imaging 1.0.5
 
 Turn a QrMatrix into SVG or PNG without System.Drawing or ImageSharp. Renders QR codes from AnointedAutomation.Algorithms to SVG and PNG using only the .NET base class library, with no third party image dependency.
 
@@ -163,7 +163,7 @@ LogMessage.MessageSourceSetter = "MyService";
 LogMessage msg = LogMessage.Error("Payment webhook failed");
 ```
 
-### AnointedAutomation.Mathematics 1.0.3
+### AnointedAutomation.Mathematics 1.0.5
 
 Ready-made foundational claims to seed an EpistemicLedger. A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.
 
@@ -205,7 +205,7 @@ GarbageCollection gc = new GarbageCollection();
 gc.PerformGarbageCollection(null);
 ```
 
-### AnointedAutomation.Objects 2.4.0
+### AnointedAutomation.Objects 2.7.1
 
 Shared account, billing and response models so APIs and clients agree on shape. Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.
 
@@ -296,7 +296,7 @@ HybridCasing.Register("AnointedAutomation", Array.Empty<string>(),
 IMongoHelper mongo = new MongoHelper("mydb", connectionString);
 ```
 
-### AnointedAutomation.Repository.MySql 1.0.8
+### AnointedAutomation.Repository.MySql 1.0.9
 
 Generic EF Core repository for MySQL via Pomelo. A generic repository and helper for MySQL over Entity Framework Core and the Pomelo provider.
 
@@ -340,7 +340,7 @@ builder.Services.AddControllers()
 string snake = JsonSerializer.Serialize(payload, JsonPresets.SnakeCase);
 ```
 
-### AnointedAutomation.Shopify 1.0.0
+### AnointedAutomation.Shopify 1.0.1
 
 Shopify REST models without pulling in a whole client library. Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.
 
@@ -375,7 +375,7 @@ builder.Services.AddAnointedSessionStatus(o => { ... });
 app.MapAnointedBackchannelLogout("/auth/anointed/backchannel-logout", async (logout, httpContext) => { ... });
 ```
 
-### AnointedAutomation.SSO.UI 1.0.0
+### AnointedAutomation.SSO.UI 1.0.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.UI
 - Target: net10.0. Depends on AnointedAutomation.SSO.
@@ -394,7 +394,7 @@ app.MapAnointedAutomationAuth("/auth/anointed"); // GET start, POST sign-out, GE
 
 Sign in with Anointed Automation for classic ASP.NET (.NET Framework 4.7.2+, MVC 5 and Web Forms on OWIN/Katana): OpenID Connect middleware preset (code + PKCE S256, verified email only), back-channel logout with Logout Token validation and replay protection, a session status client, and a sign-in button for Razor and Web Forms.
 
-### AnointedAutomation.Templates 1.0.0
+### AnointedAutomation.Templates 1.0.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/templates/AnointedAutomation.Templates
 - Target: net10.0. Depends on AnointedAutomation.SSO, AnointedAutomation.SSO.UI.
