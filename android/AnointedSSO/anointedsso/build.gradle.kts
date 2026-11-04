@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    api("androidx.browser:browser:1.8.0")
+    api("androidx.browser:browser:1.10.0")
 
     // Optional: only needed if you use AnointedSignInButton. Your app already has Compose if it uses the button.
     compileOnly(platform("androidx.compose:compose-bom:2024.12.01"))
