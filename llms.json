@@ -408,9 +408,7 @@
           "Pomelo.EntityFrameworkCore.MySql 9.0.0",
           "MySqlConnector 2.6.2"
         ],
-        "anointed": [
-          "AnointedAutomation.Logging"
-        ]
+        "anointed": ["AnointedAutomation.Logging"]
       },
       "keyNamespaces": [
         "AnointedAutomation.Repository.MySql"
@@ -457,15 +455,16 @@
     },
     {
       "id": "AnointedAutomation.Shopify",
-      "version": "1.0.2",
+      "version": "1.1.0",
       "targetFramework": "net10.0",
-      "description": "Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.",
+      "description": "Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Shopify",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Shopify",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Shopify/README.md",
       "dependencies": {
         "nuget": [
-          "Newtonsoft.Json 13.0.4"
+          "Newtonsoft.Json 13.0.4",
+          "Microsoft.Extensions.Logging.Abstractions 10.0.0"
         ],
         "anointed": [
           "AnointedAutomation.Serialization"
@@ -473,7 +472,8 @@
       },
       "keyNamespaces": [
         "AnointedAutomation.Shopify",
-        "AnointedAutomation.Shopify.Converters"
+        "AnointedAutomation.Shopify.Converters",
+        "AnointedAutomation.Shopify.GraphQL"
       ],
       "keyTypes": [
         "Customer",
@@ -481,7 +481,13 @@
         "Product",
         "Fulfillment",
         "InventoryLevel",
-        "Refund"
+        "Refund",
+        "ShopifyGraphQlClient",
+        "IShopifyStoreContext",
+        "ShopifyRetryPolicy",
+        "ShopifyCostBucket",
+        "ShopifyPager",
+        "ShopifyIdempotency"
       ],
       "notes": "Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package."
     },

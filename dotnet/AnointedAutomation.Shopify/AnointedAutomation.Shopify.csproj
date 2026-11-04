@@ -10,9 +10,9 @@
     <Title>AnointedAutomation.Shopify</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
     <Copyright>Copyright © 2026 Anointed Automation Corporation. Portions Copyright (c) 2015 Joshua Harms (ShopifySharp, MIT).</Copyright>
-    <Description>Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.</Description>
+    <Description>Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.2</Version>
+    <Version>1.1.0</Version>
     <PackageTags>shopify;rest;models;poco;dto;newtonsoft;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Shopify</PackageReleaseNotes>
     <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
@@ -21,12 +21,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="AnointedAutomation.Shopify.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
     <None Include="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
