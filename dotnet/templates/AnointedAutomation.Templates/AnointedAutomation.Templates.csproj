@@ -10,7 +10,7 @@
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
     <Copyright>Copyright © 2026 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
     <Description>dotnet new templates for Sign in with Anointed Automation: anointed-razor (Razor Pages) and anointed-blazor (Blazor Web App, interactive server), wired to AnointedAutomation.SSO and AnointedAutomation.SSO.UI with the client id and secret in user-secrets.</Description>
-    <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+    <PackageProjectUrl>https://www.anointedautomation.net/open-source</PackageProjectUrl>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <PackageTags>dotnet-new;templates;aspnetcore;blazor;razor-pages;openid-connect;sso;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/templates/AnointedAutomation.Templates</PackageReleaseNotes>
