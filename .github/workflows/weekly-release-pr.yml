@@ -3,6 +3,9 @@ name: Weekly release PR
 
 # Opens the develop -> default branch release PR once a week. The cloud Claude reviewer reviews it, and the
 # Promote release workflow (promote-release.yml) merges it once that review approves its current head commit.
+# The PR is created with MERGE_TOKEN (roku674 fine-grained PAT): this repo does not let GITHUB_TOKEN create PRs.
+# Reads stay on GITHUB_TOKEN. A PAT-opened PR is authored by roku674, so no review request is sent (GitHub refuses
+# one from the author); the cloud reviewer picks up the PR on open.
 on:
   schedule:
     - cron: '0 10 * * 1'  # 10:00 UTC Monday, so the Claude review (5 to 15 min) is done before the 8 AM New York promote check
@@ -26,7 +29,15 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       REPO: ${{ github.repository }}
       EVENT: ${{ github.event_name }}
+      MERGE_TOKEN: ${{ secrets.MERGE_TOKEN }}
     steps:
+      - name: Require MERGE_TOKEN
+        shell: bash
+        run: |
+          if [ -z "$MERGE_TOKEN" ]; then
+            echo "::error::MERGE_TOKEN secret is not set; GITHUB_TOKEN may not create pull requests in this repo"
+            exit 1
+          fi
       - name: Open the release PR when develop is ahead
         shell: bash
         run: |
@@ -66,21 +77,11 @@ jobs:
             --jq '[.[] | select(.isCrossRepository == false) | .number] | first')
           # gh --jq prints nothing for a null result
           if [ -n "$open" ] && [ "$open" != "null" ]; then
-            # A failed review request leaves the PR with neither a pending request nor a review: request it again
-            requested=$(gh api "repos/$REPO/pulls/$open/requested_reviewers" --jq '[.users[] | select(.login == "roku674")] | length')
-            reviewed=$(gh api "repos/$REPO/pulls/$open/reviews?per_page=100" --paginate --slurp | jq '[add[] | select(.user.login == "roku674")] | length')
-            if [ "$requested" -eq 0 ] && [ "$reviewed" -eq 0 ]; then
-              gh pr edit "$open" -R "$REPO" --add-reviewer roku674
-              echo "PR #$open was open with no review request; requested roku674."
-            else
-              echo "A develop -> $default_branch PR (#$open) is already open."
-            fi
+            echo "A develop -> $default_branch PR (#$open) is already open."
             exit 0
           fi
 
-          # gh pr create sends the review request right after creating the PR (two API calls, not atomic); if the
-          # request fails, the next run's already-open check above requests it again
-          url=$(gh pr create -R "$REPO" --base "$default_branch" --head develop --reviewer roku674 \
+          url=$(GH_TOKEN="$MERGE_TOKEN" gh pr create -R "$REPO" --base "$default_branch" --head develop \
             --title "Weekly release $(date -u +%Y-%m-%d)" \
-            --body "Weekly promotion of develop ($ahead $commit_word) to $default_branch. A PR opened by GITHUB_TOKEN starts no pull_request workflows, so the checks that count are the ones the develop push ran on the head commit. The Promote release workflow merges only after the Claude review approves the current head commit with no open comments and those checks are green.")
+            --body "Weekly promotion of develop ($ahead $commit_word) to $default_branch. The Promote release workflow merges only after the Claude review approves the current head commit with no open comments and the checks on that head are green.")
           echo "Opened $url"
