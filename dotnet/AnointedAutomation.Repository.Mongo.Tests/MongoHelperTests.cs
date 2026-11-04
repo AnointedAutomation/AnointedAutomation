@@ -471,13 +471,13 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         }
 
         [Theory]
-        [InlineData(typeof(IMongoHelper))]
-        [InlineData(typeof(MongoHelper))]
-        [InlineData(typeof(DelegatingMongoHelper))]
-        [InlineData(typeof(MongoRepository<>))]
-        public void GetAllDocumentsAsync_IsObsoleteWarningNotError(Type type)
+        [InlineData(typeof(IMongoHelper), "GetAllDocumentsAsync")]
+        [InlineData(typeof(MongoHelper), "GetAllDocumentsAsync")]
+        [InlineData(typeof(DelegatingMongoHelper), "GetAllDocumentsAsync")]
+        [InlineData(typeof(MongoRepository<>), "GetAllAsync")]
+        public void WholeCollectionReads_AreObsoleteWarningNotError(Type type, string methodName)
         {
-            System.Reflection.MethodInfo method = type.GetMethod("GetAllDocumentsAsync") ?? type.GetMethod("GetAllAsync");
+            System.Reflection.MethodInfo method = type.GetMethod(methodName);
             Assert.NotNull(method);
             ObsoleteAttribute attribute = (ObsoleteAttribute)Attribute.GetCustomAttribute(method, typeof(ObsoleteAttribute));
             Assert.NotNull(attribute);
