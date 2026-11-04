@@ -11,6 +11,8 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Xunit;
 
+// These tests cover GetAllDocumentsAsync, which is [Obsolete] (#253) but still shipped.
+#pragma warning disable CS0618
 namespace AnointedAutomation.Repository.Mongo.Tests
 {
     /// <summary>Concrete subclass so the abstract base can be instantiated in tests.</summary>

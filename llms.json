@@ -359,7 +359,7 @@
     },
     {
       "id": "AnointedAutomation.Repository.Mongo",
-      "version": "2.1.0",
+      "version": "2.2.0",
       "targetFramework": "net10.0",
       "description": "A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo",
