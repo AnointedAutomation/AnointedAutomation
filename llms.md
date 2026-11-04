@@ -550,10 +550,10 @@ let items = try await signIn.signIn() // query items your server added, e.g. ite
 
 ## Android library
 
-### AnointedSSO (Android) 0.1.3
+### AnointedSSO (Android) 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/android/AnointedSSO
-- Install: Maven Central, `implementation("com.anointedautomation:anointedsso:0.1.3")` (or include the `anointedsso` module from source). minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
+- Install: Maven Central, `implementation("com.anointedautomation:anointedsso:0.1.4")` (or include the `anointedsso` module from source). minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
 - The app never holds the client secret: `AnointedSignIn.signIn(activity)` opens the partner's own server start route (`@anointedautomation/sso`) in a Custom Tab; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` that `handleCallback(intent)` checks (constant time).
 - Callbacks: `AnointedCallback.Https(host, path)` (App Link) or `AnointedCallback.Scheme(name, via)` (an https server route that forwards the query to `name://anointed-sign-in`).
 
