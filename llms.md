@@ -340,13 +340,13 @@ builder.Services.AddControllers()
 string snake = JsonSerializer.Serialize(payload, JsonPresets.SnakeCase);
 ```
 
-### AnointedAutomation.Shopify 1.0.2
+### AnointedAutomation.Shopify 1.2.0
 
-Shopify REST models without pulling in a whole client library. Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.
+Shopify REST models without pulling in a whole client library. Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys. Also bulk operations (staged JSONL upload, polling with backoff, streamed results), webhook HMAC verification with an idempotent subscription registrar, typed builders for common non-money catalog operations, and System.Text.Json response models.
 
-- Depends on: NuGet Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Serialization
-- Namespaces: `AnointedAutomation.Shopify`, `AnointedAutomation.Shopify.Converters`
-- Key types: `Customer`, `Order`, `Product`, `Fulfillment`, `InventoryLevel`, `Refund`
+- Depends on: NuGet Newtonsoft.Json 13.0.4, Microsoft.Extensions.Logging.Abstractions 10.0.0; AnointedAutomation AnointedAutomation.Serialization
+- Namespaces: `AnointedAutomation.Shopify`, `AnointedAutomation.Shopify.Converters`, `AnointedAutomation.Shopify.GraphQL`, `AnointedAutomation.Shopify.GraphQL.Models`, `AnointedAutomation.Shopify.Bulk`, `AnointedAutomation.Shopify.Webhooks`, `AnointedAutomation.Shopify.Operations`
+- Key types: `Customer`, `Order`, `Product`, `Fulfillment`, `InventoryLevel`, `Refund`, `ShopifyGraphQlClient`, `IShopifyStoreContext`, `ShopifyRetryPolicy`, `ShopifyCostBucket`, `ShopifyPager`, `ShopifyIdempotency`, `ShopifyBulkOperationRunner`, `ShopifyWebhookHmac`, `ShopifyWebhookRegistrar`, `ShopifyCatalogOperations`, `ShopifyProduct`, `ShopifyOrder`
 - Notes: Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Shopify (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Shopify/README.md)
 
