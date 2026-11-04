@@ -43,6 +43,30 @@ def manifest_version(rel):
     fail(f"no version rule for {rel}")
 
 
+# The only places a package version appears in an llms.md section or llms.txt line besides its heading / "Version X,"
+VERSION_FORMS = ("git tag {v}", ":anointedsso:{v}", "Packagist, {v}")
+
+
+def replace_version_forms(text, old, new):
+    """Rewrite only the known install forms of old, never other mentions (release notes, longer numbers)."""
+    count = 0
+    for form in VERSION_FORMS:
+        prefix = re.escape(form.split("{v}")[0])
+        pattern = re.compile("(" + prefix + ")" + re.escape(old) + r"(?![\w.])")
+        text, n = pattern.subn(lambda m: m.group(1) + new, text)
+        count += n
+    return text, count
+
+
+def rewrite_md_section(section, heading, old, new):
+    """The section starts with its '### heading old' line; rewrite that heading and the install forms below it."""
+    first, sep, rest = section.partition("\n")
+    if first != "### " + heading + " " + old:
+        fail(f"llms.md section does not start with '### {heading} {old}'")
+    rest, _ = replace_version_forms(rest, old, new)
+    return "### " + heading + " " + new + sep + rest
+
+
 def main():
     json_path = ROOT / "llms.json"
     json_text = json_path.read_text(encoding="utf-8")
@@ -85,7 +109,7 @@ def main():
         section = pattern.search(md)
         if section is None:
             fail(f"llms.md has no '### {heading} {old}' section")
-        md = md[: section.start()] + section.group(0).replace(old, new) + md[section.end():]
+        md = md[: section.start()] + rewrite_md_section(section.group(0), heading, old, new) + md[section.end():]
 
         # llms.txt: the line that links this package's source
         link = re.compile(re.escape(TREE + rel) + r"(?![\w./-])")
@@ -98,7 +122,8 @@ def main():
                 fail(f"llms.txt line for {rel} has no 'Version {old},'")
             line = line.replace("Version " + old + ",", "Version " + new + ",")
         else:
-            line = line.replace(old, new)
+            # Only Android's line carries a version (its Maven coordinate); the other non-.NET lines carry none
+            line, _ = replace_version_forms(line, old, new)
         txt_lines[rows[0]] = line
         print(f"{heading}: {old} -> {new}")
 
@@ -109,4 +134,5 @@ def main():
     print(f"{len(changes)} llms.* version(s) synced")
 
 
-main()
+if __name__ == "__main__":
+    main()

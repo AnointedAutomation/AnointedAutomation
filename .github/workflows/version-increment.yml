@@ -353,7 +353,9 @@ jobs:
       - name: Sync llms.* versions
         if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         working-directory: .
-        run: python3 -I .github/workflows/sync-llms-versions.py
+        run: |
+          python3 -m unittest discover -s .github/workflows -p 'test_sync_llms_versions.py'
+          python3 -I .github/workflows/sync-llms-versions.py
 
       - name: Commit version changes
         if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
