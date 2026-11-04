@@ -81,7 +81,7 @@ Every method takes the collection name as its first argument.
 | Area | Methods |
 |---|---|
 | Create | `CreateDocumentAsync`, `CreateManyAsync` |
-| Bulk | `BulkWriteAsync` (any mix of insert/update/replace/delete models, 1000 per round trip, unordered by default; returns `BulkWriteSummary`) |
+| Bulk | `BulkWriteAsync` (any mix of insert/update/replace/delete models, 1000 per round trip, unordered by default; returns `BulkWriteSummary`; failed models raise `BulkWriteFailedException` with the applied counts and each failure's index) |
 | Read | `GetByIdAsync`, `GetSingleAsync`, `GetFilteredDocumentsAsync`, `GetAllDocumentsAsync`, `GetAllDocumentIdsAsync`, `GetPagedAsync`, `GetProjectedAsync`, `DistinctAsync`, `AggregateAsync`, `CountAsync`, `ExistsAsync` |
 | Update | `UpdateDocumentAsync`, `UpdateManyAsync`, `UpdateByIdAsync`, `UpsertAsync`, `ReplaceDocumentAsync`, `ReplaceByIdAsync`, `FindOneAndUpdateAsync` |
 | Delete | `DeleteDocumentAsync` (one), `DeleteManyAsync`, `DeleteByIdAsync`, `FindOneAndDeleteAsync` |
@@ -90,7 +90,7 @@ Every method takes the collection name as its first argument.
 - Filters are `FilterDefinition<T>`. `GetSingleAsync`, `GetFilteredDocumentsAsync`, `DeleteDocumentAsync`, `CountAsync` and `ExistsAsync` also accept an `Expression<Func<T, bool>>`.
 - The `...ByIdAsync` methods treat a 24 character hex id as an `ObjectId` and any other string as a plain string `_id`.
 - `GetAllDocumentsAsync` (and `MongoRepository<TDoc>.GetAllAsync`, which forwards it) is `[Obsolete]` since 2.2.0 (a compiler warning, not an error): it loads the whole collection into memory. Page with `GetDocumentIdsPageAsync` or `GetPagedAsync`, or use `CountAsync` / `AggregateAsync`. It will be removed in a later major version.
-- 2.3.0: bounded reads `GetFilteredDocumentsAsync(collection, filter, sort, limit)` and `GetProjectedAsync(collection, filter, projection, sort, limit)` (limit must be 1 or more). Prefer them over the unbounded `GetFilteredDocumentsAsync(collection, filter)` on collections that can grow.
+- 3.0.0 (major: three members added to `IMongoHelper`; derive from `DelegatingMongoHelper` and you need no change): `BulkWriteAsync`, plus bounded reads `GetFilteredDocumentsAsync(collection, filter, sort, limit)` and `GetProjectedAsync(collection, filter, projection, sort, limit)` (limit must be 1 or more). Prefer them over the unbounded `GetFilteredDocumentsAsync(collection, filter)` on collections that can grow.
 
 ### Routing helpers
 

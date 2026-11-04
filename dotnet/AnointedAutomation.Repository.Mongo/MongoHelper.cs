@@ -508,7 +508,9 @@ namespace AnointedAutomation.Repository.Mongo
             IMongoCollection<T> collection = GetCollection<T>(collectionName);
             BulkWriteOptions options = new BulkWriteOptions { IsOrdered = ordered };
             BulkWriteSummary summary = BulkWriteSummary.Empty;
+            List<BulkWriteFailure> failures = new List<BulkWriteFailure>();
             List<WriteModel<T>> batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+            int offset = 0;
             foreach (WriteModel<T> model in models)
             {
                 if (model == null)
@@ -518,15 +520,48 @@ namespace AnointedAutomation.Repository.Mongo
                 batch.Add(model);
                 if (batch.Count == MaxBulkWriteBatch)
                 {
-                    summary = summary.Add(await collection.BulkWriteAsync(batch, options));
+                    summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures);
+                    offset += batch.Count;
                     batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+                    if (ordered && failures.Count > 0)
+                    {
+                        throw new BulkWriteFailedException(collectionName, summary, failures);
+                    }
                 }
             }
             if (batch.Count > 0)
             {
-                summary = summary.Add(await collection.BulkWriteAsync(batch, options));
+                summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures);
+            }
+            if (failures.Count > 0)
+            {
+                throw new BulkWriteFailedException(collectionName, summary, failures);
             }
             return summary;
+        }
+
+        /// <summary>Sends one batch. A bulk write error is logged and recorded (with its index in the whole list) and the
+        /// applied part of the batch is still counted, so later batches can run.</summary>
+        private static async Task<BulkWriteSummary> SendBatchAsync<T>(IMongoCollection<T> collection, string collectionName,
+            List<WriteModel<T>> batch, BulkWriteOptions options, int offset, BulkWriteSummary summary, List<BulkWriteFailure> failures)
+        {
+            try
+            {
+                return summary.Add(await collection.BulkWriteAsync(batch, options));
+            }
+            catch (MongoBulkWriteException<T> e)
+            {
+                AddLog(LogMessage.Warning($"BulkWriteAsync: {e.WriteErrors.Count} of {batch.Count} models failed in collection '{collectionName}' (batch starting at {offset})", e));
+                foreach (BulkWriteError error in e.WriteErrors)
+                {
+                    failures.Add(new BulkWriteFailure(offset + error.Index, error.Code, error.Message));
+                }
+                if (e.WriteConcernError != null)
+                {
+                    failures.Add(new BulkWriteFailure(-1, e.WriteConcernError.Code, "write concern: " + e.WriteConcernError.Message));
+                }
+                return summary.Add(e.Result);
+            }
         }
 
         /// <summary>

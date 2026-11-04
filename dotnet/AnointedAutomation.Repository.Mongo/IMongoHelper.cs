@@ -213,8 +213,10 @@ namespace AnointedAutomation.Repository.Mongo
 
         /// <summary>
         /// Runs many inserts, updates, replaces and deletes as bulk writes, <see cref="MongoHelper.MaxBulkWriteBatch"/> models per
-        /// round trip. Unordered by default, so one failing model does not stop the rest; the driver then throws a
-        /// <see cref="MongoBulkWriteException{T}"/> listing every failed model. An empty list makes no call.
+        /// round trip. Unordered by default: a failing model does not stop the rest of its batch or the later batches, and
+        /// after every batch ran a <see cref="BulkWriteFailedException"/> lists each failed model (index in the whole list) plus
+        /// the counts that WERE applied. Ordered stops at the first failing batch with the same exception. An empty list makes
+        /// no call.
         /// </summary>
         /// <param name="collectionName">The name of the collection.</param>
         /// <param name="models">The write models.</param>

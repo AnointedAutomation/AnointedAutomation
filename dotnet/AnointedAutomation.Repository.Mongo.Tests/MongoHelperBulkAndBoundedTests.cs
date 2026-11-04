@@ -2,7 +2,12 @@
 
 using AnointedAutomation.Repository.Mongo;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Clusters;
+using MongoDB.Driver.Core.Connections;
+using MongoDB.Driver.Core.Servers;
 using Moq;
+using System.Net;
+using System.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,6 +76,90 @@ namespace AnointedAutomation.Repository.Mongo.Tests
 
             Assert.Equal(1, summary.Batches);
             Assert.Equal(2, summary.Inserted);
+        }
+
+        private static MongoBulkWriteException<MongoTestDoc> BulkFailure(int batchSize, int failedIndex)
+        {
+            ConstructorInfo errorCtor = typeof(BulkWriteError).GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)[0];
+            object[] errorArgs = errorCtor.GetParameters().Select(p => p.ParameterType == typeof(int) && p.Name == "index" ? (object)failedIndex
+                : p.ParameterType == typeof(int) ? 11000
+                : p.ParameterType == typeof(string) ? "duplicate key"
+                : p.ParameterType.IsValueType ? Activator.CreateInstance(p.ParameterType) : null).ToArray();
+            BulkWriteError error = (BulkWriteError)errorCtor.Invoke(errorArgs);
+            ConnectionId connection = new ConnectionId(new ServerId(new ClusterId(), new DnsEndPoint("localhost", 27017)));
+            List<WriteModel<MongoTestDoc>> processed = Models(batchSize);
+            return new MongoBulkWriteException<MongoTestDoc>(connection, Acked(batchSize - 1, processed),
+                new[] { error }, null, new List<WriteModel<MongoTestDoc>>());
+        }
+
+        [Fact]
+        public async Task BulkWriteAsync_Unordered_FailedBatch_StillSendsLaterBatches_AndReportsAppliedCounts()
+        {
+            (MongoHelper helper, Mock<IMongoCollection<MongoTestDoc>> collection) = Build();
+            int calls = 0;
+            collection.Setup(c => c.BulkWriteAsync(It.IsAny<IEnumerable<WriteModel<MongoTestDoc>>>(), It.IsAny<BulkWriteOptions>(), It.IsAny<CancellationToken>()))
+                .Returns((IEnumerable<WriteModel<MongoTestDoc>> r, BulkWriteOptions _, CancellationToken __) =>
+                {
+                    calls++;
+                    List<WriteModel<MongoTestDoc>> list = r.ToList();
+                    if (calls == 1)
+                    {
+                        throw BulkFailure(list.Count, 4);
+                    }
+                    return Task.FromResult(Acked(list.Count, list));
+                });
+
+            BulkWriteFailedException ex = await Assert.ThrowsAsync<BulkWriteFailedException>(() =>
+                helper.BulkWriteAsync("c", Models(MongoHelper.MaxBulkWriteBatch + 3)));
+
+            Assert.Equal(2, calls);
+            Assert.Equal(2, ex.Summary.Batches);
+            Assert.Equal(MongoHelper.MaxBulkWriteBatch - 1 + 3, ex.Summary.Inserted);
+            BulkWriteFailure failure = Assert.Single(ex.Failures);
+            Assert.Equal(4, failure.Index);
+            Assert.Equal("c", ex.CollectionName);
+        }
+
+        [Fact]
+        public async Task BulkWriteAsync_Unordered_FailureInLaterBatch_IndexIsOffsetIntoWholeList()
+        {
+            (MongoHelper helper, Mock<IMongoCollection<MongoTestDoc>> collection) = Build();
+            int calls = 0;
+            collection.Setup(c => c.BulkWriteAsync(It.IsAny<IEnumerable<WriteModel<MongoTestDoc>>>(), It.IsAny<BulkWriteOptions>(), It.IsAny<CancellationToken>()))
+                .Returns((IEnumerable<WriteModel<MongoTestDoc>> r, BulkWriteOptions _, CancellationToken __) =>
+                {
+                    calls++;
+                    List<WriteModel<MongoTestDoc>> list = r.ToList();
+                    if (calls == 2)
+                    {
+                        throw BulkFailure(list.Count, 1);
+                    }
+                    return Task.FromResult(Acked(list.Count, list));
+                });
+
+            BulkWriteFailedException ex = await Assert.ThrowsAsync<BulkWriteFailedException>(() =>
+                helper.BulkWriteAsync("c", Models(MongoHelper.MaxBulkWriteBatch + 3)));
+
+            Assert.Equal(MongoHelper.MaxBulkWriteBatch + 1, Assert.Single(ex.Failures).Index);
+        }
+
+        [Fact]
+        public async Task BulkWriteAsync_Ordered_FailedBatch_StopsBeforeLaterBatches()
+        {
+            (MongoHelper helper, Mock<IMongoCollection<MongoTestDoc>> collection) = Build();
+            int calls = 0;
+            collection.Setup(c => c.BulkWriteAsync(It.IsAny<IEnumerable<WriteModel<MongoTestDoc>>>(), It.IsAny<BulkWriteOptions>(), It.IsAny<CancellationToken>()))
+                .Returns((IEnumerable<WriteModel<MongoTestDoc>> r, BulkWriteOptions _, CancellationToken __) =>
+                {
+                    calls++;
+                    throw BulkFailure(r.Count(), 0);
+                });
+
+            BulkWriteFailedException ex = await Assert.ThrowsAsync<BulkWriteFailedException>(() =>
+                helper.BulkWriteAsync("c", Models(MongoHelper.MaxBulkWriteBatch * 2), ordered: true));
+
+            Assert.Equal(1, calls);
+            Assert.Equal(1, ex.Summary.Batches);
         }
 
         [Fact]
