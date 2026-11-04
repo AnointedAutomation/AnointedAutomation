@@ -1,0 +1,87 @@
+# Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me
+name: Weekly release PR
+
+# Opens the develop -> default branch release PR once a week. The cloud Claude reviewer reviews it, and the
+# Promote release workflow (promote-release.yml) merges it once that review approves its current head commit.
+# The PR is created with MERGE_TOKEN (roku674 fine-grained PAT): this repo does not let GITHUB_TOKEN create PRs.
+# Reads stay on GITHUB_TOKEN. A PAT-opened PR is authored by roku674, so no review request is sent (GitHub refuses
+# one from the author); the cloud reviewer picks up the PR on open.
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # 10:00 UTC Monday, so the Claude review (5 to 15 min) is done before the 8 AM New York promote check
+  workflow_dispatch:
+  push:
+    branches: [develop]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: weekly-release-pr
+  cancel-in-progress: false
+
+jobs:
+  open-release-pr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      EVENT: ${{ github.event_name }}
+      MERGE_TOKEN: ${{ secrets.MERGE_TOKEN }}
+    steps:
+      - name: Require MERGE_TOKEN
+        shell: bash
+        run: |
+          if [ -z "$MERGE_TOKEN" ]; then
+            echo "::error::MERGE_TOKEN secret is not set; GITHUB_TOKEN may not create pull requests in this repo"
+            exit 1
+          fi
+      - name: Open the release PR when develop is ahead
+        shell: bash
+        run: |
+          set -euo pipefail
+          default_branch=$(gh api "repos/$REPO" --jq .default_branch)
+
+          # Scheduled runs only use the copy on the default branch, so pushes to develop bootstrap the first
+          # release PR. Once this file is on the default branch, pushes stop opening PRs and the schedule rules.
+          if [ "$EVENT" = "push" ]; then
+            if probe=$(gh api "repos/$REPO/contents/.github/workflows/weekly-release-pr.yml?ref=$default_branch" --jq .sha 2>&1); then
+              echo "Workflow is on $default_branch; the weekly schedule opens release PRs."
+              exit 0
+            elif grep -q 'HTTP 404' <<< "$probe"; then
+              echo "Workflow is not on $default_branch yet; bootstrapping the first release PR."
+            else
+              echo "::error::Could not check $default_branch for this workflow: $probe"
+              exit 1
+            fi
+          fi
+
+          # Commit count alone is not enough: after a squash merge develop can be commits ahead with identical content,
+          # and a three-dot compare still lists the squashed files (it diffs from the merge base), so compare head trees
+          develop_tree=$(gh api "repos/$REPO/commits/develop" --jq .commit.tree.sha)
+          default_tree=$(gh api "repos/$REPO/commits/$default_branch" --jq .commit.tree.sha)
+          if [ "$develop_tree" = "$default_tree" ]; then
+            echo "develop and $default_branch have identical content."
+            exit 0
+          fi
+          ahead=$(gh api "repos/$REPO/compare/$default_branch...develop" --jq .ahead_by)
+          if [ "$ahead" -eq 0 ]; then
+            echo "develop has no commits that $default_branch lacks."
+            exit 0
+          fi
+          if [ "$ahead" -eq 1 ]; then commit_word="commit"; else commit_word="commits"; fi
+
+          open=$(gh pr list -R "$REPO" --base "$default_branch" --head develop --state open --json number,isCrossRepository \
+            --jq '[.[] | select(.isCrossRepository == false) | .number] | first')
+          # gh --jq prints nothing for a null result
+          if [ -n "$open" ] && [ "$open" != "null" ]; then
+            echo "A develop -> $default_branch PR (#$open) is already open."
+            exit 0
+          fi
+
+          url=$(GH_TOKEN="$MERGE_TOKEN" gh pr create -R "$REPO" --base "$default_branch" --head develop \
+            --title "Weekly release $(date -u +%Y-%m-%d)" \
+            --body "Weekly promotion of develop ($ahead $commit_word) to $default_branch. The Promote release workflow merges only after the Claude review approves the current head commit with no open comments and the checks on that head are green.")
+          echo "Opened $url"

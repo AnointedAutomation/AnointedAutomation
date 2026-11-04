@@ -59,3 +59,22 @@ def test_backchannel_logout(app_and_log, provider):
     assert len(log["logouts"]) == 1
     assert http.post("/auth/anointed/backchannel-logout", data={"logout_token": "bad"}).status_code == 400
     assert http.post("/auth/anointed/backchannel-logout", data={}).status_code == 400
+
+
+def test_callback_failure_is_logged_with_code(app_and_log, caplog):
+    app, _ = app_and_log
+    with caplog.at_level("WARNING", logger="anointedautomation_sso"):
+        app.test_client().get("/auth/anointed/callback?code=abc&state=nope", base_url="https://app.example")
+    assert any(r.levelname == "WARNING" and "sign-in callback rejected" in r.getMessage() for r in caplog.records)
+
+
+def test_unexpected_callback_failure_is_logged_and_raised(app_and_log, client, caplog, monkeypatch):
+    def boom(**kwargs):
+        raise RuntimeError("jwks fetch exploded")
+
+    monkeypatch.setattr(client, "handle_callback", boom)
+    app, _ = app_and_log
+    app.testing = True
+    with caplog.at_level("ERROR", logger="anointedautomation_sso"), pytest.raises(RuntimeError):
+        app.test_client().get("/auth/anointed/callback?code=abc&state=nope", base_url="https://app.example")
+    assert any(r.levelname == "ERROR" and r.exc_info is not None for r in caplog.records)

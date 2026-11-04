@@ -64,3 +64,7 @@ docs/design/plans/
 docs/design/specs/
 docs/audits/
 docs/archive/PROJECT_WORK_HISTORY.md
+
+# Windows download markers and generated payloads (zip bombs are built at runtime by ZipBomb)
+*:Zone.Identifier
+dotnet/AnointedAutomation.APIMiddlewares/Bombs/

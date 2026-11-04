@@ -68,3 +68,21 @@ def test_callback_failure_400(wired):
     http, log = wired
     r = http.get("/auth/anointed/callback/", {"code": "abc", "state": "x"})
     assert r.status_code == 400 and not log["signed_in"]
+
+
+def test_callback_failure_is_logged_with_code(wired, caplog):
+    http, _ = wired
+    with caplog.at_level("WARNING", logger="anointedautomation_sso"):
+        http.get("/auth/anointed/callback/", {"code": "abc", "state": "x"})
+    assert any(r.levelname == "WARNING" and "sign-in callback rejected" in r.getMessage() for r in caplog.records)
+
+
+def test_unexpected_callback_failure_is_logged_and_raised(wired, client, caplog, monkeypatch):
+    def boom(**kwargs):
+        raise RuntimeError("jwks fetch exploded")
+
+    monkeypatch.setattr(client, "handle_callback", boom)
+    http, _ = wired
+    with caplog.at_level("ERROR", logger="anointedautomation_sso"), pytest.raises(RuntimeError):
+        http.get("/auth/anointed/callback/", {"code": "abc", "state": "x"})
+    assert any(r.levelname == "ERROR" and r.exc_info is not None for r in caplog.records)

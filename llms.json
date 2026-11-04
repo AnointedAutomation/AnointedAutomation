@@ -8,11 +8,11 @@
   "nugetProfile": "https://www.nuget.org/profiles/roku674",
   "install": "dotnet add package <PackageId>",
   "publishing": "Work lands on develop. A develop to master pull request auto increments changed package versions; merging to master publishes each package whose version is newer than NuGet.org.",
-  "fileHeader": "// Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
+  "fileHeader": "// Copyright © Anointed Automation Corporation., 2026. Open source, provided \"as is\" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️",
   "packages": [
     {
       "id": "AnointedAutomation.Algorithms",
-      "version": "1.0.3",
+      "version": "1.0.5",
       "targetFramework": "net10.0",
       "description": "Algorithms for .NET with no dependencies, starting with a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction and automatic version and mask selection.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Algorithms",
@@ -65,7 +65,7 @@
     },
     {
       "id": "AnointedAutomation.APIMiddlewares",
-      "version": "1.0.10",
+      "version": "1.1.0",
       "targetFramework": "net10.0",
       "description": "ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares",
@@ -82,8 +82,10 @@
       },
       "keyNamespaces": [
         "AnointedAutomation.APIMiddleware",
+        "AnointedAutomation.APIMiddleware.BotDefense",
         "AnointedAutomation.APIMiddleware.Filters",
         "AnointedAutomation.APIMiddleware.Objects",
+        "AnointedAutomation.APIMiddleware.Security",
         "AnointedAutomation.APIMiddleware.Utility"
       ],
       "keyTypes": [
@@ -91,6 +93,22 @@
         "IPBlacklistMiddleware",
         "InvalidEndpointTrackerMiddleware",
         "EndpointAccessMiddleware",
+        "IpAllowlistMiddleware",
+        "CountryBlockMiddleware",
+        "CountryBlockOptions",
+        "CountryBlockExtensions",
+        "ICountryLookup",
+        "RirDelegatedCountryLookup",
+        "BotDefenseMiddleware",
+        "BotDefenseOptions",
+        "BotDefenseExtensions",
+        "FormBotGuard",
+        "HoneypotPathOptions",
+        "ZipBomb",
+        "IBanStore",
+        "ICrawlerVerifier",
+        "ICaptchaVerifier",
+        "CaptchaVerifier",
         "APIKeyAttribute",
         "IPBlacklist"
       ],
@@ -98,7 +116,7 @@
     },
     {
       "id": "AnointedAutomation.Concepts",
-      "version": "1.1.0",
+      "version": "1.1.1",
       "targetFramework": "net10.0",
       "description": "Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts",
@@ -129,7 +147,7 @@
     },
     {
       "id": "AnointedAutomation.Enums",
-      "version": "1.0.5",
+      "version": "1.0.7",
       "targetFramework": "net10.0",
       "description": "Shared enumerations for AnointedAutomation packages: payment types, providers, transaction and subscription statuses, payment operations, card types, webhook events, and moderation categories.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Enums",
@@ -155,7 +173,7 @@
     },
     {
       "id": "AnointedAutomation.Imaging",
-      "version": "1.0.3",
+      "version": "1.0.5",
       "targetFramework": "net10.0",
       "description": "Renders QR codes from AnointedAutomation.Algorithms to SVG and PNG using only the .NET base class library, with no third party image dependency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Imaging",
@@ -177,7 +195,7 @@
     },
     {
       "id": "AnointedAutomation.Logging",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "targetFramework": "net10.0",
       "description": "A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Logging",
@@ -199,7 +217,7 @@
     },
     {
       "id": "AnointedAutomation.Mathematics",
-      "version": "1.0.3",
+      "version": "1.0.5",
       "targetFramework": "net10.0",
       "description": "A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Mathematics",
@@ -244,7 +262,7 @@
     },
     {
       "id": "AnointedAutomation.Objects",
-      "version": "2.4.0",
+      "version": "2.7.1",
       "targetFramework": "net10.0",
       "description": "Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Objects",
@@ -341,7 +359,7 @@
     },
     {
       "id": "AnointedAutomation.Repository.Mongo",
-      "version": "1.3.3",
+      "version": "2.0.0",
       "targetFramework": "net10.0",
       "description": "A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo",
@@ -373,11 +391,11 @@
         "HybridCasing",
         "BsonClassMapRegistrar"
       ],
-      "notes": "Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name)."
+      "notes": "Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0."
     },
     {
       "id": "AnointedAutomation.Repository.MySql",
-      "version": "1.0.8",
+      "version": "1.0.9",
       "targetFramework": "net10.0",
       "description": "A generic repository and helper for MySQL over Entity Framework Core and the Pomelo provider.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Repository.MySql",
@@ -385,8 +403,9 @@
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.MySql/README.md",
       "dependencies": {
         "nuget": [
-          "Microsoft.EntityFrameworkCore 10.0.12",
-          "Pomelo.EntityFrameworkCore.MySql 9.0.0"
+          "Microsoft.EntityFrameworkCore 10.0.14",
+          "Pomelo.EntityFrameworkCore.MySql 9.0.0",
+          "MySqlConnector 2.6.2"
         ],
         "anointed": [
           "AnointedAutomation.Logging"
@@ -437,7 +456,7 @@
     },
     {
       "id": "AnointedAutomation.Shopify",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "targetFramework": "net10.0",
       "description": "Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Shopify",
@@ -486,7 +505,7 @@
     },
     {
       "id": "AnointedAutomation.SSO.UI",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "targetFramework": "net10.0",
       "description": "Front end for Sign in with Anointed Automation in ASP.NET Core: brand-styled sign-in and sign-out buttons as a Tag Helper (Razor Pages, MVC) and Blazor components, plus MapAnointedAutomationAuth() BFF routes (start, sign-out, user info). Cookie only, no tokens in the browser; sign-out also runs RP-initiated logout when the provider publishes end_session_endpoint.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.SSO.UI",
@@ -536,7 +555,7 @@
     },
     {
       "id": "AnointedAutomation.Templates",
-      "version": "1.0.0",
+      "version": "1.0.2",
       "targetFramework": "net10.0",
       "description": "dotnet new templates: anointed-razor (Razor Pages) and anointed-blazor (Blazor Web App, interactive server), wired to AnointedAutomation.SSO and AnointedAutomation.SSO.UI with the client id and secret in user-secrets.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Templates",
@@ -604,7 +623,7 @@
     },
     {
       "id": "@anointedautomation/sso-react",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "runtime": "Browser and SSR, React 18+ (peer dependency)",
       "published": true,
       "description": "React companion for Sign in with Anointed Automation: an accessible sign-in button and a useAnointedSignIn hook that navigate the browser to the partner server's start route. No secrets client side.",
@@ -622,7 +641,7 @@
     },
     {
       "id": "@anointedautomation/sso-next",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "Next.js App Router, Node 18+ (server only)",
       "published": true,
       "description": "Next.js App Router start, callback and back-channel logout route handlers built on @anointedautomation/sso.",
@@ -641,7 +660,7 @@
     },
     {
       "id": "@anointedautomation/sso-vue",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "Vue 3 (browser)",
       "published": true,
       "description": "Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side.",
@@ -676,7 +695,7 @@
     },
     {
       "id": "@anointedautomation/sso-angular",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "Angular 17+ (browser)",
       "published": true,
       "description": "Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side.",
@@ -694,7 +713,7 @@
     },
     {
       "id": "@anointedautomation/sso-sveltekit",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "SvelteKit 2 + Svelte 5",
       "published": true,
       "description": "SvelteKit start, callback, logout and back-channel logout handlers (handle hook or +server.js) built on @anointedautomation/sso, plus a sign-in button (./client).",
@@ -714,7 +733,7 @@
     },
     {
       "id": "@anointedautomation/sso-react-native",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "React Native / Expo",
       "published": true,
       "description": "React Native and Expo sign-in button and useAnointedSignIn hook: open the partner server's start route in a system auth session and read the deep-link callback. No secrets in the app.",
@@ -735,13 +754,13 @@
   "swiftPackages": [
     {
       "id": "AnointedSSO",
-      "version": "0.1.1",
+      "version": "0.1.3",
       "runtime": "iOS 15+, macOS 12+ (Swift Package Manager)",
       "published": true,
       "description": "Sign in with Anointed Automation for iOS and macOS apps: opens the partner's own server start route in ASWebAuthenticationSession; the server (using @anointedautomation/sso) keeps the client secret and redirects back. State check and SwiftUI button included.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/swift/AnointedSSO/README.md",
-      "install": "https://github.com/AnointedAutomation/AnointedAutomation (git tag 0.1.1, product AnointedSSO)",
+      "install": "https://github.com/AnointedAutomation/AnointedAutomation (git tag 0.1.3, product AnointedSSO)",
       "dependencies": [],
       "keyExports": [
         "AnointedSignIn",
@@ -757,7 +776,7 @@
   "pythonPackages": [
     {
       "id": "anointedautomation-sso",
-      "version": "0.1.0",
+      "version": "0.1.2",
       "runtime": "Python 3.10+ (server only)",
       "published": true,
       "description": "Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client.",
@@ -790,7 +809,7 @@
         "AnointedSsoServiceProvider"
       ],
       "registry": "Packagist",
-      "version": "0.1.1",
+      "version": "0.1.3",
       "install": "composer require anointedautomation/sso"
     }
   ]

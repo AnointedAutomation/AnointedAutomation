@@ -94,3 +94,23 @@ def test_failing_async_logout_returns_500(client, provider):
     app.include_router(create_router(client, on_signed_in=lambda r, x: None, on_logout=boom), prefix="/a")
     http = TestClient(app, base_url="https://app.example")
     assert http.post("/a/backchannel-logout", data={"logout_token": provider.logout_token()}).status_code == 500
+
+
+def test_callback_error_is_logged_with_code(client, caplog):
+    app, log = fastapi_app(client, False)
+    http = TestClient(app, base_url="https://app.example", follow_redirects=False)
+    with caplog.at_level("WARNING", logger="anointedautomation_sso"):
+        http.get("/auth/anointed/callback", params={"code": "abc", "state": "x"})
+    assert any(r.levelname == "WARNING" and "sign-in callback rejected" in r.getMessage() for r in caplog.records)
+
+
+def test_unexpected_callback_failure_is_logged_and_raised(client, caplog, monkeypatch):
+    def boom(**kwargs):
+        raise RuntimeError("jwks fetch exploded")
+
+    monkeypatch.setattr(client, "handle_callback", boom)
+    app, _ = fastapi_app(client, False)
+    http = TestClient(app, base_url="https://app.example", follow_redirects=False)
+    with caplog.at_level("ERROR", logger="anointedautomation_sso"), pytest.raises(RuntimeError):
+        http.get("/auth/anointed/callback", params={"code": "abc", "state": "x"})
+    assert any(r.levelname == "ERROR" and r.exc_info is not None for r in caplog.records)

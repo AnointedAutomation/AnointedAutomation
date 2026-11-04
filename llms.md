@@ -17,7 +17,7 @@ Open-source .NET / NuGet libraries by Anointed Automation Corporation, stewarded
 
 ## Packages
 
-### AnointedAutomation.Algorithms 1.0.3
+### AnointedAutomation.Algorithms 1.0.5
 
 Encode QR codes in pure C# with no native or third party dependency. Algorithms for .NET with no dependencies, starting with a pure C# QR code encoder (ISO/IEC 18004) with Reed-Solomon error correction and automatic version and mask selection.
 
@@ -52,13 +52,13 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.0.10
+### AnointedAutomation.APIMiddlewares 1.1.0
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
 - Depends on: NuGet Microsoft.AspNetCore.App (framework reference); AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Memory
-- Namespaces: `AnointedAutomation.APIMiddleware`, `AnointedAutomation.APIMiddleware.Filters`, `AnointedAutomation.APIMiddleware.Objects`, `AnointedAutomation.APIMiddleware.Utility`
-- Key types: `ApiKeyAuthMiddleware`, `IPBlacklistMiddleware`, `InvalidEndpointTrackerMiddleware`, `EndpointAccessMiddleware`, `APIKeyAttribute`, `IPBlacklist`
+- Namespaces: `AnointedAutomation.APIMiddleware`, `AnointedAutomation.APIMiddleware.BotDefense`, `AnointedAutomation.APIMiddleware.Filters`, `AnointedAutomation.APIMiddleware.Objects`, `AnointedAutomation.APIMiddleware.Security`, `AnointedAutomation.APIMiddleware.Utility`
+- Key types: `ApiKeyAuthMiddleware`, `IPBlacklistMiddleware`, `InvalidEndpointTrackerMiddleware`, `EndpointAccessMiddleware`, `IpAllowlistMiddleware`, `CountryBlockMiddleware`, `CountryBlockOptions`, `CountryBlockExtensions`, `ICountryLookup`, `RirDelegatedCountryLookup`, `BotDefenseMiddleware`, `BotDefenseOptions`, `BotDefenseExtensions`, `FormBotGuard`, `HoneypotPathOptions`, `ZipBomb`, `IBanStore`, `ICrawlerVerifier`, `ICaptchaVerifier`, `CaptchaVerifier`, `APIKeyAttribute`, `IPBlacklist`
 - Notes: Note the namespace is AnointedAutomation.APIMiddleware (singular) while the package id is plural.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.APIMiddlewares (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.APIMiddlewares/README.md)
 
@@ -74,7 +74,7 @@ app.UseMiddleware<InvalidEndpointTrackerMiddleware>();
 app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 ```
 
-### AnointedAutomation.Concepts 1.1.0
+### AnointedAutomation.Concepts 1.1.1
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
@@ -98,7 +98,7 @@ Situation situation = new Situation("A stranger lies beaten by the road.")
 LoveAction action = agape.Decide(situation);
 ```
 
-### AnointedAutomation.Enums 1.0.5
+### AnointedAutomation.Enums 1.0.7
 
 One shared set of payment and moderation enums so models and services agree. Shared enumerations for AnointedAutomation packages: payment types, providers, transaction and subscription statuses, payment operations, card types, webhook events, and moderation categories.
 
@@ -119,7 +119,7 @@ PaymentProvider provider = PaymentProvider.Stripe;
 TransactionStatus status = TransactionStatus.Succeeded;
 ```
 
-### AnointedAutomation.Imaging 1.0.3
+### AnointedAutomation.Imaging 1.0.5
 
 Turn a QrMatrix into SVG or PNG without System.Drawing or ImageSharp. Renders QR codes from AnointedAutomation.Algorithms to SVG and PNG using only the .NET base class library, with no third party image dependency.
 
@@ -142,7 +142,7 @@ string svg = QrRenderer.ToSvg(matrix);
 byte[] png = QrRenderer.ToPng(matrix, moduleSize: 10);
 ```
 
-### AnointedAutomation.Logging 1.0.7
+### AnointedAutomation.Logging 1.0.8
 
 A tiny log record plus a static event you can route to any sink. A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.
 
@@ -163,7 +163,7 @@ LogMessage.MessageSourceSetter = "MyService";
 LogMessage msg = LogMessage.Error("Payment webhook failed");
 ```
 
-### AnointedAutomation.Mathematics 1.0.3
+### AnointedAutomation.Mathematics 1.0.5
 
 Ready-made foundational claims to seed an EpistemicLedger. A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.
 
@@ -205,7 +205,7 @@ GarbageCollection gc = new GarbageCollection();
 gc.PerformGarbageCollection(null);
 ```
 
-### AnointedAutomation.Objects 2.4.0
+### AnointedAutomation.Objects 2.7.1
 
 Shared account, billing and response models so APIs and clients agree on shape. Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.
 
@@ -271,14 +271,14 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 1.3.3
+### AnointedAutomation.Repository.Mongo 2.0.0
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 
 - Depends on: NuGet MongoDB.Bson 3.12.0, MongoDB.Driver 3.12.0, MongoDB.Libmongocrypt 1.12.0, Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Objects, AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Repository.Mongo`, `AnointedAutomation.Repository.Mongo.Bson`
 - Key types: `MongoHelper`, `IMongoHelper`, `MongoRepository<TDoc>`, `MongoDocument`, `TimestampedMongoRepository<TDoc>`, `HybridCasing`, `BsonClassMapRegistrar`
-- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name).
+- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.Mongo (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.Mongo/README.md)
 
 ```bash
@@ -296,11 +296,11 @@ HybridCasing.Register("AnointedAutomation", Array.Empty<string>(),
 IMongoHelper mongo = new MongoHelper("mydb", connectionString);
 ```
 
-### AnointedAutomation.Repository.MySql 1.0.8
+### AnointedAutomation.Repository.MySql 1.0.9
 
 Generic EF Core repository for MySQL via Pomelo. A generic repository and helper for MySQL over Entity Framework Core and the Pomelo provider.
 
-- Depends on: NuGet Microsoft.EntityFrameworkCore 10.0.12, Pomelo.EntityFrameworkCore.MySql 9.0.0; AnointedAutomation AnointedAutomation.Logging
+- Depends on: NuGet Microsoft.EntityFrameworkCore 10.0.14, Pomelo.EntityFrameworkCore.MySql 9.0.0, MySqlConnector 2.6.2; AnointedAutomation AnointedAutomation.Logging
 - Namespaces: `AnointedAutomation.Repository.MySql`
 - Key types: `GenericRepository<T>`, `IGenericRepository<T>`, `MySqlHelper`, `IMySqlHelper`, `MySqlHelperFactory`, `DynamicDbContext`
 - Notes: GenericRepository<T> wraps any DbContext: GetByIdAsync, GetAllAsync, FindAsync, FindSingleAsync.
@@ -340,7 +340,7 @@ builder.Services.AddControllers()
 string snake = JsonSerializer.Serialize(payload, JsonPresets.SnakeCase);
 ```
 
-### AnointedAutomation.Shopify 1.0.0
+### AnointedAutomation.Shopify 1.0.2
 
 Shopify REST models without pulling in a whole client library. Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.
 
@@ -375,7 +375,7 @@ builder.Services.AddAnointedSessionStatus(o => { ... });
 app.MapAnointedBackchannelLogout("/auth/anointed/backchannel-logout", async (logout, httpContext) => { ... });
 ```
 
-### AnointedAutomation.SSO.UI 1.0.0
+### AnointedAutomation.SSO.UI 1.0.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.UI
 - Target: net10.0. Depends on AnointedAutomation.SSO.
@@ -394,7 +394,7 @@ app.MapAnointedAutomationAuth("/auth/anointed"); // GET start, POST sign-out, GE
 
 Sign in with Anointed Automation for classic ASP.NET (.NET Framework 4.7.2+, MVC 5 and Web Forms on OWIN/Katana): OpenID Connect middleware preset (code + PKCE S256, verified email only), back-channel logout with Logout Token validation and replay protection, a session status client, and a sign-in button for Razor and Web Forms.
 
-### AnointedAutomation.Templates 1.0.0
+### AnointedAutomation.Templates 1.0.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/templates/AnointedAutomation.Templates
 - Target: net10.0. Depends on AnointedAutomation.SSO, AnointedAutomation.SSO.UI.
@@ -443,7 +443,7 @@ app.get("/auth/anointed/callback", anointed.callback);
 `createWebHandlers` gives the same `start` / `callback` / `backchannelLogout` as `Request -> Response` handlers
 for Next.js App Router, Base44 and Workers. Failures are `AnointedSsoError` with a stable `code`.
 
-### @anointedautomation/sso-react 0.1.1
+### @anointedautomation/sso-react 0.1.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react
 - Runtime: browser and SSR, peer dependency react >=18. No secrets, no OIDC logic. On npm: `npm install @anointedautomation/sso-react`.
@@ -457,7 +457,7 @@ const { signIn } = useAnointedSignIn({ startUrl: "/api/auth/anointed/start" }); 
 
 `startUrl` is required (no default). The partner server (`@anointedautomation/sso`) holds the secret.
 
-### @anointedautomation/sso-next 0.1.0
+### @anointedautomation/sso-next 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-next
 - Runtime: Next.js App Router (Node 18+), server only. Depends on `@anointedautomation/sso`. On npm: `npm install @anointedautomation/sso-next`.
@@ -479,7 +479,7 @@ const anointed = createAnointedRouteHandlers({
 // .../backchannel-logout/route.js:          export const POST = anointed.backchannelLogout; (needs onLogout)
 ```
 
-### @anointedautomation/sso-vue 0.1.0
+### @anointedautomation/sso-vue 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue
 - Runtime: Vue 3 (browser). On npm: `npm install @anointedautomation/sso-vue`.
@@ -493,21 +493,21 @@ Vue 3 sign-in button and useAnointedSignIn composable that send the browser to t
 
 Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
 
-### @anointedautomation/sso-angular 0.1.0
+### @anointedautomation/sso-angular 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
 - Runtime: Angular 17+ (browser). On npm: `npm install @anointedautomation/sso-angular`.
 
 Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side. Key exports: `AnointedSignInButtonComponent`, `AnointedSignInService`, `provideAnointedSignIn`, `buildStartUrl`.
 
-### @anointedautomation/sso-sveltekit 0.1.0
+### @anointedautomation/sso-sveltekit 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-sveltekit
 - Runtime: SvelteKit 2 + Svelte 5. Depends on @anointedautomation/sso. On npm: `npm install @anointedautomation/sso-sveltekit`.
 
 SvelteKit start, callback, logout and back-channel logout handlers (handle hook or +server.js) built on @anointedautomation/sso, plus a sign-in button (./client). Key exports: `createAnointedHandle`, `createAnointedHandlers`, `redirectTo`, `AnointedSignInButton`.
 
-### @anointedautomation/sso-react-native 0.1.0
+### @anointedautomation/sso-react-native 0.1.1
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-react-native
 - Runtime: React Native / Expo. On npm: `npm install @anointedautomation/sso-react-native`.
@@ -516,7 +516,7 @@ React Native and Expo sign-in button and useAnointedSignIn hook: open the partne
 
 ## Python package
 
-### anointedautomation-sso 0.1.0
+### anointedautomation-sso 0.1.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso
 - Runtime: Python 3.10+, server only. On PyPI: `pip install anointedautomation-sso`.
@@ -525,19 +525,19 @@ Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Sta
 
 ## PHP package
 
-### anointedautomation/sso 0.1.1
+### anointedautomation/sso 0.1.3
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso
-- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` (on Packagist, 0.1.1; versions come from repo git tags shared with the Swift package; manifest is the root composer.json).
+- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` (on Packagist, 0.1.3; versions come from repo git tags shared with the Swift package; manifest is the root composer.json).
 
 Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Key classes: `Client`, `SsoConfig`, `BackchannelLogoutHandler`, `AnointedSsoServiceProvider` (Laravel).
 
 ## Swift package
 
-### AnointedSSO 0.1.1
+### AnointedSSO 0.1.3
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO
-- Install: Swift Package Manager (git tag 0.1.1), `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
+- Install: Swift Package Manager (git tag 0.1.3), `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
 - The app never holds the client secret: `AnointedSignIn` opens the partner's own server start route (`@anointedautomation/sso`) in `ASWebAuthenticationSession`; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` the package checks.
 - Callbacks: `.https(host:path:)` (universal link, iOS 17.4+) or `.scheme(name, via:)` (an https server route that forwards the query to `name://anointed-sign-in`).
 
@@ -550,10 +550,10 @@ let items = try await signIn.signIn() // query items your server added, e.g. ite
 
 ## Android library
 
-### AnointedSSO (Android) 0.1.1
+### AnointedSSO (Android) 0.1.3
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/android/AnointedSSO
-- Install: Maven Central, `implementation("com.anointedautomation:anointedsso:0.1.1")` (or include the `anointedsso` module from source). minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
+- Install: Maven Central, `implementation("com.anointedautomation:anointedsso:0.1.3")` (or include the `anointedsso` module from source). minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
 - The app never holds the client secret: `AnointedSignIn.signIn(activity)` opens the partner's own server start route (`@anointedautomation/sso`) in a Custom Tab; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` that `handleCallback(intent)` checks (constant time).
 - Callbacks: `AnointedCallback.Https(host, path)` (App Link) or `AnointedCallback.Scheme(name, via)` (an https server route that forwards the query to `name://anointed-sign-in`).
 

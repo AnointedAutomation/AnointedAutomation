@@ -107,7 +107,12 @@ class AnointedSignInRequest(
      * this request's callback, the state is missing or does not match, or your server reported an error.
      */
     fun parseCallback(url: String): Map<String, String> {
-        val uri = parseUri(url, "callback is not a valid URL")
+        // A malformed callback (for example bad percent-encoding such as %zz) is INVALID_CALLBACK, not CONFIG.
+        val uri = try {
+            URI(url)
+        } catch (e: java.net.URISyntaxException) {
+            throw AnointedSignInException(AnointedSignInException.INVALID_CALLBACK, "callback is not a valid URL: " + e.reason)
+        }
         if (!matchesCallback(uri)) {
             throw AnointedSignInException(AnointedSignInException.INVALID_CALLBACK, "the URL is not this sign-in's callback")
         }
