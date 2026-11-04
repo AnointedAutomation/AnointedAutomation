@@ -271,14 +271,14 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 2.0.0
+### AnointedAutomation.Repository.Mongo 2.1.0
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 
 - Depends on: NuGet MongoDB.Bson 3.12.0, MongoDB.Driver 3.12.0, MongoDB.Libmongocrypt 1.12.0, Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Objects, AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Repository.Mongo`, `AnointedAutomation.Repository.Mongo.Bson`
-- Key types: `MongoHelper`, `IMongoHelper`, `MongoRepository<TDoc>`, `MongoDocument`, `TimestampedMongoRepository<TDoc>`, `HybridCasing`, `BsonClassMapRegistrar`
-- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0.
+- Key types: `MongoHelper`, `IMongoHelper`, `DelegatingMongoHelper`, `MongoRepository<TDoc>`, `MongoDocument`, `TimestampedMongoRepository<TDoc>`, `HybridCasing`, `BsonClassMapRegistrar`
+- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0. 2.1.0: DelegatingMongoHelper, an abstract IMongoHelper that forwards every member to protected abstract Current() (derive from it for routing helpers so new interface members need no code change).
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.Mongo (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.Mongo/README.md)
 
 ```bash
@@ -493,7 +493,7 @@ Vue 3 sign-in button and useAnointedSignIn composable that send the browser to t
 
 Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
 
-### @anointedautomation/sso-angular 0.1.1
+### @anointedautomation/sso-angular 0.1.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
 - Runtime: Angular 17+ (browser). On npm: `npm install @anointedautomation/sso-angular`.
@@ -550,10 +550,10 @@ let items = try await signIn.signIn() // query items your server added, e.g. ite
 
 ## Android library
 
-### AnointedSSO (Android) 0.1.3
+### AnointedSSO (Android) 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/android/AnointedSSO
-- Install: Maven Central, `implementation("com.anointedautomation:anointedsso:0.1.3")` (or include the `anointedsso` module from source). minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
+- Install: Maven Central, `implementation("com.anointedautomation:anointedsso:0.1.4")` (or include the `anointedsso` module from source). minSdk 24. Depends on `androidx.browser`; the Compose button is optional.
 - The app never holds the client secret: `AnointedSignIn.signIn(activity)` opens the partner's own server start route (`@anointedautomation/sso`) in a Custom Tab; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` that `handleCallback(intent)` checks (constant time).
 - Callbacks: `AnointedCallback.Https(host, path)` (App Link) or `AnointedCallback.Scheme(name, via)` (an https server route that forwards the query to `name://anointed-sign-in`).
 

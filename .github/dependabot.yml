@@ -1,198 +1,364 @@
 # Copyright © Anointed Automation Corporation., 2025. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2025-06-08 13:27:40 Jesus is King ✝️
 # Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
+# One grouped PR per directory for minor+patch and one separate grouped PR per directory for majors, weekly.
+# Composer is left out on purpose: php/anointed-sso and the root composer.json must stay identical
+# (php-anointed-sso.yml sync check), which a one-directory bump breaks.
 version: 2
 updates:
-  # Enable version updates for NuGet
   - package-ecosystem: "nuget"
     directory: "/dotnet"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 30
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
-
-  # Enable version updates for GitHub Actions
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
       major:
+        patterns:
+          - "*"
+        update-types:
+          - major
+  - package-ecosystem: "nuget"
+    directory: "/dotnet/templates/AnointedAutomation.Templates/content/anointed-blazor"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "automated pr"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
+  - package-ecosystem: "nuget"
+    directory: "/dotnet/templates/AnointedAutomation.Templates/content/anointed-razor"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "automated pr"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      major:
+        patterns:
+          - "*"
         update-types:
           - major
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 30
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
       major:
+        patterns:
+          - "*"
         update-types:
           - major
-
-  # Security audit #240: the other package ecosystems in this repo. Composer is left out on purpose: php/anointed-sso
-  # and the root composer.json must stay identical (php-anointed-sso.yml sync check), which a one-directory bump breaks.
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
+  - package-ecosystem: "npm"
+    directory: "/js/anointed-sso/examples/express"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "automated pr"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
+  - package-ecosystem: "npm"
+    directory: "/js/anointed-sso/examples/nextjs"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "automated pr"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso-angular"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso-next"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso-nuxt"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso-react"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso-react-native"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso-sveltekit"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "npm"
     directory: "/js/anointed-sso-vue"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "pip"
     directory: "/python/anointed-sso"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "gradle"
     directory: "/android/AnointedSSO"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major
   - package-ecosystem: "swift"
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     target-branch: "develop"
     labels:
       - "dependencies"
       - "automated pr"
     groups:
       minor-and-patch:
+        patterns:
+          - "*"
         update-types:
           - minor
           - patch
+      major:
+        patterns:
+          - "*"
+        update-types:
+          - major

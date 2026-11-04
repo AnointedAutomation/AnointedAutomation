@@ -27,14 +27,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
 
-    kotlinOptions {
-        jvmTarget = "17"
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
 dependencies {
-    api("androidx.browser:browser:1.8.0")
+    api("androidx.browser:browser:1.10.0")
 
     // Optional: only needed if you use AnointedSignInButton. Your app already has Compose if it uses the button.
     compileOnly(platform("androidx.compose:compose-bom:2024.12.01"))
@@ -58,7 +60,7 @@ mavenPublishing {
             publishJavadocJar = true,
         ),
     )
-    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+    publishToMavenCentral(automaticRelease = true)
     signAllPublications()
     coordinates("com.anointedautomation", "anointedsso", project.version.toString())
 
