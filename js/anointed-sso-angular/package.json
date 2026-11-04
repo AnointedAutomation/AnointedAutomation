@@ -33,7 +33,7 @@
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
     "@angular/compiler-cli": "^20.3.0",
-    "@angular/core": "^20.3.0",
+    "@angular/core": "^22.2.4",
     "@angular/platform-browser": "^20.3.0",
     "@angular/platform-server": "^20.3.0",
     "ng-packagr": "^20.3.0",
