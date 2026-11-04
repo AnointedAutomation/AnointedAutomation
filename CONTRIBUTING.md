@@ -2,6 +2,8 @@
 
 Jesus is King ✝️
 
+Join the open-source channel on our Discord to talk with other contributors: [https://discord.gg/YFyWNYbBvQ](https://discord.gg/YFyWNYbBvQ)
+
 ## Repository layout
 
 Code is grouped by language: .NET projects live in `dotnet/` (solution `dotnet/AnointedAutomation.sln`),
