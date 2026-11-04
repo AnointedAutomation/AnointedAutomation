@@ -90,6 +90,21 @@ Every method takes the collection name as its first argument.
 - The `...ByIdAsync` methods treat a 24 character hex id as an `ObjectId` and any other string as a plain string `_id`.
 - `GetAllDocumentsAsync` loads the whole collection; prefer `GetPagedAsync`, `CountAsync` or `AggregateAsync` for large collections.
 
+### Routing helpers
+
+| Type | Description |
+|---|---|
+| `DelegatingMongoHelper` | Abstract `IMongoHelper` that forwards every member to `protected abstract IMongoHelper Current()`, resolved on each call (for example a per-tenant database). Derive from it instead of implementing `IMongoHelper` by hand, so new interface members are forwarded without changes in your code. All members are virtual. The `database` and `dbName` setters throw `InvalidOperationException` with the overridable `protected virtual string NeverSetMessage`. |
+
+```csharp
+public sealed class TenantMongoHelper : DelegatingMongoHelper
+{
+    private readonly ITenantContext _tenant;
+    public TenantMongoHelper(ITenantContext tenant) { _tenant = tenant; }
+    protected override IMongoHelper Current() => _tenant.Mongo;
+}
+```
+
 ### Repository base
 
 | Type | Description |

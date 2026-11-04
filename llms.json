@@ -359,7 +359,7 @@
     },
     {
       "id": "AnointedAutomation.Repository.Mongo",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "targetFramework": "net10.0",
       "description": "A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Repository.Mongo",
@@ -385,13 +385,14 @@
       "keyTypes": [
         "MongoHelper",
         "IMongoHelper",
+        "DelegatingMongoHelper",
         "MongoRepository<TDoc>",
         "MongoDocument",
         "TimestampedMongoRepository<TDoc>",
         "HybridCasing",
         "BsonClassMapRegistrar"
       ],
-      "notes": "Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0."
+      "notes": "Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0. 2.1.0: DelegatingMongoHelper, an abstract IMongoHelper that forwards every member to protected abstract Current() (derive from it for routing helpers so new interface members need no code change)."
     },
     {
       "id": "AnointedAutomation.Repository.MySql",
