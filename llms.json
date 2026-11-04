@@ -455,9 +455,9 @@
     },
     {
       "id": "AnointedAutomation.Shopify",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "targetFramework": "net10.0",
-      "description": "Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys.",
+      "description": "Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys. Also bulk operations (staged JSONL upload, polling with backoff, streamed results), webhook HMAC verification with an idempotent subscription registrar, typed builders for common non-money catalog operations, and System.Text.Json response models.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Shopify",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Shopify",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Shopify/README.md",
@@ -473,7 +473,11 @@
       "keyNamespaces": [
         "AnointedAutomation.Shopify",
         "AnointedAutomation.Shopify.Converters",
-        "AnointedAutomation.Shopify.GraphQL"
+        "AnointedAutomation.Shopify.GraphQL",
+        "AnointedAutomation.Shopify.GraphQL.Models",
+        "AnointedAutomation.Shopify.Bulk",
+        "AnointedAutomation.Shopify.Webhooks",
+        "AnointedAutomation.Shopify.Operations"
       ],
       "keyTypes": [
         "Customer",
@@ -487,7 +491,15 @@
         "ShopifyRetryPolicy",
         "ShopifyCostBucket",
         "ShopifyPager",
-        "ShopifyIdempotency"
+        "ShopifyIdempotency",
+        "ShopifyBulkOperationRunner",
+        "ShopifyStagedUploads",
+        "ShopifyWebhookHmac",
+        "ShopifyWebhookRegistrar",
+        "ShopifyCatalogOperations",
+        "ShopifyProduct",
+        "ShopifyOrder",
+        "ShopifyCustomer"
       ],
       "notes": "Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package."
     },
