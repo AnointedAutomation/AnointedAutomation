@@ -474,9 +474,10 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         [InlineData(typeof(IMongoHelper))]
         [InlineData(typeof(MongoHelper))]
         [InlineData(typeof(DelegatingMongoHelper))]
+        [InlineData(typeof(MongoRepository<>))]
         public void GetAllDocumentsAsync_IsObsoleteWarningNotError(Type type)
         {
-            System.Reflection.MethodInfo method = type.GetMethod("GetAllDocumentsAsync");
+            System.Reflection.MethodInfo method = type.GetMethod("GetAllDocumentsAsync") ?? type.GetMethod("GetAllAsync");
             Assert.NotNull(method);
             ObsoleteAttribute attribute = (ObsoleteAttribute)Attribute.GetCustomAttribute(method, typeof(ObsoleteAttribute));
             Assert.NotNull(attribute);
