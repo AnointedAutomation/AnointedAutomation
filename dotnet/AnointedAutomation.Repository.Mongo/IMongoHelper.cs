@@ -68,6 +68,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <typeparam name="T">The type of documents to retrieve.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>A list of all documents in the collection.</returns>
+        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
         Task<List<T>> GetAllDocumentsAsync<T>(string collectionName);
 
         /// <summary>

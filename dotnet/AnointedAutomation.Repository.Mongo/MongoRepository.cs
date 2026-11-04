@@ -84,6 +84,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// collections (see <see cref="IMongoHelper.GetAllDocumentsAsync{T}"/>).
         /// </summary>
         /// <returns>A list of all documents in the collection.</returns>
+        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
         public Task<List<TDoc>> GetAllAsync()
         {
             return Mongo.GetAllDocumentsAsync<TDoc>(CollectionName);

@@ -38,6 +38,7 @@ namespace AnointedAutomation.Repository.Mongo
         public virtual Task CreateDocumentAsync<T>(string collectionName, T document) => Current().CreateDocumentAsync(collectionName, document);
         public virtual IMongoDatabase CreateMongoDbInstance(string dbName, string connectionString) => Current().CreateMongoDbInstance(dbName, connectionString);
         public virtual Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, FilterDefinition<T> filter) => Current().DeleteDocumentAsync(collectionName, filter);
+        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
         public virtual Task<List<T>> GetAllDocumentsAsync<T>(string collectionName) => Current().GetAllDocumentsAsync<T>(collectionName);
         public virtual Task<List<string>> GetAllDocumentIdsAsync(string collectionName) => Current().GetAllDocumentIdsAsync(collectionName);
         public virtual Task<List<string>> GetDocumentIdsPageAsync(string collectionName, int skip, int limit) => Current().GetDocumentIdsPageAsync(collectionName, skip, limit);
