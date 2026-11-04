@@ -86,7 +86,7 @@ jobs:
               continue
             fi
 
-            # Every check on the head commit except the merge housekeeping runs must have passed or been skipped. No
+            # Every check on the head commit except the housekeeping runs (merge, promote, weekly release PR) must have passed or been skipped. No
             # build is required here: in most of these repos CI skips human PRs by design (it runs on the develop push),
             # the Claude review runs the relevant tests itself, and the release PR gate requires the real CI to pass.
             if ! checks=$(gh pr checks "$pr" -R "$REPO" --json name,bucket,workflow 2>&1); then
@@ -96,7 +96,7 @@ jobs:
                 continue
               fi
             fi
-            others=$(jq -c '[.[] | select(.workflow != "Merge approved into develop" and .workflow != "Promote release")]' <<< "$checks")
+            others=$(jq -c '[.[] | select(.workflow != "Merge approved into develop" and .workflow != "Promote release" and .workflow != "Weekly release PR")]' <<< "$checks")
             not_green=$(jq -r '[.[] | select(.bucket != "pass" and .bucket != "skipping") | "\(.name)=\(.bucket)"] | join(", ")' <<< "$others")
             if [ -n "$not_green" ]; then
               echo "  skip: checks not green ($not_green)"
