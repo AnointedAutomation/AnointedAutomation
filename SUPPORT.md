@@ -4,6 +4,7 @@
 
 - **Issues:** [https://github.com/AnointedAutomation/AnointedAutomation/issues](https://github.com/AnointedAutomation/AnointedAutomation/issues)
 - **Anointed Automation:** [https://anointedautomation.net](https://anointedautomation.net)
+- **Discord (open-source channel):** [https://discord.gg/YFyWNYbBvQ](https://discord.gg/YFyWNYbBvQ)
 
 ## Supporting This Project
 

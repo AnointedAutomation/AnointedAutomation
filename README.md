@@ -161,6 +161,8 @@ See [dotnet/PUBLISHING.md](./dotnet/PUBLISHING.md) for details.
 Issues and pull requests are welcome. Please target the `develop` branch and include tests for behavior
 changes.
 
+Contributors are welcome in the open-source channel on our Discord: [https://discord.gg/YFyWNYbBvQ](https://discord.gg/YFyWNYbBvQ)
+
 ## Support This Project
 
 These libraries are free and open source. If they help you, please support the author, Alexander Fields, in any of these ways:
