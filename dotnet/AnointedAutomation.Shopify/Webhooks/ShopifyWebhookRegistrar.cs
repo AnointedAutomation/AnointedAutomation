@@ -82,7 +82,7 @@ namespace AnointedAutomation.Shopify.Webhooks
         }
 
         /// <summary>Create one subscription (JSON format). Returns its id; throws <see cref="ShopifyGraphQlException"/>
-        /// on refusal or an unknown outcome.</summary>
+        /// on refusal, an unknown outcome, or an answer without a subscription id.</summary>
         public async Task<string> CreateAsync(ShopifyWebhookTarget target, CancellationToken cancellationToken)
         {
             Validate(target);
@@ -91,7 +91,14 @@ namespace AnointedAutomation.Shopify.Webhooks
                 ["topic"] = target.Topic,
                 ["webhookSubscription"] = new Dictionary<string, object> { ["uri"] = target.Uri, ["format"] = "JSON" },
             }), "webhookSubscriptionCreate", cancellationToken).ConfigureAwait(false);
-            return payload.TryGetProperty("webhookSubscription", out JsonElement sub) ? Str(sub, "id") : null;
+            string id = payload.TryGetProperty("webhookSubscription", out JsonElement sub) ? Str(sub, "id") : null;
+            if (string.IsNullOrEmpty(id))
+            {
+                // No userErrors but no subscription either: never report that as created.
+                throw new ShopifyGraphQlException("WebhookSubscriptionCreate", 200, ShopifyCallOutcome.Failed,
+                    "webhookSubscriptionCreate returned no subscription id for " + target.Topic, null);
+            }
+            return id;
         }
 
         /// <summary>Delete one subscription by id.</summary>

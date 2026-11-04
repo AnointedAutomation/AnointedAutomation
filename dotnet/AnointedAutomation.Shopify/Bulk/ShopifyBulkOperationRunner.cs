@@ -125,7 +125,8 @@ namespace AnointedAutomation.Shopify.Bulk
             return await WaitForCompletionAsync(started.Id, cancellationToken).ConfigureAwait(false);
         }
 
-        /// <summary>stagedUploadsCreate + one multipart POST of the file. Returns the stagedUploadPath ("key").</summary>
+        /// <summary>stagedUploadsCreate + one multipart POST of the file. Returns the stagedUploadPath ("key").
+        /// The caller owns <paramref name="jsonl"/>: it is read from its current position and left open.</summary>
         public async Task<string> UploadJsonlAsync(Stream jsonl, string filename, CancellationToken cancellationToken)
         {
             if (jsonl == null)
@@ -140,9 +141,9 @@ namespace AnointedAutomation.Shopify.Bulk
             {
                 foreach (KeyValuePair<string, string> p in target.Parameters)
                 {
-                    form.Add(new StringContent(p.Value ?? string.Empty), p.Key);
+                    form.Add(new StringContent(p.Value), p.Key);
                 }
-                StreamContent file = new StreamContent(jsonl);
+                StreamContent file = new StreamContent(new LeaveOpenStream(jsonl));
                 file.Headers.ContentType = new MediaTypeHeaderValue(ShopifyStagedUploads.JsonlMimeType);
                 form.Add(file, "file", filename);
                 using (HttpResponseMessage response = await _http.PostAsync(target.Url, form, cancellationToken).ConfigureAwait(false))
@@ -262,6 +263,12 @@ namespace AnointedAutomation.Shopify.Bulk
                 {
                     throw;
                 }
+                catch (ShopifyGraphQlException ex) when (IsPermanent(ex))
+                {
+                    _logger.LogError(ex, "Shopify bulk operation {OperationId} poll failed permanently (HTTP {Status}): {Reason}",
+                        id, ex.StatusCode, ex.Reason);
+                    throw;
+                }
                 catch (Exception ex) when (ex is ShopifyGraphQlException || ex is InvalidOperationException)
                 {
                     lastProblem = ex;
@@ -379,6 +386,23 @@ namespace AnointedAutomation.Shopify.Bulk
             }
         }
 
+        /// <summary>True for a poll failure that re-polling cannot fix: HTTP 401, 403 or 404, or an ACCESS_DENIED /
+        /// UNAUTHORIZED error code (Shopify answers those with HTTP 200).</summary>
+        public static bool IsPermanent(ShopifyGraphQlException ex)
+        {
+            if (ex == null)
+            {
+                throw new ArgumentNullException(nameof(ex));
+            }
+            if (ex.StatusCode == 401 || ex.StatusCode == 403 || ex.StatusCode == 404)
+            {
+                return true;
+            }
+            string reason = ex.Reason;
+            return reason != null && (reason.Contains("ACCESS_DENIED", StringComparison.Ordinal)
+                || reason.Contains("UNAUTHORIZED", StringComparison.Ordinal));
+        }
+
         private JsonElement ParseLine(string operationId, int lineNumber, string line)
         {
             try
@@ -399,6 +423,32 @@ namespace AnointedAutomation.Shopify.Bulk
         {
             TimeSpan doubled = TimeSpan.FromTicks(wait.Ticks * 2);
             return doubled > _options.MaxPollInterval ? _options.MaxPollInterval : doubled;
+        }
+
+        /// <summary>Passes reads through but ignores Dispose, so the multipart content never closes the caller's stream.</summary>
+        private sealed class LeaveOpenStream : Stream
+        {
+            private readonly Stream _inner;
+
+            public LeaveOpenStream(Stream inner)
+            {
+                _inner = inner;
+            }
+
+            public override bool CanRead => _inner.CanRead;
+            public override bool CanSeek => _inner.CanSeek;
+            public override bool CanWrite => false;
+            public override long Length => _inner.Length;
+            public override long Position { get => _inner.Position; set => _inner.Position = value; }
+            public override void Flush() { }
+            public override int Read(byte[] buffer, int offset, int count) => _inner.Read(buffer, offset, count);
+            public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) =>
+                _inner.ReadAsync(buffer, offset, count, cancellationToken);
+            public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default) =>
+                _inner.ReadAsync(buffer, cancellationToken);
+            public override long Seek(long offset, SeekOrigin origin) => _inner.Seek(offset, origin);
+            public override void SetLength(long value) => throw new NotSupportedException();
+            public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
         }
 
         private static ShopifyBulkOperation ReadField(ShopifyGraphQlResponse response, string field)

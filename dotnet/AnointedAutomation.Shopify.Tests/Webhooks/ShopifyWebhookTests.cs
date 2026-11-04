@@ -147,6 +147,21 @@ namespace AnointedAutomation.Shopify.Tests.Webhooks
         }
 
         [Fact]
+        public async Task Sync_CreateWithoutId_IsFailedNotCreated()
+        {
+            Harness h = new Harness();
+            h.Handler
+                .Json(HttpStatusCode.OK, "{\"data\":{\"webhookSubscriptions\":{\"nodes\":[],\"pageInfo\":{\"hasNextPage\":false,\"endCursor\":null}}}}")
+                .Json(HttpStatusCode.OK, "{\"data\":{\"webhookSubscriptionCreate\":{\"webhookSubscription\":null,\"userErrors\":[]}}}");
+            IReadOnlyList<ShopifyWebhookOutcome> outcomes = await new ShopifyWebhookRegistrar(h.Client(), h.Logger)
+                .SyncAsync(new[] { new ShopifyWebhookTarget("ORDERS_PAID", Prefix + "paid") }, Prefix, CancellationToken.None);
+            ShopifyWebhookOutcome o = Assert.Single(outcomes);
+            Assert.Equal(ShopifyWebhookChange.Failed, o.Change);
+            Assert.Null(o.SubscriptionId);
+            Assert.Contains("no subscription id", o.Error, StringComparison.Ordinal);
+        }
+
+        [Fact]
         public async Task Sync_DeleteFails_IsReported()
         {
             Harness h = new Harness();

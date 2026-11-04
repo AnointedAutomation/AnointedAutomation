@@ -100,10 +100,17 @@ namespace AnointedAutomation.Shopify.Bulk
                 foreach (JsonElement p in ps.EnumerateArray())
                 {
                     string name = Str(p, "name");
-                    if (!string.IsNullOrEmpty(name))
+                    if (string.IsNullOrEmpty(name))
                     {
-                        parameters.Add(new KeyValuePair<string, string>(name, Str(p, "value")));
+                        continue;
                     }
+                    string value = Str(p, "value");
+                    if (value == null)
+                    {
+                        throw new InvalidOperationException("stagedUploadsCreate target " + url + " has parameter '" + name
+                            + "' without a string value.");
+                    }
+                    parameters.Add(new KeyValuePair<string, string>(name, value));
                 }
             }
             return new ShopifyStagedTarget(url, Str(t, "resourceUrl"), parameters);

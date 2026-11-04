@@ -144,10 +144,48 @@ namespace AnointedAutomation.Shopify.Tests.Bulk
         public async Task Wait_PollFailure_IsLoggedAndRepolled()
         {
             Rig r = new Rig();
-            r.H.Handler.Json(HttpStatusCode.OK, Bodies.AccessDenied).Json(HttpStatusCode.OK, Node("COMPLETED", url: "https://f/x"));
+            r.H.Handler.Json(HttpStatusCode.OK, "{\"errors\":[{\"message\":\"Internal error\",\"extensions\":{\"code\":\"INTERNAL_SERVER_ERROR\"}}]}")
+                .Json(HttpStatusCode.OK, Node("COMPLETED", url: "https://f/x"));
             ShopifyBulkOperation op = await r.Runner().WaitForCompletionAsync("gid://shopify/BulkOperation/1", CancellationToken.None);
             Assert.True(op.IsCompleted);
             Assert.Contains(r.H.Logger.Entries, e => e.Level == LogLevel.Warning && e.Exception is ShopifyGraphQlException);
+        }
+
+        [Fact]
+        public async Task Wait_PermanentPollFailure_SurfacesAtOnce()
+        {
+            Rig r = new Rig();
+            r.H.Handler.Json(HttpStatusCode.OK, Bodies.AccessDenied);
+            ShopifyGraphQlException ex = await Assert.ThrowsAsync<ShopifyGraphQlException>(
+                () => r.Runner().WaitForCompletionAsync("gid://shopify/BulkOperation/1", CancellationToken.None));
+            Assert.Contains("ACCESS_DENIED", ex.Reason, StringComparison.Ordinal);
+            Assert.Single(r.H.Handler.Requests);
+            Assert.Single(r.Waits);
+            Assert.Contains(r.H.Logger.Entries, e => e.Level == LogLevel.Error && e.Exception == ex);
+        }
+
+        [Fact]
+        public async Task Wait_Unauthorized401_SurfacesAtOnce()
+        {
+            Rig r = new Rig();
+            r.H.Handler.Json(HttpStatusCode.Unauthorized, "{\"errors\":\"[API] Invalid API key or access token\"}");
+            await Assert.ThrowsAsync<ShopifyGraphQlException>(
+                () => r.Runner().WaitForCompletionAsync("gid://shopify/BulkOperation/1", CancellationToken.None));
+            Assert.Single(r.H.Handler.Requests);
+        }
+
+        [Theory]
+        [InlineData(401, null, true)]
+        [InlineData(403, null, true)]
+        [InlineData(404, null, true)]
+        [InlineData(200, "ACCESS_DENIED: no scope", true)]
+        [InlineData(200, "UNAUTHORIZED: bad token", true)]
+        [InlineData(500, "server error", false)]
+        [InlineData(200, "INTERNAL_SERVER_ERROR: oops", false)]
+        public void IsPermanent_ClassifiesFailures(int status, string reason, bool permanent)
+        {
+            ShopifyGraphQlException ex = new ShopifyGraphQlException("Op", status, ShopifyCallOutcome.Failed, reason, null);
+            Assert.Equal(permanent, ShopifyBulkOperationRunner.IsPermanent(ex));
         }
 
         [Fact]
@@ -187,6 +225,8 @@ namespace AnointedAutomation.Shopify.Tests.Bulk
                 jsonl, "bulk.jsonl", CancellationToken.None);
 
             Assert.True(op.IsCompleted);
+            Assert.True(jsonl.CanRead); // the caller's stream is left open
+            jsonl.Position = 0;
             Assert.Single(r.Files.Requests);
             string form = r.Files.Requests[0].Body;
             Assert.Contains("tmp/1/bulk.jsonl", form, StringComparison.Ordinal);
@@ -286,6 +326,11 @@ namespace AnointedAutomation.Shopify.Tests.Bulk
             using JsonDocument noKey = JsonDocument.Parse("{\"stagedTargets\":[{\"url\":\"https://u\",\"parameters\":[]}]}");
             ShopifyStagedTarget t = ShopifyStagedUploads.ReadTarget(noKey.RootElement);
             Assert.Throws<InvalidOperationException>(() => t.Key);
+
+            using JsonDocument nullValue = JsonDocument.Parse("{\"stagedTargets\":[{\"url\":\"https://u\",\"parameters\":[{\"name\":\"policy\",\"value\":null}]}]}");
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => ShopifyStagedUploads.ReadTarget(nullValue.RootElement));
+            Assert.Contains("policy", ex.Message, StringComparison.Ordinal);
+            Assert.Contains("https://u", ex.Message, StringComparison.Ordinal);
         }
 
         [Fact]
