@@ -135,6 +135,41 @@ namespace AnointedAutomation.Shopify.Tests.GraphQL
         }
 
         [Fact]
+        public async Task NonSuccessThrottledBody_UsesAttemptBudgetAndTerminates()
+        {
+            Harness h = new Harness();
+            for (int i = 0; i < 3; i++)
+            {
+                h.Handler.Json((HttpStatusCode)429, Bodies.Throttled);
+            }
+            ShopifyGraphQlException ex = await Assert.ThrowsAsync<ShopifyGraphQlException>(() => h.Client().SendAsync(Query(), CancellationToken.None));
+            Assert.Equal(429, ex.StatusCode);
+            Assert.Equal(3, h.Handler.Requests.Count);
+
+            Harness k = new Harness();
+            for (int i = 0; i < 3; i++)
+            {
+                k.Handler.Json(HttpStatusCode.ServiceUnavailable, Bodies.Throttled);
+            }
+            Dictionary<string, object> vars = new Dictionary<string, object> { [ShopifyIdempotency.KeyVariable] = "k" };
+            ShopifyGraphQlException ex2 = await Assert.ThrowsAsync<ShopifyGraphQlException>(
+                () => k.Client().SendAsync(new ShopifyGraphQlRequest(Bodies.KeyedMutation, vars), CancellationToken.None));
+            Assert.Equal(503, ex2.StatusCode);
+            Assert.Equal(3, k.Handler.Requests.Count);
+        }
+
+        [Fact]
+        public async Task LeadingFragmentMutation_ServerError_IsIndeterminate()
+        {
+            Harness h = new Harness();
+            h.Handler.Json(HttpStatusCode.BadGateway, "{}");
+            ShopifyGraphQlException ex = await Assert.ThrowsAsync<ShopifyGraphQlException>(() => h.Client().SendAsync(
+                new ShopifyGraphQlRequest("fragment F on Shop { name }\nmutation M { a { ...F } }", null), CancellationToken.None));
+            Assert.Equal(ShopifyCallOutcome.Indeterminate, ex.Outcome);
+            Assert.Single(h.Handler.Requests);
+        }
+
+        [Fact]
         public async Task ServerError_Query_RetriesWithBackoff()
         {
             Harness h = new Harness();

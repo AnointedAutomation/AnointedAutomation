@@ -55,6 +55,41 @@ namespace AnointedAutomation.Shopify.Tests.GraphQL
             Assert.Throws<ArgumentException>(() => new ShopifyGraphQlRequest(" ", null));
         }
 
+        [Theory]
+        [InlineData("query Q { shop { name } }", false)]
+        [InlineData("{ shop { name } }", false)]
+        [InlineData("  # mutation in a comment\n{ shop { name } }", false)]
+        [InlineData("query Q($s: String = \"mutation\") { shop(q: \"mutation {\") { name } }", false)]
+        [InlineData("query Q { shop { description(text: \"\"\"mutation }\"\"\") } }", false)]
+        [InlineData("fragment F on Shop { name }\nquery Q { shop { ...F } }", false)]
+        [InlineData("subscription S { x }", false)]
+        [InlineData("# leading comment\nmutation M { tagsAdd(id: 1) { userErrors { message } } }", true)]
+        [InlineData("fragment F on Shop { name }\nmutation M { a { ...F } }", true)]
+        [InlineData("query A { shop { name } }\nmutation B { a { b } }", true)]
+        [InlineData("{ shop { name } }\nmutation B { a { b } }", true)]
+        [InlineData("mutation{a{b}}", true)]
+        [InlineData("extend type X { y: Int }", true)]
+        [InlineData("fragment F on Shop { name }", true)]
+        [InlineData("query Q { shop { name }", true)]
+        [InlineData("query Q { shop } }", true)]
+        [InlineData("query Q(\"unterminated", true)]
+        [InlineData("query Q { s(a: \"open) }", true)]
+        [InlineData("query Q { s(a: \"\"\"open) }", true)]
+        [InlineData("query Q", true)]
+        [InlineData(" ", true)]
+        public void MayBeMutation_FailsClosed(string query, bool expected)
+        {
+            Assert.Equal(expected, ShopifyGraphQlRequest.MayBeMutation(query));
+        }
+
+        [Fact]
+        public void Request_LeadingCommentMutation_IsNotSafeToResend()
+        {
+            ShopifyGraphQlRequest r = new ShopifyGraphQlRequest("# note\nmutation M { a { b } }", null);
+            Assert.True(r.IsMutation);
+            Assert.False(r.SafeToResendAfterUnknownOutcome);
+        }
+
         [Fact]
         public void OperationName()
         {

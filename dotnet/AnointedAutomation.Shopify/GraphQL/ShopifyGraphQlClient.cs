@@ -101,8 +101,11 @@ namespace AnointedAutomation.Shopify.GraphQL
                 {
                     lastStatus = result.Status;
                     ShopifyQueryCost cost = result.Response == null ? null : result.Response.Cost;
-                    bool throttled = result.Response != null && ShopifyGraphQlErrors.IsThrottled(result.Response.Root);
-                    _options.CostBucket.Observe(request.Query, cost, throttled, _options.Clock.GetUtcNow());
+                    bool bodyThrottled = result.Response != null && ShopifyGraphQlErrors.IsThrottled(result.Response.Root);
+                    _options.CostBucket.Observe(request.Query, cost, bodyThrottled, _options.Clock.GetUtcNow());
+                    // Only a 2xx THROTTLED answer uses the throttled-round budget; any other status (a 429 or 5xx whose
+                    // body also says THROTTLED) counts against the attempt budget, so the loop always terminates.
+                    bool throttled = bodyThrottled && result.Status >= 200 && result.Status < 300;
                     if (result.Status >= 200 && result.Status < 300 && result.Response == null)
                     {
                         Exception notJson = result.ParseError;
