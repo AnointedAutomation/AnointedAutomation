@@ -8,6 +8,8 @@ using MongoDB.Driver;
 using Xunit;
 using Moq;
 
+// These tests cover GetAllDocumentsAsync, which is [Obsolete] (#253) but still shipped.
+#pragma warning disable CS0618
 namespace AnointedAutomation.Repository.Mongo.Tests
 {
     public class MongoHelperTests
@@ -466,6 +468,21 @@ namespace AnointedAutomation.Repository.Mongo.Tests
 
             // Assert
             Assert.Equal(1, result.DeletedCount);
+        }
+
+        [Theory]
+        [InlineData(typeof(IMongoHelper))]
+        [InlineData(typeof(MongoHelper))]
+        [InlineData(typeof(DelegatingMongoHelper))]
+        public void GetAllDocumentsAsync_IsObsoleteWarningNotError(Type type)
+        {
+            System.Reflection.MethodInfo method = type.GetMethod("GetAllDocumentsAsync");
+            Assert.NotNull(method);
+            ObsoleteAttribute attribute = (ObsoleteAttribute)Attribute.GetCustomAttribute(method, typeof(ObsoleteAttribute));
+            Assert.NotNull(attribute);
+            Assert.False(attribute.IsError);
+            Assert.Contains("GetDocumentIdsPageAsync", attribute.Message);
+            Assert.Contains("GetPagedAsync", attribute.Message);
         }
 
         [Fact]

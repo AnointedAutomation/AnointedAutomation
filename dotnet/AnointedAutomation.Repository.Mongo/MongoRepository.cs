@@ -86,7 +86,10 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>A list of all documents in the collection.</returns>
         public Task<List<TDoc>> GetAllAsync()
         {
+            // GetAllAsync is the repository's own whole-collection read; it forwards the obsolete helper on purpose.
+#pragma warning disable CS0618
             return Mongo.GetAllDocumentsAsync<TDoc>(CollectionName);
+#pragma warning restore CS0618
         }
 
         /// <summary>

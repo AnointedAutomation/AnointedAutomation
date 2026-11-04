@@ -271,7 +271,7 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 2.1.0
+### AnointedAutomation.Repository.Mongo 2.2.0
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 

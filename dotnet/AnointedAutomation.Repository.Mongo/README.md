@@ -88,7 +88,7 @@ Every method takes the collection name as its first argument.
 
 - Filters are `FilterDefinition<T>`. `GetSingleAsync`, `GetFilteredDocumentsAsync`, `DeleteDocumentAsync`, `CountAsync` and `ExistsAsync` also accept an `Expression<Func<T, bool>>`.
 - The `...ByIdAsync` methods treat a 24 character hex id as an `ObjectId` and any other string as a plain string `_id`.
-- `GetAllDocumentsAsync` loads the whole collection; prefer `GetPagedAsync`, `CountAsync` or `AggregateAsync` for large collections.
+- `GetAllDocumentsAsync` is `[Obsolete]` since 2.2.0 (a compiler warning, not an error): it loads the whole collection into memory. Page with `GetDocumentIdsPageAsync` or `GetPagedAsync`, or use `CountAsync` / `AggregateAsync`. It will be removed in a later major version.
 
 ### Routing helpers
 
