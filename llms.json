@@ -195,7 +195,7 @@
     },
     {
       "id": "AnointedAutomation.Logging",
-      "version": "1.0.7",
+      "version": "1.0.8",
       "targetFramework": "net10.0",
       "description": "A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Logging",
@@ -456,7 +456,7 @@
     },
     {
       "id": "AnointedAutomation.Shopify",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "targetFramework": "net10.0",
       "description": "Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Models only: no HTTP client, no services, no GraphQL types.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Shopify",
@@ -623,7 +623,7 @@
     },
     {
       "id": "@anointedautomation/sso-react",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "runtime": "Browser and SSR, React 18+ (peer dependency)",
       "published": true,
       "description": "React companion for Sign in with Anointed Automation: an accessible sign-in button and a useAnointedSignIn hook that navigate the browser to the partner server's start route. No secrets client side.",
@@ -641,7 +641,7 @@
     },
     {
       "id": "@anointedautomation/sso-next",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "Next.js App Router, Node 18+ (server only)",
       "published": true,
       "description": "Next.js App Router start, callback and back-channel logout route handlers built on @anointedautomation/sso.",
@@ -660,7 +660,7 @@
     },
     {
       "id": "@anointedautomation/sso-vue",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "Vue 3 (browser)",
       "published": true,
       "description": "Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side.",
@@ -695,7 +695,7 @@
     },
     {
       "id": "@anointedautomation/sso-angular",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "Angular 17+ (browser)",
       "published": true,
       "description": "Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side.",
@@ -713,7 +713,7 @@
     },
     {
       "id": "@anointedautomation/sso-sveltekit",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "SvelteKit 2 + Svelte 5",
       "published": true,
       "description": "SvelteKit start, callback, logout and back-channel logout handlers (handle hook or +server.js) built on @anointedautomation/sso, plus a sign-in button (./client).",
@@ -733,7 +733,7 @@
     },
     {
       "id": "@anointedautomation/sso-react-native",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "runtime": "React Native / Expo",
       "published": true,
       "description": "React Native and Expo sign-in button and useAnointedSignIn hook: open the partner server's start route in a system auth session and read the deep-link callback. No secrets in the app.",
@@ -754,13 +754,13 @@
   "swiftPackages": [
     {
       "id": "AnointedSSO",
-      "version": "0.1.1",
+      "version": "0.1.3",
       "runtime": "iOS 15+, macOS 12+ (Swift Package Manager)",
       "published": true,
       "description": "Sign in with Anointed Automation for iOS and macOS apps: opens the partner's own server start route in ASWebAuthenticationSession; the server (using @anointedautomation/sso) keeps the client secret and redirects back. State check and SwiftUI button included.",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/swift/AnointedSSO/README.md",
-      "install": "https://github.com/AnointedAutomation/AnointedAutomation (git tag 0.1.1, product AnointedSSO)",
+      "install": "https://github.com/AnointedAutomation/AnointedAutomation (git tag 0.1.3, product AnointedSSO)",
       "dependencies": [],
       "keyExports": [
         "AnointedSignIn",
@@ -776,7 +776,7 @@
   "pythonPackages": [
     {
       "id": "anointedautomation-sso",
-      "version": "0.1.0",
+      "version": "0.1.2",
       "runtime": "Python 3.10+ (server only)",
       "published": true,
       "description": "Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Starlette and Flask adapters, back-channel logout and a session status client.",
@@ -809,7 +809,7 @@
         "AnointedSsoServiceProvider"
       ],
       "registry": "Packagist",
-      "version": "0.1.1",
+      "version": "0.1.3",
       "install": "composer require anointedautomation/sso"
     }
   ]

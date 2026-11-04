@@ -349,6 +349,12 @@ jobs:
           echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      # llms.json/llms.md/llms.txt list every package version; keep them on the bumped versions in the same commit
+      - name: Sync llms.* versions
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
+        working-directory: .
+        run: python3 -I .github/workflows/sync-llms-versions.py
+
       - name: Commit version changes
         if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         run: |
