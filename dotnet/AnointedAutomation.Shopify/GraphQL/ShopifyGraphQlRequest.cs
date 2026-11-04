@@ -141,16 +141,16 @@ namespace AnointedAutomation.Shopify.GraphQL
                         continue;
                     }
                     string word = query.Substring(start, i - start);
-                    if (word == "mutation")
+                    if (string.Equals(word, "mutation", StringComparison.Ordinal))
                     {
                         return true;
                     }
-                    if (word == "fragment")
+                    if (string.Equals(word, "fragment", StringComparison.Ordinal))
                     {
                         inHeader = true;
                         continue;
                     }
-                    if (word != "query" && word != "subscription")
+                    if (!string.Equals(word, "query", StringComparison.Ordinal) && !string.Equals(word, "subscription", StringComparison.Ordinal))
                     {
                         return true; // unknown top-level definition: fail closed
                     }
