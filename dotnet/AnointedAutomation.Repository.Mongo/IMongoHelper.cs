@@ -191,6 +191,38 @@ namespace AnointedAutomation.Repository.Mongo
         Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection);
 
         /// <summary>
+        /// Gets at most <paramref name="limit"/> documents matching the filter, in the optional sort order. Use this instead of
+        /// the unbounded <see cref="GetFilteredDocumentsAsync{T}(string, FilterDefinition{T})"/> on collections that can grow.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="limit">The maximum number of documents to return (1 or more; 0 or less throws).</param>
+        Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit);
+
+        /// <summary>
+        /// Gets at most <paramref name="limit"/> documents matching the filter, projected to a smaller shape so only the
+        /// needed fields leave the server.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="projection">The projection definition.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="limit">The maximum number of documents to return (1 or more; 0 or less throws).</param>
+        Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection, SortDefinition<T> sort, int limit);
+
+        /// <summary>
+        /// Runs many inserts, updates, replaces and deletes as bulk writes, <see cref="MongoHelper.MaxBulkWriteBatch"/> models per
+        /// round trip. Unordered by default, so one failing model does not stop the rest; the driver then throws a
+        /// <see cref="MongoBulkWriteException{T}"/> listing every failed model. An empty list makes no call.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="models">The write models.</param>
+        /// <param name="ordered">True to stop at the first failure.</param>
+        /// <returns>The summed counts of every batch.</returns>
+        Task<BulkWriteSummary> BulkWriteAsync<T>(string collectionName, IEnumerable<WriteModel<T>> models, bool ordered = false);
+
+        /// <summary>
         /// Runs an aggregation pipeline on the collection and returns the results.
         /// </summary>
         /// <typeparam name="T">The source document type.</typeparam>

@@ -52,6 +52,9 @@ namespace AnointedAutomation.Repository.Mongo
         public virtual Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter) => Current().ExistsAsync(collectionName, filter);
         public virtual Task<List<T>> GetPagedAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int skip, int limit) => Current().GetPagedAsync(collectionName, filter, sort, skip, limit);
         public virtual Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection) => Current().GetProjectedAsync(collectionName, filter, projection);
+        public virtual Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit) => Current().GetFilteredDocumentsAsync(collectionName, filter, sort, limit);
+        public virtual Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection, SortDefinition<T> sort, int limit) => Current().GetProjectedAsync(collectionName, filter, projection, sort, limit);
+        public virtual Task<BulkWriteSummary> BulkWriteAsync<T>(string collectionName, IEnumerable<WriteModel<T>> models, bool ordered = false) => Current().BulkWriteAsync(collectionName, models, ordered);
         public virtual Task<List<TResult>> AggregateAsync<T, TResult>(string collectionName, PipelineDefinition<T, TResult> pipeline) => Current().AggregateAsync(collectionName, pipeline);
         public virtual Task<List<TField>> DistinctAsync<T, TField>(string collectionName, FieldDefinition<T, TField> field, FilterDefinition<T> filter) => Current().DistinctAsync(collectionName, field, filter);
         public virtual Task CreateManyAsync<T>(string collectionName, IEnumerable<T> documents) => Current().CreateManyAsync(collectionName, documents);

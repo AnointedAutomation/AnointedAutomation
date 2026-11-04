@@ -25,6 +25,9 @@ namespace AnointedAutomation.Repository.Mongo
         /// <summary>The most log messages kept in the in-memory buffer; older ones are dropped first.</summary>
         public const int MaxBufferedLogs = 1000;
 
+        /// <summary>The most write models sent in one bulk write round trip by <see cref="BulkWriteAsync{T}"/>.</summary>
+        public const int MaxBulkWriteBatch = 1000;
+
         private static readonly ConcurrentQueue<LogMessage> mongoLogs = new ConcurrentQueue<LogMessage>();
 
         /// <summary>
@@ -465,6 +468,65 @@ namespace AnointedAutomation.Repository.Mongo
         public async Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection)
         {
             return await GetCollection<T>(collectionName).Find(filter).Project(projection).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit)
+        {
+            ValidatePage(0, limit);
+            IFindFluent<T, T> find = GetCollection<T>(collectionName).Find(filter);
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection, SortDefinition<T> sort, int limit)
+        {
+            ValidatePage(0, limit);
+            if (projection == null)
+            {
+                throw new ArgumentNullException(nameof(projection));
+            }
+            IFindFluent<T, T> find = GetCollection<T>(collectionName).Find(filter);
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).Project(projection).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<BulkWriteSummary> BulkWriteAsync<T>(string collectionName, IEnumerable<WriteModel<T>> models, bool ordered = false)
+        {
+            if (models == null)
+            {
+                throw new ArgumentNullException(nameof(models));
+            }
+            IMongoCollection<T> collection = GetCollection<T>(collectionName);
+            BulkWriteOptions options = new BulkWriteOptions { IsOrdered = ordered };
+            BulkWriteSummary summary = BulkWriteSummary.Empty;
+            List<WriteModel<T>> batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+            foreach (WriteModel<T> model in models)
+            {
+                if (model == null)
+                {
+                    throw new ArgumentException("models must not contain null", nameof(models));
+                }
+                batch.Add(model);
+                if (batch.Count == MaxBulkWriteBatch)
+                {
+                    summary = summary.Add(await collection.BulkWriteAsync(batch, options));
+                    batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+                }
+            }
+            if (batch.Count > 0)
+            {
+                summary = summary.Add(await collection.BulkWriteAsync(batch, options));
+            }
+            return summary;
         }
 
         /// <summary>
