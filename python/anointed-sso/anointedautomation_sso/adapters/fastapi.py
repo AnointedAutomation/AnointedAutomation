@@ -26,6 +26,24 @@ from ..replay import InMemoryLogoutReplayStore, LogoutReplayStore
 
 _log = logging.getLogger("anointedautomation_sso")
 
+#: Largest back-channel logout body read; a logout token is a few KiB, so anything bigger is refused (413).
+MAX_LOGOUT_BODY_BYTES = 64 * 1024
+
+
+async def _read_capped_body(request: Request, limit: int) -> Optional[bytes]:
+    """The request body, or None once it passes ``limit`` bytes (declared or streamed)."""
+    declared = request.headers.get("content-length")
+    if declared is not None and declared.isdigit() and int(declared) > limit:
+        return None
+    chunks: List[bytes] = []
+    size = 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > limit:
+            return None
+        chunks.append(chunk)
+    return b"".join(chunks)
+
 
 async def _await(value: Awaitable[Any]) -> Any:
     return await value
@@ -99,7 +117,11 @@ def create_routes(
         content_type = request.headers.get("content-type", "").split(";")[0].strip().lower()
         if content_type != "application/x-www-form-urlencoded":
             return Response(status_code=400, headers={"Cache-Control": "no-store"})
-        form = parse_qs((await request.body()).decode("utf-8", errors="replace"), keep_blank_values=True)
+        body = await _read_capped_body(request, MAX_LOGOUT_BODY_BYTES)
+        if body is None:
+            _log.warning("back-channel logout rejected: body is larger than %d bytes", MAX_LOGOUT_BODY_BYTES)
+            return Response(status_code=413, headers={"Cache-Control": "no-store"})
+        form = parse_qs(body.decode("utf-8", errors="replace"), keep_blank_values=True)
 
         def sync_logout(logout: LogoutToken) -> None:
             outcome = on_logout(logout)

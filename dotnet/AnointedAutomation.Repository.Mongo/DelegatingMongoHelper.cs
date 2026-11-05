@@ -38,7 +38,12 @@ namespace AnointedAutomation.Repository.Mongo
         public virtual Task CreateDocumentAsync<T>(string collectionName, T document) => Current().CreateDocumentAsync(collectionName, document);
         public virtual IMongoDatabase CreateMongoDbInstance(string dbName, string connectionString) => Current().CreateMongoDbInstance(dbName, connectionString);
         public virtual Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, FilterDefinition<T> filter) => Current().DeleteDocumentAsync(collectionName, filter);
-        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
+        /// <summary>
+        /// OBSOLETE: forwards a read that loads EVERY document of the collection into application RAM at once, which
+        /// breaks the "no RAM-resident data" rule. Use GetDocumentIdsPageAsync, GetPagedAsync, or
+        /// GetFilteredDocumentsAsync with a filter and a limit instead.
+        /// </summary>
+        [Obsolete(MongoObsoleteMessages.WholeCollectionRead)]
         public virtual Task<List<T>> GetAllDocumentsAsync<T>(string collectionName) => Current().GetAllDocumentsAsync<T>(collectionName);
         public virtual Task<List<string>> GetAllDocumentIdsAsync(string collectionName) => Current().GetAllDocumentIdsAsync(collectionName);
         public virtual Task<List<string>> GetDocumentIdsPageAsync(string collectionName, int skip, int limit) => Current().GetDocumentIdsPageAsync(collectionName, skip, limit);
@@ -53,6 +58,10 @@ namespace AnointedAutomation.Repository.Mongo
         public virtual Task<List<T>> GetPagedAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int skip, int limit) => Current().GetPagedAsync(collectionName, filter, sort, skip, limit);
         public virtual Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection) => Current().GetProjectedAsync(collectionName, filter, projection);
         public virtual Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit) => Current().GetFilteredDocumentsAsync(collectionName, filter, sort, limit);
+        public virtual Task<T> GetSingleAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation) => Current().GetSingleAsync(collectionName, filter, collation);
+        public virtual Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit, Collation collation) => Current().GetFilteredDocumentsAsync(collectionName, filter, sort, limit, collation);
+        public virtual Task<long> CountAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation) => Current().CountAsync(collectionName, filter, collation);
+        public virtual Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation) => Current().ExistsAsync(collectionName, filter, collation);
         public virtual Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection, SortDefinition<T> sort, int limit) => Current().GetProjectedAsync(collectionName, filter, projection, sort, limit);
         public virtual Task<BulkWriteSummary> BulkWriteAsync<T>(string collectionName, IEnumerable<WriteModel<T>> models, bool ordered = false) => Current().BulkWriteAsync(collectionName, models, ordered);
         public virtual Task<List<TResult>> AggregateAsync<T, TResult>(string collectionName, PipelineDefinition<T, TResult> pipeline) => Current().AggregateAsync(collectionName, pipeline);

@@ -9,6 +9,7 @@ import {
   AnointedSsoError,
   BACKCHANNEL_LOGOUT_EVENT,
   DEFAULT_SCOPE,
+  JWKS_REFETCH_COOLDOWN_SECONDS,
   createAnointedClient,
   safeReturnTo,
 } from "../src/index.js";
@@ -402,6 +403,22 @@ test("key rotation: an unknown kid refetches the JWKS once and then verifies", a
   const result = await client.handleCallback({ url: callbackUrl, cookieValue: auth.cookie.value });
   assert.equal(result.user.sub, "4kT9xQ2mZ");
   assert.equal(idp.state.jwksFetches - fetchesBefore, 1);
+});
+
+test("forced JWKS refetches are rate limited by JWKS_REFETCH_COOLDOWN_SECONDS", async () => {
+  let now = Math.floor(Date.now() / 1000);
+  const client = makeClient({ now: () => now });
+  await client.getJwks();
+  const before = idp.state.jwksFetches;
+  await client.getJwks({ force: true });
+  await client.getJwks({ force: true });
+  assert.equal(idp.state.jwksFetches - before, 1);
+  now += JWKS_REFETCH_COOLDOWN_SECONDS - 1;
+  await client.getJwks({ force: true });
+  assert.equal(idp.state.jwksFetches - before, 1);
+  now += 1;
+  await client.getJwks({ force: true });
+  assert.equal(idp.state.jwksFetches - before, 2);
 });
 
 test("a token signed by an unpublished key fails after one refetch", async () => {
