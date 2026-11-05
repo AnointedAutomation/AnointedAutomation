@@ -721,7 +721,7 @@
     },
     {
       "id": "@anointedautomation/sso-angular",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "runtime": "Angular 17+ (browser)",
       "published": true,
       "description": "Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side.",

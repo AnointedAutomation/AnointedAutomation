@@ -1,6 +1,6 @@
 {
   "name": "@anointedautomation/sso-angular",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Sign in with Anointed Automation for Angular 17+: a standalone accessible brand-styled sign-in button, an AnointedSignInService and provideAnointedSignIn() that send the browser to your server's start route. No secrets client side.",
   "type": "module",
   "sideEffects": false,
