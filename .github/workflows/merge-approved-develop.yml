@@ -12,6 +12,13 @@ on:
     types: [submitted]
   push:
     branches: [develop]
+  # Merge as soon as CI finishes on a PR that was approved while its checks were still running
+  workflow_run:
+    workflows: ['.NET Test', 'CodeQL Analysis']
+    types: [completed]
+  # Safety sweep for PRs whose last check was an SDK workflow not listed above (was hourly; cut to save Actions minutes)
+  schedule:
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:
