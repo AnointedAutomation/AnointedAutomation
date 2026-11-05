@@ -10,8 +10,8 @@ namespace AnointedAutomation.Shopify.GraphQL.Models
     /// <summary>A resourcePublicationsV2 entry: whether the resource is published on a publication.</summary>
     public sealed class ShopifyResourcePublication
     {
-        /// <summary>True when published.</summary>
-        public bool IsPublished { get; set; }
+        /// <summary>True when published; null when the query did not select it.</summary>
+        public bool? IsPublished { get; set; }
 
         /// <summary>The publication (sales channel).</summary>
         public ShopifyNode Publication { get; set; }

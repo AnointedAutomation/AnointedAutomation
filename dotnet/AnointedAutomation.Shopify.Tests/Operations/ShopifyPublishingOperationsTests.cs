@@ -153,7 +153,7 @@ namespace AnointedAutomation.Shopify.Tests.Operations
                 "{\"data\":{\"collection\":{\"id\":\"gid://shopify/Collection/7\",\"resourcePublicationsV2\":{\"edges\":[{\"node\":{\"isPublished\":true,\"publication\":{\"id\":\"gid://shopify/Publication/1\"}}},{\"node\":{\"isPublished\":false,\"publication\":{\"id\":\"gid://shopify/Publication/2\"}}}]}}}}");
             ShopifyCollection c = await h.Client().ExecuteAsync(ShopifyPublishingOperations.CollectionPublications("gid://shopify/Collection/7"), CancellationToken.None);
             Assert.Equal(7, c.NumericId);
-            Assert.Equal(new[] { true, false }, c.ResourcePublicationsV2.Edges.Select(e => e.Node.IsPublished));
+            Assert.Equal(new bool?[] { true, false }, c.ResourcePublicationsV2.Edges.Select(e => e.Node.IsPublished));
             Assert.Equal(2, c.ResourcePublicationsV2.Edges[1].Node.Publication.NumericId);
         }
 
@@ -166,7 +166,9 @@ namespace AnointedAutomation.Shopify.Tests.Operations
                 .Json(HttpStatusCode.OK, "{\"data\":{\"product\":null}}");
             ShopifyGraphQlClient client = h.Client();
             ShopifyPublishedResource found = await client.ExecuteAsync(ShopifyPublishingOperations.ProductPublications("gid://shopify/Product/1"), CancellationToken.None);
-            Assert.Equal(9, Assert.Single(found.ResourcePublicationsV2.Edges).Node.Publication.NumericId);
+            ShopifyResourcePublication only = Assert.Single(found.ResourcePublicationsV2.Edges).Node;
+            Assert.Equal(9, only.Publication.NumericId);
+            Assert.Null(only.IsPublished);
             ShopifyPublishedResource missing = await client.ExecuteAsync(ShopifyPublishingOperations.ProductPublications("gid://shopify/Product/2"), CancellationToken.None);
             Assert.Null(missing);
         }
