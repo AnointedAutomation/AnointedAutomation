@@ -12,8 +12,6 @@ on:
     types: [submitted]
   push:
     branches: [develop]
-  schedule:
-    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:
