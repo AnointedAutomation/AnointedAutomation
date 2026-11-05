@@ -12,8 +12,13 @@ on:
     types: [submitted]
   push:
     branches: [develop]
+  # Merge as soon as CI finishes on a PR that was approved while its checks were still running
+  workflow_run:
+    workflows: ['.NET Test', 'CodeQL Analysis']
+    types: [completed]
+  # Safety sweep for PRs whose last check was an SDK workflow not listed above (was hourly; cut to save Actions minutes)
   schedule:
-    - cron: '17 * * * *'
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -26,6 +31,10 @@ concurrency:
 
 jobs:
   merge:
+    # PR CI only really runs for Dependabot (other PRs skip their jobs), so skip the CI-completion sweep otherwise
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.actor.login == 'dependabot[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
