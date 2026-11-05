@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         node-version: ["22", "24"]
-    # Angular 20 and ng-packagr need Node 20.19 or newer to build; consumers can still run the built package anywhere Angular runs.
+    # Angular 22 and ng-packagr 22 need Node 22.22 or 24.15 or newer to build; consumers can still run the built package anywhere Angular runs.
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
