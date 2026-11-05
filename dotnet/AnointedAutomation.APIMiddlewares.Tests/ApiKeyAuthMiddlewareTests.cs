@@ -11,6 +11,16 @@ namespace AnointedAutomation.APIMiddlewares.Tests
     {
         private static byte[] Key(string s) => Encoding.UTF8.GetBytes(s);
 
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        public void Constructor_MissingExpectedKey_Throws(string expectedKey)
+        {
+            System.ArgumentException ex = Assert.Throws<System.ArgumentException>(() =>
+                new ApiKeyAuthMiddleware(_ => Task.CompletedTask, "X-Api-Key", expectedKey, "/api"));
+            Assert.Equal("expectedKey", ex.ParamName);
+        }
+
         [Fact]
         public void IsAuthorized_CorrectKey_True()
         {

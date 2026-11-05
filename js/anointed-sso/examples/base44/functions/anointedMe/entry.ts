@@ -39,7 +39,8 @@ export default async function (req: Request): Promise<Response> {
     const data = JSON.parse(new TextDecoder().decode(fromB64url(payload)));
     if (data.exp < Math.floor(Date.now() / 1000)) return Response.json({ user: null }, { headers: noStore });
     return Response.json({ user: { sub: data.sub, email: data.email } }, { headers: noStore });
-  } catch {
+  } catch (err) {
+    console.warn("anointedMe: session cookie could not be verified or parsed", err);
     return Response.json({ user: null }, { headers: noStore });
   }
 }

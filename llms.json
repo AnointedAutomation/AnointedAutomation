@@ -65,7 +65,7 @@
     },
     {
       "id": "AnointedAutomation.APIMiddlewares",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "targetFramework": "net10.0",
       "description": "ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares",
