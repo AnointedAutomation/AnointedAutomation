@@ -33,19 +33,23 @@ namespace AnointedAutomation.Repository.Mongo
     public sealed record BulkWriteFailure(int Index, int Code, string Message);
 
     /// <summary>Thrown by <see cref="IMongoHelper.BulkWriteAsync{T}"/> after the batches ran (unordered) or at the first
-    /// failing batch (ordered). <see cref="Summary"/> holds what WAS applied; <see cref="Failures"/> lists what was not.</summary>
+    /// failing batch (ordered). <see cref="Summary"/> holds what WAS applied, <see cref="Failures"/> lists each model that failed, and
+    /// <see cref="NotAttempted"/> counts the models never applied because an ordered write stopped (the rest of the failing
+    /// batch plus every later batch; always 0 for unordered).</summary>
     public sealed class BulkWriteFailedException : Exception
     {
-        public BulkWriteFailedException(string collectionName, BulkWriteSummary summary, IReadOnlyList<BulkWriteFailure> failures)
-            : base($"Bulk write to '{collectionName}' had {failures.Count} failed model(s) after {summary.Batches} batch(es)")
+        public BulkWriteFailedException(string collectionName, BulkWriteSummary summary, IReadOnlyList<BulkWriteFailure> failures, int notAttempted)
+            : base($"Bulk write to '{collectionName}' had {failures.Count} failed model(s) and {notAttempted} not attempted after {summary.Batches} batch(es)")
         {
             CollectionName = collectionName;
             Summary = summary;
             Failures = failures;
+            NotAttempted = notAttempted;
         }
 
         public string CollectionName { get; }
         public BulkWriteSummary Summary { get; }
         public IReadOnlyList<BulkWriteFailure> Failures { get; }
+        public int NotAttempted { get; }
     }
 }

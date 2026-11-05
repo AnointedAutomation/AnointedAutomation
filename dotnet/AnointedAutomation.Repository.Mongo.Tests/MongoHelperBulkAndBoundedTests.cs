@@ -78,7 +78,7 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             Assert.Equal(2, summary.Inserted);
         }
 
-        private static MongoBulkWriteException<MongoTestDoc> BulkFailure(int batchSize, int failedIndex)
+        private static MongoBulkWriteException<MongoTestDoc> BulkFailure(int batchSize, int failedIndex, int unprocessed = 0)
         {
             ConstructorInfo errorCtor = typeof(BulkWriteError).GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)[0];
             object[] errorArgs = errorCtor.GetParameters().Select(p => p.ParameterType == typeof(int) && p.Name == "index" ? (object)failedIndex
@@ -89,7 +89,7 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             ConnectionId connection = new ConnectionId(new ServerId(new ClusterId(), new DnsEndPoint("localhost", 27017)));
             List<WriteModel<MongoTestDoc>> processed = Models(batchSize);
             return new MongoBulkWriteException<MongoTestDoc>(connection, Acked(batchSize - 1, processed),
-                new[] { error }, null, new List<WriteModel<MongoTestDoc>>());
+                new[] { error }, null, Models(unprocessed));
         }
 
         [Fact]
@@ -118,6 +118,7 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             BulkWriteFailure failure = Assert.Single(ex.Failures);
             Assert.Equal(4, failure.Index);
             Assert.Equal("c", ex.CollectionName);
+            Assert.Equal(0, ex.NotAttempted);
         }
 
         [Fact]
@@ -152,14 +153,17 @@ namespace AnointedAutomation.Repository.Mongo.Tests
                 .Returns((IEnumerable<WriteModel<MongoTestDoc>> r, BulkWriteOptions _, CancellationToken __) =>
                 {
                     calls++;
-                    throw BulkFailure(r.Count(), 0);
+                    // Fails at model 0; the driver hands back the other 999 of the batch as unprocessed.
+                    throw BulkFailure(r.Count(), 0, r.Count() - 1);
                 });
 
             BulkWriteFailedException ex = await Assert.ThrowsAsync<BulkWriteFailedException>(() =>
-                helper.BulkWriteAsync("c", Models(MongoHelper.MaxBulkWriteBatch * 2), ordered: true));
+                helper.BulkWriteAsync("c", Models(MongoHelper.MaxBulkWriteBatch * 2 + 7), ordered: true));
 
             Assert.Equal(1, calls);
             Assert.Equal(1, ex.Summary.Batches);
+            Assert.Single(ex.Failures);
+            Assert.Equal(MongoHelper.MaxBulkWriteBatch - 1 + MongoHelper.MaxBulkWriteBatch + 7, ex.NotAttempted);
         }
 
         [Fact]

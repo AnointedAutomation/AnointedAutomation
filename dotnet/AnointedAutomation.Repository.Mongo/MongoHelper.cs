@@ -509,10 +509,19 @@ namespace AnointedAutomation.Repository.Mongo
             BulkWriteOptions options = new BulkWriteOptions { IsOrdered = ordered };
             BulkWriteSummary summary = BulkWriteSummary.Empty;
             List<BulkWriteFailure> failures = new List<BulkWriteFailure>();
+            List<WriteModel<T>> unprocessed = new List<WriteModel<T>>();
             List<WriteModel<T>> batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
             int offset = 0;
+            int notAttempted = 0;
+            bool stopped = false;
             foreach (WriteModel<T> model in models)
             {
+                if (stopped)
+                {
+                    // Ordered and a batch failed: the rest are never sent, only counted.
+                    notAttempted++;
+                    continue;
+                }
                 if (model == null)
                 {
                     throw new ArgumentException("models must not contain null", nameof(models));
@@ -520,22 +529,22 @@ namespace AnointedAutomation.Repository.Mongo
                 batch.Add(model);
                 if (batch.Count == MaxBulkWriteBatch)
                 {
-                    summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures);
+                    summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures, unprocessed);
                     offset += batch.Count;
                     batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
                     if (ordered && failures.Count > 0)
                     {
-                        throw new BulkWriteFailedException(collectionName, summary, failures);
+                        stopped = true;
                     }
                 }
             }
-            if (batch.Count > 0)
+            if (!stopped && batch.Count > 0)
             {
-                summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures);
+                summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures, unprocessed);
             }
             if (failures.Count > 0)
             {
-                throw new BulkWriteFailedException(collectionName, summary, failures);
+                throw new BulkWriteFailedException(collectionName, summary, failures, unprocessed.Count + notAttempted);
             }
             return summary;
         }
@@ -543,7 +552,8 @@ namespace AnointedAutomation.Repository.Mongo
         /// <summary>Sends one batch. A bulk write error is logged and recorded (with its index in the whole list) and the
         /// applied part of the batch is still counted, so later batches can run.</summary>
         private static async Task<BulkWriteSummary> SendBatchAsync<T>(IMongoCollection<T> collection, string collectionName,
-            List<WriteModel<T>> batch, BulkWriteOptions options, int offset, BulkWriteSummary summary, List<BulkWriteFailure> failures)
+            List<WriteModel<T>> batch, BulkWriteOptions options, int offset, BulkWriteSummary summary, List<BulkWriteFailure> failures,
+            List<WriteModel<T>> unprocessed)
         {
             try
             {
@@ -560,6 +570,8 @@ namespace AnointedAutomation.Repository.Mongo
                 {
                     failures.Add(new BulkWriteFailure(-1, e.WriteConcernError.Code, "write concern: " + e.WriteConcernError.Message));
                 }
+                // Ordered: the driver stops at the failing model; the rest of this batch is reported back as unprocessed.
+                unprocessed.AddRange(e.UnprocessedRequests);
                 return summary.Add(e.Result);
             }
         }
