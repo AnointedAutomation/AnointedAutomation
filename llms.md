@@ -205,14 +205,14 @@ GarbageCollection gc = new GarbageCollection();
 gc.PerformGarbageCollection(null);
 ```
 
-### AnointedAutomation.Objects 2.7.1
+### AnointedAutomation.Objects 3.0.0
 
 Shared account, billing and response models so APIs and clients agree on shape. Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.
 
 - Depends on: NuGet Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Enums, AnointedAutomation.Shopify, AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Objects`, `AnointedAutomation.Objects.Account`, `AnointedAutomation.Objects.Billing`, `AnointedAutomation.Objects.Common`, `AnointedAutomation.Objects.Google`, `AnointedAutomation.Objects.Apple`
 - Key types: `User`, `UserEmail`, `UserEmailSource`, `Profile`, `SSO`, `ResponseData`, `PaginatedResponse<T>`, `PaymentIntent`, `Subscription`
-- Notes: User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry. User has a full constructor (every settable property, declaration order, assigned exactly as passed, no defaults); the legacy 14-parameter constructor accepts a null password and defaults dates to DateTime.UtcNow.
+- Notes: User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry. User has a full constructor (every settable property, declaration order, assigned exactly as passed, no defaults); the legacy 14-parameter constructor accepts a null password and defaults dates to DateTime.UtcNow. Product (3.0.0, breaking): the full constructor requires a three-letter uppercase ISO 4217 currency (ArgumentNullException/ArgumentException, Product.RequireCurrencyCode), no USD default; the parameterless constructor leaves Currency null.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Objects (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Objects/README.md)
 
 ```bash
@@ -340,13 +340,14 @@ builder.Services.AddControllers()
 string snake = JsonSerializer.Serialize(payload, JsonPresets.SnakeCase);
 ```
 
-### AnointedAutomation.Shopify 1.2.0
+### AnointedAutomation.Shopify 2.0.0
 
 Shopify REST models without pulling in a whole client library. Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys. Also bulk operations (staged JSONL upload, polling with backoff, streamed results), webhook HMAC verification with an idempotent subscription registrar, typed builders for common non-money catalog operations, and System.Text.Json response models.
 
 - Depends on: NuGet Newtonsoft.Json 13.0.4, Microsoft.Extensions.Logging.Abstractions 10.0.0; AnointedAutomation AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Shopify`, `AnointedAutomation.Shopify.Converters`, `AnointedAutomation.Shopify.GraphQL`, `AnointedAutomation.Shopify.GraphQL.Models`, `AnointedAutomation.Shopify.Bulk`, `AnointedAutomation.Shopify.Webhooks`, `AnointedAutomation.Shopify.Operations`
-- Key types: `Customer`, `Order`, `Product`, `Fulfillment`, `InventoryLevel`, `Refund`, `ShopifyGraphQlClient`, `IShopifyStoreContext`, `ShopifyRetryPolicy`, `ShopifyCostBucket`, `ShopifyPager`, `ShopifyIdempotency`, `ShopifyBulkOperationRunner`, `ShopifyWebhookHmac`, `ShopifyWebhookRegistrar`, `ShopifyCatalogOperations`, `ShopifyProduct`, `ShopifyOrder`
+- Key types: `Customer`, `Order`, `Product`, `Fulfillment`, `InventoryLevel`, `Refund`, `ShopifyGraphQlClient`, `IShopifyStoreContext`, `ShopifyRetryPolicy`, `ShopifyCostBucket`, `ShopifyPager`, `ShopifyIdempotency`, `ShopifyBulkOperationRunner`, `ShopifyWebhookHmac`, `ShopifyWebhookRegistrar`, `ShopifyCatalogOperations`, `ShopifyProduct`, `ShopifyOrder`, `ShopifyMoney`
+- Notes: ShopifyMoney (2.0.0, breaking): Read throws FormatException naming the missing or invalid field; TryRead(parent, setName, out decimal amount, out string currency) and TryReadAmount return false; no 0 or empty fallbacks.
 - Notes: Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Shopify (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Shopify/README.md)
 

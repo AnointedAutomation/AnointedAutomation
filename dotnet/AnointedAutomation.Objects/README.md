@@ -77,7 +77,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 | `SubscriptionUsage` | Metered usage: `Limit`, `Used`, `Remaining`, `UsagePercentage`, `IsOverLimit`, `IsNearLimit`, `IncrementUsage`, `DecrementUsage`, `ResetForNewPeriod`. |
 | `StatusHistoryEntry` | One status transition: `PreviousStatus`, `NewStatus`, `ChangedBy`, `Reason`, `Timestamp`. |
 | `Bill` | A customer's billing record: `AdressBilling`, `Orders`, `PaymentTypesOnFile`, `Purchases`, `Refunds`, `Subscriptions`. |
-| `Product`, `Sale`, `Inventory` | Catalog, sales and stock records. `Product.GetTotalQuantitySold(products, sales)` totals sales per product. |
+| `Product`, `Sale`, `Inventory` | Catalog, sales and stock records. `Product.GetTotalQuantitySold(products, sales)` totals sales per product. Since 3.0.0 the full `Product` constructor requires a three-letter uppercase ISO 4217 currency (no USD default; `Product.RequireCurrencyCode` validates). See `CHANGELOG.md`. |
 | `Address`, `Contact` | Postal address and person/contact details. |
 | `CreditCard` | Card details with `IsValid`, `IsExpired`, `ValidateLuhn`, static `DetectCardType` (`CardType`), static `MaskCardNumber`, `GetDisplayString` and `ToSecureObject` (strips sensitive data). |
 | `PaymentCredentials`, `PayeeInfo` | Payment method on file (`CreditCard`, `PayeeInfo`, `paymentType`). |
