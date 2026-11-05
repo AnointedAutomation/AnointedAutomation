@@ -23,10 +23,6 @@ namespace AnointedAutomation.Objects.Billing
         }
 
         /// <summary>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="cost">Cost to produce product</param>
-        /// <summary>
         /// Initializes a new instance of the <see cref="Product"/> class with specified properties.
         /// </summary>
         /// <param name="name">The name of the product (required).</param>
