@@ -22,8 +22,6 @@ final class Client
     /** Minimum seconds between forced JWKS refetches (unknown kid), so bad tokens cannot flood the issuer. */
     public const JWKS_REFETCH_COOLDOWN_SECONDS = 60;
 
-    private ?int $jwksForcedAt = null;
-
     private readonly ClientInterface $http;
     private readonly MetadataCache $cache;
     private readonly Closure $clock;
@@ -79,7 +77,7 @@ final class Client
 
     /**
      * The issuer's JWKS (cached). A forced refetch (unknown kid) runs at most once per
-     * JWKS_REFETCH_COOLDOWN_SECONDS per Client; inside the cooldown the cached JWKS is returned.
+     * JWKS_REFETCH_COOLDOWN_SECONDS per shared cache; inside the cooldown the cached JWKS is returned.
      *
      * @return array<string, mixed>
      */
@@ -91,11 +89,16 @@ final class Client
             return $hit;
         }
         if ($force) {
+            // The forced-at time lives in the shared cache, not on this object, so the cooldown holds across
+            // requests and workers (PHP-FPM builds a new Client per request).
+            $forcedKey = $key . '.forced_at';
             $now = ($this->clock)();
-            if ($hit !== null && $this->jwksForcedAt !== null && $now - $this->jwksForcedAt < self::JWKS_REFETCH_COOLDOWN_SECONDS) {
+            $forced = $this->cache->get($forcedKey);
+            if ($hit !== null && $forced !== null && isset($forced['at']) && is_int($forced['at'])
+                && $now - $forced['at'] < self::JWKS_REFETCH_COOLDOWN_SECONDS) {
                 return $hit;
             }
-            $this->jwksForcedAt = $now;
+            $this->cache->set($forcedKey, ['at' => $now], self::JWKS_REFETCH_COOLDOWN_SECONDS);
         }
         $jwks = $this->requestJson('GET', (string) $this->discover()['jwks_uri'], ['Accept' => 'application/json'], null, 'http');
         if (!is_array($jwks) || !isset($jwks['keys']) || !is_array($jwks['keys'])) {

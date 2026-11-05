@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace AnointedAutomation\Sso\Tests;
 
 use AnointedAutomation\Sso\AnointedSsoException;
+use AnointedAutomation\Sso\ArrayMetadataCache;
 use AnointedAutomation\Sso\Client;
 use AnointedAutomation\Sso\SsoConfig;
 use AnointedAutomation\Sso\Tests\Support\Provider;
@@ -183,6 +184,20 @@ final class ClientTest extends TestCase
         $now += 1;
         $c->getJwks(true);
         $this->assertSame(2, $this->provider->http->count('GET', $jwksUrl) - $before);
+    }
+
+    public function testForcedJwksCooldownIsSharedThroughTheCache(): void
+    {
+        $cache = new ArrayMetadataCache();
+        $clock = fn (): int => Provider::NOW;
+        $first = new Client($this->provider->config(), $this->provider->http, $cache, $clock);
+        $second = new Client($this->provider->config(), $this->provider->http, $cache, $clock);
+        $first->getJwks();
+        $jwksUrl = SsoConfig::ISSUER . 'connect/jwks';
+        $before = $this->provider->http->count('GET', $jwksUrl);
+        $first->getJwks(true);
+        $second->getJwks(true);
+        $this->assertSame(1, $this->provider->http->count('GET', $jwksUrl) - $before);
     }
 
     public function testTokenEndpointFailure(): void
