@@ -143,6 +143,54 @@ Property names are PascalCase with no `[BsonElement]` overrides, so element name
 | `JObjectSerializer` | BSON serializer for Newtonsoft `JObject`. |
 | `BsonMap` | `ToPlain(BsonValue)` and `ToDictionary(BsonDocument)` convert BSON into plain dictionaries, lists and CLR scalars (ObjectId becomes its hex string). |
 
+## Durability, reads and transactions (3.1.0)
+
+All opt-in. With no options a helper is exactly what it was before: no write concern or read preference is set on the
+collection handle and no `hello` is sent, so the connection string decides.
+
+```csharp
+MongoDurabilityOptions durability = new MongoDurabilityOptions(
+        MongoWriteConcernMode.W1, journal: null, MongoTransactionMode.Auto)
+    .ForCollections(new[] { "payments", "refunds" }, MongoDurabilityPolicy.MoneyWrites);
+MongoReadOptions reads = new MongoReadOptions(ReadPreference.Primary);
+
+IMongoHelperFactory factory = new MongoHelperFactory(durability, reads);
+MongoHelper helper = (MongoHelper)factory.Create("shop", connectionString);
+await helper.ValidateAsync(); // optional: fail at startup instead of on first use
+
+await helper.RunInTransactionAsync(async session =>
+{
+    IMongoCollection<Payment> payments = helper.GetCollection<Payment>("payments");
+    if (session == null) { await payments.InsertOneAsync(payment); }
+    else { await payments.InsertOneAsync(session, payment); }
+});
+```
+
+| Setting | Standalone mongod | Replica set or sharded cluster |
+|---|---|---|
+| `WriteConcern.Default` | driver / connection string default | same |
+| `WriteConcern.W1` | acknowledged by the server | acknowledged by the primary only; a failover can roll it back |
+| `WriteConcern.Majority` | **throws** `InvalidOperationException` on validation (no majority to wait for) | acknowledged by a majority; survives failover |
+| `Journal = true` | waits for the on-disk journal | waits for the journal (with Majority: on a majority) |
+| `Journal = null` | server default | server default |
+| `Transactions.Off` | callback runs with a null session | same |
+| `Transactions.Auto` | callback runs with a null session (no transactions exist); `EffectiveTransactionMode` is `Off` | session + transaction; `EffectiveTransactionMode` is `Required` |
+| `Transactions.Required` | **throws** `InvalidOperationException` | session + transaction (driver `WithTransactionAsync`, retries transient errors) |
+
+- Validation runs `hello` once per helper (on first use when `Majority` or transactions are configured, or when you call
+  `ValidateAsync`). A reply with `setName` is a replica set, `msg: "isdbgrid"` is sharded, anything else is standalone.
+  Nothing is silently downgraded: if a setting cannot be honored the helper throws.
+- A single-node replica set (`mongod --replSet rs0` plus `rs.initiate()`) is enough for `Majority` and transactions in
+  development.
+- Inside a transaction the driver ignores per-collection write concerns, so `RunInTransactionAsync` starts the
+  transaction with the strictest configured policy (for example `MoneyWrites` if any collection uses it), read concern
+  majority for a majority policy, and read preference primary. With no policy it uses the driver defaults.
+  `BuildTransactionOptions()` returns the same options if you start your own session.
+- `MongoReadOptions` only chooses which member serves reads. It is not a durability setting.
+- Per-collection policies match the exact collection name (ordinal) and replace the global write concern and journal for
+  that collection only.
+- Write concern errors (`MongoWriteConcernException`) reach the caller unchanged.
+
 ## Casing conventions
 
 Both conventions are opt in, so installing or upgrading the package changes nothing on its own. Register one once at startup, before `RegisterClassMaps()` and before any Mongo call, and only after your stored data uses the matching key casing:
