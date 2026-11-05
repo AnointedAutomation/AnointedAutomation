@@ -22,9 +22,13 @@ namespace AnointedAutomation.APIMiddleware
 
         public ApiKeyAuthMiddleware(RequestDelegate next, string headerName, string expectedKey, string protectedPathPrefix)
         {
+            if (string.IsNullOrEmpty(expectedKey))
+            {
+                throw new ArgumentException("expectedKey must be set; an empty key would lock every protected path", nameof(expectedKey));
+            }
             _next = next;
             _headerName = headerName;
-            _expectedKey = Encoding.UTF8.GetBytes(expectedKey ?? string.Empty);
+            _expectedKey = Encoding.UTF8.GetBytes(expectedKey);
             _protectedPathPrefix = protectedPathPrefix;
         }
 

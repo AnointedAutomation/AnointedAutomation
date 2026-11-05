@@ -265,7 +265,7 @@ namespace AnointedAutomation.Repository.Mongo.Tests
 
             List<BsonDocument> results = await _helper.AggregateAsync(coll, pipeline);
 
-            BsonDocument g = results.First(r => r["_id"].AsString == "g");
+            BsonDocument g = results.First(r => string.Equals(r["_id"].AsString, "g", StringComparison.Ordinal));
             Assert.Equal(15, g["total"].AsInt32);
         }
 
