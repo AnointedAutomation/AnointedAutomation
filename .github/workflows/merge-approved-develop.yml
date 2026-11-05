@@ -31,6 +31,10 @@ concurrency:
 
 jobs:
   merge:
+    # PR CI only really runs for Dependabot (other PRs skip their jobs), so skip the CI-completion sweep otherwise
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.actor.login == 'dependabot[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
