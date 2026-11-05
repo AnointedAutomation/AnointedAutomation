@@ -271,7 +271,7 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 3.1.0
+### AnointedAutomation.Repository.Mongo 3.2.0
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 
@@ -409,7 +409,7 @@ dotnet new anointed-razor -n MyApp   # or anointed-blazor
 
 ## JavaScript packages
 
-### @anointedautomation/sso 0.2.6
+### @anointedautomation/sso 0.2.7
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso
 - Runtime: Node 18+, Deno (Base44 backend functions), edge runtimes. Zero dependencies. Server only.
@@ -517,7 +517,7 @@ React Native and Expo sign-in button and useAnointedSignIn hook: open the partne
 
 ## Python package
 
-### anointedautomation-sso 0.1.2
+### anointedautomation-sso 0.1.3
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso
 - Runtime: Python 3.10+, server only. On PyPI: `pip install anointedautomation-sso`.
@@ -526,19 +526,19 @@ Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Sta
 
 ## PHP package
 
-### anointedautomation/sso 0.1.3
+### anointedautomation/sso 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso
-- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` (on Packagist, 0.1.3; versions come from repo git tags shared with the Swift package; manifest is the root composer.json).
+- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` (on Packagist, 0.1.4; versions come from repo git tags shared with the Swift package; manifest is the root composer.json).
 
 Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Key classes: `Client`, `SsoConfig`, `BackchannelLogoutHandler`, `AnointedSsoServiceProvider` (Laravel).
 
 ## Swift package
 
-### AnointedSSO 0.1.3
+### AnointedSSO 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO
-- Install: Swift Package Manager (git tag 0.1.3), `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
+- Install: Swift Package Manager (git tag 0.1.4), `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
 - The app never holds the client secret: `AnointedSignIn` opens the partner's own server start route (`@anointedautomation/sso`) in `ASWebAuthenticationSession`; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` the package checks.
 - Callbacks: `.https(host:path:)` (universal link, iOS 17.4+) or `.scheme(name, via:)` (an https server route that forwards the query to `name://anointed-sign-in`).
 
