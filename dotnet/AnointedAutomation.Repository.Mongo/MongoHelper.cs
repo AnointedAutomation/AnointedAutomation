@@ -25,6 +25,9 @@ namespace AnointedAutomation.Repository.Mongo
         /// <summary>The most log messages kept in the in-memory buffer; older ones are dropped first.</summary>
         public const int MaxBufferedLogs = 1000;
 
+        /// <summary>The most write models sent in one bulk write round trip by <see cref="BulkWriteAsync{T}"/>.</summary>
+        public const int MaxBulkWriteBatch = 1000;
+
         private static readonly ConcurrentQueue<LogMessage> mongoLogs = new ConcurrentQueue<LogMessage>();
 
         /// <summary>
@@ -465,6 +468,112 @@ namespace AnointedAutomation.Repository.Mongo
         public async Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection)
         {
             return await GetCollection<T>(collectionName).Find(filter).Project(projection).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit)
+        {
+            ValidatePage(0, limit);
+            IFindFluent<T, T> find = GetCollection<T>(collectionName).Find(filter);
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection, SortDefinition<T> sort, int limit)
+        {
+            ValidatePage(0, limit);
+            if (projection == null)
+            {
+                throw new ArgumentNullException(nameof(projection));
+            }
+            IFindFluent<T, T> find = GetCollection<T>(collectionName).Find(filter);
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).Project(projection).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<BulkWriteSummary> BulkWriteAsync<T>(string collectionName, IEnumerable<WriteModel<T>> models, bool ordered = false)
+        {
+            if (models == null)
+            {
+                throw new ArgumentNullException(nameof(models));
+            }
+            IMongoCollection<T> collection = GetCollection<T>(collectionName);
+            BulkWriteOptions options = new BulkWriteOptions { IsOrdered = ordered };
+            BulkWriteSummary summary = BulkWriteSummary.Empty;
+            List<BulkWriteFailure> failures = new List<BulkWriteFailure>();
+            List<WriteModel<T>> unprocessed = new List<WriteModel<T>>();
+            List<WriteModel<T>> batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+            int offset = 0;
+            int notAttempted = 0;
+            bool stopped = false;
+            foreach (WriteModel<T> model in models)
+            {
+                if (stopped)
+                {
+                    // Ordered and a batch failed: the rest are never sent, only counted.
+                    notAttempted++;
+                    continue;
+                }
+                if (model == null)
+                {
+                    throw new ArgumentException("models must not contain null", nameof(models));
+                }
+                batch.Add(model);
+                if (batch.Count == MaxBulkWriteBatch)
+                {
+                    summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures, unprocessed);
+                    offset += batch.Count;
+                    batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+                    if (ordered && failures.Count > 0)
+                    {
+                        stopped = true;
+                    }
+                }
+            }
+            if (!stopped && batch.Count > 0)
+            {
+                summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures, unprocessed);
+            }
+            if (failures.Count > 0)
+            {
+                throw new BulkWriteFailedException(collectionName, summary, failures, unprocessed.Count + notAttempted);
+            }
+            return summary;
+        }
+
+        /// <summary>Sends one batch. A bulk write error is logged and recorded (with its index in the whole list) and the
+        /// applied part of the batch is still counted, so later batches can run.</summary>
+        private static async Task<BulkWriteSummary> SendBatchAsync<T>(IMongoCollection<T> collection, string collectionName,
+            List<WriteModel<T>> batch, BulkWriteOptions options, int offset, BulkWriteSummary summary, List<BulkWriteFailure> failures,
+            List<WriteModel<T>> unprocessed)
+        {
+            try
+            {
+                return summary.Add(await collection.BulkWriteAsync(batch, options));
+            }
+            catch (MongoBulkWriteException<T> e)
+            {
+                AddLog(LogMessage.Warning($"BulkWriteAsync: {e.WriteErrors.Count} of {batch.Count} models failed in collection '{collectionName}' (batch starting at {offset})", e));
+                foreach (BulkWriteError error in e.WriteErrors)
+                {
+                    failures.Add(new BulkWriteFailure(offset + error.Index, error.Code, error.Message));
+                }
+                if (e.WriteConcernError != null)
+                {
+                    failures.Add(new BulkWriteFailure(-1, e.WriteConcernError.Code, "write concern: " + e.WriteConcernError.Message));
+                }
+                // Ordered: the driver stops at the failing model; the rest of this batch is reported back as unprocessed.
+                unprocessed.AddRange(e.UnprocessedRequests);
+                return summary.Add(e.Result);
+            }
         }
 
         /// <summary>
