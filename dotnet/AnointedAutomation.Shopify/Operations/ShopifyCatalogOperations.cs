@@ -375,10 +375,10 @@ namespace AnointedAutomation.Shopify.Operations
             return Op<T>(query, field, new Dictionary<string, object> { ["id"] = id });
         }
 
-        private static ShopifyOperation<T> Op<T>(string query, string field, Dictionary<string, object> variables) =>
+        internal static ShopifyOperation<T> Op<T>(string query, string field, Dictionary<string, object> variables) =>
             new ShopifyOperation<T>(new ShopifyGraphQlRequest(query, variables), field);
 
-        private static void Require(string value, string name)
+        internal static void Require(string value, string name)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
