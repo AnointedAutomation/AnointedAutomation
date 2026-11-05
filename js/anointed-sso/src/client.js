@@ -57,6 +57,9 @@ function isPlainObject(value) {
 /** Longest error-body excerpt kept on an AnointedSsoError (`bodySnippet`). */
 const BODY_SNIPPET_LENGTH = 300;
 
+/** Minimum seconds between forced JWKS refetches (unknown `kid`), so bad tokens cannot flood the issuer. */
+export const JWKS_REFETCH_COOLDOWN_SECONDS = 60;
+
 /**
  * @summary    The start of an error response body, on one line, for logs (an HTML 502 page is recognizable from it).
  * @param {string} text
@@ -297,6 +300,7 @@ export function createAnointedClient(config) {
   let discoveryPending = null;
   let jwksCache = null;
   let jwksPending = null;
+  let jwksForcedAt = null;
 
   /**
    * @summary    Fetch and parse a JSON response, raising a coded error on transport or HTTP failure.
@@ -391,13 +395,22 @@ export function createAnointedClient(config) {
   }
 
   /**
-   * @summary    The issuer's JWKS (cached).
+   * @summary    The issuer's JWKS (cached). A forced refetch (unknown kid) runs at most once per
+   *   JWKS_REFETCH_COOLDOWN_SECONDS; inside the cooldown the cached JWKS is returned.
    * @param {{force?: boolean}} [opts]
    * @returns {Promise<{keys: Array<Record<string, any>>}>}
    */
   async function getJwks(opts = {}) {
     if (opts.force !== true && jwksCache !== null && jwksCache.expiresAt > clock()) return jwksCache.value;
     if (jwksPending !== null) return jwksPending;
+    if (opts.force === true) {
+      // A token naming an unknown kid forces a refetch; the cooldown keeps a flood of such tokens from turning
+      // into a flood of JWKS requests against the issuer.
+      if (jwksCache !== null && jwksForcedAt !== null && clock() - jwksForcedAt < JWKS_REFETCH_COOLDOWN_SECONDS) {
+        return jwksCache.value;
+      }
+      jwksForcedAt = clock();
+    }
     jwksPending = (async () => {
       const doc = await discover();
       const jwks = await requestJson(doc.jwks_uri, { headers: { accept: "application/json" } }, "http");

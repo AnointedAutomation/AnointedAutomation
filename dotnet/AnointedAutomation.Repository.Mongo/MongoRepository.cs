@@ -80,11 +80,14 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <summary>
-        /// WARNING: loads EVERY document in the collection into memory. Only use for small
-        /// collections (see <see cref="IMongoHelper.GetAllDocumentsAsync{T}"/>).
+        /// OBSOLETE: loads EVERY document of the collection into application RAM at once, which breaks the
+        /// "no RAM-resident data" rule. Kept only so existing callers compile; nothing in this repository calls it.
+        /// Use <see cref="GetPagedAsync"/>, <see cref="IMongoHelper.GetDocumentIdsPageAsync"/>, or
+        /// <see cref="IMongoHelper.GetFilteredDocumentsAsync{T}(string, FilterDefinition{T}, SortDefinition{T}, int)"/>
+        /// with a filter and a limit instead.
         /// </summary>
         /// <returns>A list of all documents in the collection.</returns>
-        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
+        [Obsolete(MongoObsoleteMessages.WholeCollectionRead)]
         public Task<List<TDoc>> GetAllAsync()
         {
             return Mongo.GetAllDocumentsAsync<TDoc>(CollectionName);

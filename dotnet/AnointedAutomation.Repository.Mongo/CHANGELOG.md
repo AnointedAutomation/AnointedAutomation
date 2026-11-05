@@ -1,5 +1,18 @@
 # Changelog: AnointedAutomation.Repository.Mongo
 
+## 3.2.0
+
+Collation overloads, additive (#253). Each new `IMongoHelper` member has a default interface body that runs through
+`database`, so implementations outside this package keep compiling; `MongoHelper` and `DelegatingMongoHelper` have
+explicit versions.
+
+- `GetSingleAsync(collection, filter, collation)`, `GetFilteredDocumentsAsync(collection, filter, sort, limit, collation)`
+  (bounded: limit 1 or more), `CountAsync(collection, filter, collation)` and `ExistsAsync(collection, filter, collation)`.
+  A null collation throws `ArgumentNullException`.
+- `GetAllDocumentsAsync` and `MongoRepository<TDoc>.GetAllAsync` stay `[Obsolete]` (warning); the docs and message now
+  say they load the whole collection into RAM and name `GetDocumentIdsPageAsync`, `GetPagedAsync` and the bounded
+  `GetFilteredDocumentsAsync`. Nothing in this repository calls them.
+
 ## 3.1.0
 
 Opt-in write durability, read preference and transactions. Additive only: `IMongoHelper` is unchanged, and a helper

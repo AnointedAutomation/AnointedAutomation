@@ -177,6 +177,17 @@ test("web adapter: back-channel logout answers 200 / 400 / 500 per the spec", as
   assert.equal((await post(`logout_token=${logoutToken({ nonce: "n" })}`)).status, 400);
   assert.equal((await post("")).status, 400);
   assert.equal((await post("logout_token=")).status, 400);
+  assert.equal((await post(`logout_token=${"a".repeat(64 * 1024)}`)).status, 413);
+  const streamed = new ReadableStream({
+    start(controller) {
+      for (let i = 0; i < 70; i += 1) controller.enqueue(new Uint8Array(1024));
+      controller.close();
+    },
+  });
+  const chunked = await handlers.backchannelLogout(
+    new Request("http://localhost:3000/auth/anointed/backchannel-logout", { method: "POST", body: streamed, duplex: "half" }),
+  );
+  assert.equal(chunked.status, 413);
   failNext = true;
   assert.equal((await post(`logout_token=${logoutToken()}`)).status, 500);
 });

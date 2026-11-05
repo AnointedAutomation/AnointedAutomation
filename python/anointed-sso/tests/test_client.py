@@ -10,6 +10,8 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
+from anointedautomation_sso.client import JWKS_REFETCH_COOLDOWN_SECONDS
+
 from anointedautomation_sso import ANOINTED_ISSUER, AnointedClient, AnointedSsoError, require_env
 from anointedautomation_sso.http import HttpResponse
 
@@ -211,6 +213,26 @@ def test_jwks_refetched_once_on_key_rotation(client, provider):
     provider.token_response = {"id_token": provider.sign(claims, key=new_key, kid="k2")}
     assert callback(client, auth, state).user.sub == "u2"
     assert sum(1 for c in provider.calls if c[1].endswith("jwks.json")) == 2
+
+
+def test_forced_jwks_refetch_has_a_cooldown(provider):
+    clock = [NOW]
+    c = AnointedClient(issuer=ANOINTED_ISSUER, client_id=CLIENT_ID, redirect_uri=REDIRECT_URI, http=provider, now=lambda: clock[0])
+
+    def fetches():
+        return sum(1 for call in provider.calls if call[1].endswith("jwks.json"))
+
+    c.get_jwks()
+    before = fetches()
+    c.get_jwks(force=True)
+    c.get_jwks(force=True)
+    assert fetches() - before == 1
+    clock[0] = NOW + JWKS_REFETCH_COOLDOWN_SECONDS - 1
+    c.get_jwks(force=True)
+    assert fetches() - before == 1
+    clock[0] = NOW + JWKS_REFETCH_COOLDOWN_SECONDS
+    c.get_jwks(force=True)
+    assert fetches() - before == 2
 
 
 def test_discovery_cached_and_validated(client, provider):

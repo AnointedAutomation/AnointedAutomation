@@ -280,21 +280,17 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <summary>
-        /// WARNING: THIS METHOD IS DANGEROUS AND CAN CAUSE OutOfMemoryException!
-        /// Loads ALL documents with ALL fields into memory. For large collections or
-        /// collections with binary data, this WILL crash your application.
-        ///
-        /// USE INSTEAD:
-        /// - GetAllDocumentIdsAsync() to get only IDs (safe)
-        /// - GetFilteredDocumentsAsync() with a filter to limit results
-        /// - Use projection to exclude large fields like binary content
-        ///
-        /// Only use this method for small collections with small documents.
+        /// OBSOLETE: loads EVERY document of the collection, with every field, into application RAM at once.
+        /// That breaks the "no RAM-resident data" rule: a growing collection becomes an OutOfMemoryException.
+        /// Use a bounded read instead:
+        /// <see cref="GetDocumentIdsPageAsync"/> to walk ids page by page,
+        /// <see cref="GetPagedAsync{T}"/> to walk documents page by page, or
+        /// <see cref="GetFilteredDocumentsAsync{T}(string, FilterDefinition{T}, SortDefinition{T}, int)"/> with a filter and a limit.
         /// </summary>
         /// <typeparam name="T">The type of documents to retrieve.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>A list of all documents in the collection.</returns>
-        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
+        [Obsolete(MongoObsoleteMessages.WholeCollectionRead)]
         public async Task<List<T>> GetAllDocumentsAsync<T>(string collectionName)
         {
             IMongoCollection<T> collection = (await CollectionAsync<T>(collectionName));
@@ -522,6 +518,42 @@ namespace AnointedAutomation.Repository.Mongo
                 find = find.Sort(sort);
             }
             return await find.Limit(limit).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<T> GetSingleAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            return await (await CollectionAsync<T>(collectionName)).Find(filter, new FindOptions { Collation = collation }).FirstOrDefaultAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            ValidatePage(0, limit);
+            IFindFluent<T, T> find = (await CollectionAsync<T>(collectionName)).Find(filter, new FindOptions { Collation = collation });
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<long> CountAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            return await (await CollectionAsync<T>(collectionName)).CountDocumentsAsync(filter, new CountOptions { Collation = collation });
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            long count = await (await CollectionAsync<T>(collectionName))
+                .CountDocumentsAsync(filter, new CountOptions { Collation = collation, Limit = 1 });
+            return count > 0;
         }
 
         /// <inheritdoc />

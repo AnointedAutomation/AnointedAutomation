@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import pytest
 
+from anointedautomation_sso.client import LOGOUT_MAX_AGE_SECONDS
 from anointedautomation_sso import ANOINTED_ISSUER, AnointedSsoError, InMemoryLogoutReplayStore, process_backchannel_logout
 
 from .conftest import CLIENT_ID, NOW, make_key
@@ -109,3 +110,26 @@ def test_replay_store_expiry():
     assert store.try_add("a", 300) is True
     with pytest.raises(ValueError):
         store.try_add("", 1)
+
+
+class _RecordingStore(InMemoryLogoutReplayStore):
+    def __init__(self):
+        super().__init__(now=lambda: NOW)
+        self.windows = []
+
+    def try_add(self, jti, remember_until):
+        self.windows.append(remember_until)
+        return super().try_add(jti, remember_until)
+
+
+def test_replay_window_without_exp_covers_iat_plus_max_age(client, provider):
+    store = _RecordingStore()
+    assert process_backchannel_logout(client, [provider.logout_token(iat=NOW - 10)], lambda l: None, store) == 200
+    assert store.windows == [NOW - 10 + LOGOUT_MAX_AGE_SECONDS + client.clock_skew_seconds]
+
+
+def test_replay_window_with_exp_uses_exp(client, provider):
+    store = _RecordingStore()
+    token = provider.logout_token(jti="jti-exp", exp=NOW + 120)
+    assert process_backchannel_logout(client, [token], lambda l: None, store) == 200
+    assert store.windows == [NOW + 120 + client.clock_skew_seconds]

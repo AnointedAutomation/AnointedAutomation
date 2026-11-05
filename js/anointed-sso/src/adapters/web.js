@@ -32,6 +32,41 @@ function defaultErrorResponse(err) {
   });
 }
 
+/** Largest back-channel logout body read; a logout token is a few KiB, so anything bigger is refused (413). */
+const MAX_LOGOUT_BODY_BYTES = 64 * 1024;
+
+/**
+ * @summary    Read a request body as UTF-8 text, stopping once it passes `limit` bytes.
+ * @param {Request} request
+ * @param {number} limit
+ * @returns {Promise<string | null>} the text, or null when the body is larger than `limit`
+ */
+async function readCappedText(request, limit) {
+  const declared = Number(request.headers.get("content-length"));
+  if (Number.isFinite(declared) && declared > limit) return null;
+  if (request.body === null) return "";
+  const reader = request.body.getReader();
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.length;
+    if (size > limit) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
 /**
  * @summary    Build start / callback / back-channel logout handlers for a fetch-style runtime.
  * @param {import("../client.js").AnointedClient} client
@@ -111,8 +146,14 @@ export function createWebHandlers(client, options = {}) {
     const noStore = { "cache-control": "no-store" };
     let logoutToken;
     try {
-      logoutToken = new URLSearchParams(await request.text()).get("logout_token");
-    } catch {
+      const body = await readCappedText(request, MAX_LOGOUT_BODY_BYTES);
+      if (body === null) {
+        logger("warn", "anointed-sso back-channel logout body too large", { limitBytes: MAX_LOGOUT_BODY_BYTES, answered: 413 });
+        return new Response(null, { status: 413, headers: noStore });
+      }
+      logoutToken = new URLSearchParams(body).get("logout_token");
+    } catch (err) {
+      logger("warn", "anointed-sso back-channel logout body unreadable", { ...describeError(err), answered: 400 });
       return new Response(null, { status: 400, headers: noStore });
     }
     if (logoutToken === null || logoutToken === "") return new Response(null, { status: 400, headers: noStore });

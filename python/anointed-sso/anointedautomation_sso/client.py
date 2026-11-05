@@ -39,6 +39,12 @@ ANOINTED_ISSUER = "https://api.anointedautomation.net/"
 #: username to pick one first. Add it only when the app needs a name.
 DEFAULT_SCOPE = "openid email"
 
+#: Default oldest ``iat`` (seconds) accepted on a back-channel Logout Token.
+LOGOUT_MAX_AGE_SECONDS = 300
+
+#: Minimum seconds between forced JWKS refetches (unknown ``kid``), so bad tokens cannot flood the issuer.
+JWKS_REFETCH_COOLDOWN_SECONDS = 60
+
 #: The member a back-channel Logout Token's ``events`` claim must carry.
 BACKCHANNEL_LOGOUT_EVENT = "http://schemas.openid.net/event/backchannel-logout"
 
@@ -251,6 +257,7 @@ class AnointedClient:
         self._lock = threading.Lock()
         self._discovery: Optional[Tuple[Dict[str, Any], float]] = None
         self._jwks: Optional[Tuple[Dict[str, Any], float]] = None
+        self._jwks_forced_at: Optional[float] = None
 
     # ---- internals -------------------------------------------------------------------------------
 
@@ -324,11 +331,24 @@ class AnointedClient:
             return doc
 
     def get_jwks(self, *, force: bool = False) -> Dict[str, Any]:
-        """The issuer's JWKS (cached)."""
+        """The issuer's JWKS (cached).
+
+        A forced refetch (unknown ``kid``) runs at most once per ``JWKS_REFETCH_COOLDOWN_SECONDS``; inside the
+        cooldown the cached JWKS is returned.
+        """
         doc = self.discover()
         with self._lock:
-            if not force and self._jwks is not None and self._jwks[1] > self._clock():
+            now = self._clock()
+            if not force and self._jwks is not None and self._jwks[1] > now:
                 return self._jwks[0]
+            if force:
+                if (
+                    self._jwks is not None
+                    and self._jwks_forced_at is not None
+                    and now - self._jwks_forced_at < JWKS_REFETCH_COOLDOWN_SECONDS
+                ):
+                    return self._jwks[0]
+                self._jwks_forced_at = now
             jwks = self._request_json("GET", doc["jwks_uri"], "http")
             if not is_object(jwks) or not isinstance(jwks.get("keys"), list):
                 raise AnointedSsoError("http", "JWKS has no keys array")
@@ -633,7 +653,7 @@ class AnointedClient:
         query = "&".join(filter(None, [base.query, urlencode(params)]))
         return urlunsplit((base.scheme, base.netloc, base.path, query, ""))
 
-    def verify_logout_token(self, logout_token: str, *, max_age_seconds: float = 300) -> LogoutToken:
+    def verify_logout_token(self, logout_token: str, *, max_age_seconds: float = LOGOUT_MAX_AGE_SECONDS) -> LogoutToken:
         """Validate a back-channel Logout Token (OpenID Connect Back-Channel Logout 1.0).
 
         Checks RS256 signature via JWKS, header ``typ: logout+jwt``, iss, aud/azp, iat recent and not in

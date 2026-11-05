@@ -484,6 +484,8 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             Assert.False(attribute.IsError);
             Assert.Contains("GetDocumentIdsPageAsync", attribute.Message);
             Assert.Contains("GetPagedAsync", attribute.Message);
+            Assert.Contains("GetFilteredDocumentsAsync", attribute.Message);
+            Assert.Contains("RAM", attribute.Message);
         }
 
         [Fact]

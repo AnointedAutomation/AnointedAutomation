@@ -451,5 +451,61 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
                 _helper.GetPagedAsync(NewCollection(), FilterDefinition<TestDoc>.Empty, null, skip, limit));
         }
+
+        private static readonly Collation CaseInsensitive = new Collation("en", strength: CollationStrength.Secondary);
+
+        private static FilterDefinition<TestDoc> NameIs(string name) => Builders<TestDoc>.Filter.Eq(d => d.Name, name);
+
+        [Fact]
+        public async Task CollationOverloads_MatchCaseInsensitively()
+        {
+            string coll = await SeedAsync(NewCollection(),
+                new TestDoc { Name = "Alpha", Value = 1 },
+                new TestDoc { Name = "ALPHA", Value = 2 },
+                new TestDoc { Name = "beta", Value = 3 });
+
+            Assert.Null(await _helper.GetSingleAsync(coll, NameIs("alpha")));
+            TestDoc single = await _helper.GetSingleAsync(coll, NameIs("alpha"), CaseInsensitive);
+            Assert.NotNull(single);
+            Assert.Equal(2, await _helper.CountAsync(coll, NameIs("alpha"), CaseInsensitive));
+            Assert.True(await _helper.ExistsAsync(coll, NameIs("BETA"), CaseInsensitive));
+            Assert.False(await _helper.ExistsAsync(coll, NameIs("gamma"), CaseInsensitive));
+            List<TestDoc> page = await _helper.GetFilteredDocumentsAsync(coll, NameIs("alpha"),
+                Builders<TestDoc>.Sort.Ascending(d => d.Value), 1, CaseInsensitive);
+            Assert.Single(page);
+            Assert.Equal(1, page[0].Value);
+        }
+
+        [Fact]
+        public async Task CollationOverloads_RejectNullCollationAndBadLimit()
+        {
+            string coll = NewCollection();
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _helper.GetSingleAsync(coll, NameIs("a"), null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _helper.CountAsync(coll, NameIs("a"), null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _helper.ExistsAsync(coll, NameIs("a"), null));
+            await Assert.ThrowsAsync<ArgumentNullException>(() => _helper.GetFilteredDocumentsAsync(coll, NameIs("a"), null, 1, null));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => _helper.GetFilteredDocumentsAsync(coll, NameIs("a"), null, 0, CaseInsensitive));
+        }
+
+        [Fact]
+        public async Task CollationOverloads_DefaultInterfaceBodies_UseDatabase()
+        {
+            string coll = await SeedAsync(NewCollection(),
+                new TestDoc { Name = "Gamma", Value = 7 },
+                new TestDoc { Name = "gamma", Value = 8 });
+            Moq.Mock<IMongoHelper> legacy = new Moq.Mock<IMongoHelper> { CallBase = true };
+            legacy.SetupGet(h => h.database).Returns(_helper.database);
+            IMongoHelper helper = legacy.Object;
+
+            TestDoc single = await helper.GetSingleAsync(coll, NameIs("GAMMA"), CaseInsensitive);
+            Assert.NotNull(single);
+            Assert.Equal(2, await helper.CountAsync(coll, NameIs("GAMMA"), CaseInsensitive));
+            Assert.True(await helper.ExistsAsync(coll, NameIs("GAMMA"), CaseInsensitive));
+            List<TestDoc> page = await helper.GetFilteredDocumentsAsync(coll, NameIs("GAMMA"),
+                Builders<TestDoc>.Sort.Descending(d => d.Value), 1, CaseInsensitive);
+            Assert.Equal(8, Assert.Single(page).Value);
+            await Assert.ThrowsAsync<ArgumentNullException>(() => helper.CountAsync(coll, NameIs("a"), null));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => helper.GetFilteredDocumentsAsync(coll, NameIs("a"), null, 0, CaseInsensitive));
+        }
     }
 }

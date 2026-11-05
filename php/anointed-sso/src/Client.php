@@ -19,6 +19,11 @@ use Throwable;
  */
 final class Client
 {
+    /** Minimum seconds between forced JWKS refetches (unknown kid), so bad tokens cannot flood the issuer. */
+    public const JWKS_REFETCH_COOLDOWN_SECONDS = 60;
+
+    private ?int $jwksForcedAt = null;
+
     private readonly ClientInterface $http;
     private readonly MetadataCache $cache;
     private readonly Closure $clock;
@@ -72,12 +77,25 @@ final class Client
         return $doc;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * The issuer's JWKS (cached). A forced refetch (unknown kid) runs at most once per
+     * JWKS_REFETCH_COOLDOWN_SECONDS per Client; inside the cooldown the cached JWKS is returned.
+     *
+     * @return array<string, mixed>
+     */
     public function getJwks(bool $force = false): array
     {
         $key = 'anointed_sso.jwks.' . md5($this->config->issuer);
-        if (!$force && ($hit = $this->cache->get($key)) !== null) {
+        $hit = $this->cache->get($key);
+        if (!$force && $hit !== null) {
             return $hit;
+        }
+        if ($force) {
+            $now = ($this->clock)();
+            if ($hit !== null && $this->jwksForcedAt !== null && $now - $this->jwksForcedAt < self::JWKS_REFETCH_COOLDOWN_SECONDS) {
+                return $hit;
+            }
+            $this->jwksForcedAt = $now;
         }
         $jwks = $this->requestJson('GET', (string) $this->discover()['jwks_uri'], ['Accept' => 'application/json'], null, 'http');
         if (!is_array($jwks) || !isset($jwks['keys']) || !is_array($jwks['keys'])) {
