@@ -52,14 +52,14 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.1.0
+### AnointedAutomation.APIMiddlewares 1.2.0
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
 - Depends on: NuGet Microsoft.AspNetCore.App (framework reference); AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Memory
 - Namespaces: `AnointedAutomation.APIMiddleware`, `AnointedAutomation.APIMiddleware.BotDefense`, `AnointedAutomation.APIMiddleware.Filters`, `AnointedAutomation.APIMiddleware.Objects`, `AnointedAutomation.APIMiddleware.Security`, `AnointedAutomation.APIMiddleware.Utility`
 - Key types: `ApiKeyAuthMiddleware`, `IPBlacklistMiddleware`, `InvalidEndpointTrackerMiddleware`, `EndpointAccessMiddleware`, `IpAllowlistMiddleware`, `CountryBlockMiddleware`, `CountryBlockOptions`, `CountryBlockExtensions`, `ICountryLookup`, `RirDelegatedCountryLookup`, `BotDefenseMiddleware`, `BotDefenseOptions`, `BotDefenseExtensions`, `FormBotGuard`, `HoneypotPathOptions`, `ZipBomb`, `IBanStore`, `ICrawlerVerifier`, `ICaptchaVerifier`, `CaptchaVerifier`, `APIKeyAttribute`, `IPBlacklist`
-- Notes: Note the namespace is AnointedAutomation.APIMiddleware (singular) while the package id is plural.
+- Notes: Note the namespace is AnointedAutomation.APIMiddleware (singular) while the package id is plural. 1.2.0: ApiKeyAuthMiddleware throws ArgumentException when expectedKey is null or empty.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.APIMiddlewares (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.APIMiddlewares/README.md)
 
 ```bash
