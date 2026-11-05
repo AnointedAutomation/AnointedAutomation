@@ -158,6 +158,10 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     target-branch: "develop"
+    # typescript 7 is outside the Angular compiler-cli and ng-packagr peer range; bump it with an Angular release that allows it.
+    ignore:
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
       - "automated pr"
@@ -200,6 +204,10 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     target-branch: "develop"
+    # h3 2.x drops toWebRequest, which the Nuxt 3 and 4 (h3 v1) path in src/eventHandlers.js needs and tests against.
+    ignore:
+      - dependency-name: "h3"
+        update-types: ["version-update:semver-major"]
     labels:
       - "dependencies"
       - "automated pr"
@@ -326,6 +334,15 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     target-branch: "develop"
+    # AGP 9 needs Gradle 9.6+ and built-in Kotlin, and com.vanniktech.maven.publish 0.36+ needs AGP 8.13+ and Gradle 9.
+    # Do those as one hand-made Gradle/AGP migration, then remove these rules.
+    ignore:
+      - dependency-name: "com.android.library"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "com.android.application"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "com.vanniktech.maven.publish"
+        versions: [">=0.36.0"]
     labels:
       - "dependencies"
       - "automated pr"
