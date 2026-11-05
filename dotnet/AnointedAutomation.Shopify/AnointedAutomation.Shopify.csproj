@@ -12,7 +12,7 @@
     <Copyright>Copyright © 2026 Anointed Automation Corporation. Portions Copyright (c) 2015 Joshua Harms (ShopifySharp, MIT).</Copyright>
     <Description>Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys. Also bulk operations (staged JSONL upload, polling with backoff, streamed results), webhook HMAC verification with an idempotent subscription registrar, typed builders for common non-money catalog operations, and System.Text.Json response models.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <PackageTags>shopify;rest;models;poco;dto;newtonsoft;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Shopify</PackageReleaseNotes>
     <Authors>Anointed Automation Corporation, Alexander Fields</Authors>

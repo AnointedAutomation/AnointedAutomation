@@ -69,6 +69,7 @@ await foreach (ShopifyOrder o in ShopifyCatalogOperations.EnumerateOrdersAsync(c
 ```
 
 - Builders: `TagsAdd`, `TagsRemove`, `MetafieldsSet`, `ProductUpdate`, `ProductSet`, `ProductVariantsBulkUpdate`, `CustomerUpdate`, `InventoryActivate`, `InventorySetQuantities`, `ProductById`, `OrderById`, `CustomerById`, plus paged product/order/customer enumeration. Each pins its query text (tests assert it byte for byte).
+- `ShopifyPublishingOperations` (2.1.0): `Publish` / `Unpublish` (Publication gids only, validated), `ProductPublications`, `CollectionPublications`, `SellingPlanGroupCreate` / `SellingPlanGroupUpdate` / `SellingPlanGroupDelete`, `OrderFulfillmentOrders`. Run them with `client.ExecuteAsync` like the catalog builders. `ShopifyStagedUploads` stays the one `stagedUploadsCreate` builder.
 - Money paths (`orderCancel`, `refundCreate`, `orderCapture`, `orderEdit*`, `draftOrderCreate`) are deliberately not included.
 - Schema target 2026-10. On older versions: `productUpdate(product:)` needs 2024-10+; `@idempotent` is accepted from 2026-01 and required for the inventory mutations from 2026-04; `changeFromQuantity` replaces `ignoreCompareQuantity` from 2026-04.
 - Models (`ShopifyProduct`, `ShopifyProductVariant`, `ShopifyMetafield`, `ShopifyCustomer`, `ShopifyOrder`, `ShopifyUserError`, `ShopifyConnection<T>` with `ShopifyPageInfo`, `ShopifyMoneyV2`/`ShopifyMoneyBag`; cost stays `ShopifyQueryCost`) read with `ShopifyGraphQlJson.Options`. Money is `decimal`; `NumericId` uses `ShopifyGid`.

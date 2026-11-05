@@ -460,7 +460,7 @@
     },
     {
       "id": "AnointedAutomation.Shopify",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "targetFramework": "net10.0",
       "description": "Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys. Also bulk operations (staged JSONL upload, polling with backoff, streamed results), webhook HMAC verification with an idempotent subscription registrar, typed builders for common non-money catalog operations, and System.Text.Json response models.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Shopify",
@@ -502,6 +502,7 @@
         "ShopifyWebhookHmac",
         "ShopifyWebhookRegistrar",
         "ShopifyCatalogOperations",
+        "ShopifyPublishingOperations",
         "ShopifyProduct",
         "ShopifyOrder",
         "ShopifyCustomer",
