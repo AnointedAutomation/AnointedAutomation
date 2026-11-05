@@ -33,6 +33,7 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             Rig rig = new Rig();
             rig.Db.Setup(d => d.GetCollection<MongoTestDoc>(It.IsAny<string>(), It.IsAny<MongoCollectionSettings>()))
                 .Returns(rig.Raw.Object);
+            rig.Db.SetupGet(d => d.Settings).Returns(new MongoDatabaseSettings { WriteConcern = WriteConcern.Acknowledged });
             rig.Raw.SetupGet(c => c.Settings).Returns(new MongoCollectionSettings { WriteConcern = WriteConcern.Acknowledged });
             rig.Raw.Setup(c => c.WithWriteConcern(It.IsAny<WriteConcern>()))
                 .Callback((WriteConcern w) => rig.Concerns.Add(w))
@@ -271,12 +272,27 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         }
 
         [Fact]
+        public void TransactionOptions_KeepsConfiguredWTimeout()
+        {
+            Rig rig = Build(ReplicaSet());
+            rig.Db.SetupGet(d => d.Settings).Returns(new MongoDatabaseSettings { WriteConcern = WriteConcern.Acknowledged.With(wTimeout: TimeSpan.FromSeconds(5)) });
+            MongoHelper helper = Helper(rig, new MongoHelper(new MongoDurabilityOptions(MongoWriteConcernMode.Majority, true, MongoTransactionMode.Required)));
+
+            TransactionOptions options = helper.BuildTransactionOptions();
+
+            Assert.Equal(WriteConcern.WMode.Majority, options.WriteConcern.W);
+            Assert.True(options.WriteConcern.Journal);
+            Assert.Equal(TimeSpan.FromSeconds(5), options.WriteConcern.WTimeout);
+        }
+
+        [Fact]
         public void TransactionOptions_NullWhenNoPolicy()
         {
-            MongoHelper helper = new MongoHelper(new MongoDurabilityOptions(MongoWriteConcernMode.Default, null, MongoTransactionMode.Required));
+            Rig rig = Build(ReplicaSet());
+            MongoHelper helper = Helper(rig, new MongoHelper(new MongoDurabilityOptions(MongoWriteConcernMode.Default, null, MongoTransactionMode.Required)));
             Assert.Null(helper.BuildTransactionOptions());
 
-            MongoHelper w1 = new MongoHelper(new MongoDurabilityOptions(MongoWriteConcernMode.W1, false, MongoTransactionMode.Required));
+            MongoHelper w1 = Helper(rig, new MongoHelper(new MongoDurabilityOptions(MongoWriteConcernMode.W1, false, MongoTransactionMode.Required)));
             TransactionOptions options = w1.BuildTransactionOptions();
             Assert.Equal(new WriteConcern.WCount(1), options.WriteConcern.W);
             Assert.False(options.WriteConcern.Journal);

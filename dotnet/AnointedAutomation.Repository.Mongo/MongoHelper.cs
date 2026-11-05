@@ -1090,7 +1090,8 @@ namespace AnointedAutomation.Repository.Mongo
         /// <summary>
         /// The transaction options for <see cref="RunInTransactionAsync{TResult}"/>: null when no policy is configured
         /// (driver defaults), otherwise the strictest configured policy's write concern, read concern majority for a
-        /// majority policy, and read preference primary. Public so code that starts its own session can use the same options.
+        /// majority policy, and read preference primary. The policy layers on the database's configured write concern, so a
+        /// connection-string wtimeout is kept. Public so code that starts its own session can use the same options.
         /// </summary>
         /// <returns>The options, or null for driver defaults.</returns>
         public TransactionOptions BuildTransactionOptions()
@@ -1104,7 +1105,7 @@ namespace AnointedAutomation.Repository.Mongo
             return new TransactionOptions(
                 readConcern: readConcern,
                 readPreference: ReadPreference.Primary,
-                writeConcern: policy.ApplyTo(WriteConcern.Acknowledged));
+                writeConcern: policy.ApplyTo(database.Settings.WriteConcern));
         }
     }
 }
