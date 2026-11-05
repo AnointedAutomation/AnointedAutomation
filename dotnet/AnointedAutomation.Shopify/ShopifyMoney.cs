@@ -2,8 +2,10 @@
 //
 // Readers for a Shopify GraphQL MoneyBag ("<setName>": { "shopMoney": { "amount", "currencyCode" } }). Moved from the
 // Anointed API (Services/Common/ShopMoney.cs) and widened with the double-typed variants the order-sync code uses.
-// Every reader is guarded at every level: a non-object anywhere on the path is a miss, never a throw.
+// Every reader is guarded at every level. Since 2.0.0 the decimal readers never fabricate a value: a miss is a false
+// TryRead/TryReadAmount or a FormatException from Read naming the missing field.
 
+using System;
 using System.Globalization;
 using System.Text.Json;
 using AnointedAutomation.Serialization.Json;
@@ -14,21 +16,74 @@ namespace AnointedAutomation.Shopify
     public static class ShopifyMoney
     {
         /// <summary>
-        /// (<c>amount</c> as decimal, <c>currencyCode</c>) of <c>parent.setName.shopMoney</c>. A string amount is parsed
-        /// with <see cref="NumberStyles.Number"/> invariant; a number amount is read exactly. A missing set/shopMoney gives
-        /// (0, ""); an unparseable amount gives 0; a missing currency gives "".
+        /// Reads (<c>amount</c> as decimal, <c>currencyCode</c>) of <c>parent.setName.shopMoney</c>. A string amount is
+        /// parsed with <see cref="NumberStyles.Number"/> invariant; a number amount is read exactly. Returns false (amount 0,
+        /// currency null, both meaningless) when the set or shopMoney is missing or not an object, the amount is missing or
+        /// unparseable, or the currency is missing or empty. Never fabricates a value.
         /// </summary>
+        public static bool TryRead(JsonElement parent, string setName, out decimal amount, out string currency)
+        {
+            return TryReadCore(parent, setName, out amount, out currency) == null;
+        }
+
+        /// <summary>
+        /// Reads (<c>amount</c> as decimal, <c>currencyCode</c>) of <c>parent.setName.shopMoney</c>, like
+        /// <see cref="TryRead"/>, but throws a <see cref="FormatException"/> naming the missing or invalid field
+        /// (for example <c>totalSet.shopMoney.amount</c>) instead of returning false.
+        /// </summary>
+        /// <exception cref="FormatException">The MoneyBag, its amount or its currency is missing or invalid.</exception>
         public static (decimal Amount, string Currency) Read(JsonElement parent, string setName)
         {
+            string failure = TryReadCore(parent, setName, out decimal amount, out string currency);
+            if (failure != null)
+            {
+                throw new FormatException(failure);
+            }
+
+            return (amount, currency);
+        }
+
+        /// <summary>
+        /// Reads <c>parent.setName.shopMoney.amount</c> as a decimal (JSON number, or a string parsed with
+        /// <see cref="NumberStyles.Number"/> invariant). Returns false when it is missing or unparseable. Currency is not read.
+        /// </summary>
+        public static bool TryReadAmount(JsonElement parent, string setName, out decimal amount)
+        {
+            decimal? parsed = ShopMoneyElement(parent, setName).GetDecimalCoercedOrNull("amount", NumberStyles.Number);
+            amount = parsed.HasValue ? parsed.Value : 0m;
+            return parsed.HasValue;
+        }
+
+        private static string TryReadCore(JsonElement parent, string setName, out decimal amount, out string currency)
+        {
+            amount = 0m;
+            currency = null;
             JsonElement money = ShopMoneyElement(parent, setName);
             if (money.ValueKind != JsonValueKind.Object)
             {
-                return (0m, string.Empty);
+                return "Shopify MoneyBag '" + setName + ".shopMoney' is missing or not an object.";
             }
 
-            decimal amount = money.GetDecimalCoercedOrNull("amount", NumberStyles.Number) ?? 0m;
-            string currency = money.GetStringOrNull("currencyCode") ?? string.Empty;
-            return (amount, currency);
+            if (money.GetElementOrDefault("amount").ValueKind == JsonValueKind.Undefined)
+            {
+                return "Shopify MoneyBag field '" + setName + ".shopMoney.amount' is missing.";
+            }
+
+            decimal? parsed = money.GetDecimalCoercedOrNull("amount", NumberStyles.Number);
+            if (!parsed.HasValue)
+            {
+                return "Shopify MoneyBag field '" + setName + ".shopMoney.amount' is not a parseable decimal.";
+            }
+
+            string code = money.GetStringOrNull("currencyCode");
+            if (string.IsNullOrEmpty(code))
+            {
+                return "Shopify MoneyBag field '" + setName + ".shopMoney.currencyCode' is missing or empty.";
+            }
+
+            amount = parsed.Value;
+            currency = code;
+            return null;
         }
 
         /// <summary>

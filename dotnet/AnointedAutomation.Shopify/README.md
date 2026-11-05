@@ -4,7 +4,7 @@ Jesus is King ✝️
 
 Plain POCO models for the Shopify Admin REST API, with Newtonsoft.Json attributes. Customers, addresses, marketing consent, orders, line items, refunds, transactions, products, variants, images, fulfillments, fulfillment orders, inventory items and levels, locations, webhooks, price rules, gift cards, payouts, disputes and the rest of the REST resource set.
 
-Models plus two small helpers: `ShopifyGid` (format and parse `gid://shopify/<Resource>/<id>`) and `ShopifyMoney` (read a GraphQL MoneyBag from a System.Text.Json `JsonElement`). Deserialize the JSON you already have:
+Models plus two small helpers: `ShopifyGid` (format and parse `gid://shopify/<Resource>/<id>`) and `ShopifyMoney` (read a GraphQL MoneyBag from a System.Text.Json `JsonElement`). Since 2.0.0 `ShopifyMoney.Read` throws a `FormatException` naming the missing field and `TryRead`/`TryReadAmount` return false; a missing or unparseable amount is never 0 (see `CHANGELOG.md`). Deserialize the JSON you already have:
 
 ```csharp
 using AnointedAutomation.Shopify;

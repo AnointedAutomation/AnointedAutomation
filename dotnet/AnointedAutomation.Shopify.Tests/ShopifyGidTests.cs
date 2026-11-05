@@ -164,12 +164,52 @@ namespace AnointedAutomation.Shopify.Tests
         {
             Assert.Equal((12.50m, "USD"), ShopifyMoney.Read(P("{\"totalSet\":{\"shopMoney\":{\"amount\":\"12.50\",\"currencyCode\":\"USD\"}}}"), "totalSet"));
             Assert.Equal((3m, "CAD"), ShopifyMoney.Read(P("{\"totalSet\":{\"shopMoney\":{\"amount\":3,\"currencyCode\":\"CAD\"}}}"), "totalSet"));
-            Assert.Equal((1234.5m, ""), ShopifyMoney.Read(P("{\"totalSet\":{\"shopMoney\":{\"amount\":\"1,234.5\"}}}"), "totalSet"));
-            Assert.Equal((0m, "USD"), ShopifyMoney.Read(P("{\"totalSet\":{\"shopMoney\":{\"amount\":\"x\",\"currencyCode\":\"USD\"}}}"), "totalSet"));
-            Assert.Equal((0m, ""), ShopifyMoney.Read(P("{\"totalSet\":{\"shopMoney\":5}}"), "totalSet"));
-            Assert.Equal((0m, ""), ShopifyMoney.Read(P("{}"), "totalSet"));
-            Assert.Equal((0m, ""), ShopifyMoney.Read(P("[1]"), "totalSet"));
-            Assert.Equal((0m, ""), ShopifyMoney.Read(default, "totalSet"));
+            Assert.Equal((1234.5m, "USD"), ShopifyMoney.Read(P("{\"totalSet\":{\"shopMoney\":{\"amount\":\"1,234.5\",\"currencyCode\":\"USD\"}}}"), "totalSet"));
+            Assert.Equal((0m, "USD"), ShopifyMoney.Read(P("{\"totalSet\":{\"shopMoney\":{\"amount\":\"0.00\",\"currencyCode\":\"USD\"}}}"), "totalSet"));
+        }
+
+        [Theory]
+        [InlineData("{\"totalSet\":{\"shopMoney\":{\"amount\":\"1,234.5\"}}}", "totalSet.shopMoney.currencyCode")]
+        [InlineData("{\"totalSet\":{\"shopMoney\":{\"amount\":\"1\",\"currencyCode\":\"\"}}}", "totalSet.shopMoney.currencyCode")]
+        [InlineData("{\"totalSet\":{\"shopMoney\":{\"amount\":\"x\",\"currencyCode\":\"USD\"}}}", "totalSet.shopMoney.amount")]
+        [InlineData("{\"totalSet\":{\"shopMoney\":{\"amount\":null,\"currencyCode\":\"USD\"}}}", "totalSet.shopMoney.amount")]
+        [InlineData("{\"totalSet\":{\"shopMoney\":{\"currencyCode\":\"USD\"}}}", "totalSet.shopMoney.amount")]
+        [InlineData("{\"totalSet\":{\"shopMoney\":5}}", "totalSet.shopMoney")]
+        [InlineData("{}", "totalSet.shopMoney")]
+        [InlineData("[1]", "totalSet.shopMoney")]
+        public void Read_MissingOrInvalid_ThrowsNamingField(string json, string field)
+        {
+            FormatException ex = Assert.Throws<FormatException>(() => ShopifyMoney.Read(P(json), "totalSet"));
+            Assert.Contains("'" + field + "'", ex.Message);
+            Assert.False(ShopifyMoney.TryRead(P(json), "totalSet", out decimal amount, out string currency));
+            Assert.Equal(0m, amount);
+            Assert.Null(currency);
+        }
+
+        [Fact]
+        public void Read_DefaultElement_Throws()
+        {
+            Assert.Throws<FormatException>(() => ShopifyMoney.Read(default, "totalSet"));
+            Assert.False(ShopifyMoney.TryRead(default, "totalSet", out decimal _, out string _));
+        }
+
+        [Fact]
+        public void TryRead_Success()
+        {
+            Assert.True(ShopifyMoney.TryRead(P("{\"s\":{\"shopMoney\":{\"amount\":\"7.25\",\"currencyCode\":\"EUR\"}}}"), "s", out decimal amount, out string currency));
+            Assert.Equal(7.25m, amount);
+            Assert.Equal("EUR", currency);
+        }
+
+        [Fact]
+        public void TryReadAmount_SuccessAndFailure()
+        {
+            Assert.True(ShopifyMoney.TryReadAmount(P("{\"s\":{\"shopMoney\":{\"amount\":\"4.10\"}}}"), "s", out decimal amount));
+            Assert.Equal(4.10m, amount);
+            Assert.False(ShopifyMoney.TryReadAmount(P("{\"s\":{\"shopMoney\":{\"amount\":\"abc\"}}}"), "s", out decimal bad));
+            Assert.Equal(0m, bad);
+            Assert.False(ShopifyMoney.TryReadAmount(P("{\"s\":{}}"), "s", out decimal _));
+            Assert.False(ShopifyMoney.TryReadAmount(default, "s", out decimal _));
         }
 
         [Fact]
