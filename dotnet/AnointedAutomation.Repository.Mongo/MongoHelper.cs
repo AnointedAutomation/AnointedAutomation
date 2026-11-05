@@ -1048,7 +1048,18 @@ namespace AnointedAutomation.Repository.Mongo
         /// Auto on a standalone: same as Off (there are no transactions to use). Required, or Auto on a replica set
         /// or sharded cluster: a session is started and the callback runs inside <c>WithTransactionAsync</c> (the
         /// driver retries transient errors and commits). Pass the session to every operation that must be in the
-        /// transaction, for example <c>helper.GetCollection&lt;T&gt;(name).InsertOneAsync(session, doc)</c>.
+        /// transaction; the session is null when no transaction is used, so branch on it:
+        /// <code>
+        /// IMongoCollection&lt;T&gt; c = helper.GetCollection&lt;T&gt;(name);
+        /// if (session == null) { await c.InsertOneAsync(doc); }
+        /// else { await c.InsertOneAsync(session, doc); }
+        /// </code>
+        /// Inside a transaction the driver ignores per-collection write concerns and commits with the transaction's
+        /// write concern, so the transaction is started with the strictest policy configured anywhere (global or any
+        /// <see cref="MongoDurabilityOptions.ForCollections"/> override, for example
+        /// <see cref="MongoDurabilityPolicy.MoneyWrites"/>), with read concern majority when that policy is majority,
+        /// and read preference primary. With no policy configured the driver's default transaction options apply.
+        /// A majority policy on a standalone server throws during validation, never weakens.
         /// </summary>
         /// <typeparam name="TResult">The callback result.</typeparam>
         /// <param name="callback">The work; the session is null when no transaction is used.</param>
@@ -1072,8 +1083,28 @@ namespace AnointedAutomation.Repository.Mongo
             }
             using (IClientSessionHandle session = await database.Client.StartSessionAsync(null, cancellationToken))
             {
-                return await session.WithTransactionAsync((s, token) => callback(s), null, cancellationToken);
+                return await session.WithTransactionAsync((s, token) => callback(s), BuildTransactionOptions(), cancellationToken);
             }
+        }
+
+        /// <summary>
+        /// The transaction options for <see cref="RunInTransactionAsync{TResult}"/>: null when no policy is configured
+        /// (driver defaults), otherwise the strictest configured policy's write concern, read concern majority for a
+        /// majority policy, and read preference primary. Public so code that starts its own session can use the same options.
+        /// </summary>
+        /// <returns>The options, or null for driver defaults.</returns>
+        public TransactionOptions BuildTransactionOptions()
+        {
+            MongoDurabilityPolicy policy = Durability.StrictestPolicy;
+            if (policy.IsDefault)
+            {
+                return null;
+            }
+            ReadConcern readConcern = policy.WriteConcern == MongoWriteConcernMode.Majority ? ReadConcern.Majority : null;
+            return new TransactionOptions(
+                readConcern: readConcern,
+                readPreference: ReadPreference.Primary,
+                writeConcern: policy.ApplyTo(WriteConcern.Acknowledged));
         }
     }
 }

@@ -182,6 +182,32 @@ namespace AnointedAutomation.Repository.Mongo
             }
         }
 
+        /// <summary>
+        /// The strictest policy configured anywhere (global or any collection override): Majority over W1 over Default,
+        /// and journal true when any policy sets it (false only when one sets false and none sets true). A transaction
+        /// commits with one write concern for every collection it touches, so it must honor the strictest one.
+        /// </summary>
+        internal MongoDurabilityPolicy StrictestPolicy
+        {
+            get
+            {
+                MongoWriteConcernMode mode = Global.WriteConcern;
+                bool? journal = Global.Journal;
+                foreach (MongoDurabilityPolicy policy in _collections.Values)
+                {
+                    if ((int)policy.WriteConcern > (int)mode)
+                    {
+                        mode = policy.WriteConcern;
+                    }
+                    if (policy.Journal == true || (policy.Journal == false && !journal.HasValue))
+                    {
+                        journal = policy.Journal;
+                    }
+                }
+                return new MongoDurabilityPolicy(mode, journal);
+            }
+        }
+
         /// <summary>True when the topology must be checked before use (transactions on, or majority anywhere).</summary>
         internal bool NeedsTopology => Transactions != MongoTransactionMode.Off || UsesMajority;
 

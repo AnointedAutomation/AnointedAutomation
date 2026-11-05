@@ -15,5 +15,9 @@ built without options behaves exactly as in 3.0.0 (no `WithWriteConcern`, no `Wi
   `Majority` policy meets a standalone server; it runs automatically on first use when the options need it. Settings are
   never silently downgraded. `DetectedTopology` and `EffectiveTransactionMode` expose the result.
 - `MongoHelper.RunInTransactionAsync(callback)` honors the mode: Off and Auto-on-standalone run the callback with a null
-  session; Required (or Auto on a replica set or sharded cluster) runs it in a session transaction.
+  session; Required (or Auto on a replica set or sharded cluster) runs it in a session transaction. The
+  transaction is started with the strictest configured policy (global or any `ForCollections` override): its write
+  concern, read concern majority when that policy is majority, and read preference primary, because the driver ignores
+  per-collection write concerns inside a transaction. No policy configured: driver default transaction options.
+  `MongoHelper.BuildTransactionOptions()` returns those options for code that starts its own session.
 - Write concern errors (`MongoWriteConcernException`) propagate to the caller unchanged.

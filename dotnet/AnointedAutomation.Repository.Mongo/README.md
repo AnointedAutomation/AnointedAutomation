@@ -182,6 +182,10 @@ await helper.RunInTransactionAsync(async session =>
   Nothing is silently downgraded: if a setting cannot be honored the helper throws.
 - A single-node replica set (`mongod --replSet rs0` plus `rs.initiate()`) is enough for `Majority` and transactions in
   development.
+- Inside a transaction the driver ignores per-collection write concerns, so `RunInTransactionAsync` starts the
+  transaction with the strictest configured policy (for example `MoneyWrites` if any collection uses it), read concern
+  majority for a majority policy, and read preference primary. With no policy it uses the driver defaults.
+  `BuildTransactionOptions()` returns the same options if you start your own session.
 - `MongoReadOptions` only chooses which member serves reads. It is not a durability setting.
 - Per-collection policies match the exact collection name (ordinal) and replace the global write concern and journal for
   that collection only.

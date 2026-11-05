@@ -243,6 +243,47 @@ namespace AnointedAutomation.Repository.Mongo.Tests
         }
 
         [Fact]
+        public async Task Transaction_UsesStrictestPolicyWriteConcern()
+        {
+            Rig rig = Build(ReplicaSet());
+            TransactionOptions captured = null;
+            Mock<IClientSessionHandle> session = new Mock<IClientSessionHandle>();
+            session.Setup(s => s.WithTransactionAsync(It.IsAny<Func<IClientSessionHandle, CancellationToken, Task<int>>>(), It.IsAny<TransactionOptions>(), It.IsAny<CancellationToken>()))
+                .Returns((Func<IClientSessionHandle, CancellationToken, Task<int>> cb, TransactionOptions o, CancellationToken ct) =>
+                {
+                    captured = o;
+                    return cb(session.Object, ct);
+                });
+            Mock<IMongoClient> client = new Mock<IMongoClient>();
+            client.Setup(c => c.StartSessionAsync(It.IsAny<ClientSessionOptions>(), It.IsAny<CancellationToken>())).ReturnsAsync(session.Object);
+            rig.Db.SetupGet(d => d.Client).Returns(client.Object);
+            MongoDurabilityOptions options = new MongoDurabilityOptions(MongoWriteConcernMode.W1, null, MongoTransactionMode.Required)
+                .ForCollections(new[] { "payments" }, MongoDurabilityPolicy.MoneyWrites);
+            MongoHelper helper = Helper(rig, new MongoHelper(options));
+
+            await helper.RunInTransactionAsync(_ => Task.FromResult(1));
+
+            Assert.NotNull(captured);
+            Assert.Equal(WriteConcern.WMode.Majority, captured.WriteConcern.W);
+            Assert.True(captured.WriteConcern.Journal);
+            Assert.Equal(ReadConcern.Majority, captured.ReadConcern);
+            Assert.Equal(ReadPreference.Primary, captured.ReadPreference);
+        }
+
+        [Fact]
+        public void TransactionOptions_NullWhenNoPolicy()
+        {
+            MongoHelper helper = new MongoHelper(new MongoDurabilityOptions(MongoWriteConcernMode.Default, null, MongoTransactionMode.Required));
+            Assert.Null(helper.BuildTransactionOptions());
+
+            MongoHelper w1 = new MongoHelper(new MongoDurabilityOptions(MongoWriteConcernMode.W1, false, MongoTransactionMode.Required));
+            TransactionOptions options = w1.BuildTransactionOptions();
+            Assert.Equal(new WriteConcern.WCount(1), options.WriteConcern.W);
+            Assert.False(options.WriteConcern.Journal);
+            Assert.Null(options.ReadConcern);
+        }
+
+        [Fact]
         public async Task WriteConcernError_Propagates()
         {
             Rig rig = Build(Standalone());
