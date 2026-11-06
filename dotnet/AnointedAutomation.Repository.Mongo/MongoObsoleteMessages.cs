@@ -10,6 +10,6 @@ namespace AnointedAutomation.Repository.Mongo
         /// <summary>
         /// The message on every whole-collection read (GetAllDocumentsAsync and MongoRepository.GetAllAsync).
         /// </summary>
-        public const string WholeCollectionRead = "Loads a whole collection into RAM (no RAM-resident data); use GetDocumentIdsPageAsync, GetPagedAsync, or GetFilteredDocumentsAsync with a filter and a limit instead.";
+        public const string WholeCollectionRead = "Loads a whole collection into RAM (no RAM-resident data); use GetPageAsync or GetDocumentIdPageAsync (page + totals), GetDocumentIdsPageAsync, GetPagedAsync, or GetFilteredDocumentsAsync with a filter and a limit instead.";
     }
 }

@@ -1,5 +1,6 @@
 // Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me Jesus is King ✝️
 
+using AnointedAutomation.Objects;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,10 @@ namespace AnointedAutomation.Repository.Mongo
         public virtual Task<T> GetSingleAsync<T>(string collectionName, FilterDefinition<T> filter) => Current().GetSingleAsync(collectionName, filter);
         public virtual Task<long> CountAsync<T>(string collectionName, FilterDefinition<T> filter) => Current().CountAsync(collectionName, filter);
         public virtual Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter) => Current().ExistsAsync(collectionName, filter);
+        /// <inheritdoc />
+        public virtual Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize) => Current().GetPageAsync(collectionName, filter, sort, page, pageSize);
+        /// <inheritdoc />
+        public virtual Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize) => Current().GetDocumentIdPageAsync(collectionName, page, pageSize);
         public virtual Task<List<T>> GetPagedAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int skip, int limit) => Current().GetPagedAsync(collectionName, filter, sort, skip, limit);
         public virtual Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection) => Current().GetProjectedAsync(collectionName, filter, projection);
         public virtual Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit) => Current().GetFilteredDocumentsAsync(collectionName, filter, sort, limit);

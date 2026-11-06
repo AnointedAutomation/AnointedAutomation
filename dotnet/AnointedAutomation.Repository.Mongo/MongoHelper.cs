@@ -4,6 +4,7 @@ using AnointedAutomation.Optimization.Logging;
 
 //Stewarded by Alexander Fields
 using MongoDB.Bson;
+using AnointedAutomation.Objects;
 using MongoDB.Driver;
 using System;
 using System.Collections.Concurrent;
@@ -335,6 +336,20 @@ namespace AnointedAutomation.Repository.Mongo
                 .Project(projection)
                 .ToListAsync();
             return documents.ConvertAll(doc => doc["_id"].ToString());
+        }
+
+        /// <inheritdoc />
+        public async Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
+        {
+            MongoPaging.ValidateAndGetSkip(page, pageSize);
+            return await MongoPaging.GetPageAsync(await CollectionAsync<T>(collectionName), filter, sort, page, pageSize);
+        }
+
+        /// <inheritdoc />
+        public async Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize)
+        {
+            MongoPaging.ValidateAndGetSkip(page, pageSize);
+            return await MongoPaging.GetDocumentIdPageAsync(await CollectionAsync<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize);
         }
 
         private static void ValidatePage(int skip, int limit)

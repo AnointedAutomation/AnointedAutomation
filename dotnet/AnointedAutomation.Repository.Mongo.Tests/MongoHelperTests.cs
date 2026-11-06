@@ -482,6 +482,8 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             ObsoleteAttribute attribute = (ObsoleteAttribute)Attribute.GetCustomAttribute(method, typeof(ObsoleteAttribute));
             Assert.NotNull(attribute);
             Assert.False(attribute.IsError);
+            Assert.Contains("GetPageAsync", attribute.Message);
+            Assert.Contains("GetDocumentIdPageAsync", attribute.Message);
             Assert.Contains("GetDocumentIdsPageAsync", attribute.Message);
             Assert.Contains("GetPagedAsync", attribute.Message);
             Assert.Contains("GetFilteredDocumentsAsync", attribute.Message);

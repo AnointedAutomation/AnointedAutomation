@@ -82,7 +82,7 @@ Every method takes the collection name as its first argument.
 |---|---|
 | Create | `CreateDocumentAsync`, `CreateManyAsync` |
 | Bulk | `BulkWriteAsync` (any mix of insert/update/replace/delete models, 1000 per round trip, unordered by default; returns `BulkWriteSummary`; failed models raise `BulkWriteFailedException` with the applied counts and each failure's index) |
-| Read | `GetByIdAsync`, `GetSingleAsync`, `GetFilteredDocumentsAsync`, `GetAllDocumentsAsync`, `GetAllDocumentIdsAsync`, `GetPagedAsync`, `GetProjectedAsync`, `DistinctAsync`, `AggregateAsync`, `CountAsync`, `ExistsAsync` |
+| Read | `GetByIdAsync`, `GetSingleAsync`, `GetFilteredDocumentsAsync`, `GetAllDocumentsAsync`, `GetAllDocumentIdsAsync`, `GetPagedAsync`, `GetPageAsync` (1-based page, returns `PaginatedResponse<T>` with exact totals), `GetDocumentIdPageAsync` (ids page with an estimated total), `GetProjectedAsync`, `DistinctAsync`, `AggregateAsync`, `CountAsync`, `ExistsAsync` |
 | Update | `UpdateDocumentAsync`, `UpdateManyAsync`, `UpdateByIdAsync`, `UpsertAsync`, `ReplaceDocumentAsync`, `ReplaceByIdAsync`, `FindOneAndUpdateAsync` |
 | Delete | `DeleteDocumentAsync` (one), `DeleteManyAsync`, `DeleteByIdAsync`, `FindOneAndDeleteAsync` |
 | Indexes | `EnsureIndexAsync(string, MongoIndexSpec)`, `EnsureIndexesAsync(string, IEnumerable<MongoIndexSpec>)` |
