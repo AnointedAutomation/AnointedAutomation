@@ -86,7 +86,9 @@ if (signIn.isCallback(intent)) {
 ```
 
 Compose is a `compileOnly` dependency: the button needs `androidx.compose.foundation` and `material3` in your app,
-and nothing else in the kit touches Compose. The logo is live at
+and nothing else in the kit touches Compose.
+Since 0.2.0 the kit is compiled against Compose BOM 2026.09.00, so use a Compose BOM of 2026.09.00 or newer in your
+app (older Compose versions are not tested with the button). The logo is live at
 `https://www.anointedautomation.net/favicon.png`; pass it to the button's `logo` slot with your image loader.
 
 ### Callback choices
@@ -150,3 +152,10 @@ gradle :anointedsso:testDebugUnitTest
 
 The request and callback logic (`AnointedSignInRequest`) is plain JVM Kotlin, so its JUnit tests need no
 emulator.
+
+## Changelog
+
+### 0.2.0
+
+- Minimum supported Compose raised: `AnointedSignInButton` is built against Compose BOM 2026.09.00 (was 2024.12.01). Apps using the button need that BOM or newer.
+- Build toolchain: Android Gradle Plugin 8.13.2, vanniktech maven-publish 0.35.0, Gradle 8.14.6.
