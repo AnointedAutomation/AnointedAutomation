@@ -1,5 +1,17 @@
 # Changelog: AnointedAutomation.Repository.Mongo
 
+## 3.3.0
+
+Page-numbered reads that return `AnointedAutomation.Objects.PaginatedResponse<T>`, additive. Default interface bodies
+keep outside implementations compiling; `MongoHelper` and `DelegatingMongoHelper` have explicit versions.
+
+- `GetPageAsync(collection, filter, sort, page, pageSize)`: 1-based page plus `totalItems`/`totalPages`; the page Find and
+  a server-side `CountDocumentsAsync` of the same filter run concurrently.
+- `GetDocumentIdPageAsync(collection, page, pageSize)`: ids only (projected to `_id`, ordered by `_id`) with totals. Named
+  apart from the skip/limit `GetDocumentIdsPageAsync`, which has the same parameter types.
+- `MongoPaging` (shared implementation, `MaxPageSize` = 1000). page < 1 or pageSize outside 1..1000 throws
+  `ArgumentOutOfRangeException`. The skip/limit methods stay and are not obsolete.
+
 ## 3.2.0
 
 Collation overloads, additive (#253). Each new `IMongoHelper` member has a default interface body that runs through

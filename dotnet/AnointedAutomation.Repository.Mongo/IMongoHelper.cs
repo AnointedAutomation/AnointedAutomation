@@ -2,6 +2,7 @@
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 //Stewarded by Alexander Fields
 
+using AnointedAutomation.Objects;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -472,5 +473,35 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="specs">The index specifications.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task EnsureIndexesAsync(string collectionName, IEnumerable<MongoIndexSpec> specs);
+
+        /// <summary>
+        /// Gets one 1-based page of documents matching the filter, in the optional sort order, together with the total
+        /// count of the filter (counted on the server, concurrently with the page read) and the page count.
+        /// </summary>
+        /// <typeparam name="T">The type of documents to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match; required.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="page">The 1-based page number (1 or more; less throws).</param>
+        /// <param name="pageSize">The number of items per page (1 to <see cref="MongoPaging.MaxPageSize"/>; outside throws).</param>
+        /// <returns>The page of documents with currentPage, pageSize, totalItems and totalPages.</returns>
+        Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
+        {
+            return MongoPaging.GetPageAsync(database.GetCollection<T>(collectionName), filter, sort, page, pageSize);
+        }
+
+        /// <summary>
+        /// Gets one 1-based page of document ids ordered by _id (projected to _id only), together with the collection's
+        /// total count and the page count. Named differently from the skip/limit <see cref="GetDocumentIdsPageAsync"/>,
+        /// which has the same parameter types.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="page">The 1-based page number (1 or more; less throws).</param>
+        /// <param name="pageSize">The number of ids per page (1 to <see cref="MongoPaging.MaxPageSize"/>; outside throws).</param>
+        /// <returns>The page of ids with currentPage, pageSize, totalItems and totalPages.</returns>
+        Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize)
+        {
+            return MongoPaging.GetDocumentIdPageAsync(database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize);
+        }
     }
 }
