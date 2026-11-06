@@ -43,6 +43,13 @@ dependencies {
     compileOnly("androidx.compose.foundation:foundation")
     compileOnly("androidx.compose.material3:material3")
 
+    // AGP 8.13 resolves the debug compile classpath consistently with the debug runtime classpath. compileOnly does not
+    // reach the runtime one, so without these the runtime picks older androidx.annotation/coroutines than the Compose
+    // BOM needs and compileDebugKotlin fails. The debug variant is not published (release is), so consumers are unaffected.
+    debugImplementation(platform("androidx.compose:compose-bom:2026.09.00"))
+    debugImplementation("androidx.compose.foundation:foundation")
+    debugImplementation("androidx.compose.material3:material3")
+
     testImplementation("junit:junit:4.13.2")
     // The Compose compiler plugin also compiles the unit tests, and it refuses to run without the Compose runtime on
     // that classpath (compileOnly does not reach it).
