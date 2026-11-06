@@ -12,7 +12,7 @@ version = file("../VERSION").readText().trim()
 
 android {
     namespace = "com.anointedautomation.sso"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 24

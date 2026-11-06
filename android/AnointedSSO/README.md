@@ -158,4 +158,5 @@ emulator.
 ### 0.2.0
 
 - Minimum supported Compose raised: `AnointedSignInButton` is built against Compose BOM 2026.09.00 (was 2024.12.01). Apps using the button need that BOM or newer.
+- compileSdk 36 (required by androidx.browser 1.10.0).
 - Build toolchain: Android Gradle Plugin 8.13.2, vanniktech maven-publish 0.35.0, Gradle 8.14.6.
