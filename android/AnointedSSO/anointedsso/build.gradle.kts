@@ -50,14 +50,6 @@ dependencies {
     testImplementation("androidx.compose.runtime:runtime")
 }
 
-// AGP 8.13 resolves each compile classpath consistently with its runtime classpath. compileOnly (the Compose BOM and
-// libraries) does not reach the runtime classpath, so the runtime resolved older androidx.annotation/coroutines than
-// Compose needs and compileKotlin failed. Extending the resolvable runtime classpaths from compileOnly aligns them for
-// resolution only; nothing is added to the published dependencies.
-configurations.matching { it.name == "debugRuntimeClasspath" || it.name == "releaseRuntimeClasspath" }.configureEach {
-    extendsFrom(configurations.getByName("compileOnly"))
-}
-
 // Maven Central (Central Portal), published by .github/workflows/maven-publish.yml on master. Credentials and the
 // signing key come from ORG_GRADLE_PROJECT_* secrets in CI; a local publishToMavenLocal needs neither.
 mavenPublishing {
