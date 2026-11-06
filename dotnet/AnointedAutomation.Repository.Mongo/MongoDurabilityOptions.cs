@@ -19,7 +19,7 @@ namespace AnointedAutomation.Repository.Mongo
         Majority = 2
     }
 
-    /// <summary>How <see cref="MongoHelper.RunInTransactionAsync(System.Func{IClientSessionHandle, System.Threading.Tasks.Task})"/> uses transactions.</summary>
+    /// <summary>How <see cref="MongoHelper.RunInTransactionAsync(System.Func{IClientSessionHandle, System.Threading.Tasks.Task}, System.Threading.CancellationToken)"/> uses transactions.</summary>
     public enum MongoTransactionMode
     {
         /// <summary>Never start a session or transaction; the callback runs with a null session.</summary>

@@ -12,7 +12,7 @@ public class FulfillmentRequestOrderLineItem : ShopifyObject
 {
     /// <summary>
     /// The id of the fulfillment order line item being fulfilled. This is **not** the same as <see cref="FulfillmentOrderLineItem.LineItemId"/>;
-    /// instead, Shopify expects the value of <see cref="FulfillmentOrderLineItem.Id"/>.
+    /// instead, Shopify expects the value of the fulfillment order line item's <c>id</c> (<see cref="FulfillmentOrderLineItem"/>).
     /// </summary>
     [JsonProperty("id")]
     public new long? Id { get; set; }
