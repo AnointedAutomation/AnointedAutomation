@@ -7,7 +7,7 @@ keep outside implementations compiling; `MongoHelper` and `DelegatingMongoHelper
 
 - `GetPageAsync(collection, filter, sort, page, pageSize)`: 1-based page plus `totalItems`/`totalPages`; the page Find and
   a server-side `CountDocumentsAsync` of the same filter run concurrently.
-- `GetDocumentIdPageAsync(collection, page, pageSize)`: ids only (projected to `_id`, ordered by `_id`) with totals. Named
+- `GetDocumentIdPageAsync(collection, page, pageSize)`: ids only (projected to `_id`, ordered by `_id`); its total comes from `EstimatedDocumentCountAsync` (O(1) metadata count), so `totalItems` is an estimate. Named
   apart from the skip/limit `GetDocumentIdsPageAsync`, which has the same parameter types.
 - `MongoPaging` (shared implementation, `MaxPageSize` = 1000). page < 1 or pageSize outside 1..1000 throws
   `ArgumentOutOfRangeException`. The skip/limit methods stay and are not obsolete.

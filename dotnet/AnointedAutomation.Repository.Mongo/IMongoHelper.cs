@@ -492,7 +492,8 @@ namespace AnointedAutomation.Repository.Mongo
 
         /// <summary>
         /// Gets one 1-based page of document ids ordered by _id (projected to _id only), together with the collection's
-        /// total count and the page count. Named differently from the skip/limit <see cref="GetDocumentIdsPageAsync"/>,
+        /// total and the page count. The total comes from EstimatedDocumentCountAsync (metadata, O(1) per page), so
+        /// totalItems and totalPages are an estimate; use <see cref="CountAsync{T}(string, FilterDefinition{T})"/> for an exact count. Named differently from the skip/limit <see cref="GetDocumentIdsPageAsync"/>,
         /// which has the same parameter types.
         /// </summary>
         /// <param name="collectionName">The name of the collection.</param>

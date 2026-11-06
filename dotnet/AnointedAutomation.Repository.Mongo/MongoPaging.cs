@@ -44,14 +44,24 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <summary>
-        /// Computes the page count with integer ceiling; 0 items gives 0 pages.
+        /// Computes the page count with integer ceiling; 0 items gives 0 pages. Throws <see cref="OverflowException"/>
+        /// when the count does not fit in an int (never wraps).
         /// </summary>
         /// <param name="totalItems">The total number of matching items.</param>
         /// <param name="pageSize">The number of items per page (1 or more).</param>
         /// <returns>The number of pages.</returns>
         public static int TotalPages(long totalItems, int pageSize)
         {
-            return (int)((totalItems + pageSize - 1) / pageSize);
+            if (totalItems < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(totalItems), totalItems, "totalItems must be 0 or more");
+            }
+            if (pageSize < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, "pageSize must be 1 or more");
+            }
+            long pages = totalItems / pageSize + (totalItems % pageSize == 0 ? 0 : 1);
+            return checked((int)pages);
         }
 
         /// <summary>
@@ -81,7 +91,9 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <summary>
-        /// Reads one page of document ids ordered by _id (projected to _id only), with the collection's total count.
+        /// Reads one page of document ids ordered by _id (projected to _id only), with the collection's total from
+        /// EstimatedDocumentCountAsync (collection metadata, O(1) per page). totalItems and totalPages are therefore an
+        /// estimate (exact after a clean shutdown; may drift after an unclean one or on sharded orphans).
         /// Ids are strings (an ObjectId becomes its 24-char hex form).
         /// </summary>
         /// <param name="collection">The collection to read.</param>
@@ -100,7 +112,7 @@ namespace AnointedAutomation.Repository.Mongo
                 .Limit(pageSize)
                 .Project(projection)
                 .ToListAsync();
-            Task<long> countTask = collection.CountDocumentsAsync(FilterDefinition<BsonDocument>.Empty);
+            Task<long> countTask = collection.EstimatedDocumentCountAsync();
             await Task.WhenAll(idsTask, countTask);
             List<string> ids = idsTask.Result.ConvertAll(doc => doc["_id"].ToString());
             return Build(ids, page, pageSize, countTask.Result);
