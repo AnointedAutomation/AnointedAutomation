@@ -10,8 +10,8 @@ bodies, and `MongoHelper` and `DelegatingMongoHelper` implement them explicitly.
   `GetDocumentIdPageAsync(collection, page, pageSize, cancellationToken)`, plus matching `MongoPaging` overloads. A
   cancelled token throws `OperationCanceledException` before any read; the token is passed to the Find,
   `CountDocumentsAsync` and `EstimatedDocumentCountAsync`. The tokenless overloads pass `CancellationToken.None`.
-- Oversized page: skip is computed in `long`, and a skip past `int.MaxValue` throws `ArgumentOutOfRangeException`
-  (no clamping, never overflows).
+- Tests only, no behaviour change: boundary tests for the oversized-page guard that 3.3.0 already had (skip is
+  computed in `long`; a skip past `int.MaxValue` throws `ArgumentOutOfRangeException`).
 
 ## 3.3.0
 
