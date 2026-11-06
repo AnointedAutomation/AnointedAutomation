@@ -5,6 +5,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AnointedAutomation.Repository.Mongo
@@ -74,8 +75,27 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="page">The 1-based page number.</param>
         /// <param name="pageSize">The number of items per page (1 to <see cref="MaxPageSize"/>).</param>
         /// <returns>The page and its totals.</returns>
-        public static async Task<PaginatedResponse<T>> GetPageAsync<T>(IMongoCollection<T> collection, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
+        public static Task<PaginatedResponse<T>> GetPageAsync<T>(IMongoCollection<T> collection, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
         {
+            return GetPageAsync(collection, filter, sort, page, pageSize, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Reads one page of documents matching the filter in the optional sort order, with the total count of the filter,
+        /// observing the token: a cancelled token throws <see cref="OperationCanceledException"/> before any read, and the
+        /// token is passed to the page Find and the count.
+        /// </summary>
+        /// <typeparam name="T">The document type.</typeparam>
+        /// <param name="collection">The collection to read.</param>
+        /// <param name="filter">The filter to match; required.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="page">The 1-based page number.</param>
+        /// <param name="pageSize">The number of items per page (1 to <see cref="MaxPageSize"/>).</param>
+        /// <param name="cancellationToken">Cancels the page read and the count.</param>
+        /// <returns>The page and its totals.</returns>
+        public static async Task<PaginatedResponse<T>> GetPageAsync<T>(IMongoCollection<T> collection, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
             ArgumentNullException.ThrowIfNull(collection);
             ArgumentNullException.ThrowIfNull(filter);
             int skip = ValidateAndGetSkip(page, pageSize);
@@ -84,8 +104,8 @@ namespace AnointedAutomation.Repository.Mongo
             {
                 find = find.Sort(sort);
             }
-            Task<List<T>> itemsTask = find.Skip(skip).Limit(pageSize).ToListAsync();
-            Task<long> countTask = collection.CountDocumentsAsync(filter);
+            Task<List<T>> itemsTask = find.Skip(skip).Limit(pageSize).ToListAsync(cancellationToken);
+            Task<long> countTask = collection.CountDocumentsAsync(filter, null, cancellationToken);
             await Task.WhenAll(itemsTask, countTask);
             return Build(itemsTask.Result, page, pageSize, countTask.Result);
         }
@@ -100,8 +120,24 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="page">The 1-based page number.</param>
         /// <param name="pageSize">The number of ids per page (1 to <see cref="MaxPageSize"/>).</param>
         /// <returns>The page of ids and its totals.</returns>
-        public static async Task<PaginatedResponse<string>> GetDocumentIdPageAsync(IMongoCollection<BsonDocument> collection, int page, int pageSize)
+        public static Task<PaginatedResponse<string>> GetDocumentIdPageAsync(IMongoCollection<BsonDocument> collection, int page, int pageSize)
         {
+            return GetDocumentIdPageAsync(collection, page, pageSize, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Reads one page of document ids ordered by _id with the estimated collection total, observing the token: a
+        /// cancelled token throws <see cref="OperationCanceledException"/> before any read, and the token is passed to the
+        /// Find and EstimatedDocumentCountAsync.
+        /// </summary>
+        /// <param name="collection">The collection to read.</param>
+        /// <param name="page">The 1-based page number.</param>
+        /// <param name="pageSize">The number of ids per page (1 to <see cref="MaxPageSize"/>).</param>
+        /// <param name="cancellationToken">Cancels the id read and the count.</param>
+        /// <returns>The page of ids and its totals.</returns>
+        public static async Task<PaginatedResponse<string>> GetDocumentIdPageAsync(IMongoCollection<BsonDocument> collection, int page, int pageSize, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
             ArgumentNullException.ThrowIfNull(collection);
             int skip = ValidateAndGetSkip(page, pageSize);
             ProjectionDefinition<BsonDocument> projection = Builders<BsonDocument>.Projection.Include("_id");
@@ -111,8 +147,8 @@ namespace AnointedAutomation.Repository.Mongo
                 .Skip(skip)
                 .Limit(pageSize)
                 .Project(projection)
-                .ToListAsync();
-            Task<long> countTask = collection.EstimatedDocumentCountAsync();
+                .ToListAsync(cancellationToken);
+            Task<long> countTask = collection.EstimatedDocumentCountAsync(null, cancellationToken);
             await Task.WhenAll(idsTask, countTask);
             List<string> ids = idsTask.Result.ConvertAll(doc => doc["_id"].ToString());
             return Build(ids, page, pageSize, countTask.Result);
