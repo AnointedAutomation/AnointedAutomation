@@ -54,8 +54,8 @@ dependencies {
 // libraries) does not reach the runtime classpath, so the runtime resolved older androidx.annotation/coroutines than
 // Compose needs and compileKotlin failed. Extending the resolvable runtime classpaths from compileOnly aligns them for
 // resolution only; nothing is added to the published dependencies.
-listOf("debugRuntimeClasspath", "releaseRuntimeClasspath").forEach { name ->
-    configurations.named(name) { extendsFrom(configurations.getByName("compileOnly")) }
+configurations.matching { it.name == "debugRuntimeClasspath" || it.name == "releaseRuntimeClasspath" }.configureEach {
+    extendsFrom(configurations.getByName("compileOnly"))
 }
 
 // Maven Central (Central Portal), published by .github/workflows/maven-publish.yml on master. Credentials and the
