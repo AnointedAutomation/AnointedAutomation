@@ -146,7 +146,7 @@ namespace AnointedAutomation.Repository.Mongo.Bson
 
         /// <summary>
         /// The first of the dotted <paramref name="paths"/> (see <see cref="GetPath"/>) whose value is present and not
-        /// BsonNull: a string's value, otherwise the value's <see cref="BsonValue.ToString"/>. "" when none.
+        /// BsonNull: a string's value, otherwise the value's <see cref="object.ToString()"/> (as <c>BsonValue</c> overrides it). "" when none.
         /// </summary>
         public static string GetStringFromPathsOrEmpty(this BsonDocument doc, params string[] paths)
         {
@@ -375,7 +375,7 @@ namespace AnointedAutomation.Repository.Mongo.Bson
 
         /// <summary>
         /// Text of a value: null for C# null or BsonNull; a string's value; any other value's
-        /// <see cref="BsonValue.ToString"/>. (Legacy BsonMap returned "BsonNull" for BsonNull; fixed.)
+        /// <see cref="object.ToString()"/> (as <c>BsonValue</c> overrides it). (Legacy BsonMap returned "BsonNull" for BsonNull; fixed.)
         /// </summary>
         public static string AsStringOrNull(this BsonValue value)
         {

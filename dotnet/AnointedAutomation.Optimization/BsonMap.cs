@@ -264,7 +264,7 @@ namespace AnointedAutomation.Optimization
 
         /// <summary>
         /// Returns a string form of the value: its raw string when it IS a BSON string, otherwise its
-        /// rendered <see cref="BsonValue.ToString"/>. Null when the value itself is null.
+        /// rendered <see cref="object.ToString()"/> (as <c>BsonValue</c> overrides it). Null when the value itself is null.
         /// </summary>
         public static string? AsStringOrNull(this BsonValue? value) =>
             value == null ? null : (value.IsString ? value.AsString : value.ToString());
