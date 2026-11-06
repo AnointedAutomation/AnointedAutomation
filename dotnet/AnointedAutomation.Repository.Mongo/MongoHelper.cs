@@ -339,17 +339,31 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <inheritdoc />
-        public async Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
+        public Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
         {
-            MongoPaging.ValidateAndGetSkip(page, pageSize);
-            return await MongoPaging.GetPageAsync(await CollectionAsync<T>(collectionName), filter, sort, page, pageSize);
+            return GetPageAsync(collectionName, filter, sort, page, pageSize, System.Threading.CancellationToken.None);
         }
 
         /// <inheritdoc />
-        public async Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize)
+        public async Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize, System.Threading.CancellationToken cancellationToken)
         {
             MongoPaging.ValidateAndGetSkip(page, pageSize);
-            return await MongoPaging.GetDocumentIdPageAsync(await CollectionAsync<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize);
+            cancellationToken.ThrowIfCancellationRequested();
+            return await MongoPaging.GetPageAsync(await CollectionAsync<T>(collectionName), filter, sort, page, pageSize, cancellationToken);
+        }
+
+        /// <inheritdoc />
+        public Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize)
+        {
+            return GetDocumentIdPageAsync(collectionName, page, pageSize, System.Threading.CancellationToken.None);
+        }
+
+        /// <inheritdoc />
+        public async Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize, System.Threading.CancellationToken cancellationToken)
+        {
+            MongoPaging.ValidateAndGetSkip(page, pageSize);
+            cancellationToken.ThrowIfCancellationRequested();
+            return await MongoPaging.GetDocumentIdPageAsync(await CollectionAsync<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize, cancellationToken);
         }
 
         private static void ValidatePage(int skip, int limit)

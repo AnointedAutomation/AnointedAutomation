@@ -504,5 +504,39 @@ namespace AnointedAutomation.Repository.Mongo
         {
             return MongoPaging.GetDocumentIdPageAsync(database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize);
         }
+
+        /// <summary>
+        /// <see cref="GetPageAsync{T}(string, FilterDefinition{T}, SortDefinition{T}, int, int)"/> observing a token: a
+        /// cancelled token throws <see cref="System.OperationCanceledException"/> before any read, and the token reaches
+        /// the page Find and the count. An overload (not an optional parameter) so existing callers and implementers keep
+        /// binary and source compatibility.
+        /// </summary>
+        /// <typeparam name="T">The type of documents to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match; required.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="page">The 1-based page number (1 or more; less throws).</param>
+        /// <param name="pageSize">The number of items per page (1 to <see cref="MongoPaging.MaxPageSize"/>; outside throws).</param>
+        /// <param name="cancellationToken">Cancels the page read and the count.</param>
+        /// <returns>The page of documents with currentPage, pageSize, totalItems and totalPages.</returns>
+        Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize, System.Threading.CancellationToken cancellationToken)
+        {
+            return MongoPaging.GetPageAsync(database.GetCollection<T>(collectionName), filter, sort, page, pageSize, cancellationToken);
+        }
+
+        /// <summary>
+        /// <see cref="GetDocumentIdPageAsync(string, int, int)"/> observing a token: a cancelled token throws
+        /// <see cref="System.OperationCanceledException"/> before any read, and the token reaches the Find and
+        /// EstimatedDocumentCountAsync.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="page">The 1-based page number (1 or more; less throws).</param>
+        /// <param name="pageSize">The number of ids per page (1 to <see cref="MongoPaging.MaxPageSize"/>; outside throws).</param>
+        /// <param name="cancellationToken">Cancels the id read and the count.</param>
+        /// <returns>The page of ids with currentPage, pageSize, totalItems and totalPages.</returns>
+        Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize, System.Threading.CancellationToken cancellationToken)
+        {
+            return MongoPaging.GetDocumentIdPageAsync(database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize, cancellationToken);
+        }
     }
 }

@@ -215,6 +215,153 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             collection.Verify(c => c.EstimatedDocumentCountAsync(It.IsAny<EstimatedDocumentCountOptions>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
+        [Fact]
+        public async Task GetPageAsync_PreCancelledToken_ThrowsBeforeAnyRead()
+        {
+            Mock<IMongoCollection<TestDoc>> collection = new Mock<IMongoCollection<TestDoc>>();
+            using CancellationTokenSource cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => MongoPaging.GetPageAsync(collection.Object, FilterDefinition<TestDoc>.Empty, ByValue, 1, 3, cts.Token));
+
+            collection.Verify(c => c.FindAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<FindOptions<TestDoc, TestDoc>>(), It.IsAny<CancellationToken>()), Times.Never);
+            collection.Verify(c => c.CountDocumentsAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<CountOptions>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task GetDocumentIdPageAsync_PreCancelledToken_ThrowsBeforeAnyRead()
+        {
+            Mock<IMongoCollection<BsonDocument>> collection = new Mock<IMongoCollection<BsonDocument>>();
+            using CancellationTokenSource cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => MongoPaging.GetDocumentIdPageAsync(collection.Object, 1, 3, cts.Token));
+
+            collection.Verify(c => c.FindAsync(It.IsAny<FilterDefinition<BsonDocument>>(), It.IsAny<FindOptions<BsonDocument, BsonDocument>>(), It.IsAny<CancellationToken>()), Times.Never);
+            collection.Verify(c => c.EstimatedDocumentCountAsync(It.IsAny<EstimatedDocumentCountOptions>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task Helper_PreCancelledToken_ThrowsAgainstRealServer()
+        {
+            string coll = await SeedValuesAsync(3);
+            using CancellationTokenSource cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => _helper.GetPageAsync(coll, FilterDefinition<TestDoc>.Empty, ByValue, 1, 3, cts.Token));
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => _helper.GetDocumentIdPageAsync(coll, 1, 3, cts.Token));
+        }
+
+        [Fact]
+        public async Task Helper_LiveToken_ReturnsSamePageAsTokenlessOverload()
+        {
+            string coll = await SeedValuesAsync(5);
+            using CancellationTokenSource cts = new CancellationTokenSource();
+
+            PaginatedResponse<TestDoc> page = await _helper.GetPageAsync(coll, FilterDefinition<TestDoc>.Empty, ByValue, 2, 2, cts.Token);
+            PaginatedResponse<string> ids = await _helper.GetDocumentIdPageAsync(coll, 1, 10, cts.Token);
+
+            Assert.Equal(new[] { 3, 4 }, page.Data.Select(d => d.Value).ToArray());
+            Assert.Equal(5L, page.totalItems);
+            Assert.Equal(5, ids.Data.Count);
+        }
+
+        [Fact]
+        public async Task GetPageAsync_TokenReachesFindAndCount()
+        {
+            Mock<IAsyncCursor<TestDoc>> cursor = new Mock<IAsyncCursor<TestDoc>>();
+            cursor.Setup(c => c.MoveNextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(false);
+            Mock<IMongoCollection<TestDoc>> collection = new Mock<IMongoCollection<TestDoc>>();
+            using CancellationTokenSource cts = new CancellationTokenSource();
+            CancellationToken token = cts.Token;
+            collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<FindOptions<TestDoc, TestDoc>>(), token))
+                .ReturnsAsync(cursor.Object);
+            collection.Setup(c => c.CountDocumentsAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<CountOptions>(), token))
+                .ReturnsAsync(7L);
+
+            PaginatedResponse<TestDoc> result = await MongoPaging.GetPageAsync(collection.Object, FilterDefinition<TestDoc>.Empty, ByValue, 1, 3, token);
+
+            Assert.Equal(7L, result.totalItems);
+            collection.Verify(c => c.FindAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<FindOptions<TestDoc, TestDoc>>(), token), Times.Once);
+            collection.Verify(c => c.CountDocumentsAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<CountOptions>(), token), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetDocumentIdPageAsync_TokenReachesFindAndEstimatedCount()
+        {
+            Mock<IAsyncCursor<BsonDocument>> cursor = new Mock<IAsyncCursor<BsonDocument>>();
+            cursor.Setup(c => c.MoveNextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(false);
+            Mock<IMongoCollection<BsonDocument>> collection = new Mock<IMongoCollection<BsonDocument>>();
+            using CancellationTokenSource cts = new CancellationTokenSource();
+            CancellationToken token = cts.Token;
+            collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<BsonDocument>>(), It.IsAny<FindOptions<BsonDocument, BsonDocument>>(), token))
+                .ReturnsAsync(cursor.Object);
+            collection.Setup(c => c.EstimatedDocumentCountAsync(It.IsAny<EstimatedDocumentCountOptions>(), token))
+                .ReturnsAsync(4L);
+
+            PaginatedResponse<string> result = await MongoPaging.GetDocumentIdPageAsync(collection.Object, 1, 3, token);
+
+            Assert.Equal(4L, result.totalItems);
+            collection.Verify(c => c.EstimatedDocumentCountAsync(It.IsAny<EstimatedDocumentCountOptions>(), token), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetPageAsync_CountCancelledMidRead_PropagatesCancellation()
+        {
+            Mock<IAsyncCursor<TestDoc>> cursor = new Mock<IAsyncCursor<TestDoc>>();
+            cursor.Setup(c => c.MoveNextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(false);
+            Mock<IMongoCollection<TestDoc>> collection = new Mock<IMongoCollection<TestDoc>>();
+            using CancellationTokenSource cts = new CancellationTokenSource();
+            collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<FindOptions<TestDoc, TestDoc>>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(cursor.Object);
+            collection.Setup(c => c.CountDocumentsAsync(It.IsAny<FilterDefinition<TestDoc>>(), It.IsAny<CountOptions>(), It.IsAny<CancellationToken>()))
+                .Returns((FilterDefinition<TestDoc> f, CountOptions o, CancellationToken t) =>
+                {
+                    cts.Cancel();
+                    return Task.FromCanceled<long>(t);
+                });
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(
+                () => MongoPaging.GetPageAsync(collection.Object, FilterDefinition<TestDoc>.Empty, ByValue, 1, 3, cts.Token));
+        }
+
+        [Fact]
+        public void ValidateAndGetSkip_LargestSkipThatFitsInInt_IsAccepted()
+        {
+            int lastPage = int.MaxValue / MongoPaging.MaxPageSize + 1;
+
+            int skip = MongoPaging.ValidateAndGetSkip(lastPage, MongoPaging.MaxPageSize);
+
+            Assert.Equal((long)(lastPage - 1) * MongoPaging.MaxPageSize, (long)skip);
+            Assert.True(skip > 0);
+        }
+
+        [Fact]
+        public void ValidateAndGetSkip_SkipPastIntMax_ThrowsInsteadOfOverflowing()
+        {
+            int firstOversizedPage = int.MaxValue / MongoPaging.MaxPageSize + 2;
+
+            ArgumentOutOfRangeException ex = Assert.Throws<ArgumentOutOfRangeException>(
+                () => MongoPaging.ValidateAndGetSkip(firstOversizedPage, MongoPaging.MaxPageSize));
+
+            Assert.Equal("page", ex.ParamName);
+        }
+
+        [Fact]
+        public async Task Helper_OversizedPage_ThrowsArgumentOutOfRangeBeforeAnyRead()
+        {
+            int oversized = int.MaxValue / MongoPaging.MaxPageSize + 2;
+
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+                () => _helper.GetPageAsync(NewCollection(), FilterDefinition<TestDoc>.Empty, ByValue, oversized, MongoPaging.MaxPageSize, CancellationToken.None));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+                () => _helper.GetDocumentIdPageAsync(NewCollection(), oversized, MongoPaging.MaxPageSize, CancellationToken.None));
+        }
+
         [Theory]
         [InlineData(0L, 3, 0)]
         [InlineData(1L, 3, 1)]
