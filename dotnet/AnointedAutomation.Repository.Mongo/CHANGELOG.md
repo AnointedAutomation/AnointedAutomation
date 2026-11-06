@@ -1,5 +1,18 @@
 # Changelog: AnointedAutomation.Repository.Mongo
 
+## 3.4.0
+
+Cancellation for the page-numbered reads, additive. New overloads instead of an optional parameter, so existing
+callers and `IMongoHelper` implementers keep binary and source compatibility; the new members have default interface
+bodies, and `MongoHelper` and `DelegatingMongoHelper` implement them explicitly.
+
+- `GetPageAsync(collection, filter, sort, page, pageSize, cancellationToken)` and
+  `GetDocumentIdPageAsync(collection, page, pageSize, cancellationToken)`, plus matching `MongoPaging` overloads. A
+  cancelled token throws `OperationCanceledException` before any read; the token is passed to the Find,
+  `CountDocumentsAsync` and `EstimatedDocumentCountAsync`. The tokenless overloads pass `CancellationToken.None`.
+- Tests only, no behaviour change: boundary tests for the oversized-page guard that 3.3.0 already had (skip is
+  computed in `long`; a skip past `int.MaxValue` throws `ArgumentOutOfRangeException`).
+
 ## 3.3.0
 
 Page-numbered reads that return `AnointedAutomation.Objects.PaginatedResponse<T>`, additive. Default interface bodies

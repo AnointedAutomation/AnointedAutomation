@@ -61,8 +61,11 @@ namespace AnointedAutomation.Repository.Mongo.Tests
             if (type == typeof(string)) return "arg" + index;
             if (type == typeof(int)) return 100 + index;
             if (type == typeof(bool)) return index % 2 == 0;
+            if (type == typeof(System.Threading.CancellationToken)) return SampleTokenSource.Token;
             return null;
         }
+
+        private static readonly System.Threading.CancellationTokenSource SampleTokenSource = new System.Threading.CancellationTokenSource();
 
         private static object SampleReturn(Type type)
         {
