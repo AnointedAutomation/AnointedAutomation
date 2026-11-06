@@ -74,7 +74,7 @@ app.UseMiddleware<InvalidEndpointTrackerMiddleware>();
 app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 ```
 
-### AnointedAutomation.Concepts 1.1.1
+### AnointedAutomation.Concepts 1.1.2
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
@@ -249,7 +249,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(o => JsonCasingConvention.Configure(o.JsonSerializerOptions));
 ```
 
-### AnointedAutomation.Optimization 1.0.4
+### AnointedAutomation.Optimization 1.0.5
 
 Everyday data helpers: chunking, CSV and DataTable, JSON flattening, safe field reads. Reusable optimization utilities: CSV/DataTable/DataReader helpers, chunking, string helpers, Roman numerals, JSON flattening, file management, and null-safe JsonElement/BsonDocument field accessors.
 
