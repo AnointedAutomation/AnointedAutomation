@@ -5,7 +5,7 @@
 namespace AnointedAutomation.Concepts
 {
     /// <summary>
-    /// The deed a <see cref="Love"/> performs in response to a <see cref="Scenario"/> — what love
+    /// The deed a <see cref="Love"/> performs in response to a <c>Scenario</c>: what love
     /// does, the virtue that drives it, and the Scripture it answers to.
     /// </summary>
     public class LoveAction

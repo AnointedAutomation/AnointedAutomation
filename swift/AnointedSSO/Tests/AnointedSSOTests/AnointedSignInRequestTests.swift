@@ -54,6 +54,22 @@ final class AnointedSignInRequestTests: XCTestCase {
         }
     }
 
+    func testParseCallbackRejectsMissingOrPrefixState() throws {
+        let r = try AnointedSignInRequest(start: start, callback: .scheme("myapp", via: via), state: "abc")
+        for bad in ["myapp://anointed-sign-in?code=xyz", "myapp://anointed-sign-in?aa_state=ab&code=xyz", "myapp://anointed-sign-in?aa_state=abcd&code=xyz"] {
+            XCTAssertThrowsError(try r.parseCallback(URL(string: bad)!)) {
+                XCTAssertEqual($0 as? AnointedSignInError, .stateMismatch)
+            }
+        }
+    }
+
+    func testConstantTimeEquals() {
+        XCTAssertTrue(AnointedSignInRequest.constantTimeEquals("abc", "abc"))
+        XCTAssertTrue(AnointedSignInRequest.constantTimeEquals("", ""))
+        XCTAssertFalse(AnointedSignInRequest.constantTimeEquals("abc", "abd"))
+        XCTAssertFalse(AnointedSignInRequest.constantTimeEquals("abc", "ab"))
+    }
+
     func testParseCallbackSurfacesServerError() throws {
         let r = try AnointedSignInRequest(start: start, callback: .scheme("myapp", via: via), state: "abc")
         XCTAssertThrowsError(try r.parseCallback(URL(string: "myapp://anointed-sign-in?aa_state=abc&error=access_denied")!)) {

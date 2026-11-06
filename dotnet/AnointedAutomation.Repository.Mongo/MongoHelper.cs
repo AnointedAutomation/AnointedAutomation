@@ -4,12 +4,14 @@ using AnointedAutomation.Optimization.Logging;
 
 //Stewarded by Alexander Fields
 using MongoDB.Bson;
+using AnointedAutomation.Objects;
 using MongoDB.Driver;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AnointedAutomation.Repository.Mongo
@@ -24,6 +26,9 @@ namespace AnointedAutomation.Repository.Mongo
     {
         /// <summary>The most log messages kept in the in-memory buffer; older ones are dropped first.</summary>
         public const int MaxBufferedLogs = 1000;
+
+        /// <summary>The most write models sent in one bulk write round trip by <see cref="BulkWriteAsync{T}"/>.</summary>
+        public const int MaxBulkWriteBatch = 1000;
 
         private static readonly ConcurrentQueue<LogMessage> mongoLogs = new ConcurrentQueue<LogMessage>();
 
@@ -44,6 +49,47 @@ namespace AnointedAutomation.Repository.Mongo
             IMongoDatabase db = client.GetDatabase(dbName);
             database = db;
         }
+
+        /// <summary>
+        /// Creates a helper with durability options (set <see cref="database"/> afterwards, as with the default constructor).
+        /// </summary>
+        /// <param name="durability">The durability options; <see cref="MongoDurabilityOptions.Default"/> changes nothing.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="durability"/> is null.</exception>
+        public MongoHelper(MongoDurabilityOptions durability)
+        {
+            if (durability == null)
+            {
+                throw new ArgumentNullException(nameof(durability));
+            }
+            Durability = durability;
+        }
+
+        /// <summary>
+        /// Creates a helper with durability and read options (set <see cref="database"/> afterwards).
+        /// </summary>
+        /// <param name="durability">The durability options.</param>
+        /// <param name="readOptions">The read options (a read preference applied to every collection handle).</param>
+        /// <exception cref="ArgumentNullException">An argument is null.</exception>
+        public MongoHelper(MongoDurabilityOptions durability, MongoReadOptions readOptions)
+            : this(durability)
+        {
+            if (readOptions == null)
+            {
+                throw new ArgumentNullException(nameof(readOptions));
+            }
+            ReadOptions = readOptions;
+        }
+
+        private readonly SemaphoreSlim _topologyLock = new SemaphoreSlim(1, 1);
+
+        /// <summary>The durability options. <see cref="MongoDurabilityOptions.Default"/> unless a constructor set them.</summary>
+        public MongoDurabilityOptions Durability { get; } = MongoDurabilityOptions.Default;
+
+        /// <summary>The read options, or null when no read preference override is set (the driver default applies).</summary>
+        public MongoReadOptions ReadOptions { get; }
+
+        /// <summary>The topology found by <see cref="ValidateAsync"/>; <see cref="MongoTopologyKind.Unknown"/> before it runs.</summary>
+        public MongoTopologyKind DetectedTopology { get; private set; }
 
         // NOTE: no finalizer. `mongoLogs` is a STATIC shared buffer, so a per-instance
         // finalizer calling ClearLogs() would wipe the global log buffer whenever the GC
@@ -206,7 +252,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CreateDocumentAsync<T>(string collectionName, T document)
         {
-            await GetCollection<T>(collectionName).InsertOneAsync(document);
+            await (await CollectionAsync<T>(collectionName)).InsertOneAsync(document);
         }
 
         /// <summary>
@@ -231,28 +277,24 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The result of the delete operation.</returns>
         public async Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, FilterDefinition<T> filter)
         {
-            return await GetCollection<T>(collectionName).DeleteOneAsync(filter);
+            return await (await CollectionAsync<T>(collectionName)).DeleteOneAsync(filter);
         }
 
         /// <summary>
-        /// WARNING: THIS METHOD IS DANGEROUS AND CAN CAUSE OutOfMemoryException!
-        /// Loads ALL documents with ALL fields into memory. For large collections or
-        /// collections with binary data, this WILL crash your application.
-        ///
-        /// USE INSTEAD:
-        /// - GetAllDocumentIdsAsync() to get only IDs (safe)
-        /// - GetFilteredDocumentsAsync() with a filter to limit results
-        /// - Use projection to exclude large fields like binary content
-        ///
-        /// Only use this method for small collections with small documents.
+        /// OBSOLETE: loads EVERY document of the collection, with every field, into application RAM at once.
+        /// That breaks the "no RAM-resident data" rule: a growing collection becomes an OutOfMemoryException.
+        /// Use a bounded read instead:
+        /// <see cref="GetDocumentIdsPageAsync"/> to walk ids page by page,
+        /// <see cref="GetPagedAsync{T}"/> to walk documents page by page, or
+        /// <see cref="GetFilteredDocumentsAsync{T}(string, FilterDefinition{T}, SortDefinition{T}, int)"/> with a filter and a limit.
         /// </summary>
         /// <typeparam name="T">The type of documents to retrieve.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>A list of all documents in the collection.</returns>
-        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
+        [Obsolete(MongoObsoleteMessages.WholeCollectionRead)]
         public async Task<List<T>> GetAllDocumentsAsync<T>(string collectionName)
         {
-            IMongoCollection<T> collection = GetCollection<T>(collectionName);
+            IMongoCollection<T> collection = (await CollectionAsync<T>(collectionName));
             return await collection.Find(x => true).ToListAsync();
         }
 
@@ -266,7 +308,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>A list of all document IDs in the collection.</returns>
         public async Task<List<string>> GetAllDocumentIdsAsync(string collectionName)
         {
-            IMongoCollection<MongoDB.Bson.BsonDocument> collection = database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName);
+            IMongoCollection<MongoDB.Bson.BsonDocument> collection = await CollectionAsync<MongoDB.Bson.BsonDocument>(collectionName);
             ProjectionDefinition<MongoDB.Bson.BsonDocument> projection = Builders<MongoDB.Bson.BsonDocument>.Projection.Include("_id");
             List<MongoDB.Bson.BsonDocument> documents = await collection.Find(FilterDefinition<MongoDB.Bson.BsonDocument>.Empty)
                 .Project(projection)
@@ -284,7 +326,7 @@ namespace AnointedAutomation.Repository.Mongo
         public async Task<List<string>> GetDocumentIdsPageAsync(string collectionName, int skip, int limit)
         {
             ValidatePage(skip, limit);
-            IMongoCollection<MongoDB.Bson.BsonDocument> collection = database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName);
+            IMongoCollection<MongoDB.Bson.BsonDocument> collection = await CollectionAsync<MongoDB.Bson.BsonDocument>(collectionName);
             ProjectionDefinition<MongoDB.Bson.BsonDocument> projection = Builders<MongoDB.Bson.BsonDocument>.Projection.Include("_id");
             SortDefinition<MongoDB.Bson.BsonDocument> sort = Builders<MongoDB.Bson.BsonDocument>.Sort.Ascending("_id");
             List<MongoDB.Bson.BsonDocument> documents = await collection.Find(FilterDefinition<MongoDB.Bson.BsonDocument>.Empty)
@@ -294,6 +336,20 @@ namespace AnointedAutomation.Repository.Mongo
                 .Project(projection)
                 .ToListAsync();
             return documents.ConvertAll(doc => doc["_id"].ToString());
+        }
+
+        /// <inheritdoc />
+        public async Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
+        {
+            MongoPaging.ValidateAndGetSkip(page, pageSize);
+            return await MongoPaging.GetPageAsync(await CollectionAsync<T>(collectionName), filter, sort, page, pageSize);
+        }
+
+        /// <inheritdoc />
+        public async Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize)
+        {
+            MongoPaging.ValidateAndGetSkip(page, pageSize);
+            return await MongoPaging.GetDocumentIdPageAsync(await CollectionAsync<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize);
         }
 
         private static void ValidatePage(int skip, int limit)
@@ -320,7 +376,7 @@ namespace AnointedAutomation.Repository.Mongo
                     FilterDefinition<T> filter
                 )
         {
-            return await GetCollection<T>(collectionName).Find(filter).ToListAsync();
+            return await (await CollectionAsync<T>(collectionName)).Find(filter).ToListAsync();
         }
 
         /// <summary>
@@ -337,7 +393,7 @@ namespace AnointedAutomation.Repository.Mongo
                     T document
                 )
         {
-            return await GetCollection<T>(collectionName).ReplaceOneAsync(filter, document);
+            return await (await CollectionAsync<T>(collectionName)).ReplaceOneAsync(filter, document);
         }
 
         /// <summary>
@@ -372,7 +428,7 @@ namespace AnointedAutomation.Repository.Mongo
             UpdateDefinition<T> document
         )
         {
-            return await GetCollection<T>(collectionName).UpdateOneAsync(filter, document);
+            return await (await CollectionAsync<T>(collectionName)).UpdateOneAsync(filter, document);
         }
 
         // ---- Standard read queries (additive) ------------------------------
@@ -390,7 +446,7 @@ namespace AnointedAutomation.Repository.Mongo
             FilterDefinition<T> filter = ObjectId.TryParse(id, out ObjectId objectId)
                 ? Builders<T>.Filter.Eq("_id", objectId)
                 : Builders<T>.Filter.Eq("_id", id);
-            return await GetCollection<T>(collectionName).Find(filter).FirstOrDefaultAsync();
+            return await (await CollectionAsync<T>(collectionName)).Find(filter).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -402,7 +458,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The first matching document, or null.</returns>
         public async Task<T> GetSingleAsync<T>(string collectionName, FilterDefinition<T> filter)
         {
-            return await GetCollection<T>(collectionName).Find(filter).FirstOrDefaultAsync();
+            return await (await CollectionAsync<T>(collectionName)).Find(filter).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -415,7 +471,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The number of matching documents.</returns>
         public async Task<long> CountAsync<T>(string collectionName, FilterDefinition<T> filter)
         {
-            return await GetCollection<T>(collectionName).CountDocumentsAsync(filter);
+            return await (await CollectionAsync<T>(collectionName)).CountDocumentsAsync(filter);
         }
 
         /// <summary>
@@ -427,7 +483,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>True if any document matches; otherwise false.</returns>
         public async Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter)
         {
-            long count = await GetCollection<T>(collectionName)
+            long count = await (await CollectionAsync<T>(collectionName))
                 .CountDocumentsAsync(filter, new CountOptions { Limit = 1 });
             return count > 0;
         }
@@ -445,7 +501,7 @@ namespace AnointedAutomation.Repository.Mongo
         public async Task<List<T>> GetPagedAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int skip, int limit)
         {
             ValidatePage(skip, limit);
-            IFindFluent<T, T> find = GetCollection<T>(collectionName).Find(filter);
+            IFindFluent<T, T> find = (await CollectionAsync<T>(collectionName)).Find(filter);
             if (sort != null)
             {
                 find = find.Sort(sort);
@@ -464,7 +520,149 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The projected results.</returns>
         public async Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection)
         {
-            return await GetCollection<T>(collectionName).Find(filter).Project(projection).ToListAsync();
+            return await (await CollectionAsync<T>(collectionName)).Find(filter).Project(projection).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit)
+        {
+            ValidatePage(0, limit);
+            IFindFluent<T, T> find = (await CollectionAsync<T>(collectionName)).Find(filter);
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<T> GetSingleAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            return await (await CollectionAsync<T>(collectionName)).Find(filter, new FindOptions { Collation = collation }).FirstOrDefaultAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            ValidatePage(0, limit);
+            IFindFluent<T, T> find = (await CollectionAsync<T>(collectionName)).Find(filter, new FindOptions { Collation = collation });
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<long> CountAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            return await (await CollectionAsync<T>(collectionName)).CountDocumentsAsync(filter, new CountOptions { Collation = collation });
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            long count = await (await CollectionAsync<T>(collectionName))
+                .CountDocumentsAsync(filter, new CountOptions { Collation = collation, Limit = 1 });
+            return count > 0;
+        }
+
+        /// <inheritdoc />
+        public async Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection, SortDefinition<T> sort, int limit)
+        {
+            ValidatePage(0, limit);
+            if (projection == null)
+            {
+                throw new ArgumentNullException(nameof(projection));
+            }
+            IFindFluent<T, T> find = (await CollectionAsync<T>(collectionName)).Find(filter);
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).Project(projection).ToListAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<BulkWriteSummary> BulkWriteAsync<T>(string collectionName, IEnumerable<WriteModel<T>> models, bool ordered = false)
+        {
+            if (models == null)
+            {
+                throw new ArgumentNullException(nameof(models));
+            }
+            IMongoCollection<T> collection = (await CollectionAsync<T>(collectionName));
+            BulkWriteOptions options = new BulkWriteOptions { IsOrdered = ordered };
+            BulkWriteSummary summary = BulkWriteSummary.Empty;
+            List<BulkWriteFailure> failures = new List<BulkWriteFailure>();
+            List<WriteModel<T>> unprocessed = new List<WriteModel<T>>();
+            List<WriteModel<T>> batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+            int offset = 0;
+            int notAttempted = 0;
+            bool stopped = false;
+            foreach (WriteModel<T> model in models)
+            {
+                if (stopped)
+                {
+                    // Ordered and a batch failed: the rest are never sent, only counted.
+                    notAttempted++;
+                    continue;
+                }
+                if (model == null)
+                {
+                    throw new ArgumentException("models must not contain null", nameof(models));
+                }
+                batch.Add(model);
+                if (batch.Count == MaxBulkWriteBatch)
+                {
+                    summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures, unprocessed);
+                    offset += batch.Count;
+                    batch = new List<WriteModel<T>>(MaxBulkWriteBatch);
+                    if (ordered && failures.Count > 0)
+                    {
+                        stopped = true;
+                    }
+                }
+            }
+            if (!stopped && batch.Count > 0)
+            {
+                summary = await SendBatchAsync(collection, collectionName, batch, options, offset, summary, failures, unprocessed);
+            }
+            if (failures.Count > 0)
+            {
+                throw new BulkWriteFailedException(collectionName, summary, failures, unprocessed.Count + notAttempted);
+            }
+            return summary;
+        }
+
+        /// <summary>Sends one batch. A bulk write error is logged and recorded (with its index in the whole list) and the
+        /// applied part of the batch is still counted, so later batches can run.</summary>
+        private static async Task<BulkWriteSummary> SendBatchAsync<T>(IMongoCollection<T> collection, string collectionName,
+            List<WriteModel<T>> batch, BulkWriteOptions options, int offset, BulkWriteSummary summary, List<BulkWriteFailure> failures,
+            List<WriteModel<T>> unprocessed)
+        {
+            try
+            {
+                return summary.Add(await collection.BulkWriteAsync(batch, options));
+            }
+            catch (MongoBulkWriteException<T> e)
+            {
+                AddLog(LogMessage.Warning($"BulkWriteAsync: {e.WriteErrors.Count} of {batch.Count} models failed in collection '{collectionName}' (batch starting at {offset})", e));
+                foreach (BulkWriteError error in e.WriteErrors)
+                {
+                    failures.Add(new BulkWriteFailure(offset + error.Index, error.Code, error.Message));
+                }
+                if (e.WriteConcernError != null)
+                {
+                    failures.Add(new BulkWriteFailure(-1, e.WriteConcernError.Code, "write concern: " + e.WriteConcernError.Message));
+                }
+                // Ordered: the driver stops at the failing model; the rest of this batch is reported back as unprocessed.
+                unprocessed.AddRange(e.UnprocessedRequests);
+                return summary.Add(e.Result);
+            }
         }
 
         /// <summary>
@@ -477,7 +675,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The pipeline results.</returns>
         public async Task<List<TResult>> AggregateAsync<T, TResult>(string collectionName, PipelineDefinition<T, TResult> pipeline)
         {
-            return await (await GetCollection<T>(collectionName).AggregateAsync(pipeline)).ToListAsync();
+            return await (await (await CollectionAsync<T>(collectionName)).AggregateAsync(pipeline)).ToListAsync();
         }
 
         /// <summary>
@@ -491,7 +689,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The distinct field values.</returns>
         public async Task<List<TField>> DistinctAsync<T, TField>(string collectionName, FieldDefinition<T, TField> field, FilterDefinition<T> filter)
         {
-            return await (await GetCollection<T>(collectionName).DistinctAsync(field, filter)).ToListAsync();
+            return await (await (await CollectionAsync<T>(collectionName)).DistinctAsync(field, filter)).ToListAsync();
         }
 
         // ---- Standard write queries (additive) -----------------------------
@@ -505,7 +703,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CreateManyAsync<T>(string collectionName, IEnumerable<T> documents)
         {
-            await GetCollection<T>(collectionName).InsertManyAsync(documents);
+            await (await CollectionAsync<T>(collectionName)).InsertManyAsync(documents);
         }
 
         /// <summary>
@@ -518,7 +716,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The result of the update operation.</returns>
         public async Task<UpdateResult> UpdateManyAsync<T>(string collectionName, FilterDefinition<T> filter, UpdateDefinition<T> update)
         {
-            return await GetCollection<T>(collectionName).UpdateManyAsync(filter, update);
+            return await (await CollectionAsync<T>(collectionName)).UpdateManyAsync(filter, update);
         }
 
         /// <summary>
@@ -531,7 +729,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The result of the upsert operation.</returns>
         public async Task<UpdateResult> UpsertAsync<T>(string collectionName, FilterDefinition<T> filter, UpdateDefinition<T> update)
         {
-            return await GetCollection<T>(collectionName)
+            return await (await CollectionAsync<T>(collectionName))
                 .UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
         }
 
@@ -544,7 +742,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The result of the delete operation.</returns>
         public async Task<DeleteResult> DeleteManyAsync<T>(string collectionName, FilterDefinition<T> filter)
         {
-            return await GetCollection<T>(collectionName).DeleteManyAsync(filter);
+            return await (await CollectionAsync<T>(collectionName)).DeleteManyAsync(filter);
         }
 
         /// <summary>
@@ -565,7 +763,7 @@ namespace AnointedAutomation.Repository.Mongo
                 ReturnDocument = returnUpdated ? ReturnDocument.After : ReturnDocument.Before,
                 IsUpsert = upsert
             };
-            return await GetCollection<T>(collectionName).FindOneAndUpdateAsync(filter, update, options);
+            return await (await CollectionAsync<T>(collectionName)).FindOneAndUpdateAsync(filter, update, options);
         }
 
         /// <summary>
@@ -578,7 +776,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns>The deleted document, or null.</returns>
         public async Task<T> FindOneAndDeleteAsync<T>(string collectionName, FilterDefinition<T> filter)
         {
-            return await GetCollection<T>(collectionName).FindOneAndDeleteAsync(filter);
+            return await (await CollectionAsync<T>(collectionName)).FindOneAndDeleteAsync(filter);
         }
 
         // ---- Convenience: write-by-id (additive) ---------------------------
@@ -599,7 +797,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<ReplaceOneResult> ReplaceByIdAsync<T>(string collectionName, string id, T document)
         {
-            return await GetCollection<T>(collectionName).ReplaceOneAsync(IdFilter<T>(id), document);
+            return await (await CollectionAsync<T>(collectionName)).ReplaceOneAsync(IdFilter<T>(id), document);
         }
 
         /// <summary>
@@ -607,7 +805,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<UpdateResult> UpdateByIdAsync<T>(string collectionName, string id, UpdateDefinition<T> update)
         {
-            return await GetCollection<T>(collectionName).UpdateOneAsync(IdFilter<T>(id), update);
+            return await (await CollectionAsync<T>(collectionName)).UpdateOneAsync(IdFilter<T>(id), update);
         }
 
         /// <summary>
@@ -615,7 +813,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<DeleteResult> DeleteByIdAsync<T>(string collectionName, string id)
         {
-            return await GetCollection<T>(collectionName).DeleteOneAsync(IdFilter<T>(id));
+            return await (await CollectionAsync<T>(collectionName)).DeleteOneAsync(IdFilter<T>(id));
         }
 
         // ---- Convenience: expression-predicate overloads (additive) --------
@@ -625,7 +823,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<T> GetSingleAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
         {
-            return await GetCollection<T>(collectionName).Find(predicate).FirstOrDefaultAsync();
+            return await (await CollectionAsync<T>(collectionName)).Find(predicate).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -633,7 +831,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
         {
-            return await GetCollection<T>(collectionName).Find(predicate).ToListAsync();
+            return await (await CollectionAsync<T>(collectionName)).Find(predicate).ToListAsync();
         }
 
         /// <summary>
@@ -641,7 +839,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
         {
-            return await GetCollection<T>(collectionName).DeleteOneAsync(predicate);
+            return await (await CollectionAsync<T>(collectionName)).DeleteOneAsync(predicate);
         }
 
         /// <summary>
@@ -649,7 +847,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<long> CountAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
         {
-            return await GetCollection<T>(collectionName).CountDocumentsAsync(predicate);
+            return await (await CollectionAsync<T>(collectionName)).CountDocumentsAsync(predicate);
         }
 
         /// <summary>
@@ -657,7 +855,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         public async Task<bool> ExistsAsync<T>(string collectionName, Expression<Func<T, bool>> predicate)
         {
-            long count = await GetCollection<T>(collectionName)
+            long count = await (await CollectionAsync<T>(collectionName))
                 .CountDocumentsAsync(predicate, new CountOptions { Limit = 1 });
             return count > 0;
         }
@@ -703,7 +901,7 @@ namespace AnointedAutomation.Repository.Mongo
                 ExpireAfter = spec.ExpireAfter
             };
             CreateIndexModel<BsonDocument> model = new CreateIndexModel<BsonDocument>(keys, options);
-            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(collectionName);
+            IMongoCollection<BsonDocument> collection = await CollectionAsync<BsonDocument>(collectionName);
             await collection.Indexes.CreateOneAsync(model);
         }
 
@@ -741,14 +939,220 @@ namespace AnointedAutomation.Repository.Mongo
         }
 
         /// <summary>
-        /// Gets a typed collection from the database.
+        /// Gets a typed collection handle with this helper's durability and read options applied: the collection's
+        /// policy (see <see cref="MongoDurabilityOptions.PolicyFor"/>) through <c>WithWriteConcern</c> and the read
+        /// preference through <c>WithReadPreference</c>. With no options the plain driver handle is returned.
+        /// Use it with the session passed to <see cref="RunInTransactionAsync{TResult}"/>. It does not run topology
+        /// validation; call <see cref="ValidateAsync"/> first when the options need it.
         /// </summary>
         /// <typeparam name="T">The type of documents in the collection.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>The MongoDB collection.</returns>
-        private IMongoCollection<T> GetCollection<T>(string collectionName)
+        public IMongoCollection<T> GetCollection<T>(string collectionName)
         {
-            return database.GetCollection<T>(collectionName);
+            IMongoCollection<T> collection = database.GetCollection<T>(collectionName);
+            MongoDurabilityPolicy policy = Durability.PolicyFor(collectionName);
+            if (!policy.IsDefault)
+            {
+                collection = collection.WithWriteConcern(policy.ApplyTo(collection.Settings.WriteConcern));
+            }
+            if (ReadOptions != null)
+            {
+                collection = collection.WithReadPreference(ReadOptions.ReadPreference);
+            }
+            return collection;
+        }
+
+        /// <summary>Validates the topology first when the options need it, then returns <see cref="GetCollection{T}"/>.</summary>
+        private async Task<IMongoCollection<T>> CollectionAsync<T>(string collectionName)
+        {
+            if (Durability.NeedsTopology)
+            {
+                await ValidateAsync();
+            }
+            return GetCollection<T>(collectionName);
+        }
+
+        /// <summary>
+        /// Runs <c>hello</c> once (cached) to detect the topology, then enforces the options: a standalone server with
+        /// <see cref="MongoTransactionMode.Required"/> or any <see cref="MongoWriteConcernMode.Majority"/> policy throws.
+        /// Settings are never silently downgraded. Called automatically on first use when the options need it.
+        /// </summary>
+        /// <param name="cancellationToken">Cancels the <c>hello</c> call.</param>
+        /// <returns>The detected topology.</returns>
+        /// <exception cref="InvalidOperationException">The options need a replica set or sharded cluster and the server is standalone.</exception>
+        public async Task<MongoTopologyKind> ValidateAsync(CancellationToken cancellationToken = default)
+        {
+            if (DetectedTopology == MongoTopologyKind.Unknown)
+            {
+                await _topologyLock.WaitAsync(cancellationToken);
+                try
+                {
+                    if (DetectedTopology == MongoTopologyKind.Unknown)
+                    {
+                        DetectedTopology = await DetectTopologyAsync(cancellationToken);
+                    }
+                }
+                finally
+                {
+                    _topologyLock.Release();
+                }
+            }
+            EnforceTopology(DetectedTopology);
+            return DetectedTopology;
+        }
+
+        private async Task<MongoTopologyKind> DetectTopologyAsync(CancellationToken cancellationToken)
+        {
+            BsonDocument reply;
+            try
+            {
+                Command<BsonDocument> hello = new BsonDocumentCommand<BsonDocument>(new BsonDocument("hello", 1));
+                reply = await database.RunCommandAsync(hello, null, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception theseHands)
+            {
+                AddLog(LogMessage.Error($"MongoHelper.ValidateAsync: hello on db '{dbName}' failed", theseHands));
+                throw;
+            }
+            if (reply.Contains("setName"))
+            {
+                return MongoTopologyKind.ReplicaSet;
+            }
+            if (reply.Contains("msg") && reply["msg"].IsString && string.Equals(reply["msg"].AsString, "isdbgrid", StringComparison.Ordinal))
+            {
+                return MongoTopologyKind.Sharded;
+            }
+            return MongoTopologyKind.Standalone;
+        }
+
+        private void EnforceTopology(MongoTopologyKind kind)
+        {
+            if (kind != MongoTopologyKind.Standalone)
+            {
+                return;
+            }
+            if (Durability.Transactions == MongoTransactionMode.Required)
+            {
+                string message = $"MongoHelper: Transactions=Required but db '{dbName}' is on a standalone server (hello has no setName). "
+                    + "Transactions need a replica set or sharded cluster; run a replica set (a single-node one works) or use Auto/Off.";
+                AddLog(LogMessage.Error(message));
+                throw new InvalidOperationException(message);
+            }
+            if (Durability.UsesMajority)
+            {
+                string message = $"MongoHelper: WriteConcern=Majority but db '{dbName}' is on a standalone server (hello has no setName). "
+                    + "Majority acknowledgement needs a replica set or sharded cluster; run a replica set or use W1/Default.";
+                AddLog(LogMessage.Error(message));
+                throw new InvalidOperationException(message);
+            }
+        }
+
+        /// <summary>
+        /// The transaction mode actually used: <see cref="MongoTransactionMode.Off"/> or <see cref="MongoTransactionMode.Required"/>.
+        /// Auto resolves after <see cref="ValidateAsync"/> (Off on a standalone, Required on a replica set or sharded
+        /// cluster); before that it reads <see cref="MongoTransactionMode.Auto"/>.
+        /// </summary>
+        public MongoTransactionMode EffectiveTransactionMode
+        {
+            get
+            {
+                if (Durability.Transactions != MongoTransactionMode.Auto)
+                {
+                    return Durability.Transactions;
+                }
+                if (DetectedTopology == MongoTopologyKind.Unknown)
+                {
+                    return MongoTransactionMode.Auto;
+                }
+                return DetectedTopology == MongoTopologyKind.Standalone ? MongoTransactionMode.Off : MongoTransactionMode.Required;
+            }
+        }
+
+        /// <summary>Runs <paramref name="callback"/> under the transaction mode; see <see cref="RunInTransactionAsync{TResult}"/>.</summary>
+        /// <param name="callback">The work; the session is null when no transaction is used.</param>
+        /// <param name="cancellationToken">Cancels validation, session start and the transaction.</param>
+        /// <returns>A task that completes when the work (and commit) is done.</returns>
+        public async Task RunInTransactionAsync(Func<IClientSessionHandle, Task> callback, CancellationToken cancellationToken = default)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            await RunInTransactionAsync<bool>(async session =>
+            {
+                await callback(session);
+                return true;
+            }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Runs <paramref name="callback"/> under the transaction mode. Off: no session, the callback gets null.
+        /// Auto on a standalone: same as Off (there are no transactions to use). Required, or Auto on a replica set
+        /// or sharded cluster: a session is started and the callback runs inside <c>WithTransactionAsync</c> (the
+        /// driver retries transient errors and commits). Pass the session to every operation that must be in the
+        /// transaction; the session is null when no transaction is used, so branch on it:
+        /// <code>
+        /// IMongoCollection&lt;T&gt; c = helper.GetCollection&lt;T&gt;(name);
+        /// if (session == null) { await c.InsertOneAsync(doc); }
+        /// else { await c.InsertOneAsync(session, doc); }
+        /// </code>
+        /// Inside a transaction the driver ignores per-collection write concerns and commits with the transaction's
+        /// write concern, so the transaction is started with the strictest policy configured anywhere (global or any
+        /// <see cref="MongoDurabilityOptions.ForCollections"/> override, for example
+        /// <see cref="MongoDurabilityPolicy.MoneyWrites"/>), with read concern majority when that policy is majority,
+        /// and read preference primary. With no policy configured the driver's default transaction options apply.
+        /// A majority policy on a standalone server throws during validation, never weakens.
+        /// </summary>
+        /// <typeparam name="TResult">The callback result.</typeparam>
+        /// <param name="callback">The work; the session is null when no transaction is used.</param>
+        /// <param name="cancellationToken">Cancels validation, session start and the transaction.</param>
+        /// <returns>The callback result.</returns>
+        /// <exception cref="InvalidOperationException">Required (or majority) on a standalone server.</exception>
+        public async Task<TResult> RunInTransactionAsync<TResult>(Func<IClientSessionHandle, Task<TResult>> callback, CancellationToken cancellationToken = default)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+            if (Durability.Transactions == MongoTransactionMode.Off)
+            {
+                return await callback(null);
+            }
+            MongoTopologyKind kind = await ValidateAsync(cancellationToken);
+            if (Durability.Transactions == MongoTransactionMode.Auto && kind == MongoTopologyKind.Standalone)
+            {
+                return await callback(null);
+            }
+            using (IClientSessionHandle session = await database.Client.StartSessionAsync(null, cancellationToken))
+            {
+                return await session.WithTransactionAsync((s, token) => callback(s), BuildTransactionOptions(), cancellationToken);
+            }
+        }
+
+        /// <summary>
+        /// The transaction options for <see cref="RunInTransactionAsync{TResult}"/>: null when no policy is configured
+        /// (driver defaults), otherwise the strictest configured policy's write concern, read concern majority for a
+        /// majority policy, and read preference primary. The policy layers on the database's configured write concern, so a
+        /// connection-string wtimeout is kept. Public so code that starts its own session can use the same options.
+        /// </summary>
+        /// <returns>The options, or null for driver defaults.</returns>
+        public TransactionOptions BuildTransactionOptions()
+        {
+            MongoDurabilityPolicy policy = Durability.StrictestPolicy;
+            if (policy.IsDefault)
+            {
+                return null;
+            }
+            ReadConcern readConcern = policy.WriteConcern == MongoWriteConcernMode.Majority ? ReadConcern.Majority : null;
+            return new TransactionOptions(
+                readConcern: readConcern,
+                readPreference: ReadPreference.Primary,
+                writeConcern: policy.ApplyTo(database.Settings.WriteConcern));
         }
     }
 }

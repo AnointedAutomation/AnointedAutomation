@@ -7,7 +7,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+    <PackageProjectUrl>https://www.anointedautomation.net/open-source</PackageProjectUrl>
     <Title>AnointedAutomation.SSO.Owin</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
     <Copyright>Copyright © 2026 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>

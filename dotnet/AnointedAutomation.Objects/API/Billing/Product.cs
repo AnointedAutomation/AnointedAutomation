@@ -15,40 +15,63 @@ namespace AnointedAutomation.Objects.Billing
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Product"/> class.
-        /// Sets default quantity to 1 and currency to USD.
+        /// Sets default quantity to 1. Currency is left unset (null): there is no implicit currency.
         /// </summary>
         public Product()
         {
             this.quantitySold = 1;
-            this.Currency = "USD";
         }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="cost">Cost to produce product</param>
-        /// <param name="currency">if null defaults to USD</param>
-        /// <param name="price"></param>
-        /// <param name="quantitySold"></param>
-        /// <exception cref="System.ArgumentNullException"></exception>
         /// <summary>
         /// Initializes a new instance of the <see cref="Product"/> class with specified properties.
         /// </summary>
         /// <param name="name">The name of the product (required).</param>
         /// <param name="cost">The cost to produce/acquire the product.</param>
-        /// <param name="currency">The currency code (defaults to USD).</param>
+        /// <param name="currency">The three-letter uppercase ISO 4217 currency code (required, e.g. "USD").</param>
         /// <param name="price">The selling price of the product.</param>
         /// <param name="productId">The unique identifier for the product.</param>
         /// <param name="quantitySold">The quantity sold (defaults to 1 if 0).</param>
-        /// <exception cref="System.ArgumentNullException">Thrown when name is null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown when name or currency is null.</exception>
+        /// <exception cref="System.ArgumentException">Thrown when currency is not three uppercase ASCII letters.</exception>
         public Product(string name, decimal cost, string currency, decimal price, string productId, int quantitySold)
         {
             this.cost = cost;
-            this.Currency = currency ?? "USD";
+            this.Currency = RequireCurrencyCode(currency, nameof(currency));
             this.price = price;
             this.ProductId = productId;
             this.quantitySold = (quantitySold == 0) ? 1 : quantitySold;
             this.Name = name ?? throw new System.ArgumentNullException(nameof(name));
+        }
+
+        /// <summary>
+        /// Validates a three-letter uppercase ISO 4217 currency code and returns it unchanged.
+        /// </summary>
+        /// <param name="currency">The code to validate.</param>
+        /// <param name="paramName">The parameter name reported in the exception.</param>
+        /// <returns>The validated code.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when currency is null.</exception>
+        /// <exception cref="System.ArgumentException">Thrown when currency is not three uppercase ASCII letters.</exception>
+        public static string RequireCurrencyCode(string currency, string paramName)
+        {
+            if (currency == null)
+            {
+                throw new System.ArgumentNullException(paramName, "Currency is required; there is no default currency.");
+            }
+
+            if (currency.Length != 3)
+            {
+                throw new System.ArgumentException("Currency must be a three-letter ISO 4217 code, got '" + currency + "'.", paramName);
+            }
+
+            foreach (char c in currency)
+            {
+                if (c < 'A' || c > 'Z')
+                {
+                    throw new System.ArgumentException("Currency must be three uppercase ASCII letters (ISO 4217), got '" + currency + "'.", paramName);
+                }
+            }
+
+            return currency;
         }
 
         /// <summary>

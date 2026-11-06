@@ -81,7 +81,8 @@ Every method takes the collection name as its first argument.
 | Area | Methods |
 |---|---|
 | Create | `CreateDocumentAsync`, `CreateManyAsync` |
-| Read | `GetByIdAsync`, `GetSingleAsync`, `GetFilteredDocumentsAsync`, `GetAllDocumentsAsync`, `GetAllDocumentIdsAsync`, `GetPagedAsync`, `GetProjectedAsync`, `DistinctAsync`, `AggregateAsync`, `CountAsync`, `ExistsAsync` |
+| Bulk | `BulkWriteAsync` (any mix of insert/update/replace/delete models, 1000 per round trip, unordered by default; returns `BulkWriteSummary`; failed models raise `BulkWriteFailedException` with the applied counts and each failure's index) |
+| Read | `GetByIdAsync`, `GetSingleAsync`, `GetFilteredDocumentsAsync`, `GetAllDocumentsAsync`, `GetAllDocumentIdsAsync`, `GetPagedAsync`, `GetPageAsync` (1-based page, returns `PaginatedResponse<T>` with exact totals), `GetDocumentIdPageAsync` (ids page with an estimated total), `GetProjectedAsync`, `DistinctAsync`, `AggregateAsync`, `CountAsync`, `ExistsAsync` |
 | Update | `UpdateDocumentAsync`, `UpdateManyAsync`, `UpdateByIdAsync`, `UpsertAsync`, `ReplaceDocumentAsync`, `ReplaceByIdAsync`, `FindOneAndUpdateAsync` |
 | Delete | `DeleteDocumentAsync` (one), `DeleteManyAsync`, `DeleteByIdAsync`, `FindOneAndDeleteAsync` |
 | Indexes | `EnsureIndexAsync(string, MongoIndexSpec)`, `EnsureIndexesAsync(string, IEnumerable<MongoIndexSpec>)` |
@@ -89,6 +90,8 @@ Every method takes the collection name as its first argument.
 - Filters are `FilterDefinition<T>`. `GetSingleAsync`, `GetFilteredDocumentsAsync`, `DeleteDocumentAsync`, `CountAsync` and `ExistsAsync` also accept an `Expression<Func<T, bool>>`.
 - The `...ByIdAsync` methods treat a 24 character hex id as an `ObjectId` and any other string as a plain string `_id`.
 - `GetAllDocumentsAsync` (and `MongoRepository<TDoc>.GetAllAsync`, which forwards it) is `[Obsolete]` since 2.2.0 (a compiler warning, not an error): it loads the whole collection into memory. Page with `GetDocumentIdsPageAsync` or `GetPagedAsync`, or use `CountAsync` / `AggregateAsync`. It will be removed in a later major version.
+- 3.2.0: collation overloads `GetSingleAsync(collection, filter, collation)`, `GetFilteredDocumentsAsync(collection, filter, sort, limit, collation)`, `CountAsync(collection, filter, collation)` and `ExistsAsync(collection, filter, collation)` (for example case-insensitive matching with `new Collation("en", strength: CollationStrength.Secondary)`). They have default interface bodies that run through `database`, so existing `IMongoHelper` implementations keep compiling.
+- 3.0.0 (major: three members added to `IMongoHelper`; derive from `DelegatingMongoHelper` and you need no change): `BulkWriteAsync`, plus bounded reads `GetFilteredDocumentsAsync(collection, filter, sort, limit)` and `GetProjectedAsync(collection, filter, projection, sort, limit)` (limit must be 1 or more). Prefer them over the unbounded `GetFilteredDocumentsAsync(collection, filter)` on collections that can grow.
 
 ### Routing helpers
 
@@ -140,6 +143,54 @@ Property names are PascalCase with no `[BsonElement]` overrides, so element name
 | `SnakeCaseElementNameConvention` | snake_case element names; `static string ToSnake(string)` is public. |
 | `JObjectSerializer` | BSON serializer for Newtonsoft `JObject`. |
 | `BsonMap` | `ToPlain(BsonValue)` and `ToDictionary(BsonDocument)` convert BSON into plain dictionaries, lists and CLR scalars (ObjectId becomes its hex string). |
+
+## Durability, reads and transactions (3.1.0)
+
+All opt-in. With no options a helper is exactly what it was before: no write concern or read preference is set on the
+collection handle and no `hello` is sent, so the connection string decides.
+
+```csharp
+MongoDurabilityOptions durability = new MongoDurabilityOptions(
+        MongoWriteConcernMode.W1, journal: null, MongoTransactionMode.Auto)
+    .ForCollections(new[] { "payments", "refunds" }, MongoDurabilityPolicy.MoneyWrites);
+MongoReadOptions reads = new MongoReadOptions(ReadPreference.Primary);
+
+IMongoHelperFactory factory = new MongoHelperFactory(durability, reads);
+MongoHelper helper = (MongoHelper)factory.Create("shop", connectionString);
+await helper.ValidateAsync(); // optional: fail at startup instead of on first use
+
+await helper.RunInTransactionAsync(async session =>
+{
+    IMongoCollection<Payment> payments = helper.GetCollection<Payment>("payments");
+    if (session == null) { await payments.InsertOneAsync(payment); }
+    else { await payments.InsertOneAsync(session, payment); }
+});
+```
+
+| Setting | Standalone mongod | Replica set or sharded cluster |
+|---|---|---|
+| `WriteConcern.Default` | driver / connection string default | same |
+| `WriteConcern.W1` | acknowledged by the server | acknowledged by the primary only; a failover can roll it back |
+| `WriteConcern.Majority` | **throws** `InvalidOperationException` on validation (no majority to wait for) | acknowledged by a majority; survives failover |
+| `Journal = true` | waits for the on-disk journal | waits for the journal (with Majority: on a majority) |
+| `Journal = null` | server default | server default |
+| `Transactions.Off` | callback runs with a null session | same |
+| `Transactions.Auto` | callback runs with a null session (no transactions exist); `EffectiveTransactionMode` is `Off` | session + transaction; `EffectiveTransactionMode` is `Required` |
+| `Transactions.Required` | **throws** `InvalidOperationException` | session + transaction (driver `WithTransactionAsync`, retries transient errors) |
+
+- Validation runs `hello` once per helper (on first use when `Majority` or transactions are configured, or when you call
+  `ValidateAsync`). A reply with `setName` is a replica set, `msg: "isdbgrid"` is sharded, anything else is standalone.
+  Nothing is silently downgraded: if a setting cannot be honored the helper throws.
+- A single-node replica set (`mongod --replSet rs0` plus `rs.initiate()`) is enough for `Majority` and transactions in
+  development.
+- Inside a transaction the driver ignores per-collection write concerns, so `RunInTransactionAsync` starts the
+  transaction with the strictest configured policy (for example `MoneyWrites` if any collection uses it), read concern
+  majority for a majority policy, and read preference primary. With no policy it uses the driver defaults.
+  `BuildTransactionOptions()` returns the same options if you start your own session.
+- `MongoReadOptions` only chooses which member serves reads. It is not a durability setting.
+- Per-collection policies match the exact collection name (ordinal) and replace the global write concern and journal for
+  that collection only.
+- Write concern errors (`MongoWriteConcernException`) reach the caller unchanged.
 
 ## Casing conventions
 

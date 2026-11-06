@@ -52,14 +52,14 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.1.0
+### AnointedAutomation.APIMiddlewares 1.2.0
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
 - Depends on: NuGet Microsoft.AspNetCore.App (framework reference); AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Memory
 - Namespaces: `AnointedAutomation.APIMiddleware`, `AnointedAutomation.APIMiddleware.BotDefense`, `AnointedAutomation.APIMiddleware.Filters`, `AnointedAutomation.APIMiddleware.Objects`, `AnointedAutomation.APIMiddleware.Security`, `AnointedAutomation.APIMiddleware.Utility`
 - Key types: `ApiKeyAuthMiddleware`, `IPBlacklistMiddleware`, `InvalidEndpointTrackerMiddleware`, `EndpointAccessMiddleware`, `IpAllowlistMiddleware`, `CountryBlockMiddleware`, `CountryBlockOptions`, `CountryBlockExtensions`, `ICountryLookup`, `RirDelegatedCountryLookup`, `BotDefenseMiddleware`, `BotDefenseOptions`, `BotDefenseExtensions`, `FormBotGuard`, `HoneypotPathOptions`, `ZipBomb`, `IBanStore`, `ICrawlerVerifier`, `ICaptchaVerifier`, `CaptchaVerifier`, `APIKeyAttribute`, `IPBlacklist`
-- Notes: Note the namespace is AnointedAutomation.APIMiddleware (singular) while the package id is plural.
+- Notes: Note the namespace is AnointedAutomation.APIMiddleware (singular) while the package id is plural. 1.2.0: ApiKeyAuthMiddleware throws ArgumentException when expectedKey is null or empty.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.APIMiddlewares (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.APIMiddlewares/README.md)
 
 ```bash
@@ -74,7 +74,7 @@ app.UseMiddleware<InvalidEndpointTrackerMiddleware>();
 app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 ```
 
-### AnointedAutomation.Concepts 1.1.1
+### AnointedAutomation.Concepts 1.1.2
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
@@ -205,14 +205,14 @@ GarbageCollection gc = new GarbageCollection();
 gc.PerformGarbageCollection(null);
 ```
 
-### AnointedAutomation.Objects 2.7.1
+### AnointedAutomation.Objects 3.0.0
 
 Shared account, billing and response models so APIs and clients agree on shape. Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.
 
 - Depends on: NuGet Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Enums, AnointedAutomation.Shopify, AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Objects`, `AnointedAutomation.Objects.Account`, `AnointedAutomation.Objects.Billing`, `AnointedAutomation.Objects.Common`, `AnointedAutomation.Objects.Google`, `AnointedAutomation.Objects.Apple`
 - Key types: `User`, `UserEmail`, `UserEmailSource`, `Profile`, `SSO`, `ResponseData`, `PaginatedResponse<T>`, `PaymentIntent`, `Subscription`
-- Notes: User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry. User has a full constructor (every settable property, declaration order, assigned exactly as passed, no defaults); the legacy 14-parameter constructor accepts a null password and defaults dates to DateTime.UtcNow.
+- Notes: User.SSO holds one slot per provider: Google (GoogleObjects), Microsoft (MicrosoftUser), Apple (AppleSignIn), Facebook (FacebookLogin), Shopify (AnointedAutomation.Shopify.Customer). A null slot means never linked. User.Emails holds every address (UserEmail, UserEmailSource) and is stored directly under Email; each UserEmail may carry ShopifyCustomerId (long?, the Shopify customer it maps to) and ShopifyLinkedAt; User.Email mirrors the IsPrimary entry. User has a full constructor (every settable property, declaration order, assigned exactly as passed, no defaults); the legacy 14-parameter constructor accepts a null password and defaults dates to DateTime.UtcNow. Product (3.0.0, breaking): the full constructor requires a three-letter uppercase ISO 4217 currency (ArgumentNullException/ArgumentException, Product.RequireCurrencyCode), no USD default; the parameterless constructor leaves Currency null.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Objects (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Objects/README.md)
 
 ```bash
@@ -249,7 +249,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(o => JsonCasingConvention.Configure(o.JsonSerializerOptions));
 ```
 
-### AnointedAutomation.Optimization 1.0.4
+### AnointedAutomation.Optimization 1.0.5
 
 Everyday data helpers: chunking, CSV and DataTable, JSON flattening, safe field reads. Reusable optimization utilities: CSV/DataTable/DataReader helpers, chunking, string helpers, Roman numerals, JSON flattening, file management, and null-safe JsonElement/BsonDocument field accessors.
 
@@ -271,14 +271,14 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 2.2.0
+### AnointedAutomation.Repository.Mongo 3.3.0
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 
 - Depends on: NuGet MongoDB.Bson 3.12.0, MongoDB.Driver 3.12.0, MongoDB.Libmongocrypt 1.12.0, Newtonsoft.Json 13.0.4; AnointedAutomation AnointedAutomation.Logging, AnointedAutomation.Objects, AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Repository.Mongo`, `AnointedAutomation.Repository.Mongo.Bson`
-- Key types: `MongoHelper`, `IMongoHelper`, `DelegatingMongoHelper`, `MongoRepository<TDoc>`, `MongoDocument`, `TimestampedMongoRepository<TDoc>`, `HybridCasing`, `BsonClassMapRegistrar`
-- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0. 2.1.0: DelegatingMongoHelper, an abstract IMongoHelper that forwards every member to protected abstract Current() (derive from it for routing helpers so new interface members need no code change). 2.2.0: IMongoHelper.GetAllDocumentsAsync and MongoRepository<TDoc>.GetAllAsync are [Obsolete] (warning, not error); page with GetDocumentIdsPageAsync / GetPagedAsync.
+- Key types: `MongoHelper`, `IMongoHelper`, `DelegatingMongoHelper`, `MongoPaging`, `BulkWriteSummary`, `BulkWriteFailedException`, `MongoDurabilityOptions`, `MongoDurabilityPolicy`, `MongoReadOptions`, `MongoRepository<TDoc>`, `MongoDocument`, `TimestampedMongoRepository<TDoc>`, `HybridCasing`, `BsonClassMapRegistrar`
+- Notes: Call HybridCasing.Register once at startup, before any Mongo operation. MongoRepository<TDoc> is abstract (protected ctor taking IMongoHelper and a collection name). 2.0.0: MongoHelperConnector throws InvalidOperationException when the connection test fails; IMongoHelper adds GetDocumentIdsPageAsync(collection, skip, limit); GetPagedAsync rejects limit <= 0 and skip < 0. 2.1.0: DelegatingMongoHelper, an abstract IMongoHelper that forwards every member to protected abstract Current() (derive from it for routing helpers so new interface members need no code change). 2.2.0: IMongoHelper.GetAllDocumentsAsync and MongoRepository<TDoc>.GetAllAsync are [Obsolete] (warning, not error); page with GetDocumentIdsPageAsync / GetPagedAsync. 3.0.0 (major: IMongoHelper gained members; DelegatingMongoHelper subclasses need no change): BulkWriteAsync(collection, models, ordered=false) sends 1000 models per round trip and returns BulkWriteSummary; failed models raise BulkWriteFailedException (applied counts + each failure's index; unordered still runs every batch); bounded GetFilteredDocumentsAsync(collection, filter, sort, limit) and GetProjectedAsync(collection, filter, projection, sort, limit). 3.1.0 (additive, IMongoHelper unchanged; no options = 3.0.0 behavior): MongoDurabilityOptions (WriteConcern Default/W1/Majority, Journal bool?, Transactions Off/Auto/Required, ForCollections(names, MongoDurabilityPolicy.MoneyWrites)); separate MongoReadOptions(ReadPreference); MongoHelper and MongoHelperFactory constructor overloads take them; public MongoHelper.GetCollection<T> applies them; ValidateAsync runs hello and throws InvalidOperationException for Required or Majority on a standalone; RunInTransactionAsync honors the mode (Off and Auto-on-standalone: null session; transactions use the strictest configured policy's write concern, majority read concern for majority, primary reads; BuildTransactionOptions exposes them). 3.2.0 (additive; default interface bodies, so other IMongoHelper implementations keep compiling): collation overloads GetSingleAsync(collection, filter, collation), bounded GetFilteredDocumentsAsync(collection, filter, sort, limit, collation), CountAsync(collection, filter, collation), ExistsAsync(collection, filter, collation); a null collation throws ArgumentNullException. 3.3.0 (additive; default interface bodies): GetPageAsync(collection, filter, sort, page, pageSize) and ids-only GetDocumentIdPageAsync(collection, page, pageSize) return AnointedAutomation.Objects.PaginatedResponse<T> (1-based page, totalItems, totalPages); GetPageAsync counts the filter exactly (concurrently with the page read), GetDocumentIdPageAsync uses EstimatedDocumentCountAsync so totalItems is a metadata estimate; shared MongoPaging (MaxPageSize 1000) throws ArgumentOutOfRangeException on page < 1, pageSize outside 1..1000, or overflow.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Repository.Mongo (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Repository.Mongo/README.md)
 
 ```bash
@@ -340,13 +340,14 @@ builder.Services.AddControllers()
 string snake = JsonSerializer.Serialize(payload, JsonPresets.SnakeCase);
 ```
 
-### AnointedAutomation.Shopify 1.2.0
+### AnointedAutomation.Shopify 2.1.0
 
 Shopify REST models without pulling in a whole client library. Plain Newtonsoft.Json POCO models for the Shopify Admin REST API (customers, orders, products, fulfillments, inventory, refunds, transactions, webhooks and more), derived from ShopifySharp's REST entities. Plus a transport-neutral Admin GraphQL client (HttpClient based) with error parsing, cost-bucket throttling, safe retries (unkeyed mutations are never resent after an unknown outcome), cursor paging and @idempotent keys. Also bulk operations (staged JSONL upload, polling with backoff, streamed results), webhook HMAC verification with an idempotent subscription registrar, typed builders for common non-money catalog operations, and System.Text.Json response models.
 
 - Depends on: NuGet Newtonsoft.Json 13.0.4, Microsoft.Extensions.Logging.Abstractions 10.0.0; AnointedAutomation AnointedAutomation.Serialization
 - Namespaces: `AnointedAutomation.Shopify`, `AnointedAutomation.Shopify.Converters`, `AnointedAutomation.Shopify.GraphQL`, `AnointedAutomation.Shopify.GraphQL.Models`, `AnointedAutomation.Shopify.Bulk`, `AnointedAutomation.Shopify.Webhooks`, `AnointedAutomation.Shopify.Operations`
-- Key types: `Customer`, `Order`, `Product`, `Fulfillment`, `InventoryLevel`, `Refund`, `ShopifyGraphQlClient`, `IShopifyStoreContext`, `ShopifyRetryPolicy`, `ShopifyCostBucket`, `ShopifyPager`, `ShopifyIdempotency`, `ShopifyBulkOperationRunner`, `ShopifyWebhookHmac`, `ShopifyWebhookRegistrar`, `ShopifyCatalogOperations`, `ShopifyProduct`, `ShopifyOrder`
+- Key types: `Customer`, `Order`, `Product`, `Fulfillment`, `InventoryLevel`, `Refund`, `ShopifyGraphQlClient`, `IShopifyStoreContext`, `ShopifyRetryPolicy`, `ShopifyCostBucket`, `ShopifyPager`, `ShopifyIdempotency`, `ShopifyBulkOperationRunner`, `ShopifyWebhookHmac`, `ShopifyWebhookRegistrar`, `ShopifyCatalogOperations`, `ShopifyPublishingOperations`, `ShopifyProduct`, `ShopifyOrder`, `ShopifyMoney`
+- Notes: ShopifyMoney (2.0.0, breaking): Read throws FormatException naming the missing or invalid field; TryRead(parent, setName, out decimal amount, out string currency) and TryReadAmount return false; no 0 or empty fallbacks.
 - Notes: Derived from ShopifySharp (MIT, Copyright (c) 2015 Joshua Harms); see THIRD-PARTY-NOTICES.md in the package.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Shopify (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Shopify/README.md)
 
@@ -408,7 +409,7 @@ dotnet new anointed-razor -n MyApp   # or anointed-blazor
 
 ## JavaScript packages
 
-### @anointedautomation/sso 0.2.6
+### @anointedautomation/sso 0.2.7
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso
 - Runtime: Node 18+, Deno (Base44 backend functions), edge runtimes. Zero dependencies. Server only.
@@ -493,7 +494,7 @@ Vue 3 sign-in button and useAnointedSignIn composable that send the browser to t
 
 Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
 
-### @anointedautomation/sso-angular 0.1.2
+### @anointedautomation/sso-angular 0.1.3
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
 - Runtime: Angular 17+ (browser). On npm: `npm install @anointedautomation/sso-angular`.
@@ -516,7 +517,7 @@ React Native and Expo sign-in button and useAnointedSignIn hook: open the partne
 
 ## Python package
 
-### anointedautomation-sso 0.1.2
+### anointedautomation-sso 0.1.3
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/python/anointed-sso
 - Runtime: Python 3.10+, server only. On PyPI: `pip install anointedautomation-sso`.
@@ -525,19 +526,19 @@ Server-side OpenID Connect kit (code + PKCE) for Python with Django, FastAPI/Sta
 
 ## PHP package
 
-### anointedautomation/sso 0.1.3
+### anointedautomation/sso 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/php/anointed-sso
-- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` (on Packagist, 0.1.3; versions come from repo git tags shared with the Swift package; manifest is the root composer.json).
+- Runtime: PHP 8.1+, Laravel optional. Install: `composer require anointedautomation/sso` (on Packagist, 0.1.4; versions come from repo git tags shared with the Swift package; manifest is the root composer.json).
 
 Sign in with Anointed Automation for PHP and Laravel: code + PKCE S256, ID token verification, logout and back-channel logout. Key classes: `Client`, `SsoConfig`, `BackchannelLogoutHandler`, `AnointedSsoServiceProvider` (Laravel).
 
 ## Swift package
 
-### AnointedSSO 0.1.3
+### AnointedSSO 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/swift/AnointedSSO
-- Install: Swift Package Manager (git tag 0.1.3), `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
+- Install: Swift Package Manager (git tag 0.1.4), `https://github.com/AnointedAutomation/AnointedAutomation`, product `AnointedSSO`. iOS 15+, macOS 12+. Zero dependencies.
 - The app never holds the client secret: `AnointedSignIn` opens the partner's own server start route (`@anointedautomation/sso`) in `ASWebAuthenticationSession`; the server finishes OIDC and redirects to the app's callback, carrying the `aa_state` the package checks.
 - Callbacks: `.https(host:path:)` (universal link, iOS 17.4+) or `.scheme(name, via:)` (an https server route that forwards the query to `name://anointed-sign-in`).
 

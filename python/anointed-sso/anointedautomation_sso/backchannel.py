@@ -6,7 +6,7 @@ from __future__ import annotations
 import logging
 from typing import Callable, Sequence
 
-from .client import AnointedClient, LogoutToken
+from .client import LOGOUT_MAX_AGE_SECONDS, AnointedClient, LogoutToken
 from .errors import AnointedSsoError
 from .replay import LogoutReplayStore
 
@@ -14,6 +14,17 @@ _log = logging.getLogger("anointedautomation_sso")
 
 #: The form field the provider posts the Logout Token in.
 LOGOUT_TOKEN_FIELD = "logout_token"
+
+
+def replay_window_end(logout: LogoutToken, clock_skew_seconds: float) -> float:
+    """When a processed ``jti`` may be forgotten: the last moment the same token could still validate.
+
+    With ``exp`` that is ``exp + skew``; without it the token is accepted until ``iat + max age + skew``, so the
+    ``jti`` is remembered that long (``verify_logout_token`` has already checked ``iat`` is a number).
+    """
+    if logout.exp is not None:
+        return logout.exp + clock_skew_seconds
+    return float(logout.claims["iat"]) + LOGOUT_MAX_AGE_SECONDS + clock_skew_seconds
 
 
 def process_backchannel_logout(
@@ -43,7 +54,7 @@ def process_backchannel_logout(
             return 400
         _log.error("back-channel logout could not be validated (provider keys unavailable): %s", err)
         return 500
-    remember_until = (logout.exp if logout.exp is not None else client.now()) + client.clock_skew_seconds
+    remember_until = replay_window_end(logout, client.clock_skew_seconds)
     if not replay_store.try_add(logout.jti, remember_until):
         _log.info("back-channel logout %s was already processed", logout.jti)
         return 200

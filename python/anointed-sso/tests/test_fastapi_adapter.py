@@ -114,3 +114,21 @@ def test_unexpected_callback_failure_is_logged_and_raised(client, caplog, monkey
     with caplog.at_level("ERROR", logger="anointedautomation_sso"), pytest.raises(RuntimeError):
         http.get("/auth/anointed/callback", params={"code": "abc", "state": "x"})
     assert any(r.levelname == "ERROR" and r.exc_info is not None for r in caplog.records)
+
+
+def test_oversized_logout_body_is_413(client, provider):
+    from anointedautomation_sso.adapters.fastapi import MAX_LOGOUT_BODY_BYTES
+
+    app = FastAPI()
+    app.include_router(create_router(client, on_signed_in=lambda r, res: RedirectResponse("/"), on_logout=lambda l: None), prefix="/a")
+    http = TestClient(app)
+    big = "logout_token=" + "a" * MAX_LOGOUT_BODY_BYTES
+    response = http.post("/a/backchannel-logout", content=big, headers={"content-type": "application/x-www-form-urlencoded"})
+    assert response.status_code == 413
+
+    def chunks():
+        for _ in range(70):
+            yield b"a" * 1024
+
+    streamed = http.post("/a/backchannel-logout", content=chunks(), headers={"content-type": "application/x-www-form-urlencoded"})
+    assert streamed.status_code == 413

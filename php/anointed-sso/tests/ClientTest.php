@@ -6,6 +6,8 @@ declare(strict_types=1);
 namespace AnointedAutomation\Sso\Tests;
 
 use AnointedAutomation\Sso\AnointedSsoException;
+use AnointedAutomation\Sso\ArrayMetadataCache;
+use AnointedAutomation\Sso\Client;
 use AnointedAutomation\Sso\SsoConfig;
 use AnointedAutomation\Sso\Tests\Support\Provider;
 use PHPUnit\Framework\TestCase;
@@ -162,6 +164,40 @@ final class ClientTest extends TestCase
         $result = $c->handleCallback(['state' => $auth->state, 'code' => 'c'], $auth->cookie->value);
         $this->assertSame('user-1', $result->user->sub);
         $this->assertSame(2, $this->provider->http->count('GET', SsoConfig::ISSUER . 'connect/jwks'));
+    }
+
+    public function testForcedJwksRefetchHasACooldown(): void
+    {
+        $now = Provider::NOW;
+        $c = new Client($this->provider->config(), $this->provider->http, null, function () use (&$now): int {
+            return $now;
+        });
+        $c->getJwks();
+        $jwksUrl = SsoConfig::ISSUER . 'connect/jwks';
+        $before = $this->provider->http->count('GET', $jwksUrl);
+        $c->getJwks(true);
+        $c->getJwks(true);
+        $this->assertSame(1, $this->provider->http->count('GET', $jwksUrl) - $before);
+        $now += Client::JWKS_REFETCH_COOLDOWN_SECONDS - 1;
+        $c->getJwks(true);
+        $this->assertSame(1, $this->provider->http->count('GET', $jwksUrl) - $before);
+        $now += 1;
+        $c->getJwks(true);
+        $this->assertSame(2, $this->provider->http->count('GET', $jwksUrl) - $before);
+    }
+
+    public function testForcedJwksCooldownIsSharedThroughTheCache(): void
+    {
+        $cache = new ArrayMetadataCache();
+        $clock = fn (): int => Provider::NOW;
+        $first = new Client($this->provider->config(), $this->provider->http, $cache, $clock);
+        $second = new Client($this->provider->config(), $this->provider->http, $cache, $clock);
+        $first->getJwks();
+        $jwksUrl = SsoConfig::ISSUER . 'connect/jwks';
+        $before = $this->provider->http->count('GET', $jwksUrl);
+        $first->getJwks(true);
+        $second->getJwks(true);
+        $this->assertSame(1, $this->provider->http->count('GET', $jwksUrl) - $before);
     }
 
     public function testTokenEndpointFailure(): void

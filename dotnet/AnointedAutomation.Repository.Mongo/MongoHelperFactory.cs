@@ -31,6 +31,40 @@ namespace AnointedAutomation.Repository.Mongo
         /// </summary>
         private readonly ConcurrentDictionary<string, IMongoHelper> _cache = new ConcurrentDictionary<string, IMongoHelper>();
 
+        private readonly MongoDurabilityOptions _durability;
+        private readonly MongoReadOptions _readOptions;
+
+        /// <summary>Creates a factory whose helpers use no durability or read overrides (the driver defaults).</summary>
+        public MongoHelperFactory()
+        {
+        }
+
+        /// <summary>Creates a factory whose helpers all use <paramref name="durability"/>.</summary>
+        /// <param name="durability">The durability options for every helper this factory creates.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="durability"/> is null.</exception>
+        public MongoHelperFactory(MongoDurabilityOptions durability)
+        {
+            if (durability == null)
+            {
+                throw new System.ArgumentNullException(nameof(durability));
+            }
+            _durability = durability;
+        }
+
+        /// <summary>Creates a factory whose helpers all use <paramref name="durability"/> and <paramref name="readOptions"/>.</summary>
+        /// <param name="durability">The durability options.</param>
+        /// <param name="readOptions">The read options.</param>
+        /// <exception cref="System.ArgumentNullException">An argument is null.</exception>
+        public MongoHelperFactory(MongoDurabilityOptions durability, MongoReadOptions readOptions)
+            : this(durability)
+        {
+            if (readOptions == null)
+            {
+                throw new System.ArgumentNullException(nameof(readOptions));
+            }
+            _readOptions = readOptions;
+        }
+
         /// <summary>
         /// Creates or retrieves a cached IMongoHelper instance for the specified database.
         /// </summary>
@@ -46,7 +80,7 @@ namespace AnointedAutomation.Repository.Mongo
             if (!_cache.TryGetValue(cacheKey, out IMongoHelper cachedMongoHelper))
             {
                 // If not found in cache, create a new instance
-                MongoHelper mongoHelper = new MongoHelper();
+                MongoHelper mongoHelper = NewHelper();
 
                 mongoHelper.database = mongoHelper.CreateMongoDbInstance(dbName, connectionString);
                 mongoHelper.dbName = dbName;
@@ -59,6 +93,19 @@ namespace AnointedAutomation.Repository.Mongo
 
             // If cached instance exists, return it
             return cachedMongoHelper;
+        }
+
+        private MongoHelper NewHelper()
+        {
+            if (_durability == null)
+            {
+                return new MongoHelper();
+            }
+            if (_readOptions == null)
+            {
+                return new MongoHelper(_durability);
+            }
+            return new MongoHelper(_durability, _readOptions);
         }
     }
 }

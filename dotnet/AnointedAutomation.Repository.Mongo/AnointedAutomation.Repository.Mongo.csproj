@@ -6,13 +6,13 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<PackageProjectUrl>https://anointed.company</PackageProjectUrl>
+		<PackageProjectUrl>https://www.anointedautomation.net/open-source</PackageProjectUrl>
 		<Title>AnointedAutomation.Repository.Mongo</Title>
 		<Company>Anointed Automation Corporation - Alexander Fields</Company>
 		<Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>2.2.0</Version>
+		<Version>3.3.0</Version>
 		<PackageTags>mongodb;mongo;repository;bson;database;nosql;anointedautomation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Repository.Mongo</PackageReleaseNotes>
 		<Authors>Anointed Automation Corporation, Alexander Fields</Authors>

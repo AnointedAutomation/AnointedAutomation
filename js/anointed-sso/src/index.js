@@ -5,6 +5,7 @@ export {
   ANOINTED_ISSUER,
   BACKCHANNEL_LOGOUT_EVENT,
   DEFAULT_SCOPE,
+  JWKS_REFETCH_COOLDOWN_SECONDS,
   createAnointedClient,
   safeReturnTo,
 } from "./client.js";

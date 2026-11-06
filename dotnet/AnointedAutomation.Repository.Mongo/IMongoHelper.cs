@@ -2,6 +2,7 @@
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 //Stewarded by Alexander Fields
 
+using AnointedAutomation.Objects;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -54,21 +55,17 @@ namespace AnointedAutomation.Repository.Mongo
         Task<DeleteResult> DeleteDocumentAsync<T>(string collectionName, FilterDefinition<T> filter);
 
         /// <summary>
-        /// WARNING: THIS METHOD IS DANGEROUS AND CAN CAUSE OutOfMemoryException!
-        /// Loads ALL documents with ALL fields into memory. For large collections or
-        /// collections with binary data, this WILL crash your application.
-        ///
-        /// USE INSTEAD:
-        /// - GetAllDocumentIdsAsync() to get only IDs (safe)
-        /// - GetFilteredDocumentsAsync() with a filter to limit results
-        /// - Use projection to exclude large fields like binary content
-        ///
-        /// Only use this method for small collections with small documents.
+        /// OBSOLETE: loads EVERY document of the collection, with every field, into application RAM at once.
+        /// That breaks the "no RAM-resident data" rule: a growing collection becomes an OutOfMemoryException.
+        /// Use a bounded read instead:
+        /// <see cref="GetDocumentIdsPageAsync"/> to walk ids page by page,
+        /// <see cref="GetPagedAsync{T}"/> to walk documents page by page, or
+        /// <see cref="GetFilteredDocumentsAsync{T}(string, FilterDefinition{T}, SortDefinition{T}, int)"/> with a filter and a limit.
         /// </summary>
         /// <typeparam name="T">The type of documents to retrieve.</typeparam>
         /// <param name="collectionName">The name of the collection.</param>
         /// <returns>A list of all documents in the collection.</returns>
-        [Obsolete("Loads a whole collection into memory; page with GetDocumentIdsPageAsync / GetPagedAsync instead.")]
+        [Obsolete(MongoObsoleteMessages.WholeCollectionRead)]
         Task<List<T>> GetAllDocumentsAsync<T>(string collectionName);
 
         /// <summary>
@@ -189,6 +186,99 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="projection">The projection definition.</param>
         /// <returns>The projected results.</returns>
         Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection);
+
+        /// <summary>
+        /// Gets at most <paramref name="limit"/> documents matching the filter, in the optional sort order. Use this instead of
+        /// the unbounded <see cref="GetFilteredDocumentsAsync{T}(string, FilterDefinition{T})"/> on collections that can grow.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="limit">The maximum number of documents to return (1 or more; 0 or less throws).</param>
+        Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit);
+
+        /// <summary>
+        /// Gets the first document matching the filter under the given collation (for example case-insensitive
+        /// matching), or the type default (null) if none matches.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="collation">The collation used to compare strings; required.</param>
+        async Task<T> GetSingleAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            return await database.GetCollection<T>(collectionName).Find(filter, new FindOptions { Collation = collation }).FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Gets at most <paramref name="limit"/> documents matching the filter under the given collation, in the optional
+        /// sort order (the collation also orders strings in the sort).
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="limit">The maximum number of documents to return (1 or more; 0 or less throws).</param>
+        /// <param name="collation">The collation used to compare strings; required.</param>
+        async Task<List<T>> GetFilteredDocumentsAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int limit, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            ArgumentOutOfRangeException.ThrowIfLessThan(limit, 1);
+            IFindFluent<T, T> find = database.GetCollection<T>(collectionName).Find(filter, new FindOptions { Collation = collation });
+            if (sort != null)
+            {
+                find = find.Sort(sort);
+            }
+            return await find.Limit(limit).ToListAsync();
+        }
+
+        /// <summary>
+        /// Counts documents matching the filter under the given collation WITHOUT loading them.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="collation">The collation used to compare strings; required.</param>
+        async Task<long> CountAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            return await database.GetCollection<T>(collectionName).CountDocumentsAsync(filter, new CountOptions { Collation = collation });
+        }
+
+        /// <summary>
+        /// Returns true if at least one document matches the filter under the given collation (stops at the first match).
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="collation">The collation used to compare strings; required.</param>
+        async Task<bool> ExistsAsync<T>(string collectionName, FilterDefinition<T> filter, Collation collation)
+        {
+            ArgumentNullException.ThrowIfNull(collation);
+            long count = await database.GetCollection<T>(collectionName).CountDocumentsAsync(filter, new CountOptions { Collation = collation, Limit = 1 });
+            return count > 0;
+        }
+
+        /// <summary>
+        /// Gets at most <paramref name="limit"/> documents matching the filter, projected to a smaller shape so only the
+        /// needed fields leave the server.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match.</param>
+        /// <param name="projection">The projection definition.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="limit">The maximum number of documents to return (1 or more; 0 or less throws).</param>
+        Task<List<TProjection>> GetProjectedAsync<T, TProjection>(string collectionName, FilterDefinition<T> filter, ProjectionDefinition<T, TProjection> projection, SortDefinition<T> sort, int limit);
+
+        /// <summary>
+        /// Runs many inserts, updates, replaces and deletes as bulk writes, <see cref="MongoHelper.MaxBulkWriteBatch"/> models per
+        /// round trip. Unordered by default: a failing model does not stop the rest of its batch or the later batches, and
+        /// after every batch ran a <see cref="BulkWriteFailedException"/> lists each failed model (index in the whole list) plus
+        /// the counts that WERE applied. Ordered stops at the first failing batch with the same exception. An empty list makes
+        /// no call.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="models">The write models.</param>
+        /// <param name="ordered">True to stop at the first failure.</param>
+        /// <returns>The summed counts of every batch.</returns>
+        Task<BulkWriteSummary> BulkWriteAsync<T>(string collectionName, IEnumerable<WriteModel<T>> models, bool ordered = false);
 
         /// <summary>
         /// Runs an aggregation pipeline on the collection and returns the results.
@@ -383,5 +473,36 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="specs">The index specifications.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task EnsureIndexesAsync(string collectionName, IEnumerable<MongoIndexSpec> specs);
+
+        /// <summary>
+        /// Gets one 1-based page of documents matching the filter, in the optional sort order, together with the total
+        /// count of the filter (counted on the server, concurrently with the page read) and the page count.
+        /// </summary>
+        /// <typeparam name="T">The type of documents to retrieve.</typeparam>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="filter">The filter to match; required.</param>
+        /// <param name="sort">The sort definition, or null for natural order.</param>
+        /// <param name="page">The 1-based page number (1 or more; less throws).</param>
+        /// <param name="pageSize">The number of items per page (1 to <see cref="MongoPaging.MaxPageSize"/>; outside throws).</param>
+        /// <returns>The page of documents with currentPage, pageSize, totalItems and totalPages.</returns>
+        Task<PaginatedResponse<T>> GetPageAsync<T>(string collectionName, FilterDefinition<T> filter, SortDefinition<T> sort, int page, int pageSize)
+        {
+            return MongoPaging.GetPageAsync(database.GetCollection<T>(collectionName), filter, sort, page, pageSize);
+        }
+
+        /// <summary>
+        /// Gets one 1-based page of document ids ordered by _id (projected to _id only), together with the collection's
+        /// total and the page count. The total comes from EstimatedDocumentCountAsync (metadata, O(1) per page), so
+        /// totalItems and totalPages are an estimate; use <see cref="CountAsync{T}(string, FilterDefinition{T})"/> for an exact count. Named differently from the skip/limit <see cref="GetDocumentIdsPageAsync"/>,
+        /// which has the same parameter types.
+        /// </summary>
+        /// <param name="collectionName">The name of the collection.</param>
+        /// <param name="page">The 1-based page number (1 or more; less throws).</param>
+        /// <param name="pageSize">The number of ids per page (1 to <see cref="MongoPaging.MaxPageSize"/>; outside throws).</param>
+        /// <returns>The page of ids with currentPage, pageSize, totalItems and totalPages.</returns>
+        Task<PaginatedResponse<string>> GetDocumentIdPageAsync(string collectionName, int page, int pageSize)
+        {
+            return MongoPaging.GetDocumentIdPageAsync(database.GetCollection<MongoDB.Bson.BsonDocument>(collectionName), page, pageSize);
+        }
     }
 }

@@ -97,10 +97,23 @@ public struct AnointedSignInRequest: Equatable {
         let items = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems ?? []
         var values: [String: String] = [:]
         for item in items { values[item.name] = item.value ?? "" }
-        guard values[Self.stateItem] == state else { throw AnointedSignInError.stateMismatch }
+        guard let received = values[Self.stateItem], Self.constantTimeEquals(received, state) else {
+            throw AnointedSignInError.stateMismatch
+        }
         if let error = values["error"] { throw AnointedSignInError.serverError(error) }
         values.removeValue(forKey: Self.stateItem)
         return values
+    }
+
+    /// Compares two strings without stopping at the first differing byte, so the time taken does not reveal
+    /// how much of a guessed state was right. Only the lengths may leak.
+    static func constantTimeEquals(_ a: String, _ b: String) -> Bool {
+        let x = Array(a.utf8)
+        let y = Array(b.utf8)
+        guard x.count == y.count else { return false }
+        var diff: UInt8 = 0
+        for i in 0..<x.count { diff |= x[i] ^ y[i] }
+        return diff == 0
     }
 
     /// 32 random bytes, base64url.

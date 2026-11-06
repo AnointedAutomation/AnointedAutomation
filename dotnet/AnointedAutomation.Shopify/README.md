@@ -4,7 +4,7 @@ Jesus is King ✝️
 
 Plain POCO models for the Shopify Admin REST API, with Newtonsoft.Json attributes. Customers, addresses, marketing consent, orders, line items, refunds, transactions, products, variants, images, fulfillments, fulfillment orders, inventory items and levels, locations, webhooks, price rules, gift cards, payouts, disputes and the rest of the REST resource set.
 
-Models plus two small helpers: `ShopifyGid` (format and parse `gid://shopify/<Resource>/<id>`) and `ShopifyMoney` (read a GraphQL MoneyBag from a System.Text.Json `JsonElement`). Deserialize the JSON you already have:
+Models plus two small helpers: `ShopifyGid` (format and parse `gid://shopify/<Resource>/<id>`) and `ShopifyMoney` (read a GraphQL MoneyBag from a System.Text.Json `JsonElement`). Since 2.0.0 `ShopifyMoney.Read` throws a `FormatException` naming the missing field and `TryRead`/`TryReadAmount` return false; a missing or unparseable amount is never 0 (see `CHANGELOG.md`). Deserialize the JSON you already have:
 
 ```csharp
 using AnointedAutomation.Shopify;
@@ -69,6 +69,7 @@ await foreach (ShopifyOrder o in ShopifyCatalogOperations.EnumerateOrdersAsync(c
 ```
 
 - Builders: `TagsAdd`, `TagsRemove`, `MetafieldsSet`, `ProductUpdate`, `ProductSet`, `ProductVariantsBulkUpdate`, `CustomerUpdate`, `InventoryActivate`, `InventorySetQuantities`, `ProductById`, `OrderById`, `CustomerById`, plus paged product/order/customer enumeration. Each pins its query text (tests assert it byte for byte).
+- `ShopifyPublishingOperations` (2.1.0): `Publish` / `Unpublish` (Publication gids only, validated), `ProductPublications`, `CollectionPublications`, `SellingPlanGroupCreate` / `SellingPlanGroupUpdate` / `SellingPlanGroupDelete`, `OrderFulfillmentOrders`. Run them with `client.ExecuteAsync` like the catalog builders. `ShopifyStagedUploads` stays the one `stagedUploadsCreate` builder.
 - Money paths (`orderCancel`, `refundCreate`, `orderCapture`, `orderEdit*`, `draftOrderCreate`) are deliberately not included.
 - Schema target 2026-10. On older versions: `productUpdate(product:)` needs 2024-10+; `@idempotent` is accepted from 2026-01 and required for the inventory mutations from 2026-04; `changeFromQuantity` replaces `ignoreCompareQuantity` from 2026-04.
 - Models (`ShopifyProduct`, `ShopifyProductVariant`, `ShopifyMetafield`, `ShopifyCustomer`, `ShopifyOrder`, `ShopifyUserError`, `ShopifyConnection<T>` with `ShopifyPageInfo`, `ShopifyMoneyV2`/`ShopifyMoneyBag`; cost stays `ShopifyQueryCost`) read with `ShopifyGraphQlJson.Options`. Money is `decimal`; `NumericId` uses `ShopifyGid`.
