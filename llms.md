@@ -480,7 +480,7 @@ const anointed = createAnointedRouteHandlers({
 // .../backchannel-logout/route.js:          export const POST = anointed.backchannelLogout; (needs onLogout)
 ```
 
-### @anointedautomation/sso-vue 0.1.1
+### @anointedautomation/sso-vue 0.1.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue
 - Runtime: Vue 3 (browser). On npm: `npm install @anointedautomation/sso-vue`.

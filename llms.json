@@ -687,7 +687,7 @@
     },
     {
       "id": "@anointedautomation/sso-vue",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "runtime": "Vue 3 (browser)",
       "published": true,
       "description": "Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side.",
