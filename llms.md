@@ -494,7 +494,7 @@ Vue 3 sign-in button and useAnointedSignIn composable that send the browser to t
 
 Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
 
-### @anointedautomation/sso-angular 0.1.3
+### @anointedautomation/sso-angular 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
 - Runtime: Angular 17+ (browser). On npm: `npm install @anointedautomation/sso-angular`.
