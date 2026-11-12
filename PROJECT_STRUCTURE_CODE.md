@@ -124,6 +124,14 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   DivineCharacter.cs, Resolution.cs, Grounding.cs, and Word.cs. Design spec for this subtree:
   `docs/design/specs/2026-06-11-divine-grounding-reality-engine-design.md`.
 
+- Sin catalog (additive): Reality/Morals/Sins/ holds SinId.cs and SinCatalog.Entries.cs (the coded catalog: one
+  SinId member and one SinEntry per checklist number, 668 entries; #367 omitted placeholder, the duplicate #566 is
+  id 668), SinEntry.cs, SinCategory.cs (no Unknown; real categories from 1), BibleBook.cs (Unknown=0, 66 books), ScriptureReference.cs
+  (validated book/chapter/verse range), SinCatalog.cs (Get/TryGet/InCategory/UnderCoarseSin/Concept, precomputed
+  dictionaries), CataloguedSin.cs (a MoralConcept over an entry, grounded in the engine vice for its coarse
+  Enums.Sin or its category, so Reality.Witness reads it), and ISinConsequence.cs/SinConsequenceRegistry.cs (the
+  consumer extension point for effects). Concepts now references AnointedAutomation.Enums.
+
 - Trinity, love triad, and creed (1.1.0, additive): Trinity/ holds Trinity.cs (one God in three
   Persons over a Reality: one shared Essence instance = Reality.Character, three distinct
   DivinePerson objects, undivided Work/WorkThrough), DivinePerson.cs, DivinePersonKind.cs (Unknown=0),
@@ -142,8 +150,8 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   that checks the consistency of theological claims against foundational claims over a shared
   proposition vocabulary. Proposition.cs defines the shared vocabulary; Testability.cs and
   LawDomain.cs classify claims (law domains are bounded so intra-universe laws never settle origin
-  claims); FoundationalClaim.cs and TheologicalClaim.cs hold three-valued (bool?) standings on
-  propositions; EpistemicStatus.cs and Verdict.cs carry the four-state verdict
+  claims); FoundationalClaim.cs and TheologicalClaim.cs assert and deny propositions whose standing is a
+  three-valued Reasoning.TruthValue (Unknown/True/False); EpistemicStatus.cs and Verdict.cs carry the four-state verdict
   (Consistent/Contradicts/Unfalsifiable/Undetermined); DerivationStep.cs and Examination.cs record how
   a verdict was reached; Tension.cs holds contradicting claims as data rather than resolving them
   away; EpistemicLedger.cs is the aggregate that admits claims, runs examinations, and tracks tensions,
@@ -154,6 +162,53 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   UTF-16 string holds them, no UTF-32 needed), a glossary of ProofSymbol tokens, and an ordered
   ProofStep derivation. TheoreticalProofs.cs is a static factory exposing the canonical Agnosticism
   and Christianity proofs.
+
+- Reasoning contracts (Reasoning/, namespace `AnointedAutomation.Concepts.Reasoning`): the shared
+  contracts for the dual reasoning engine (deterministic canon engine, language engine, hybrid) behind
+  one API, PR 1 of 5 (contracts only). TruthValue.cs (Unknown = 0, True, False; Unknown is "not
+  established", never False) and TruthLogic.cs (strong Kleene And/Or/Not); RelationKind.cs (None = 0,
+  rejected by Assertion); ConceptRef.cs (Kind + Id, Of(SinId) and Of(MoralConcept), a CataloguedSin
+  resolving to its SinId); Assertion.cs, Query.cs, Justification.cs (ProofStep, ScriptureReference,
+  facts used, explanation); AnswerSource.cs and VerificationStatus.cs (Unknown = 0, rejected by
+  Provenance); Provenance.cs (every field required); Answer.cs; IReasoner.cs (Ask(Query,
+  CancellationToken)). ReasoningGuard.cs holds the shared argument checks. Proposition.Standing and
+  Examination.Standing are TruthValue (changed in place from bool?). Owner rule: only the owner can
+  approve promoting an AI interpretation into a permanent fact. Tests: Reasoning/TruthLogicTests,
+  Reasoning/ReasoningContractsTests.
+- CanonReasoner (Reasoning/Canon/, same namespace, dual engine PR 2 of 5): the deterministic, offline
+  IReasoner. CanonFacts.cs is the immutable index built once (Lazy) from SinCatalog.All, every public
+  MoralConcept type (reflection, ordered by name) and Reality.Revealed() facets: GroundedIn per reference,
+  Upholds/Violates per facet with the mirrored Commands/Forbids, InCategory and IsInstanceOf (coarse sin,
+  grounding vice) per sin; lookups by (subject, relation) or whole assertion, With() extends a copy.
+  CanonFact.cs (Assertion + at least one ScriptureReference). ICanonRule.cs; rules SinViolatesRule,
+  CategoryRule, IsInstanceOfRule, WitnessRule (oracle thresholds), FactRule (stated or contrary);
+  CanonRules.Default; CanonProof.cs (internal step helpers). CanonReasoner.cs runs every rule for the
+  relation, first established answer wins, opposite answers throw; Unknown when nothing settles it.
+  ScriptureReference.Parse reads display references. Tests: Reasoning/Canon/ (rule unit tests, FsCheck
+  properties, oracle regression).
+- LanguageReasoner (Reasoning/Language/, namespace AnointedAutomation.Concepts.Reasoning.Language, dual engine
+  PR 3 of 5): ILanguageModel.cs (the port; no AI SDK or network in core). PromptComposer.cs (deterministic prompt
+  plus the exact ReplySchema; ComposedPrompt id = SHA-256 prefix). InterpretationParser.cs (strict JSON into
+  Interpretation.cs; any invalid reply throws InterpretationRejected.cs, logged at Error in full via
+  Microsoft.Extensions.Logging.Abstractions). LanguageReasoner.cs (one model call per query; Answer is Language and
+  Unverified; Interpret returns LanguageResult.cs with the whole interpretation). Reasoning/AnswerDescriber.cs renders
+  any Answer as text. Tests: Reasoning/Language/ with golden prompt, reply-fixture and Describe files in Golden/.
+- HybridReasoner (Reasoning/Hybrid/, namespace AnointedAutomation.Concepts.Reasoning.Hybrid, dual engine PR 4 of 5):
+  HybridReasoner.cs (canon first; on Unknown one LanguageReasoner.Interpret call per owner, query and model, recorded
+  in the ledger; HybridResult.cs carries the entry). InterpretationLedger.cs (owner-scoped cache, Get, paged List,
+  Promote and Reject through an injected IPromotionPolicy.cs with no default) over IInterpretationStore.cs
+  (InMemoryInterpretationStore.cs in core). InterpretationEntry.cs, InterpretationStatus.cs, OwnerScope.cs,
+  Reviewer.cs, InterpretationPage.cs, FactPromotion.cs (never mutates CanonFacts). Tests: Reasoning/Hybrid/.
+
+### 4a-1. AnointedAutomation.Concepts.Anthropic (optional adapter, dual engine PR 5 of 5)
+Namespace `AnointedAutomation.Concepts.Anthropic`; references Concepts and the Anthropic SDK (Concepts never references it).
+AnthropicLanguageModel.cs (ILanguageModel over AnthropicClient with SDK retries off; one structured-output call per
+question; own bounded backoff for 429/408/5xx/overload/IO/timeout; 401/403 to AnthropicConfigurationException.cs;
+exhausted retries to AnthropicTransientException.cs; other API errors logged and rethrown). AnthropicLanguageModelOptions.cs
+(all settings required, Problems()/ThrowIfInvalid()). ReplySchemaFormat.cs (internal; core ReplySchema minus
+minimum/maximum/minLength). RetryAfterRecorder.cs (internal DelegatingHandler capturing Retry-After per call). AnthropicServiceCollectionExtensions.cs
+(AddAnthropicLanguageModel(section), named HttpClient). Tests: AnointedAutomation.Concepts.Anthropic.Tests (RecordedHandler replays recorded HTTP responses, no
+network; ArchitectureTests check the dependency direction).
 
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with

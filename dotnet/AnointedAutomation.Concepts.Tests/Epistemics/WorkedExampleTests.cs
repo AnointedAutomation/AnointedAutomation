@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
@@ -20,7 +21,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             "EnergyConserved",
             "Within the universe, energy is neither created nor destroyed.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         private static readonly Proposition CreatedUniverse = new Proposition(
             "CreatedUniverse",
@@ -82,9 +83,9 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Assert.Equal(Verdict.Unfalsifiable, eternalMatterExam.Verdict);
             Assert.Equal(Verdict.Unfalsifiable, cosmologicalExam.Verdict);
             Assert.Equal(Verdict.Unfalsifiable, atheismExam.Verdict);
-            Assert.Null(eternalMatterExam.Standing);
-            Assert.Null(cosmologicalExam.Standing);
-            Assert.Null(atheismExam.Standing);
+            Assert.Equal(TruthValue.Unknown, eternalMatterExam.Standing);
+            Assert.Equal(TruthValue.Unknown, cosmologicalExam.Standing);
+            Assert.Equal(TruthValue.Unknown, atheismExam.Standing);
 
             // Eternal matter and the cosmological argument collide on CreatedUniverse: one
             // tension, both claims still on the ledger.

@@ -6,6 +6,7 @@ The repository ships these packages to [NuGet.org](https://www.nuget.org/profile
 - [AnointedAutomation.Search](https://www.nuget.org/packages/AnointedAutomation.Search/)
 - [AnointedAutomation.APIMiddlewares](https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares/)
 - [AnointedAutomation.Concepts](https://www.nuget.org/packages/AnointedAutomation.Concepts/)
+- [AnointedAutomation.Concepts.Anthropic](https://www.nuget.org/packages/AnointedAutomation.Concepts.Anthropic/) (optional Claude adapter; publish after Concepts)
 - [AnointedAutomation.Enums](https://www.nuget.org/packages/AnointedAutomation.Enums/)
 - [AnointedAutomation.Imaging](https://www.nuget.org/packages/AnointedAutomation.Imaging/)
 - [AnointedAutomation.Logging](https://www.nuget.org/packages/AnointedAutomation.Logging/)

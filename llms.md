@@ -74,14 +74,14 @@ app.UseMiddleware<InvalidEndpointTrackerMiddleware>();
 app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 ```
 
-### AnointedAutomation.Concepts 1.1.2
+### AnointedAutomation.Concepts 2.3.0
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
-- Depends on: NuGet none; AnointedAutomation none
-- Namespaces: `AnointedAutomation.Concepts`, `AnointedAutomation.Concepts.Epistemics`
-- Key types: `Love`, `LoveAction`, `Situation`, `MoralConcept`, `Trinity`, `DivinePerson`, `Presence`, `Bond`, `Creed`, `EpistemicLedger`, `FoundationalClaim`
-- Notes: Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity (one essence, three distinct Persons, undivided works), the triadic coherence rule (ground x Word x Spirit), the love triad (lover x beloved x Bond) with a binary commitment gate, and `Creed.ToJson()` / `Creed.ToPrompt()` for AI system prompts.
+- Depends on: NuGet Microsoft.Extensions.Logging.Abstractions; AnointedAutomation AnointedAutomation.Enums
+- Namespaces: `AnointedAutomation.Concepts`, `AnointedAutomation.Concepts.Epistemics`, `AnointedAutomation.Concepts.Reasoning`, `AnointedAutomation.Concepts.Reasoning.Language`, `AnointedAutomation.Concepts.Reasoning.Hybrid`
+- Key types: `Love`, `LoveAction`, `Situation`, `MoralConcept`, `Trinity`, `DivinePerson`, `Presence`, `Bond`, `Creed`, `EpistemicLedger`, `FoundationalClaim`, `SinCatalog`, `SinEntry`, `SinId`, `SinCategory`, `CataloguedSin`, `ScriptureReference`, `BibleBook`, `ISinConsequence<T>`, `SinConsequenceRegistry<T>`, `TruthValue`, `TruthLogic`, `ConceptRef`, `Assertion`, `Query`, `Answer`, `Provenance`, `IReasoner`, `CanonReasoner`, `CanonFacts`, `CanonFact`, `ICanonRule`, `CanonRules`, `LanguageReasoner`, `ILanguageModel`, `PromptComposer`, `InterpretationParser`, `Interpretation`, `InterpretationRejected`, `AnswerDescriber`, `HybridReasoner`, `InterpretationLedger`, `IInterpretationStore`, `InMemoryInterpretationStore`, `IPromotionPolicy`, `OwnerScope`, `FactPromotion`
+- Notes: Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity (one essence, three distinct Persons, undivided works), the triadic coherence rule (ground x Word x Spirit), the love triad (lover x beloved x Bond) with a binary commitment gate, and `Creed.ToJson()` / `Creed.ToPrompt()` for AI system prompts. Sin catalog (additive): `SinCatalog` holds 668 Scripture-referenced entries (stable `SinId` values, no Unknown or 0 member (use `SinId?`); `SinEntry.Category` is a `SinCategory?` (null only for the omitted placeholder), `SinCategory` has no Unknown either; #367 is an omitted placeholder; the duplicate #566 is id 668), lookups by id, `SinCategory` and coarse `Enums.Sin`; `SinCatalog.Concept(id)` returns a `CataloguedSin` MoralConcept that `Reality.Witness` reads like any vice; consumers attach effects through `ISinConsequence<T>` / `SinConsequenceRegistry<T>`. Reasoning contracts (namespace `AnointedAutomation.Concepts.Reasoning`): `TruthValue` (Unknown = 0, True, False; Unknown is never False) with Kleene `TruthLogic`, `RelationKind`, `ConceptRef.Of(SinId|MoralConcept)`, `Assertion`, `Query`, `Justification`, `AnswerSource`, `VerificationStatus`, `Provenance` (all fields required), `Answer`, and `IReasoner.Ask(Query, CancellationToken)`. 2.1.0 adds `CanonReasoner`, the deterministic offline engine: `CanonFacts.Canon` (immutable index of Scripture-grounded facts), `ICanonRule` rules (`SinViolatesRule`, `CategoryRule`, `IsInstanceOfRule`, `WitnessRule`, `FactRule`), Unknown (never False) when nothing settles a query, and `ScriptureReference.Parse`. Breaking: `Proposition.Standing` and `Examination.Standing` are now `TruthValue` (were `bool?`). Only the owner can approve promoting an AI interpretation into a permanent fact. 2.2.0 adds `LanguageReasoner` (`Reasoning.Language`): an `ILanguageModel` port (no AI SDK or network in core), a deterministic `PromptComposer` that asks once for every field as one JSON object of an exact schema, a strict `InterpretationParser` that rejects any invalid reply with `InterpretationRejected` (logged in full, never patched), Language answers that are always Unverified, and `AnswerDescriber.Describe` for any answer. 2.3.0 adds `HybridReasoner` (`Reasoning.Hybrid`): canon first, and only on Unknown one language call per owner, query and model, kept in an owner-private `InterpretationLedger` (no cross-owner listing) and never inserted into `CanonFacts`; `Promote` needs an injected `IPromotionPolicy` (no default) and returns a `FactPromotion` for a reviewed catalog PR.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts/README.md)
 
 ```bash
@@ -163,7 +163,27 @@ LogMessage.MessageSourceSetter = "MyService";
 LogMessage msg = LogMessage.Error("Payment webhook failed");
 ```
 
-### AnointedAutomation.Mathematics 1.0.5
+### AnointedAutomation.Concepts.Anthropic 1.0.0
+
+Optional adapter that implements the AnointedAutomation.Concepts ILanguageModel port with Claude through the official Anthropic .NET SDK: one structured-output call per question, required options (ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts, RetryBaseDelayMilliseconds; no defaults), bounded backoff on 429/408/5xx/network/timeout, typed AnthropicTransientException and AnthropicConfigurationException (401/403, missing config), and services.AddAnthropicLanguageModel(section). The core never references it.
+
+- Depends on: NuGet Anthropic 13.8.0, Microsoft.Extensions.Configuration.Binder, Microsoft.Extensions.Http, Microsoft.Extensions.Logging.Abstractions; AnointedAutomation AnointedAutomation.Concepts
+- Namespaces: `AnointedAutomation.Concepts.Anthropic`
+- Key types: `AnthropicLanguageModel`, `AnthropicLanguageModelOptions`, `AnthropicServiceCollectionExtensions`, `AnthropicTransientException`, `AnthropicConfigurationException`
+- Notes: build a `HybridReasoner` from `CanonReasoner` + `LanguageReasoner(AnthropicLanguageModel)` + an `InterpretationLedger`; only the owner may promote an AI interpretation (the injected `IPromotionPolicy`). Caching stays in the ledger, not the adapter.
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts.Anthropic (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts.Anthropic/README.md)
+
+```bash
+dotnet add package AnointedAutomation.Concepts.Anthropic
+```
+
+```csharp
+using AnointedAutomation.Concepts.Anthropic;
+
+builder.Services.AddAnthropicLanguageModel(builder.Configuration.GetSection("Anthropic"));
+```
+
+### AnointedAutomation.Mathematics 2.0.0
 
 Ready-made foundational claims to seed an EpistemicLedger. A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.
 
@@ -480,7 +500,7 @@ const anointed = createAnointedRouteHandlers({
 // .../backchannel-logout/route.js:          export const POST = anointed.backchannelLogout; (needs onLogout)
 ```
 
-### @anointedautomation/sso-vue 0.1.1
+### @anointedautomation/sso-vue 0.1.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-vue
 - Runtime: Vue 3 (browser). On npm: `npm install @anointedautomation/sso-vue`.
@@ -494,7 +514,7 @@ Vue 3 sign-in button and useAnointedSignIn composable that send the browser to t
 
 Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
 
-### @anointedautomation/sso-angular 0.1.3
+### @anointedautomation/sso-angular 0.1.4
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
 - Runtime: Angular 17+ (browser). On npm: `npm install @anointedautomation/sso-angular`.
@@ -630,7 +650,7 @@ using AnointedAutomation.Concepts.Epistemics;
 using AnointedAutomation.Mathematics;
 
 EpistemicLedger ledger = new EpistemicLedger(UniversalLaws.All);
-// ledger.Examine(claim) returns an Examination with Verdict, Standing and Confidence.
+// ledger.Examine(claim) returns an Examination with Verdict, Standing (a TruthValue) and Confidence.
 ```
 
 ## Support the author

@@ -2,14 +2,15 @@
 // Stewarded by Alexander Fields
 
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Mathematics
 {
     /// <summary>
     /// The shared vocabulary of propositions the mathematics and physics catalogs assert and deny.
     /// Everything here can be tested from inside the universe: logic and intra-universe physics are
-    /// empirically testable, never beyond observation. Standing is true for the propositions behind
-    /// bedrock laws and well supported theories, and honestly null for the propositions behind
+    /// empirically testable, never beyond observation. Standing is True for the propositions behind
+    /// bedrock laws and well supported theories, and honestly Unknown for the propositions behind
     /// unproven conjectures.
     /// </summary>
     public static partial class UniversalPropositions
@@ -23,7 +24,7 @@ namespace AnointedAutomation.Mathematics
             "NonContradiction",
             "A statement and its negation cannot both be true at the same time and in the same sense.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// A thing is identical to itself.
@@ -32,7 +33,7 @@ namespace AnointedAutomation.Mathematics
             "Identity",
             "A thing is identical to itself.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For any proposition, either it or its negation holds.
@@ -41,7 +42,7 @@ namespace AnointedAutomation.Mathematics
             "ExcludedMiddle",
             "For any proposition, either it or its negation holds.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Mechanics (causality)
 
@@ -52,7 +53,7 @@ namespace AnointedAutomation.Mathematics
             "EffectsHaveCauses",
             "Every effect has a cause.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Conservation
 
@@ -63,7 +64,7 @@ namespace AnointedAutomation.Mathematics
             "EnergyConserved",
             "Within a closed system, energy is neither created nor destroyed.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The entropy of an isolated system never decreases over time.
@@ -72,7 +73,7 @@ namespace AnointedAutomation.Mathematics
             "EntropyIncreases",
             "The entropy of an isolated system never decreases over time.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Mass and energy are equivalent and convertible according to E equals m times c squared.
@@ -81,7 +82,7 @@ namespace AnointedAutomation.Mathematics
             "MassEnergyEquivalent",
             "Mass and energy are equivalent and convertible according to E equals m times c squared.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The speed of light in a vacuum is the same for every observer, regardless of motion.
@@ -90,7 +91,7 @@ namespace AnointedAutomation.Mathematics
             "SpeedOfLightConstant",
             "The speed of light in a vacuum is the same for every observer, regardless of motion.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Major theories
 
@@ -102,7 +103,7 @@ namespace AnointedAutomation.Mathematics
             "SpecialRelativityHolds",
             "The laws of physics are the same in all inertial frames and the speed of light is invariant, so space and time measurements depend on relative motion.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Gravity is the curvature of spacetime by mass and energy.
@@ -111,7 +112,7 @@ namespace AnointedAutomation.Mathematics
             "GravityIsSpacetimeCurvature",
             "Gravity is the curvature of spacetime by mass and energy.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Matter and energy at the smallest scales behave as quantized states with probabilistic
@@ -121,7 +122,7 @@ namespace AnointedAutomation.Mathematics
             "MatterEnergyIsQuantized",
             "Matter and energy at the smallest scales behave as quantized states with probabilistic outcomes.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// All matter is composed of atoms.
@@ -130,7 +131,7 @@ namespace AnointedAutomation.Mathematics
             "MatterComposedOfAtoms",
             "All matter is composed of atoms.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The observable universe expanded from an extremely hot, dense early state roughly
@@ -140,7 +141,7 @@ namespace AnointedAutomation.Mathematics
             "UniverseExpandedFromHotDenseState",
             "The observable universe expanded from an extremely hot, dense early state roughly 13.8 billion years ago.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Populations of organisms change across generations through heritable variation and
@@ -150,7 +151,7 @@ namespace AnointedAutomation.Mathematics
             "PopulationsEvolveByNaturalSelection",
             "Populations of organisms change across generations through heritable variation and differential reproductive success.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Many diseases are caused by microorganisms.
@@ -159,7 +160,7 @@ namespace AnointedAutomation.Mathematics
             "DiseasesCausedByMicroorganisms",
             "Many diseases are caused by microorganisms.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// All living organisms are composed of cells, and all cells arise from pre-existing
@@ -169,7 +170,7 @@ namespace AnointedAutomation.Mathematics
             "OrganismsComposedOfCells",
             "All living organisms are composed of cells, and all cells arise from pre-existing cells.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Earth's lithosphere is divided into plates whose motion produces continental drift,
@@ -179,7 +180,7 @@ namespace AnointedAutomation.Mathematics
             "LithosphereDividedIntoMovingPlates",
             "Earth's lithosphere is divided into plates whose motion produces continental drift, earthquakes, and mountain building.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Gas pressure and temperature arise from the motion and collisions of large numbers of
@@ -189,7 +190,7 @@ namespace AnointedAutomation.Mathematics
             "GasBehaviorArisesFromMolecularMotion",
             "Gas pressure and temperature arise from the motion and collisions of large numbers of molecules.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Every Collatz sequence, starting from any positive integer, eventually reaches one.

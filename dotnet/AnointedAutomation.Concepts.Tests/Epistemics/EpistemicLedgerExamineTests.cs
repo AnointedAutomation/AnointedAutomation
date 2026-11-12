@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
@@ -14,13 +15,13 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             "EffectsHaveCauses",
             "Within the universe, effects have causes.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         private static readonly Proposition EnergyConserved = new Proposition(
             "EnergyConserved",
             "Within the universe, energy is neither created nor destroyed.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         private static readonly Proposition CreatedUniverse = new Proposition(
             "CreatedUniverse",
@@ -64,7 +65,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = NewLedger().Examine(uncausedMiracles);
 
             Assert.Equal(Verdict.Contradicts, examination.Verdict);
-            Assert.False(examination.Standing);
+            Assert.Equal(TruthValue.False, examination.Standing);
             // The foundational claim is named in the derivation.
             Assert.Contains(examination.Derivation,
                 (DerivationStep step) => step.Authority.Equals("Causality"));
@@ -91,8 +92,8 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Assert.Equal(Verdict.Unfalsifiable, ledger.Examine(theism).Verdict);
             Assert.Equal(Verdict.Unfalsifiable, ledger.Examine(atheism).Verdict);
             Assert.Equal(Verdict.Unfalsifiable, ledger.Examine(eternalMatter).Verdict);
-            Assert.Null(ledger.Examine(theism).Standing);
-            Assert.Null(ledger.Examine(atheism).Standing);
+            Assert.Equal(TruthValue.Unknown, ledger.Examine(theism).Standing);
+            Assert.Equal(TruthValue.Unknown, ledger.Examine(atheism).Standing);
         }
 
         [Fact]
@@ -145,7 +146,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = NewLedger().Examine(orderlyWorld);
 
             Assert.Equal(Verdict.Consistent, examination.Verdict);
-            Assert.True(examination.Standing);
+            Assert.Equal(TruthValue.True, examination.Standing);
             Assert.Equal(0.8, examination.Confidence);
         }
 
@@ -163,7 +164,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = NewLedger().Examine(claim);
 
             Assert.Equal(Verdict.Undetermined, examination.Verdict);
-            Assert.Null(examination.Standing);
+            Assert.Equal(TruthValue.Unknown, examination.Standing);
         }
 
         [Fact]
@@ -181,7 +182,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = NewLedger().Examine(claim);
 
             Assert.Equal(Verdict.Unfalsifiable, examination.Verdict);
-            Assert.Null(examination.Standing);
+            Assert.Equal(TruthValue.Unknown, examination.Standing);
         }
 
         [Fact]
@@ -209,7 +210,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = ledger.Examine(claim);
 
             Assert.Equal(Verdict.Undetermined, examination.Verdict);
-            Assert.Null(examination.Standing);
+            Assert.Equal(TruthValue.Unknown, examination.Standing);
         }
 
         [Fact]

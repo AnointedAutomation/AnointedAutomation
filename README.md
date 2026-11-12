@@ -105,6 +105,7 @@ Adding "Sign in with Anointed Automation" to your own site? Start with the
 | [AnointedAutomation.Search](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Search) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Search.svg)](https://www.nuget.org/packages/AnointedAutomation.Search) | In-process full-text search with no dependencies: Apache Lucene and tantivy translated to C# |
 | [AnointedAutomation.Imaging](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Imaging) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Imaging.svg)](https://www.nuget.org/packages/AnointedAutomation.Imaging) | Render QR codes to SVG and PNG with no image library |
 | [AnointedAutomation.Concepts](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Concepts.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts) | Abstract concept modeling and an epistemics engine |
+| [AnointedAutomation.Concepts.Anthropic](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts.Anthropic) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Concepts.Anthropic.svg)](https://www.nuget.org/packages/AnointedAutomation.Concepts.Anthropic) | Optional Claude adapter for the Concepts language engine (ILanguageModel via the Anthropic SDK) |
 | [AnointedAutomation.Mathematics](https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Mathematics) | [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Mathematics.svg)](https://www.nuget.org/packages/AnointedAutomation.Mathematics) | Catalog of mathematical and physical laws, theories and conjectures |
 
 Each package folder has a README with installation, a quick start and an API overview. The same README is
@@ -131,6 +132,8 @@ Logging  <----+----  Repository.Mongo
 
 Algorithms  <-  Imaging
 Concepts    <-  Mathematics
+   ^
+   +---------  Concepts.Anthropic  (optional; core never references it)
 ```
 
 An arrow points from a package to one it depends on.

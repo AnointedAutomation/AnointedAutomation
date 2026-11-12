@@ -3,6 +3,7 @@
 
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Mathematics.Tests
 {
@@ -56,7 +57,7 @@ namespace AnointedAutomation.Mathematics.Tests
             Examination examination = ledger.Examine(claim);
 
             Assert.Equal(Verdict.Undetermined, examination.Verdict);
-            Assert.Null(examination.Standing);
+            Assert.Equal(TruthValue.Unknown, examination.Standing);
         }
     }
 }

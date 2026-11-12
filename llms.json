@@ -116,23 +116,35 @@
     },
     {
       "id": "AnointedAutomation.Concepts",
-      "version": "1.1.2",
+      "version": "2.3.0",
       "targetFramework": "net10.0",
       "description": "Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts/README.md",
       "dependencies": {
-        "nuget": [],
-        "anointed": []
+        "nuget": ["Microsoft.Extensions.Logging.Abstractions"],
+        "anointed": ["AnointedAutomation.Enums"]
       },
       "keyNamespaces": [
         "AnointedAutomation.Concepts",
-        "AnointedAutomation.Concepts.Epistemics"
+        "AnointedAutomation.Concepts.Epistemics",
+        "AnointedAutomation.Concepts.Reasoning",
+        "AnointedAutomation.Concepts.Reasoning.Language",
+        "AnointedAutomation.Concepts.Reasoning.Hybrid"
       ],
       "keyTypes": [
         "Love",
         "LoveAction",
+        "SinCatalog",
+        "SinEntry",
+        "SinId",
+        "SinCategory",
+        "CataloguedSin",
+        "ScriptureReference",
+        "ISinConsequence",
+        "SinConsequenceRegistry",
+        "BibleBook",
         "Situation",
         "MoralConcept",
         "Trinity",
@@ -141,9 +153,30 @@
         "Bond",
         "Creed",
         "EpistemicLedger",
-        "FoundationalClaim"
+        "FoundationalClaim",
+        "TruthValue",
+        "TruthLogic",
+        "ConceptRef",
+        "Assertion",
+        "Query",
+        "Answer",
+        "Provenance",
+        "IReasoner",
+        "CanonReasoner",
+        "CanonFacts",
+        "ICanonRule",
+        "LanguageReasoner",
+        "ILanguageModel",
+        "PromptComposer",
+        "InterpretationParser",
+        "AnswerDescriber",
+        "HybridReasoner",
+        "InterpretationLedger",
+        "IInterpretationStore",
+        "IPromotionPolicy",
+        "FactPromotion"
       ],
-      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts."
+      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts. The Reasoning namespace adds the dual reasoning engine contracts (TruthValue with Kleene logic, Assertion, Query, Answer, Provenance, IReasoner) and, in 2.1.0, CanonReasoner (deterministic, offline, Scripture-grounded; Unknown is never False); Proposition.Standing and Examination.Standing are TruthValue (were bool?). Only the owner can approve promoting an AI interpretation into a permanent fact. 2.2.0 adds LanguageReasoner (Reasoning.Language): an ILanguageModel port with no AI SDK in core, a deterministic PromptComposer that asks once for every field as one JSON object, a strict InterpretationParser that rejects any invalid reply (InterpretationRejected, logged in full), Language answers that are always Unverified, and AnswerDescriber.Describe for any answer. 2.3.0 adds HybridReasoner (Reasoning.Hybrid): canon first, and only on Unknown one cached language call per owner, query and model, kept in an owner-private InterpretationLedger (no cross-owner listing, never inserted into CanonFacts); Promote and Reject need an injected IPromotionPolicy (no default), and Promote returns a FactPromotion for a reviewed catalog PR."
     },
     {
       "id": "AnointedAutomation.Enums",
@@ -216,8 +249,39 @@
       "notes": "Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational; Error/Warning/Critical also take (message, Exception). Timestamps are UTC; factories record caller file:line. Embedded PDBs."
     },
     {
+      "id": "AnointedAutomation.Concepts.Anthropic",
+      "version": "1.0.0",
+      "targetFramework": "net10.0",
+      "description": "Optional adapter that implements the AnointedAutomation.Concepts ILanguageModel port with Claude through the official Anthropic .NET SDK.",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts.Anthropic",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts.Anthropic",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts.Anthropic/README.md",
+      "dependencies": {
+        "nuget": [
+          "Anthropic",
+          "Microsoft.Extensions.Configuration.Binder",
+          "Microsoft.Extensions.Http",
+          "Microsoft.Extensions.Logging.Abstractions"
+        ],
+        "anointed": [
+          "AnointedAutomation.Concepts"
+        ]
+      },
+      "keyNamespaces": [
+        "AnointedAutomation.Concepts.Anthropic"
+      ],
+      "keyTypes": [
+        "AnthropicLanguageModel",
+        "AnthropicLanguageModelOptions",
+        "AnthropicServiceCollectionExtensions",
+        "AnthropicTransientException",
+        "AnthropicConfigurationException"
+      ],
+      "notes": "All options required (ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts, RetryBaseDelayMilliseconds); no defaults or fallback model. One structured-output Messages call per question; bounded backoff on 429/408/5xx/network/timeout then AnthropicTransientException; 401/403 and missing config raise AnthropicConfigurationException. Register with services.AddAnthropicLanguageModel(section). Core never references this package; only the owner may promote AI interpretations (IPromotionPolicy)."
+    },
+    {
       "id": "AnointedAutomation.Mathematics",
-      "version": "1.0.5",
+      "version": "2.0.0",
       "targetFramework": "net10.0",
       "description": "A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Mathematics",
@@ -687,7 +751,7 @@
     },
     {
       "id": "@anointedautomation/sso-vue",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "runtime": "Vue 3 (browser)",
       "published": true,
       "description": "Vue 3 sign-in button and useAnointedSignIn composable that send the browser to the partner server's start route. No secrets client side.",
@@ -722,7 +786,7 @@
     },
     {
       "id": "@anointedautomation/sso-angular",
-      "version": "0.1.3",
+      "version": "0.1.4",
       "runtime": "Angular 17+ (browser)",
       "published": true,
       "description": "Angular standalone sign-in button, AnointedSignInService and provideAnointedSignIn() that send the browser to the partner server's start route. No secrets client side.",
