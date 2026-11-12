@@ -200,6 +200,16 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   (InMemoryInterpretationStore.cs in core). InterpretationEntry.cs, InterpretationStatus.cs, OwnerScope.cs,
   Reviewer.cs, InterpretationPage.cs, FactPromotion.cs (never mutates CanonFacts). Tests: Reasoning/Hybrid/.
 
+### 4a-1. AnointedAutomation.Concepts.Anthropic (optional adapter, dual engine PR 5 of 5)
+Namespace `AnointedAutomation.Concepts.Anthropic`; references Concepts and the Anthropic SDK (Concepts never references it).
+AnthropicLanguageModel.cs (ILanguageModel over AnthropicClient with SDK retries off; one structured-output call per
+question; own bounded backoff for 429/408/5xx/overload/IO/timeout; 401/403 to AnthropicConfigurationException.cs;
+exhausted retries to AnthropicTransientException.cs; other API errors logged and rethrown). AnthropicLanguageModelOptions.cs
+(all settings required, Problems()/ThrowIfInvalid()). ReplySchemaFormat.cs (internal; core ReplySchema minus
+minimum/maximum/minLength). AnthropicServiceCollectionExtensions.cs (AddAnthropicLanguageModel(section), typed
+HttpClient). Tests: AnointedAutomation.Concepts.Anthropic.Tests (RecordedHandler replays recorded HTTP responses, no
+network; ArchitectureTests check the dependency direction).
+
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with
 foundational and theological claims drawn from mathematics and physics. UniversalPropositions.cs

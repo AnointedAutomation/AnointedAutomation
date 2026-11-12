@@ -249,6 +249,37 @@
       "notes": "Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational; Error/Warning/Critical also take (message, Exception). Timestamps are UTC; factories record caller file:line. Embedded PDBs."
     },
     {
+      "id": "AnointedAutomation.Concepts.Anthropic",
+      "version": "1.0.0",
+      "targetFramework": "net10.0",
+      "description": "Optional adapter that implements the AnointedAutomation.Concepts ILanguageModel port with Claude through the official Anthropic .NET SDK.",
+      "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts.Anthropic",
+      "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts.Anthropic",
+      "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts.Anthropic/README.md",
+      "dependencies": {
+        "nuget": [
+          "Anthropic",
+          "Microsoft.Extensions.Configuration.Binder",
+          "Microsoft.Extensions.Http",
+          "Microsoft.Extensions.Logging.Abstractions"
+        ],
+        "anointed": [
+          "AnointedAutomation.Concepts"
+        ]
+      },
+      "keyNamespaces": [
+        "AnointedAutomation.Concepts.Anthropic"
+      ],
+      "keyTypes": [
+        "AnthropicLanguageModel",
+        "AnthropicLanguageModelOptions",
+        "AnthropicServiceCollectionExtensions",
+        "AnthropicTransientException",
+        "AnthropicConfigurationException"
+      ],
+      "notes": "All options required (ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts, RetryBaseDelayMilliseconds); no defaults or fallback model. One structured-output Messages call per question; bounded backoff on 429/408/5xx/network/timeout then AnthropicTransientException; 401/403 and missing config raise AnthropicConfigurationException. Register with services.AddAnthropicLanguageModel(section). Core never references this package; only the owner may promote AI interpretations (IPromotionPolicy)."
+    },
+    {
       "id": "AnointedAutomation.Mathematics",
       "version": "2.0.0",
       "targetFramework": "net10.0",
