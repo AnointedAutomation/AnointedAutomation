@@ -80,11 +80,18 @@ jobs:
             if [ "$result" != "none" ]; then
               age=${result%% *}
               wait_s=$((min_age - age + 5))
-              if [ "$age" -lt "$min_age" ] && [ $(( $(date +%s) + wait_s )) -le "$settle_deadline" ]; then
+              # Only an approval can be superseded into a block, so anything else is decided at once without waiting
+              if [ "$age" -lt "$min_age" ] && [[ "${result#* }" == "✅ Claude review: approved"* ]] && [ $(( $(date +%s) + wait_s )) -le "$settle_deadline" ]; then
                 # A fresh verdict is waited out inside this run (this run was triggered by that very review, and a superseding
                 # review triggers its own run), so the PR is not left for the 6-hourly schedule. Bounded by the run-wide settle_deadline.
                 echo "  latest Claude review is ${age}s old; waiting ${wait_s}s for a superseding verdict"
                 sleep "$wait_s"
+                # A push during the wait moves the head: the verdict above belongs to the old commit, so leave it to the next run
+                current_head=$(gh api "repos/$REPO/pulls/$pr" --jq .head.sha)
+                if [ "$current_head" != "$head_sha" ]; then
+                  echo "  skip: head moved from $head_sha to $current_head while waiting"
+                  continue
+                fi
                 result=$(latest_review)
               fi
             fi
