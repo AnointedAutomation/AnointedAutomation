@@ -74,7 +74,7 @@ app.UseMiddleware<InvalidEndpointTrackerMiddleware>();
 app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 ```
 
-### AnointedAutomation.Concepts 2.3.0
+### AnointedAutomation.Concepts 2.3.1
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
