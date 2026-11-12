@@ -239,7 +239,7 @@ For a ready made set of foundational claims (64 laws, 12 theories and 3 conjectu
 
 Namespace: `AnointedAutomation.Concepts.Reasoning`
 
-The shared contracts for the reasoning engines (a deterministic canon engine, a language engine, and a hybrid) behind one API. The deterministic `CanonReasoner` ships in 2.1.0; the language and hybrid engines follow.
+The shared contracts for the reasoning engines (a deterministic canon engine, a language engine, and a hybrid) behind one API. The deterministic `CanonReasoner` ships in 2.1.0 and the `LanguageReasoner` in 2.2.0; the hybrid engine follows.
 
 | Type | Description |
 |---|---|
@@ -286,6 +286,28 @@ Answer answer = await canon.Ask(query, CancellationToken.None);
 A missing fact or rule gives Unknown (confidence 0), never False. False only comes from a stated contrary or a rule that proves the negation. An established answer has confidence 1.0, proof steps, the facts used and their Scripture, and `Provenance(Canon, "canon", now, Verified, rule id)`; an Unknown answer is `Unverified` with rule id `canon.none`. Two rules establishing opposite answers throw (a canon contradiction). `ScriptureReference.Parse("1 Corinthians 13:4")` reads display references.
 
 Only the owner can approve promoting an AI (language engine) interpretation into a permanent fact; `Provenance` records where an answer came from and never grants that.
+
+### LanguageReasoner (language engine)
+
+`LanguageReasoner : IReasoner` (namespace `AnointedAutomation.Concepts.Reasoning.Language`) asks a language model through the `ILanguageModel` port. The core has no AI SDK, HTTP or network dependency: you pass in an adapter (or a fake in tests), and there is no default model.
+
+```csharp
+using AnointedAutomation.Concepts.Reasoning;
+using AnointedAutomation.Concepts.Reasoning.Language;
+
+public interface ILanguageModel { string Name { get; } Task<string> Complete(string prompt, CancellationToken ct); }
+
+LanguageReasoner language = new LanguageReasoner(myModel, new InterpretationParser(logger), TimeProvider.System);
+LanguageResult result = await language.Interpret(query, CancellationToken.None); // one model call
+Console.WriteLine(AnswerDescriber.Describe(result.Answer));
+```
+
+| Type | Description |
+|---|---|
+| `PromptComposer` | `Compose(Query)` gives deterministic English: the concept names, the Scripture the catalog ties to them, the context, and the exact JSON schema (`ReplySchema`) of the reply. It asks once for everything any consumer needs: classification, truth (`true`/`false`/`unknown`), confidence 0..1, explanation, scripture, candidate SinIds and suggested assertions. The prompt id is `prompt-` plus the first 16 hex digits of the SHA-256 of the text. |
+| `InterpretationParser` | Strict JSON parsing into an `Interpretation`. Malformed JSON, a missing, extra or repeated field, a truth outside the three values, a confidence outside [0,1], a scripture reference that fails `ScriptureReference.Parse` or its chapter bounds, or a SinId not in `SinCatalog` rejects the whole reply with `InterpretationRejected`, logged at Error with the full reply. A reply is never patched. |
+| `LanguageReasoner` | `Ask` returns the `Answer`; `Interpret` also returns the full `Interpretation` (candidate sins, suggested assertions) so later steps reuse it instead of paying for a second call. Provenance is `(Language, model.Name, now, Unverified, prompt id)`; an answer is never Verified, only the owner promotes an interpretation into a fact. |
+| `AnswerDescriber` | `Describe(Answer)` renders any answer, canon or language, as plain text: the question, the truth and confidence, the source, the reasoning steps, the facts used and the Scripture. |
 
 ## Related packages
 
