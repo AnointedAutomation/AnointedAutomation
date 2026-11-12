@@ -37,7 +37,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Hybrid
 
         /// <summary>
         /// Returns the owner's entry for this query hash and model, or asks once and records the result.
-        /// Concurrent callers for the same owner, query and model share one ask (run under the first caller's token).
+        /// Concurrent callers for the same owner, query and model share one ask. The shared ask runs to completion on its own; each caller's token only cancels that caller's wait.
         /// </summary>
         /// <param name="owner">The owner the entry is private to.</param>
         /// <param name="queryKey">The query hash (the composed prompt id).</param>
@@ -62,25 +62,15 @@ namespace AnointedAutomation.Concepts.Reasoning.Hybrid
             {
                 if (!inFlight.TryGetValue(key, out pending))
                 {
-                    pending = Load(owner, queryKey, model, ask, cancellationToken);
-                    inFlight.Add(key, pending);
-                }
-            }
-
-            try
-            {
-                return await pending.ConfigureAwait(false);
-            }
-            finally
-            {
-                lock (gate)
-                {
-                    if (inFlight.TryGetValue(key, out Task<InterpretationEntry> current) && ReferenceEquals(current, pending))
+                    pending = LoadAndRelease(key, owner, queryKey, model, ask);
+                    if (!pending.IsCompleted)
                     {
-                        inFlight.Remove(key);
+                        inFlight.Add(key, pending);
                     }
                 }
             }
+
+            return await pending.WaitAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -185,6 +175,26 @@ namespace AnointedAutomation.Concepts.Reasoning.Hybrid
             }
 
             return reviewed;
+        }
+
+        private async Task<InterpretationEntry> LoadAndRelease(
+            string key,
+            OwnerScope owner,
+            string queryKey,
+            string model,
+            Func<CancellationToken, Task<LanguageResult>> ask)
+        {
+            try
+            {
+                return await Load(owner, queryKey, model, ask, CancellationToken.None).ConfigureAwait(false);
+            }
+            finally
+            {
+                lock (gate)
+                {
+                    inFlight.Remove(key);
+                }
+            }
         }
 
         private async Task<InterpretationEntry> Load(

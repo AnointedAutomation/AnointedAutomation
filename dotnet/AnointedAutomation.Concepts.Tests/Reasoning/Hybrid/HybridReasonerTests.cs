@@ -49,6 +49,12 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Hybrid
 
             public InterpretationLedger Ledger { get; }
 
+            public HybridReasoner With(ILanguageModel model, OwnerScope owner)
+            {
+                var language = new LanguageReasoner(model, LanguageKit.Parser(new LanguageKit.CapturingLogger<InterpretationParser>()), new CanonKit.FixedClock(CanonKit.Now));
+                return new HybridReasoner(CanonKit.Reasoner(), language, Ledger, owner);
+            }
+
             public HybridReasoner For(OwnerScope owner)
             {
                 return new HybridReasoner(CanonKit.Reasoner(), Language, Ledger, owner);
@@ -72,6 +78,34 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Hybrid
             public bool MayReject(Reviewer reviewer, InterpretationEntry entry)
             {
                 return reviewer == owner;
+            }
+        }
+
+        private sealed class GatedModel : ILanguageModel
+        {
+            private readonly string reply;
+            private readonly TaskCompletionSource gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            private int calls;
+
+            public GatedModel(string reply)
+            {
+                this.reply = reply;
+            }
+
+            public int Calls => Volatile.Read(ref calls);
+
+            public string Name => LanguageKit.ModelName;
+
+            public void Release()
+            {
+                gate.SetResult();
+            }
+
+            public async Task<string> Complete(string prompt, CancellationToken ct)
+            {
+                Interlocked.Increment(ref calls);
+                await gate.Task;
+                return reply;
             }
         }
 
@@ -139,14 +173,40 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Hybrid
         public async Task Ask_ConcurrentSameQuery_SharesOneModelCall()
         {
             var kit = new Kit();
-            HybridReasoner reasoner = kit.For(Alice);
+            var model = new GatedModel(LanguageKit.Golden("reply-valid.json"));
+            HybridReasoner reasoner = kit.With(model, Alice);
 
-            HybridResult[] results = await Task.WhenAll(
-                reasoner.AskWithEntry(Unsettled(), CancellationToken.None),
-                reasoner.AskWithEntry(Unsettled(), CancellationToken.None));
+            Task<HybridResult> first = reasoner.AskWithEntry(Unsettled(), CancellationToken.None);
+            Task<HybridResult> second = reasoner.AskWithEntry(Unsettled(), CancellationToken.None);
+            Assert.False(first.IsCompleted);
+            Assert.False(second.IsCompleted);
+            model.Release();
+            HybridResult[] results = await Task.WhenAll(first, second);
 
-            Assert.Single(kit.Model.Prompts);
+            Assert.Equal(1, model.Calls);
             Assert.Equal(results[0].Entry.Id, results[1].Entry.Id);
+            Assert.Equal(1, (await kit.Ledger.List(Alice, 0, 10, CancellationToken.None)).Total);
+        }
+
+        [Fact]
+        public async Task Ask_ConcurrentCallerCancels_OtherCallerStillGetsTheSharedAnswer()
+        {
+            var kit = new Kit();
+            var model = new GatedModel(LanguageKit.Golden("reply-valid.json"));
+            HybridReasoner reasoner = kit.With(model, Alice);
+            using var cancel = new CancellationTokenSource();
+
+            Task<HybridResult> cancelled = reasoner.AskWithEntry(Unsettled(), cancel.Token);
+            Task<HybridResult> waiting = reasoner.AskWithEntry(Unsettled(), CancellationToken.None);
+            cancel.Cancel();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => cancelled);
+            Assert.False(waiting.IsCompleted);
+            model.Release();
+            HybridResult result = await waiting;
+
+            Assert.Equal(1, model.Calls);
+            Assert.Equal(InterpretationStatus.Unverified, result.Entry.Status);
+            Assert.Equal(1, (await kit.Ledger.List(Alice, 0, 10, CancellationToken.None)).Total);
         }
 
         [Fact]
