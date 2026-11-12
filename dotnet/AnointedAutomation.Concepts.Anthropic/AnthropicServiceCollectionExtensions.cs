@@ -1,10 +1,11 @@
 // Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-11-12 Jesus is King ✝️
 // Stewarded by Alexander Fields
 using System;
-using System.Threading;
+using System.Net.Http;
 using AnointedAutomation.Concepts.Reasoning.Language;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace AnointedAutomation.Concepts.Anthropic
 {
@@ -14,9 +15,14 @@ namespace AnointedAutomation.Concepts.Anthropic
     public static class AnthropicServiceCollectionExtensions
     {
         /// <summary>
+        /// The IHttpClientFactory name whose handler pipeline the adapter sends through; configure proxies or handlers on it.
+        /// </summary>
+        public const string HttpClientName = "AnointedAutomation.Concepts.Anthropic";
+
+        /// <summary>
         /// Binds <see cref="AnthropicLanguageModelOptions"/> from <paramref name="section"/>, validates it at once
         /// (throwing <see cref="AnthropicConfigurationException"/> when ApiKey, Model or another setting is missing),
-        /// and registers the adapter as a typed HTTP client resolved as <see cref="ILanguageModel"/>.
+        /// and registers the adapter (over the named HTTP client <see cref="HttpClientName"/>) resolved as <see cref="ILanguageModel"/>.
         /// </summary>
         /// <param name="services">The service collection.</param>
         /// <param name="section">The configuration section holding the options, for example "Anthropic".</param>
@@ -35,9 +41,11 @@ namespace AnointedAutomation.Concepts.Anthropic
             options.ThrowIfInvalid();
             services.AddSingleton(options);
 
-            // The SDK enforces TimeoutSeconds per call, so the HttpClient's own 100 second limit must not cut in first.
-            services.AddHttpClient<AnthropicLanguageModel>(http => http.Timeout = Timeout.InfiniteTimeSpan);
-            services.AddTransient<ILanguageModel>(provider => provider.GetRequiredService<AnthropicLanguageModel>());
+            services.AddHttpClient(HttpClientName);
+            services.AddTransient<ILanguageModel>(provider => new AnthropicLanguageModel(
+                provider.GetRequiredService<IHttpMessageHandlerFactory>().CreateHandler(HttpClientName),
+                provider.GetRequiredService<AnthropicLanguageModelOptions>(),
+                provider.GetRequiredService<ILogger<AnthropicLanguageModel>>()));
             return services;
         }
     }

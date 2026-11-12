@@ -90,11 +90,28 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
     /// </summary>
     internal sealed class RecordedHandler : HttpMessageHandler
     {
-        private readonly Queue<Func<HttpResponseMessage>> responses;
+        private readonly Queue<Func<CancellationToken, Task<HttpResponseMessage>>> responses = new Queue<Func<CancellationToken, Task<HttpResponseMessage>>>();
 
         public RecordedHandler(params Func<HttpResponseMessage>[] responses)
         {
-            this.responses = new Queue<Func<HttpResponseMessage>>(responses);
+            foreach (Func<HttpResponseMessage> response in responses)
+            {
+                this.responses.Enqueue(_ => Task.FromResult(response()));
+            }
+        }
+
+        /// <summary>
+        /// A handler whose steps may throw or wait (for network failures and timeouts).
+        /// </summary>
+        public static RecordedHandler Steps(params Func<CancellationToken, Task<HttpResponseMessage>>[] steps)
+        {
+            RecordedHandler handler = new RecordedHandler();
+            foreach (Func<CancellationToken, Task<HttpResponseMessage>> step in steps)
+            {
+                handler.responses.Enqueue(step);
+            }
+
+            return handler;
         }
 
         public List<HttpRequestMessage> Requests { get; } = new List<HttpRequestMessage>();
@@ -110,7 +127,7 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
                 throw new InvalidOperationException("No recorded response left: the adapter made an unexpected call.");
             }
 
-            return responses.Dequeue()();
+            return await responses.Dequeue()(cancellationToken).ConfigureAwait(false);
         }
     }
 

@@ -43,12 +43,12 @@ namespace AnointedAutomation.Concepts.Anthropic
         /// <summary>
         /// Creates the adapter. Throws <see cref="AnthropicConfigurationException"/> when a required option is missing.
         /// </summary>
-        /// <param name="httpClient">The HTTP client the SDK sends through (a typed client from IHttpClientFactory in DI).</param>
+        /// <param name="handler">The HTTP handler pipeline the SDK sends through (from IHttpMessageHandlerFactory in DI). Not disposed here.</param>
         /// <param name="options">The required settings.</param>
         /// <param name="logger">Receives retries and failures; never the key.</param>
-        public AnthropicLanguageModel(HttpClient httpClient, AnthropicLanguageModelOptions options, ILogger<AnthropicLanguageModel> logger)
+        public AnthropicLanguageModel(HttpMessageHandler handler, AnthropicLanguageModelOptions options, ILogger<AnthropicLanguageModel> logger)
         {
-            ArgumentNullException.ThrowIfNull(httpClient);
+            ArgumentNullException.ThrowIfNull(handler);
             ArgumentNullException.ThrowIfNull(options);
             ArgumentNullException.ThrowIfNull(logger);
             this.logger = logger;
@@ -70,7 +70,8 @@ namespace AnointedAutomation.Concepts.Anthropic
             client = new AnthropicClient
             {
                 ApiKey = options.ApiKey,
-                HttpClient = httpClient,
+                // The SDK enforces TimeoutSeconds per call, so the HttpClient's own 100 second limit must not cut in first.
+                HttpClient = new HttpClient(new RetryAfterRecorder(handler), false) { Timeout = System.Threading.Timeout.InfiniteTimeSpan },
                 MaxRetries = 0,
                 Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds),
             };
@@ -98,6 +99,8 @@ namespace AnointedAutomation.Concepts.Anthropic
 
             for (int attempt = 1; ; attempt++)
             {
+                RetryAfterSlot retryAfter = new RetryAfterSlot();
+                RetryAfterRecorder.Current.Value = retryAfter;
                 try
                 {
                     Message message = await client.Messages.Create(request, ct).ConfigureAwait(false);
@@ -113,27 +116,35 @@ namespace AnointedAutomation.Concepts.Anthropic
                 }
                 catch (AnthropicRateLimitException ex)
                 {
-                    await Backoff(ex, "429 rate limit", attempt, ct).ConfigureAwait(false);
+                    await Backoff(ex, "429 rate limit", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
                 }
                 catch (AnthropicRequestTimeoutException ex)
                 {
-                    await Backoff(ex, "408 request timeout", attempt, ct).ConfigureAwait(false);
+                    await Backoff(ex, "408 request timeout", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
                 }
                 catch (AnthropicOverloadedException ex)
                 {
-                    await Backoff(ex, "overloaded", attempt, ct).ConfigureAwait(false);
+                    await Backoff(ex, "overloaded", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
                 }
                 catch (Anthropic5xxException ex)
                 {
-                    await Backoff(ex, "5xx server error", attempt, ct).ConfigureAwait(false);
+                    await Backoff(ex, "5xx server error", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
                 }
                 catch (AnthropicIOException ex)
                 {
-                    await Backoff(ex, "network error", attempt, ct).ConfigureAwait(false);
+                    await Backoff(ex, "network error", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
                 }
                 catch (TaskCanceledException ex) when (!ct.IsCancellationRequested)
                 {
-                    await Backoff(ex, "timeout", attempt, ct).ConfigureAwait(false);
+                    await Backoff(ex, "timeout", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
+                }
+                catch (TimeoutException ex)
+                {
+                    await Backoff(ex, "timeout", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
+                }
+                catch (HttpRequestException ex)
+                {
+                    await Backoff(ex, "network error", attempt, retryAfter.Delay, ct).ConfigureAwait(false);
                 }
                 catch (AnthropicApiException ex)
                 {
@@ -170,7 +181,7 @@ namespace AnointedAutomation.Concepts.Anthropic
             return failed;
         }
 
-        private async Task Backoff(Exception ex, string kind, int attempt, CancellationToken ct)
+        private async Task Backoff(Exception ex, string kind, int attempt, TimeSpan? retryAfter, CancellationToken ct)
         {
             // A caller's cancellation is shutdown, not a failure: rethrow it quietly instead of retrying.
             ct.ThrowIfCancellationRequested();
@@ -182,7 +193,9 @@ namespace AnointedAutomation.Concepts.Anthropic
                 throw failed;
             }
 
-            double milliseconds = Math.Min(retryBaseDelayMilliseconds * Math.Pow(2, attempt - 1), MaxBackoff.TotalMilliseconds);
+            // The server's Retry-After hint wins when present; otherwise exponential backoff. Both are capped.
+            double wanted = retryAfter.HasValue ? retryAfter.Value.TotalMilliseconds : retryBaseDelayMilliseconds * Math.Pow(2, attempt - 1);
+            double milliseconds = Math.Min(wanted, MaxBackoff.TotalMilliseconds);
             TimeSpan delay = TimeSpan.FromMilliseconds(milliseconds);
             logger.LogWarning(ex, "Anthropic transient failure ({Kind}) on attempt {Attempt} of {MaxAttempts} for model {Model}; retrying in {DelayMs} ms.", kind, attempt, maxAttempts, model, (long)milliseconds);
             await Task.Delay(delay, ct).ConfigureAwait(false);

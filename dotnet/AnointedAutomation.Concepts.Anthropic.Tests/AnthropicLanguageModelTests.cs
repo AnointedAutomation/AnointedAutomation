@@ -20,9 +20,13 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
     {
         private static (AnthropicLanguageModel Model, RecordedHandler Handler, CapturingLogger<AnthropicLanguageModel> Logger) Build(params Func<HttpResponseMessage>[] responses)
         {
-            RecordedHandler handler = new RecordedHandler(responses);
+            return Build(new RecordedHandler(responses), TestKit.Options());
+        }
+
+        private static (AnthropicLanguageModel Model, RecordedHandler Handler, CapturingLogger<AnthropicLanguageModel> Logger) Build(RecordedHandler handler, AnthropicLanguageModelOptions options)
+        {
             CapturingLogger<AnthropicLanguageModel> logger = new CapturingLogger<AnthropicLanguageModel>();
-            AnthropicLanguageModel model = new AnthropicLanguageModel(new HttpClient(handler), TestKit.Options(), logger);
+            AnthropicLanguageModel model = new AnthropicLanguageModel(handler, options, logger);
             return (model, handler, logger);
         }
 
@@ -52,7 +56,8 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
 
             Assert.Equal(TestKit.ValidReply, reply);
             Assert.Single(handler.Requests);
-            Assert.Equal(TestKit.ApiKey, handler.Requests[0].Headers.GetValues("x-api-key").Single());
+            Assert.Equal("Bearer", handler.Requests[0].Headers.Authorization.Scheme);
+            Assert.Equal(TestKit.ApiKey, handler.Requests[0].Headers.Authorization.Parameter);
             using (JsonDocument body = JsonDocument.Parse(handler.Bodies[0]))
             {
                 JsonElement root = body.RootElement;
@@ -110,6 +115,8 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
         [InlineData(429, "rate_limit_error")]
         [InlineData(500, "api_error")]
         [InlineData(503, "api_error")]
+        [InlineData(408, "timeout_error")]
+        [InlineData(529, "overloaded_error")]
         public async Task TransientErrors_AreBounded_ThenRaisedAsTransient(int status, string type)
         {
             (AnthropicLanguageModel model, RecordedHandler handler, CapturingLogger<AnthropicLanguageModel> logger) = Build(
@@ -125,6 +132,75 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
             Assert.Equal(2, logger.Entries.Count(e => e.Level == LogLevel.Warning));
             Assert.Contains(logger.Entries, e => e.Level == LogLevel.Error && e.Exception == failed);
             AssertKeyNeverLogged(logger);
+        }
+
+        [Fact]
+        public async Task NetworkErrors_AreRetried_ThenRaisedAsTransient()
+        {
+            RecordedHandler handler = RecordedHandler.Steps(
+                _ => throw new HttpRequestException("connection reset"),
+                _ => throw new HttpRequestException("connection reset"),
+                _ => throw new HttpRequestException("connection reset"));
+            (AnthropicLanguageModel model, RecordedHandler _, CapturingLogger<AnthropicLanguageModel> logger) = Build(handler, TestKit.Options());
+
+            AnthropicTransientException failed = await Assert.ThrowsAsync<AnthropicTransientException>(() => model.Complete("the prompt", CancellationToken.None));
+
+            Assert.Equal(3, failed.Attempts);
+            Assert.Equal(3, handler.Requests.Count);
+            Assert.Equal(2, logger.Entries.Count(e => e.Level == LogLevel.Warning));
+        }
+
+        [Fact]
+        public async Task ClientTimeout_IsRetried_ThenSucceeds()
+        {
+            AnthropicLanguageModelOptions options = TestKit.Options();
+            options.TimeoutSeconds = 1;
+            RecordedHandler handler = RecordedHandler.Steps(
+                async ct =>
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(30), ct).ConfigureAwait(false);
+                    throw new InvalidOperationException("The SDK timeout should have cancelled this call.");
+                },
+                _ => Task.FromResult(TestKit.Message(TestKit.ValidReply)));
+            (AnthropicLanguageModel model, RecordedHandler _, CapturingLogger<AnthropicLanguageModel> logger) = Build(handler, options);
+
+            string reply = await model.Complete("the prompt", CancellationToken.None);
+
+            Assert.Equal(TestKit.ValidReply, reply);
+            Assert.Equal(2, handler.Requests.Count);
+            Assert.Single(logger.Entries, e => e.Level == LogLevel.Warning);
+        }
+
+        [Fact]
+        public async Task RateLimited_HonorsRetryAfter_OverTheLocalBackoff()
+        {
+            AnthropicLanguageModelOptions options = TestKit.Options();
+            options.RetryBaseDelayMilliseconds = 25000;
+            RecordedHandler handler = new RecordedHandler(
+                () =>
+                {
+                    HttpResponseMessage limited = TestKit.Error(429, "rate_limit_error", "slow down");
+                    limited.Headers.RetryAfter = new System.Net.Http.Headers.RetryConditionHeaderValue(TimeSpan.Zero);
+                    return limited;
+                },
+                () => TestKit.Message(TestKit.ValidReply));
+            (AnthropicLanguageModel model, RecordedHandler _, CapturingLogger<AnthropicLanguageModel> logger) = Build(handler, options);
+
+            string reply = await model.Complete("the prompt", CancellationToken.None);
+
+            Assert.Equal(TestKit.ValidReply, reply);
+            Assert.Contains(logger.Entries, e => e.Level == LogLevel.Warning && e.Message.Contains("retrying in 0 ms", StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public void RetryAfter_ReadsDeltaAndDate_AndNeverGoesNegative()
+        {
+            DateTimeOffset now = new DateTimeOffset(2026, 11, 12, 12, 0, 0, TimeSpan.Zero);
+
+            Assert.Null(RetryAfterRecorder.Read(null, now));
+            Assert.Equal(TimeSpan.FromSeconds(7), RetryAfterRecorder.Read(new System.Net.Http.Headers.RetryConditionHeaderValue(TimeSpan.FromSeconds(7)), now));
+            Assert.Equal(TimeSpan.FromSeconds(5), RetryAfterRecorder.Read(new System.Net.Http.Headers.RetryConditionHeaderValue(now.AddSeconds(5)), now));
+            Assert.Equal(TimeSpan.Zero, RetryAfterRecorder.Read(new System.Net.Http.Headers.RetryConditionHeaderValue(now.AddSeconds(-5)), now));
         }
 
         [Theory]
@@ -189,7 +265,7 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
             }
 
             CapturingLogger<AnthropicLanguageModel> logger = new CapturingLogger<AnthropicLanguageModel>();
-            AnthropicConfigurationException failed = Assert.Throws<AnthropicConfigurationException>(() => new AnthropicLanguageModel(new HttpClient(new RecordedHandler()), options, logger));
+            AnthropicConfigurationException failed = Assert.Throws<AnthropicConfigurationException>(() => new AnthropicLanguageModel(new RecordedHandler(), options, logger));
 
             Assert.Contains(setting, failed.Message, StringComparison.Ordinal);
             Assert.DoesNotContain(TestKit.ApiKey, failed.Message, StringComparison.Ordinal);
