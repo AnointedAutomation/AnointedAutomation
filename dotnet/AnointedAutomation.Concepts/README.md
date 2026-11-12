@@ -189,11 +189,11 @@ The ledger maps the consistency of claims without deciding theology. Contradicti
 
 | Type | Description |
 |---|---|
-| `Proposition` | A named entry in the shared vocabulary, with `Testability` and a three valued `bool? Standing`. Equal by name. |
+| `Proposition` | A named entry in the shared vocabulary, with `Testability` and a three valued `TruthValue Standing` (`Unknown`, `True`, `False`). Equal by name. |
 | `FoundationalClaim` | A measuring stick claim: `Name`, `Statement`, `Domain`, `Asserts`, `Denies`, `Falsifiable`, `SurvivedFalsificationWeight` (0.0 to 1.0), `Status`. |
 | `TheologicalClaim` | A claim from a tradition: `Statement`, `Source`, `Confidence`, `Asserts`, `Denies`. |
 | `EpistemicLedger` | The engine. `Examine(claim)` (pure), `Admit(claim)` (examines, stores, records tensions), `Tensions`, `ClaimsAbout(Proposition)`, `ClaimsFrom(string source)`. |
-| `Examination` | `Claim`, `Verdict`, `Standing`, `Confidence`, `Derivation`. |
+| `Examination` | `Claim`, `Verdict`, `Standing` (a `TruthValue`: Consistent is True, Contradicts is False, Unfalsifiable and Undetermined are Unknown), `Confidence`, `Derivation`. |
 | `DerivationStep` | One step of reasoning: `Authority`, `PropositionName`, `Outcome`. |
 | `Tension` | Two admitted claims that disagree on a `Proposition`: `First`, `Second`, `Proposition`. |
 | `Verdict` | `Consistent`, `Contradicts`, `Unfalsifiable`, `Undetermined`. |
@@ -207,11 +207,12 @@ The ledger maps the consistency of claims without deciding theology. Contradicti
 using System;
 using System.Collections.Generic;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 Proposition created = new Proposition(
     "CreatedUniverse", "The universe was created.", Testability.BeyondObservation);
 Proposition energy = new Proposition(
-    "EnergyConserved", "Energy is neither created nor destroyed.", Testability.EmpiricallyTestable, true);
+    "EnergyConserved", "Energy is neither created nor destroyed.", Testability.EmpiricallyTestable, TruthValue.True);
 
 FoundationalClaim conservation = new FoundationalClaim(
     "ConservationOfEnergy", "Within a closed system, energy is conserved.",
@@ -228,11 +229,34 @@ ledger.Admit(new TheologicalClaim(
     new List<Proposition>(), new List<Proposition> { created }));
 
 Console.WriteLine(genesis.Verdict);       // Unfalsifiable
-Console.WriteLine(genesis.Standing == null); // True: honestly unknown, never guessed
+Console.WriteLine(genesis.Standing);      // Unknown: not established, never guessed to False
 Console.WriteLine(ledger.Tensions.Count); // 1: the two claims disagree, and both stand
 ```
 
 For a ready made set of foundational claims (64 laws, 12 theories and 3 conjectures), see [AnointedAutomation.Mathematics](https://www.nuget.org/packages/AnointedAutomation.Mathematics).
+
+## Reasoning contracts
+
+Namespace: `AnointedAutomation.Concepts.Reasoning`
+
+The shared contracts for the reasoning engines (a deterministic canon engine, a language engine, and a hybrid) behind one API. This release ships the contracts only; the engines follow.
+
+| Type | Description |
+|---|---|
+| `TruthValue` | `Unknown = 0`, `True`, `False`. Unknown means "not established" and is never False. No bool conversion. |
+| `TruthLogic` | Strong Kleene `And`, `Or`, `Not`. Undefined values throw. |
+| `RelationKind` | `None = 0` (rejected by `Assertion`), `Violates`, `Upholds`, `IsInstanceOf`, `InCategory`, `HasGravity`, `GroundedIn`, `Commands`, `Forbids`. |
+| `ConceptRef` | `Kind` + `Id`. `ConceptRef.Of(SinId)` and `ConceptRef.Of(MoralConcept)` (a `CataloguedSin` resolves to its `SinId` reference). |
+| `Assertion` | `Subject`, `Relation`, `Object`. |
+| `Query` | An `Assertion` plus the `Circumstance` context (copied, never null). |
+| `Justification` | `Steps` (`ProofStep`), `Scripture` (`ScriptureReference`), `FactsUsed` (`Assertion`), `Explanation`. |
+| `AnswerSource` | `Unknown = 0` (rejected), `Canon`, `Language`. |
+| `VerificationStatus` | `Unknown = 0` (rejected), `Verified`, `Unverified`, `Rejected`. |
+| `Provenance` | `Source`, `Model`, `At`, `Status`, `RuleOrPromptId`; every field required, no defaults. |
+| `Answer` | `Query`, `Truth`, `Confidence` (0.0 to 1.0), `Classification` (`ConceptRef` list), `Why`, `Provenance`. |
+| `IReasoner` | `Task<Answer> Ask(Query, CancellationToken)`. |
+
+Only the owner can approve promoting an AI (language engine) interpretation into a permanent fact; `Provenance` records where an answer came from and never grants that.
 
 ## Related packages
 

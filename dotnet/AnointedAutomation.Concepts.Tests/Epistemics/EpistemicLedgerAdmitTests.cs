@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
@@ -20,7 +21,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
                 "EffectsHaveCauses",
                 "Within the universe, effects have causes.",
                 Testability.EmpiricallyTestable,
-                true);
+                TruthValue.True);
             FoundationalClaim causality = new FoundationalClaim(
                 "Causality",
                 "Within the universe, effects have causes.",
@@ -76,7 +77,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = ledger.Admit(Materialist());
 
             Assert.Equal(Verdict.Unfalsifiable, examination.Verdict);
-            Assert.Null(examination.Standing);
+            Assert.Equal(TruthValue.Unknown, examination.Standing);
         }
 
         [Fact]

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
@@ -24,7 +25,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = new Examination(
                 AnyClaim(), Verdict.Consistent, 0.8, new List<DerivationStep>());
 
-            Assert.True(examination.Standing);
+            Assert.Equal(TruthValue.True, examination.Standing);
         }
 
         [Fact]
@@ -33,21 +34,30 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Examination examination = new Examination(
                 AnyClaim(), Verdict.Contradicts, 0.8, new List<DerivationStep>());
 
-            Assert.False(examination.Standing);
+            Assert.Equal(TruthValue.False, examination.Standing);
         }
 
         [Fact]
-        public void Examination_MapsBothNullFlavorsToNullStanding()
+        public void Examination_MapsBothUnknownFlavorsToUnknownStanding()
         {
-            // Unfalsifiable and Undetermined are the two flavors of null: can never test from
+            // Unfalsifiable and Undetermined are the two flavors of Unknown: can never test from
             // inside, versus could test but have not sufficiently.
             Examination unfalsifiable = new Examination(
                 AnyClaim(), Verdict.Unfalsifiable, 0.8, new List<DerivationStep>());
             Examination undetermined = new Examination(
                 AnyClaim(), Verdict.Undetermined, 0.8, new List<DerivationStep>());
 
-            Assert.Null(unfalsifiable.Standing);
-            Assert.Null(undetermined.Standing);
+            Assert.Equal(TruthValue.Unknown, unfalsifiable.Standing);
+            Assert.Equal(TruthValue.Unknown, undetermined.Standing);
+        }
+
+        [Fact]
+        public void Examination_RejectsAVerdictWithNoTruthMapping()
+        {
+            Examination unmapped = new Examination(
+                AnyClaim(), (Verdict)99, 0.8, new List<DerivationStep>());
+
+            Assert.Throws<System.InvalidOperationException>(() => unmapped.Standing);
         }
 
         [Fact]

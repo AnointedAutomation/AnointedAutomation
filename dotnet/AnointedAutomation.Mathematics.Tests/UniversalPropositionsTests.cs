@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Mathematics.Tests
 {
@@ -50,30 +51,30 @@ namespace AnointedAutomation.Mathematics.Tests
         [Fact]
         public void LawPropositions_StandTrue()
         {
-            Assert.True(UniversalPropositions.NonContradiction.Standing);
-            Assert.True(UniversalPropositions.Identity.Standing);
-            Assert.True(UniversalPropositions.ExcludedMiddle.Standing);
-            Assert.True(UniversalPropositions.EffectsHaveCauses.Standing);
-            Assert.True(UniversalPropositions.EnergyConserved.Standing);
-            Assert.True(UniversalPropositions.EntropyIncreases.Standing);
-            Assert.True(UniversalPropositions.SpecialRelativityHolds.Standing);
-            Assert.True(UniversalPropositions.GravityIsSpacetimeCurvature.Standing);
-            Assert.True(UniversalPropositions.MatterEnergyIsQuantized.Standing);
-            Assert.True(UniversalPropositions.MatterComposedOfAtoms.Standing);
-            Assert.True(UniversalPropositions.UniverseExpandedFromHotDenseState.Standing);
-            Assert.True(UniversalPropositions.PopulationsEvolveByNaturalSelection.Standing);
-            Assert.True(UniversalPropositions.DiseasesCausedByMicroorganisms.Standing);
-            Assert.True(UniversalPropositions.OrganismsComposedOfCells.Standing);
-            Assert.True(UniversalPropositions.LithosphereDividedIntoMovingPlates.Standing);
-            Assert.True(UniversalPropositions.GasBehaviorArisesFromMolecularMotion.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.NonContradiction.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.Identity.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.ExcludedMiddle.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.EffectsHaveCauses.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.EnergyConserved.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.EntropyIncreases.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.SpecialRelativityHolds.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.GravityIsSpacetimeCurvature.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.MatterEnergyIsQuantized.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.MatterComposedOfAtoms.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.UniverseExpandedFromHotDenseState.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.PopulationsEvolveByNaturalSelection.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.DiseasesCausedByMicroorganisms.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.OrganismsComposedOfCells.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.LithosphereDividedIntoMovingPlates.Standing);
+            Assert.Equal(TruthValue.True, UniversalPropositions.GasBehaviorArisesFromMolecularMotion.Standing);
         }
 
         [Fact]
         public void ConjectureBackedPropositions_StandNull()
         {
-            Assert.Null(UniversalPropositions.CollatzTerminates.Standing);
-            Assert.Null(UniversalPropositions.GoldbachHolds.Standing);
-            Assert.Null(UniversalPropositions.RiemannZerosOnCriticalLine.Standing);
+            Assert.Equal(TruthValue.Unknown, UniversalPropositions.CollatzTerminates.Standing);
+            Assert.Equal(TruthValue.Unknown, UniversalPropositions.GoldbachHolds.Standing);
+            Assert.Equal(TruthValue.Unknown, UniversalPropositions.RiemannZerosOnCriticalLine.Standing);
         }
 
         [Fact]

@@ -1,6 +1,8 @@
 // Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-07-02 Jesus is King ✝️
 // Stewarded by Alexander Fields
 
+using AnointedAutomation.Concepts.Reasoning;
+
 namespace AnointedAutomation.Concepts.Epistemics
 {
     /// <summary>
@@ -65,23 +67,26 @@ namespace AnointedAutomation.Concepts.Epistemics
         /// <summary>
         /// The three-valued standing of the claim. Consistent leans true (provisional, like every
         /// scientific claim), Contradicts is false relative to the current unfalsified set, and
-        /// both Unfalsifiable and Undetermined are honestly null. Null is never defaulted away.
+        /// both Unfalsifiable and Undetermined map to <see cref="TruthValue.Unknown"/>. Unknown is
+        /// never defaulted away to False.
         /// </summary>
-        public bool? Standing
+        public TruthValue Standing
         {
             get
             {
-                if (Verdict == Verdict.Consistent)
+                switch (Verdict)
                 {
-                    return true;
+                    case Verdict.Consistent:
+                        return TruthValue.True;
+                    case Verdict.Contradicts:
+                        return TruthValue.False;
+                    case Verdict.Unfalsifiable:
+                    case Verdict.Undetermined:
+                        return TruthValue.Unknown;
+                    default:
+                        throw new System.InvalidOperationException(
+                            "Verdict " + Verdict + " has no truth-value mapping.");
                 }
-
-                if (Verdict == Verdict.Contradicts)
-                {
-                    return false;
-                }
-
-                return null;
             }
         }
 
