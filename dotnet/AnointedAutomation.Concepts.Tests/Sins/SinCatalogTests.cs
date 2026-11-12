@@ -13,7 +13,7 @@ namespace AnointedAutomation.Concepts.Tests.Sins
 {
     public class SinCatalogTests
     {
-        private static readonly Regex ReferenceFormat = new Regex(@"^[A-Za-z]+ \d+:\d+(-\d+)?$");
+        private static readonly Regex ReferenceFormat = new Regex(@"^([1-3] )?[A-Z][a-z]+( of [A-Z][a-z]+)? \d+:\d+(-\d+)?$");
 
         [Fact]
         public void Catalog_Has667NumbersPlusTheDuplicate566()
@@ -128,6 +128,41 @@ namespace AnointedAutomation.Concepts.Tests.Sins
             }
 
             Assert.Contains(SinCatalog.Get(SinId.Adultery), SinCatalog.UnderCoarseSin(Sin.SexualImmorality));
+        }
+
+        [Theory]
+        [InlineData(652u, SinCategory.Worldliness, false, Sin.Pride)]
+        [InlineData(480u, SinCategory.Pride, true, Sin.Pride)]
+        [InlineData(339u, SinCategory.Omission, false, Sin.Pride)]
+        [InlineData(581u, SinCategory.Speech, true, Sin.Wrath)]
+        [InlineData(21u, SinCategory.AgainstGod, false, Sin.Pride)]
+        [InlineData(231u, SinCategory.AgainstGod, false, Sin.Pride)]
+        [InlineData(341u, SinCategory.FamilyAndMarriage, false, Sin.Pride)]
+        [InlineData(363u, SinCategory.AgainstOthers, false, Sin.Pride)]
+        [InlineData(364u, SinCategory.DishonestyAndTheft, true, Sin.Theft)]
+        [InlineData(365u, SinCategory.AngerAndViolence, true, Sin.Murder)]
+        public void HandCorrectedMappings_DoNotRegress(uint id, SinCategory category, bool hasCoarse, Sin coarse)
+        {
+            SinEntry e = SinCatalog.Get((SinId)id);
+            Assert.Equal(category, e.Category);
+            Assert.Equal(hasCoarse, e.CoarseSin.HasValue);
+            if (hasCoarse)
+            {
+                Assert.Equal(coarse, e.CoarseSin.Value);
+            }
+        }
+
+        [Fact]
+        public void OnlyKillingPeople_IsUnderMurder()
+        {
+            Assert.DoesNotContain(SinCatalog.UnderCoarseSin(Sin.Murder), e => e.DocumentNumber == 363 || e.DocumentNumber == 364);
+        }
+
+        [Fact]
+        public void ScriptureReference_UsesTheEnginesBookNames()
+        {
+            Assert.Equal("1 Corinthians 6:18", new ScriptureReference(BibleBook.FirstCorinthians, 6, 18, 0).ToString());
+            Assert.Equal("Song of Solomon 2:15", new ScriptureReference(BibleBook.SongOfSolomon, 2, 15, 0).ToString());
         }
 
         [Fact]

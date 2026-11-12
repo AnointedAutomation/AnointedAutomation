@@ -140,6 +140,8 @@
         "CataloguedSin",
         "ScriptureReference",
         "ISinConsequence",
+        "SinConsequenceRegistry",
+        "BibleBook",
         "Situation",
         "MoralConcept",
         "Trinity",

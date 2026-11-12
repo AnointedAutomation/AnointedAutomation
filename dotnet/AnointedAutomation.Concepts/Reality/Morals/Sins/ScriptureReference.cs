@@ -18,6 +18,12 @@ namespace AnointedAutomation.Concepts
             3, 3, 3, 2, 14, 4, 28, 16, 24, 21, 28, 16, 16, 13, 6, 6, 4, 4, 5, 3, 6, 4, 3, 1, 13, 5, 5, 3, 5, 1, 1, 1, 22,
         };
 
+        // Display name per book ("1 Corinthians"), indexed by BibleBook value, matching MoralConcept.Scripture.
+        private static readonly string[] DisplayNames =
+        {
+            "Unknown", "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", "Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah", "Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", "Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation",
+        };
+
         /// <summary>
         /// Creates a reference.
         /// </summary>
@@ -86,12 +92,12 @@ namespace AnointedAutomation.Concepts
         }
 
         /// <summary>
-        /// Formats as "Book chapter:verse" or "Book chapter:verse-end".
+        /// Formats as "1 Corinthians 6:18" or "Exodus 21:22-25", the engine's Scripture style.
         /// </summary>
         /// <returns>The formatted reference.</returns>
         public override string ToString()
         {
-            string head = Book + " " + Chapter + ":" + Verse;
+            string head = DisplayNames[(int)Book] + " " + Chapter + ":" + Verse;
             return IsRange ? head + "-" + EndVerse : head;
         }
 
