@@ -121,5 +121,63 @@ namespace AnointedAutomation.Concepts
         /// </summary>
         /// <returns>The hash code.</returns>
         public override int GetHashCode() => HashCode.Combine(Book, Chapter, Verse, EndVerse);
+
+        /// <summary>
+        /// Parses a display reference such as "1 Corinthians 13:4" or "Exodus 21:22-25", the form
+        /// <see cref="MoralConcept.Scripture"/> uses. "Psalm" is accepted for Psalms.
+        /// </summary>
+        /// <param name="text">The reference text.</param>
+        /// <returns>The validated reference.</returns>
+        /// <exception cref="FormatException">The text is not a reference to a known book.</exception>
+        public static ScriptureReference Parse(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new FormatException("A Scripture reference needs text.");
+            }
+
+            string trimmed = text.Trim();
+            int split = trimmed.LastIndexOf(' ');
+            int colon = trimmed.IndexOf(':', split + 1);
+            if (split < 1 || colon < 0)
+            {
+                throw new FormatException("'" + text + "' is not of the form 'Book chapter:verse'.");
+            }
+
+            string bookName = trimmed.Substring(0, split);
+            if (bookName.Equals("Psalm", StringComparison.Ordinal))
+            {
+                bookName = "Psalms";
+            }
+
+            int bookIndex = Array.IndexOf(DisplayNames, bookName, 1);
+            if (bookIndex < 1)
+            {
+                throw new FormatException("'" + bookName + "' is not a known book.");
+            }
+
+            string verses = trimmed.Substring(colon + 1);
+            int dash = verses.IndexOf('-');
+            int chapter = ParseNumber(trimmed.Substring(split + 1, colon - split - 1), text);
+            int verse = ParseNumber(dash < 0 ? verses : verses.Substring(0, dash), text);
+            int endVerse = dash < 0 ? 0 : ParseNumber(verses.Substring(dash + 1), text);
+            return new ScriptureReference((BibleBook)bookIndex, chapter, verse, endVerse);
+        }
+
+        /// <summary>
+        /// Parses one positive number of a reference.
+        /// </summary>
+        /// <param name="digits">The digits.</param>
+        /// <param name="text">The whole reference, for the error message.</param>
+        /// <returns>The number.</returns>
+        private static int ParseNumber(string digits, string text)
+        {
+            if (!int.TryParse(digits, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out int number))
+            {
+                throw new FormatException("'" + text + "' has a malformed chapter or verse.");
+            }
+
+            return number;
+        }
     }
 }

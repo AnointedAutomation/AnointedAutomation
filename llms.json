@@ -116,7 +116,7 @@
     },
     {
       "id": "AnointedAutomation.Concepts",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "targetFramework": "net10.0",
       "description": "Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts",
@@ -159,9 +159,12 @@
         "Query",
         "Answer",
         "Provenance",
-        "IReasoner"
+        "IReasoner",
+        "CanonReasoner",
+        "CanonFacts",
+        "ICanonRule"
       ],
-      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts. The Reasoning namespace adds the dual reasoning engine contracts (TruthValue with Kleene logic, Assertion, Query, Answer, Provenance, IReasoner); Proposition.Standing and Examination.Standing are TruthValue (were bool?). Only the owner can approve promoting an AI interpretation into a permanent fact."
+      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts. The Reasoning namespace adds the dual reasoning engine contracts (TruthValue with Kleene logic, Assertion, Query, Answer, Provenance, IReasoner) and, in 2.1.0, CanonReasoner (deterministic, offline, Scripture-grounded; Unknown is never False); Proposition.Standing and Examination.Standing are TruthValue (were bool?). Only the owner can approve promoting an AI interpretation into a permanent fact."
     },
     {
       "id": "AnointedAutomation.Enums",

@@ -175,6 +175,17 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   Examination.Standing are TruthValue (changed in place from bool?). Owner rule: only the owner can
   approve promoting an AI interpretation into a permanent fact. Tests: Reasoning/TruthLogicTests,
   Reasoning/ReasoningContractsTests.
+- CanonReasoner (Reasoning/Canon/, same namespace, dual engine PR 2 of 5): the deterministic, offline
+  IReasoner. CanonFacts.cs is the immutable index built once (Lazy) from SinCatalog.All, every public
+  MoralConcept type (reflection, ordered by name) and Reality.Revealed() facets: GroundedIn per reference,
+  Upholds/Violates per facet with the mirrored Commands/Forbids, InCategory and IsInstanceOf (coarse sin,
+  grounding vice) per sin; lookups by (subject, relation) or whole assertion, With() extends a copy.
+  CanonFact.cs (Assertion + at least one ScriptureReference). ICanonRule.cs; rules SinViolatesRule,
+  CategoryRule, IsInstanceOfRule, WitnessRule (oracle thresholds), FactRule (stated or contrary);
+  CanonRules.Default; CanonProof.cs (internal step helpers). CanonReasoner.cs runs every rule for the
+  relation, first established answer wins, opposite answers throw; Unknown when nothing settles it.
+  ScriptureReference.Parse reads display references. Tests: Reasoning/Canon/ (rule unit tests, FsCheck
+  properties, oracle regression).
 
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with
