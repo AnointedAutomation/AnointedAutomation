@@ -1,26 +1,28 @@
 // Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-07-02 Jesus is King ✝️
 // Stewarded by Alexander Fields
 
+using AnointedAutomation.Concepts.Reasoning;
+
 namespace AnointedAutomation.Concepts.Epistemics
 {
     /// <summary>
     /// One entry in the shared vocabulary through which claims interact. The engine does not parse
     /// natural language; claims declare which propositions they assert and deny, and checking is
-    /// set logic over these. Standing is three-valued: true (asserted, so far unfalsified), false
-    /// (falsified), null (unknown, untested, or unknowable). Null is the honest state for most of
-    /// theology and is never defaulted or guessed away.
+    /// set logic over these. Standing is a three-valued <see cref="TruthValue"/>: True (asserted, so
+    /// far unfalsified), False (falsified), Unknown (untested or unknowable). Unknown is the honest
+    /// state for most of theology and is never defaulted or guessed away to False.
     /// </summary>
     public class Proposition
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Proposition"/> class with an unknown
-        /// (null) standing.
+        /// Initializes a new instance of the <see cref="Proposition"/> class with an
+        /// <see cref="TruthValue.Unknown"/> standing.
         /// </summary>
         /// <param name="name">The vocabulary name, e.g. "CreatedUniverse".</param>
         /// <param name="description">What the proposition asserts, in plain words.</param>
         /// <param name="testability">Whether it can be tested from inside the universe.</param>
         public Proposition(string name, string description, Testability testability)
-            : this(name, description, testability, null)
+            : this(name, description, testability, TruthValue.Unknown)
         {
         }
 
@@ -31,8 +33,8 @@ namespace AnointedAutomation.Concepts.Epistemics
         /// <param name="name">The vocabulary name, e.g. "CreatedUniverse".</param>
         /// <param name="description">What the proposition asserts, in plain words.</param>
         /// <param name="testability">Whether it can be tested from inside the universe.</param>
-        /// <param name="standing">True (so far unfalsified), false (falsified), or null (unknown).</param>
-        public Proposition(string name, string description, Testability testability, bool? standing)
+        /// <param name="standing">True (so far unfalsified), False (falsified), or Unknown.</param>
+        public Proposition(string name, string description, Testability testability, TruthValue standing)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -76,10 +78,10 @@ namespace AnointedAutomation.Concepts.Epistemics
         }
 
         /// <summary>
-        /// The three-valued standing: true (so far unfalsified), false (falsified), or null
-        /// (unknown, untested, or unknowable).
+        /// The three-valued standing: True (so far unfalsified), False (falsified), or Unknown
+        /// (untested or unknowable). Unknown is "not established", never False.
         /// </summary>
-        public bool? Standing
+        public TruthValue Standing
         {
             get;
         }

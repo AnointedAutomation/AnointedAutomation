@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
@@ -15,7 +16,7 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
                 "EffectsHaveCauses",
                 "Within the universe, effects have causes.",
                 Testability.EmpiricallyTestable,
-                true);
+                TruthValue.True);
         }
 
         [Fact]

@@ -3,21 +3,22 @@
 
 using Xunit;
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Concepts.Tests.Epistemics
 {
     public class PropositionTests
     {
         [Fact]
-        public void Proposition_DefaultsStandingToNull()
+        public void Proposition_DefaultsStandingToUnknown()
         {
-            // null is the honest state: unknown, untested, or unknowable from inside the universe.
+            // Unknown is the honest state: not established, untested, or unknowable from inside the universe.
             Proposition creator = new Proposition(
                 "Creator",
                 "A creator of the universe exists.",
                 Testability.BeyondObservation);
 
-            Assert.Null(creator.Standing);
+            Assert.Equal(TruthValue.Unknown, creator.Standing);
             Assert.Equal(Testability.BeyondObservation, creator.Testability);
         }
 
@@ -28,9 +29,9 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
                 "EntropyIncreases",
                 "Entropy of a closed system does not decrease.",
                 Testability.EmpiricallyTestable,
-                true);
+                TruthValue.True);
 
-            Assert.True(entropy.Standing);
+            Assert.Equal(TruthValue.True, entropy.Standing);
         }
 
         [Fact]

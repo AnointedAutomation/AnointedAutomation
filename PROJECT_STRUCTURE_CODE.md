@@ -150,8 +150,8 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   that checks the consistency of theological claims against foundational claims over a shared
   proposition vocabulary. Proposition.cs defines the shared vocabulary; Testability.cs and
   LawDomain.cs classify claims (law domains are bounded so intra-universe laws never settle origin
-  claims); FoundationalClaim.cs and TheologicalClaim.cs hold three-valued (bool?) standings on
-  propositions; EpistemicStatus.cs and Verdict.cs carry the four-state verdict
+  claims); FoundationalClaim.cs and TheologicalClaim.cs assert and deny propositions whose standing is a
+  three-valued Reasoning.TruthValue (Unknown/True/False); EpistemicStatus.cs and Verdict.cs carry the four-state verdict
   (Consistent/Contradicts/Unfalsifiable/Undetermined); DerivationStep.cs and Examination.cs record how
   a verdict was reached; Tension.cs holds contradicting claims as data rather than resolving them
   away; EpistemicLedger.cs is the aggregate that admits claims, runs examinations, and tracks tensions,
@@ -162,6 +162,19 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   UTF-16 string holds them, no UTF-32 needed), a glossary of ProofSymbol tokens, and an ordered
   ProofStep derivation. TheoreticalProofs.cs is a static factory exposing the canonical Agnosticism
   and Christianity proofs.
+
+- Reasoning contracts (Reasoning/, namespace `AnointedAutomation.Concepts.Reasoning`): the shared
+  contracts for the dual reasoning engine (deterministic canon engine, language engine, hybrid) behind
+  one API, PR 1 of 5 (contracts only). TruthValue.cs (Unknown = 0, True, False; Unknown is "not
+  established", never False) and TruthLogic.cs (strong Kleene And/Or/Not); RelationKind.cs (None = 0,
+  rejected by Assertion); ConceptRef.cs (Kind + Id, Of(SinId) and Of(MoralConcept), a CataloguedSin
+  resolving to its SinId); Assertion.cs, Query.cs, Justification.cs (ProofStep, ScriptureReference,
+  facts used, explanation); AnswerSource.cs and VerificationStatus.cs (Unknown = 0, rejected by
+  Provenance); Provenance.cs (every field required); Answer.cs; IReasoner.cs (Ask(Query,
+  CancellationToken)). ReasoningGuard.cs holds the shared argument checks. Proposition.Standing and
+  Examination.Standing are TruthValue (changed in place from bool?). Owner rule: only the owner can
+  approve promoting an AI interpretation into a permanent fact. Tests: Reasoning/TruthLogicTests,
+  Reasoning/ReasoningContractsTests.
 
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with

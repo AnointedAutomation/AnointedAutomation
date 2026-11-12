@@ -2,6 +2,7 @@
 // Stewarded by Alexander Fields
 
 using AnointedAutomation.Concepts.Epistemics;
+using AnointedAutomation.Concepts.Reasoning;
 
 namespace AnointedAutomation.Mathematics
 {
@@ -21,7 +22,7 @@ namespace AnointedAutomation.Mathematics
             "NewtonsFirstLaw",
             "Within an inertial frame, a body at rest or in uniform motion remains so unless acted on by a net force.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For constant mass, net force equals the rate of change of momentum, reducing to force
@@ -31,7 +32,7 @@ namespace AnointedAutomation.Mathematics
             "NewtonsSecondLaw",
             "For constant mass, net force equals the rate of change of momentum, reducing to force equals mass times acceleration.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For every action there is an equal and opposite reaction.
@@ -40,7 +41,7 @@ namespace AnointedAutomation.Mathematics
             "ActionHasEqualOppositeReaction",
             "For every action there is an equal and opposite reaction.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Within the elastic limit, the restoring force of a spring is proportional to its
@@ -50,7 +51,7 @@ namespace AnointedAutomation.Mathematics
             "SpringForceProportionalToDisplacement",
             "Within the elastic limit, the restoring force of a spring is proportional to its displacement.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For a small sphere at low Reynolds number, the drag force in a viscous fluid is
@@ -60,7 +61,7 @@ namespace AnointedAutomation.Mathematics
             "ViscousDragProportionalToVelocity",
             "For a small sphere at low Reynolds number, the drag force in a viscous fluid is proportional to its velocity.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Gravitation and astronomy
 
@@ -73,7 +74,7 @@ namespace AnointedAutomation.Mathematics
             "MassesAttractInverseSquareToDistance",
             "Two masses attract with a force proportional to the product of the masses over the square of the distance between them, though general relativity supersedes this at high precision.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Under the two body approximation, planets orbit the sun in ellipses with the sun at one
@@ -83,7 +84,7 @@ namespace AnointedAutomation.Mathematics
             "PlanetaryOrbitsAreElliptical",
             "Under the two body approximation, planets orbit the sun in ellipses with the sun at one focus.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Under the two body approximation, a line joining a planet and the sun sweeps out equal
@@ -93,7 +94,7 @@ namespace AnointedAutomation.Mathematics
             "OrbitsSweepEqualAreas",
             "Under the two body approximation, a line joining a planet and the sun sweeps out equal areas in equal times.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Under the two body approximation, the square of a planet's orbital period is
@@ -103,7 +104,7 @@ namespace AnointedAutomation.Mathematics
             "OrbitalPeriodSquaredProportionalToAxisCubed",
             "Under the two body approximation, the square of a planet's orbital period is proportional to the cube of its orbit's semi-major axis.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Conservation
 
@@ -114,7 +115,7 @@ namespace AnointedAutomation.Mathematics
             "MomentumConserved",
             "The total momentum of an isolated system is constant.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The total angular momentum of an isolated system is constant.
@@ -123,7 +124,7 @@ namespace AnointedAutomation.Mathematics
             "AngularMomentumConserved",
             "The total angular momentum of an isolated system is constant.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Mass is neither created nor destroyed in a chemical reaction.
@@ -132,7 +133,7 @@ namespace AnointedAutomation.Mathematics
             "MassConserved",
             "Mass is neither created nor destroyed in a chemical reaction.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Thermodynamics
 
@@ -144,7 +145,7 @@ namespace AnointedAutomation.Mathematics
             "ThermalEquilibriumIsTransitive",
             "If two systems are each in thermal equilibrium with a third system, they are in thermal equilibrium with each other.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized perfect crystal, entropy approaches a constant minimum as temperature
@@ -154,7 +155,7 @@ namespace AnointedAutomation.Mathematics
             "EntropyVanishesAtAbsoluteZero",
             "For an idealized perfect crystal, entropy approaches a constant minimum as temperature approaches absolute zero.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Electromagnetism
 
@@ -166,7 +167,7 @@ namespace AnointedAutomation.Mathematics
             "ElectrostaticForceInverseSquareToDistance",
             "For idealized point charges in a vacuum, the electrostatic force between two charges is proportional to the product of the charges over the square of the distance between them.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The electric flux through a closed surface is proportional to the charge enclosed by
@@ -176,7 +177,7 @@ namespace AnointedAutomation.Mathematics
             "ElectricFluxProportionalToEnclosedCharge",
             "The electric flux through a closed surface is proportional to the charge enclosed by that surface.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The net magnetic flux through any closed surface is zero, since magnetic monopoles have
@@ -186,7 +187,7 @@ namespace AnointedAutomation.Mathematics
             "MagneticFluxThroughClosedSurfaceIsZero",
             "The net magnetic flux through any closed surface is zero, since magnetic monopoles have not been observed.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// A changing magnetic flux through a circuit induces an electromotive force in that
@@ -196,7 +197,7 @@ namespace AnointedAutomation.Mathematics
             "ChangingMagneticFluxInducesEmf",
             "A changing magnetic flux through a circuit induces an electromotive force in that circuit.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The circulating magnetic field around a closed loop relates to the electric current and
@@ -206,7 +207,7 @@ namespace AnointedAutomation.Mathematics
             "CirculatingMagneticFieldRelatesToCurrentAndFlux",
             "The circulating magnetic field around a closed loop relates to the electric current and the changing electric flux through the loop.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// An induced current flows in the direction that opposes the change in magnetic flux that
@@ -216,7 +217,7 @@ namespace AnointedAutomation.Mathematics
             "InducedCurrentOpposesFluxChange",
             "An induced current flows in the direction that opposes the change in magnetic flux that produced it.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized steady current, the magnetic field it generates is calculable from the
@@ -226,7 +227,7 @@ namespace AnointedAutomation.Mathematics
             "MagneticFieldCalculableFromSteadyCurrentGeometry",
             "For an idealized steady current, the magnetic field it generates is calculable from the geometry of the current.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized ohmic material, the current through a conductor is proportional to the
@@ -236,7 +237,7 @@ namespace AnointedAutomation.Mathematics
             "CurrentProportionalToVoltage",
             "For an idealized ohmic material, the current through a conductor is proportional to the voltage across it.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Under the lumped circuit approximation, the sum of currents entering a node equals the
@@ -246,7 +247,7 @@ namespace AnointedAutomation.Mathematics
             "CurrentIntoNodeEqualsCurrentOut",
             "Under the lumped circuit approximation, the sum of currents entering a node equals the sum leaving it.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// Under the lumped circuit approximation, the sum of voltages around a closed loop is
@@ -256,7 +257,7 @@ namespace AnointedAutomation.Mathematics
             "VoltageAroundLoopSumsToZero",
             "Under the lumped circuit approximation, the sum of voltages around a closed loop is zero.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// At thermal equilibrium, the emissivity of a body equals its absorptivity at a given
@@ -266,7 +267,7 @@ namespace AnointedAutomation.Mathematics
             "EmissivityEqualsAbsorptivityAtEquilibrium",
             "At thermal equilibrium, the emissivity of a body equals its absorptivity at a given wavelength.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For a constant resistance, the heat produced by a current is proportional to the square
@@ -276,7 +277,7 @@ namespace AnointedAutomation.Mathematics
             "HeatProportionalToCurrentSquared",
             "For a constant resistance, the heat produced by a current is proportional to the square of the current, the resistance, and the time.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an ideal gas, internal energy is independent of volume at constant temperature.
@@ -285,7 +286,7 @@ namespace AnointedAutomation.Mathematics
             "InternalEnergyIndependentOfVolumeForIdealGas",
             "For an ideal gas, internal energy is independent of volume at constant temperature.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For a dilute, non-interacting paramagnetic system, magnetic susceptibility is inversely
@@ -295,7 +296,7 @@ namespace AnointedAutomation.Mathematics
             "MagneticSusceptibilityInverseToTemperature",
             "For a dilute, non-interacting paramagnetic system, magnetic susceptibility is inversely proportional to absolute temperature.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Optics and radiation
 
@@ -307,7 +308,7 @@ namespace AnointedAutomation.Mathematics
             "RefractionRatioEqualsIndexRatio",
             "The ratio of the sines of the angles of incidence and refraction equals the ratio of the refractive indices of the two media.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The angle of incidence equals the angle of reflection.
@@ -316,7 +317,7 @@ namespace AnointedAutomation.Mathematics
             "AngleOfIncidenceEqualsAngleOfReflection",
             "The angle of incidence equals the angle of reflection.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized point source with no absorption, the intensity of radiation is
@@ -326,7 +327,7 @@ namespace AnointedAutomation.Mathematics
             "RadiationIntensityInverseSquareToDistance",
             "For an idealized point source with no absorption, the intensity of radiation is inversely proportional to the square of the distance from the source.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized polarizer, the intensity of polarized light passing through varies as
@@ -337,7 +338,7 @@ namespace AnointedAutomation.Mathematics
             "PolarizedLightIntensityFollowsCosineSquared",
             "For an idealized polarizer, the intensity of polarized light passing through varies as the cosine squared of the angle between the light's polarization and the polarizer's axis.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized perfect black body, the total energy radiated is proportional to the
@@ -347,7 +348,7 @@ namespace AnointedAutomation.Mathematics
             "BlackBodyRadiationProportionalToFourthPowerOfTemperature",
             "For an idealized perfect black body, the total energy radiated is proportional to the fourth power of its absolute temperature.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized perfect black body, the peak wavelength of its radiation is inversely
@@ -357,7 +358,7 @@ namespace AnointedAutomation.Mathematics
             "BlackBodyPeakWavelengthInverseToTemperature",
             "For an idealized perfect black body, the peak wavelength of its radiation is inversely proportional to its absolute temperature.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For an idealized perfect black body, the spectral density of its radiation at a given
@@ -367,7 +368,7 @@ namespace AnointedAutomation.Mathematics
             "BlackBodyRadiationSpectrumDescribedByPlancksLaw",
             "For an idealized perfect black body, the spectral density of its radiation at a given temperature is described by Planck's law of black body radiation.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For a dilute, non-scattering medium under monochromatic light, absorbance is
@@ -377,7 +378,7 @@ namespace AnointedAutomation.Mathematics
             "LightAbsorbanceProportionalToConcentrationAndPathLength",
             "For a dilute, non-scattering medium under monochromatic light, absorbance is proportional to concentration and path length.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         // Fluids
 
@@ -389,7 +390,7 @@ namespace AnointedAutomation.Mathematics
             "PressureTransmittedUndiminishedInEnclosedFluid",
             "For an idealized incompressible fluid, pressure applied to an enclosed fluid is transmitted undiminished throughout the fluid.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// The buoyant force on a submerged body equals the weight of the fluid it displaces.
@@ -398,7 +399,7 @@ namespace AnointedAutomation.Mathematics
             "BuoyantForceEqualsWeightOfDisplacedFluid",
             "The buoyant force on a submerged body equals the weight of the fluid it displaces.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For idealized inviscid, incompressible flow, an increase in fluid speed occurs together
@@ -408,7 +409,7 @@ namespace AnointedAutomation.Mathematics
             "FluidSpeedIncreaseAccompaniesPressureDecrease",
             "For idealized inviscid, incompressible flow, an increase in fluid speed occurs together with a decrease in pressure or potential energy.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
 
         /// <summary>
         /// For idealized inviscid, frictionless flow, the speed of fluid efflux from an orifice
@@ -418,6 +419,6 @@ namespace AnointedAutomation.Mathematics
             "FluidEffluxSpeedRelatesToHeight",
             "For idealized inviscid, frictionless flow, the speed of fluid efflux from an orifice relates to the height of fluid above it.",
             Testability.EmpiricallyTestable,
-            true);
+            TruthValue.True);
     }
 }

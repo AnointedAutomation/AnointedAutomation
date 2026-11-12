@@ -128,7 +128,8 @@
       },
       "keyNamespaces": [
         "AnointedAutomation.Concepts",
-        "AnointedAutomation.Concepts.Epistemics"
+        "AnointedAutomation.Concepts.Epistemics",
+        "AnointedAutomation.Concepts.Reasoning"
       ],
       "keyTypes": [
         "Love",
@@ -150,9 +151,17 @@
         "Bond",
         "Creed",
         "EpistemicLedger",
-        "FoundationalClaim"
+        "FoundationalClaim",
+        "TruthValue",
+        "TruthLogic",
+        "ConceptRef",
+        "Assertion",
+        "Query",
+        "Answer",
+        "Provenance",
+        "IReasoner"
       ],
-      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts."
+      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts. The Reasoning namespace adds the dual reasoning engine contracts (TruthValue with Kleene logic, Assertion, Query, Answer, Provenance, IReasoner); Proposition.Standing and Examination.Standing are TruthValue (were bool?). Only the owner can approve promoting an AI interpretation into a permanent fact."
     },
     {
       "id": "AnointedAutomation.Enums",
