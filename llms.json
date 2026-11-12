@@ -116,7 +116,7 @@
     },
     {
       "id": "AnointedAutomation.Concepts",
-      "version": "2.3.0",
+      "version": "2.3.1",
       "targetFramework": "net10.0",
       "description": "Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts",
