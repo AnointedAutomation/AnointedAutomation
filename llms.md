@@ -78,10 +78,10 @@ app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
-- Depends on: NuGet none; AnointedAutomation none
+- Depends on: NuGet none; AnointedAutomation AnointedAutomation.Enums
 - Namespaces: `AnointedAutomation.Concepts`, `AnointedAutomation.Concepts.Epistemics`
-- Key types: `Love`, `LoveAction`, `Situation`, `MoralConcept`, `Trinity`, `DivinePerson`, `Presence`, `Bond`, `Creed`, `EpistemicLedger`, `FoundationalClaim`
-- Notes: Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity (one essence, three distinct Persons, undivided works), the triadic coherence rule (ground x Word x Spirit), the love triad (lover x beloved x Bond) with a binary commitment gate, and `Creed.ToJson()` / `Creed.ToPrompt()` for AI system prompts.
+- Key types: `Love`, `LoveAction`, `Situation`, `MoralConcept`, `Trinity`, `DivinePerson`, `Presence`, `Bond`, `Creed`, `EpistemicLedger`, `FoundationalClaim`, `SinCatalog`, `SinEntry`, `SinId`, `SinCategory`, `CataloguedSin`, `ScriptureReference`, `BibleBook`, `ISinConsequence<T>`, `SinConsequenceRegistry<T>`
+- Notes: Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity (one essence, three distinct Persons, undivided works), the triadic coherence rule (ground x Word x Spirit), the love triad (lover x beloved x Bond) with a binary commitment gate, and `Creed.ToJson()` / `Creed.ToPrompt()` for AI system prompts. Sin catalog (additive): `SinCatalog` holds 668 Scripture-referenced entries (stable `SinId` values, 0 = Unknown; #367 is an omitted placeholder; the duplicate #566 is id 668), lookups by id, `SinCategory` and coarse `Enums.Sin`; `SinCatalog.Concept(id)` returns a `CataloguedSin` MoralConcept that `Reality.Witness` reads like any vice; consumers attach effects through `ISinConsequence<T>` / `SinConsequenceRegistry<T>`.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts/README.md)
 
 ```bash

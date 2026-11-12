@@ -14,7 +14,7 @@ namespace AnointedAutomation.Concepts.Tests
             List<System.Type> types = new List<System.Type>();
             foreach (System.Type type in baseType.Assembly.GetTypes())
             {
-                if (!type.IsAbstract && baseType.IsAssignableFrom(type))
+                if (!type.IsAbstract && baseType.IsAssignableFrom(type) && type.GetConstructor(System.Type.EmptyTypes) != null)
                 {
                     types.Add(type);
                 }

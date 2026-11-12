@@ -22,7 +22,7 @@ namespace AnointedAutomation.Concepts.Tests.Canon
         {
             Type baseType = typeof(MoralConcept);
             return baseType.Assembly.GetTypes()
-                .Where(t => !t.IsAbstract && baseType.IsAssignableFrom(t))
+                .Where(t => !t.IsAbstract && baseType.IsAssignableFrom(t) && t.GetConstructor(Type.EmptyTypes) != null)
                 .Select(t => (MoralConcept)Activator.CreateInstance(t));
         }
 
