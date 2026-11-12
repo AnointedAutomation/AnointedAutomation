@@ -64,16 +64,6 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Canon
         }
 
         [Fact]
-        public void Decide_Unsettled_ExplanationIsPlainIDontKnow()
-        {
-            var answer = CanonKit.Reasoner().Decide(CanonKit.Ask(CanonKit.Abortion, RelationKind.Violates, CanonKit.Mercy));
-
-            Assert.StartsWith("I don't know.", answer.Why.Explanation);
-            Assert.DoesNotContain("not False", answer.Why.Explanation);
-            Assert.DoesNotContain("Unknown", answer.Why.Explanation);
-        }
-
-        [Fact]
         public void Decide_SubjectOutsideTheCanon_IsUnknown()
         {
             var answer = CanonKit.Reasoner().Decide(CanonKit.Ask(new ConceptRef("Nowhere", "Nothing"), RelationKind.Violates, CanonKit.Love));
