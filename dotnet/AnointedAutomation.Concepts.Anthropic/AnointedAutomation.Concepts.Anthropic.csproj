@@ -31,9 +31,9 @@
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Concepts\AnointedAutomation.Concepts.csproj" />
 		<PackageReference Include="Anthropic" Version="13.8.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.15" />
-		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.15" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.15" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="11.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0" />
 	</ItemGroup>
 
 </Project>
