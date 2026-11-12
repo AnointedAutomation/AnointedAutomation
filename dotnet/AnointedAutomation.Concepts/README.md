@@ -239,7 +239,7 @@ For a ready made set of foundational claims (64 laws, 12 theories and 3 conjectu
 
 Namespace: `AnointedAutomation.Concepts.Reasoning`
 
-The shared contracts for the reasoning engines (a deterministic canon engine, a language engine, and a hybrid) behind one API. This release ships the contracts only; the engines follow.
+The shared contracts for the reasoning engines (a deterministic canon engine, a language engine, and a hybrid) behind one API. The deterministic `CanonReasoner` ships in 2.1.0; the language and hybrid engines follow.
 
 | Type | Description |
 |---|---|
@@ -255,6 +255,35 @@ The shared contracts for the reasoning engines (a deterministic canon engine, a 
 | `Provenance` | `Source`, `Model`, `At`, `Status`, `RuleOrPromptId`; every field required, no defaults. |
 | `Answer` | `Query`, `Truth`, `Confidence` (0.0 to 1.0), `Classification` (`ConceptRef` list), `Why`, `Provenance`. |
 | `IReasoner` | `Task<Answer> Ask(Query, CancellationToken)`. |
+
+### CanonReasoner (deterministic engine)
+
+`CanonReasoner : IReasoner` answers from Scripture-grounded canon facts and small rules. It is offline and deterministic, with no AI or network dependency: the same query over the same facts always gets the same answer.
+
+```csharp
+using AnointedAutomation.Concepts;
+using AnointedAutomation.Concepts.Reasoning;
+
+CanonReasoner canon = new CanonReasoner(TimeProvider.System);
+Query query = new Query(
+    new Assertion(ConceptRef.Of(SinId.Abortion), RelationKind.Violates, new ConceptRef(CanonFacts.AttributeKind, "Justice")),
+    new List<Circumstance>());
+Answer answer = await canon.Ask(query, CancellationToken.None);
+// answer.Truth == TruthValue.True, Confidence 1.0, answer.Why.Scripture cites Exodus 21:22-25, Jeremiah 1:4 and Jeremiah 1:5.
+```
+
+| Type | Description |
+|---|---|
+| `CanonFacts` | Immutable, thread-safe index built once (`CanonFacts.Canon`) from `SinCatalog.All`, every public `MoralConcept` type and the facets of God's revealed character. Each `CanonFact` is an `Assertion` plus at least one `ScriptureReference`. Hash lookups by (subject, relation) (`About`) or whole assertion (`TryGetFact`); `With(facts)` returns an extended copy. |
+| `ICanonRule` | `Id`, `Relation`, `Apply(Query, CanonFacts, out ProofStep[], out CanonFact[])`. |
+| `SinViolatesRule` | A catalogued sin violates a facet when `CataloguedSin.Violates(facet)`; otherwise Unknown. |
+| `CategoryRule` | `InCategory` from `SinEntry.Category`; a catalogued sin has one category, so another category is False. |
+| `IsInstanceOfRule` | A sin is an instance of its coarse `Sin` and grounding vice; another coarse sin is False. |
+| `WitnessRule` | `Upholds CanonFacts.RevealedCharacter`: runs `Reality.Witness` in the query context; coherence above 0.5 with no disorder is True, below 0.5 with disorder is False, else Unknown. |
+| `FactRule` | A stated fact is True; a stated contrary (`Forbids` against `Upholds`/`Commands`) is False. |
+| `CanonRules.Default` | The rules above, in evaluation order. |
+
+A missing fact or rule gives Unknown (confidence 0), never False. False only comes from a stated contrary or a rule that proves the negation. An established answer has confidence 1.0, proof steps, the facts used and their Scripture, and `Provenance(Canon, "canon", now, Verified, rule id)`. Two rules establishing opposite answers throw (a canon contradiction). `ScriptureReference.Parse("1 Corinthians 13:4")` reads display references.
 
 Only the owner can approve promoting an AI (language engine) interpretation into a permanent fact; `Provenance` records where an answer came from and never grants that.
 
