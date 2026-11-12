@@ -17,7 +17,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
         /// <param name="reply">The raw reply, kept in full for the log.</param>
         /// <param name="inner">The underlying parse or validation error, or null when there is none.</param>
         public InterpretationRejected(string reason, string reply, Exception inner)
-            : base("Language model reply rejected: " + reason + " Reply: " + reply, inner)
+            : base("Language model reply rejected: " + reason, inner)
         {
             Reason = reason;
             Reply = reply;

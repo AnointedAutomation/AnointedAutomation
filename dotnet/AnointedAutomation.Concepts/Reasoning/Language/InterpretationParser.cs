@@ -2,6 +2,7 @@
 // Stewarded by Alexander Fields
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -20,6 +21,20 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
         private static readonly string[] RootFields = { "classification", "truth", "confidence", "explanation", "scripture", "sinIds", "assertions" };
         private static readonly string[] ConceptFields = { "kind", "id" };
         private static readonly string[] AssertionFields = { "subject", "relation", "object" };
+
+        /// <summary>
+        /// The concept kinds a reply may use; any other kind (including a different casing) is rejected.
+        /// </summary>
+        public static readonly IReadOnlyList<string> KnownKinds = Array.AsReadOnly(new[]
+        {
+            ConceptRef.SinKind,
+            ConceptRef.MoralConceptKind,
+            CanonFacts.AttributeKind,
+            CanonFacts.CategoryKind,
+            CanonFacts.CoarseSinKind,
+            CanonFacts.ScriptureKind,
+            CanonFacts.CharacterKind,
+        });
 
         private readonly ILogger<InterpretationParser> logger;
 
@@ -226,6 +241,11 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
             if (string.IsNullOrWhiteSpace(kind) || string.IsNullOrWhiteSpace(id))
             {
                 throw new InterpretationRejected(where + " needs a kind and an id.", reply, null);
+            }
+
+            if (!KnownKinds.Contains(kind))
+            {
+                throw new InterpretationRejected(where + " has unknown kind '" + kind + "'.", reply, null);
             }
 
             if (kind.Equals(ConceptRef.SinKind, StringComparison.Ordinal))

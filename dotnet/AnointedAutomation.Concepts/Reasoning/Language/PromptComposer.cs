@@ -91,8 +91,8 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
             text.Append("matching this JSON schema exactly. A missing, extra or invalid field rejects the whole reply.\n");
             text.Append(ReplySchema).Append("\n\n");
             text.Append("Rules:\n");
-            text.Append("- \"classification\": every concept the situation falls under, as {\"kind\", \"id\"} (kinds such as \"").Append(ConceptRef.SinKind)
-                .Append("\" or \"").Append(ConceptRef.MoralConceptKind).Append("\").\n");
+            text.Append("- \"classification\": every concept the situation falls under, as {\"kind\", \"id\"}; \"kind\" is one of: ")
+                .Append(string.Join(", ", InterpretationParser.KnownKinds)).Append(".\n");
             text.Append("- \"truth\": \"true\", \"false\" or \"unknown\". Answer \"unknown\" when Scripture does not settle it; never \"false\" for lack of proof.\n");
             text.Append("- \"confidence\": a number from 0 to 1.\n");
             text.Append("- \"explanation\": the reasoning in plain words.\n");

@@ -11,8 +11,8 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Language
     public class PromptComposerTests
     {
         [Theory]
-        [InlineData("prompt-abortion-violates-love.txt", false, "prompt-ee05fad796731622")]
-        [InlineData("prompt-compassion-upholds-mercy-context.txt", true, "prompt-5ca13e3196f09cd5")]
+        [InlineData("prompt-abortion-violates-love.txt", false, "prompt-3fc269faa5359a68")]
+        [InlineData("prompt-compassion-upholds-mercy-context.txt", true, "prompt-c4fa1cef534aa07c")]
         public void Compose_MatchesGoldenTextAndId(string golden, bool withContext, string expectedId)
         {
             ComposedPrompt prompt = PromptComposer.Compose(withContext ? LanguageKit.CompassionUpholdsMercyInContext() : LanguageKit.AbortionViolatesLove());

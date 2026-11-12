@@ -42,6 +42,7 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Language
             InterpretationRejected rejected = Assert.Throws<InterpretationRejected>(() => LanguageKit.Parser(logger).Parse(reply, "prompt-x", LanguageKit.ModelName));
 
             Assert.Equal(reply, rejected.Reply);
+            Assert.DoesNotContain(reply, rejected.Message);
             Assert.Contains(expectedReason, rejected.Reason);
             var entry = Assert.Single(logger.Entries);
             Assert.Equal(LogLevel.Error, entry.Level);
@@ -75,6 +76,9 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Language
         [InlineData("\"sinIds\": [\"Abortion\"]", "\"sinIds\": [\"Omitted367\"]")]
         [InlineData("\"sinIds\": [\"Abortion\"]", "\"sinIds\": [\"abortion\"]")]
         [InlineData("{\"kind\": \"Sin\", \"id\": \"Abortion\"}, {", "{\"kind\": \"Sin\", \"id\": \"NotASin\"}, {")]
+        [InlineData("{\"kind\": \"Sin\", \"id\": \"Abortion\"}, {", "{\"kind\": \"sin\", \"id\": \"NotASin\"}, {")]
+        [InlineData("{\"kind\": \"Sin\", \"id\": \"Abortion\"}, {", "{\"kind\": \" Sin\", \"id\": \"Abortion\"}, {")]
+        [InlineData("\"kind\": \"DivineAttribute\"", "\"kind\": \"Angel\"")]
         [InlineData("\"relation\": \"Violates\"", "\"relation\": \"None\"")]
         [InlineData("\"relation\": \"Violates\"", "\"relation\": \"Loves\"")]
         [InlineData("\"id\": \"Love\"}", "\"id\": \"Love\", \"weight\": 2}")]
