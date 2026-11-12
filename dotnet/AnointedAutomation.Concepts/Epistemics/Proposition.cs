@@ -49,7 +49,7 @@ namespace AnointedAutomation.Concepts.Epistemics
             Name = name;
             Description = description;
             Testability = testability;
-            Standing = standing;
+            Standing = ReasoningGuard.Defined(standing, nameof(standing));
         }
 
         /// <summary>

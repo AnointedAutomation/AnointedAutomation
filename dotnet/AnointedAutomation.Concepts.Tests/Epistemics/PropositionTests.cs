@@ -35,6 +35,16 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
         }
 
         [Fact]
+        public void Proposition_RejectsAnUndefinedStanding()
+        {
+            Assert.Throws<System.ArgumentOutOfRangeException>(() => new Proposition(
+                "EntropyIncreases",
+                "Entropy of a closed system does not decrease.",
+                Testability.EmpiricallyTestable,
+                (TruthValue)7));
+        }
+
+        [Fact]
         public void Proposition_EqualityIsByName()
         {
             Proposition a = new Proposition("Creator", "one wording", Testability.BeyondObservation);

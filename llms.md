@@ -74,7 +74,7 @@ app.UseMiddleware<InvalidEndpointTrackerMiddleware>();
 app.UseMiddleware<ApiKeyAuthMiddleware>("X-Api-Key", expectedKey, "/api");
 ```
 
-### AnointedAutomation.Concepts 1.1.3
+### AnointedAutomation.Concepts 2.0.0
 
 Theological concepts modeled as code, including a claim consistency engine. Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.
 
@@ -163,7 +163,7 @@ LogMessage.MessageSourceSetter = "MyService";
 LogMessage msg = LogMessage.Error("Payment webhook failed");
 ```
 
-### AnointedAutomation.Mathematics 1.0.5
+### AnointedAutomation.Mathematics 2.0.0
 
 Ready-made foundational claims to seed an EpistemicLedger. A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.
 

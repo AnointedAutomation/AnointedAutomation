@@ -92,8 +92,8 @@ namespace AnointedAutomation.Concepts.Tests.Epistemics
             Assert.Equal(Verdict.Unfalsifiable, ledger.Examine(theism).Verdict);
             Assert.Equal(Verdict.Unfalsifiable, ledger.Examine(atheism).Verdict);
             Assert.Equal(Verdict.Unfalsifiable, ledger.Examine(eternalMatter).Verdict);
-            Assert.Null(ledger.Examine(theism).Standing);
-            Assert.Null(ledger.Examine(atheism).Standing);
+            Assert.Equal(TruthValue.Unknown, ledger.Examine(theism).Standing);
+            Assert.Equal(TruthValue.Unknown, ledger.Examine(atheism).Standing);
         }
 
         [Fact]
