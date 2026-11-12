@@ -193,6 +193,12 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   Microsoft.Extensions.Logging.Abstractions). LanguageReasoner.cs (one model call per query; Answer is Language and
   Unverified; Interpret returns LanguageResult.cs with the whole interpretation). Reasoning/AnswerDescriber.cs renders
   any Answer as text. Tests: Reasoning/Language/ with golden prompt, reply-fixture and Describe files in Golden/.
+- HybridReasoner (Reasoning/Hybrid/, namespace AnointedAutomation.Concepts.Reasoning.Hybrid, dual engine PR 4 of 5):
+  HybridReasoner.cs (canon first; on Unknown one LanguageReasoner.Interpret call per owner, query and model, recorded
+  in the ledger; HybridResult.cs carries the entry). InterpretationLedger.cs (owner-scoped cache, Get, paged List,
+  Promote and Reject through an injected IPromotionPolicy.cs with no default) over IInterpretationStore.cs
+  (InMemoryInterpretationStore.cs in core). InterpretationEntry.cs, InterpretationStatus.cs, OwnerScope.cs,
+  Reviewer.cs, InterpretationPage.cs, FactPromotion.cs (never mutates CanonFacts). Tests: Reasoning/Hybrid/.
 
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with
