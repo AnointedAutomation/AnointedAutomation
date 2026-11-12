@@ -18,6 +18,8 @@ namespace AnointedAutomation.Logging.Tests
             Assert.Equal(4, (int)MessageType.Message);
             Assert.Equal(5, (int)MessageType.Critical);
             Assert.Equal(6, (int)MessageType.Celebrate);
+            Assert.Equal(7, (int)MessageType.Debug);
+            Assert.Equal(8, (int)MessageType.Trace);
         }
     }
 }
