@@ -1,0 +1,9 @@
+{
+  "classification": [{"kind": "Sin", "id": "Abortion"}, {"kind": "MoralConcept", "id": "Murder"}],
+  "truth": "true",
+  "confidence": 0.9,
+  "explanation": "Taking an unborn life sheds innocent blood, which God's love forbids.",
+  "scripture": ["Exodus 21:22-25", "Jeremiah 1:5", "Psalms 139:13"],
+  "sinIds": ["Abortion"],
+  "assertions": [{"subject": {"kind": "Sin", "id": "Abortion"}, "relation": "Violates", "object": {"kind": "DivineAttribute", "id": "Love"}}]
+}

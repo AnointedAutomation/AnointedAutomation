@@ -186,6 +186,13 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
   relation, first established answer wins, opposite answers throw; Unknown when nothing settles it.
   ScriptureReference.Parse reads display references. Tests: Reasoning/Canon/ (rule unit tests, FsCheck
   properties, oracle regression).
+- LanguageReasoner (Reasoning/Language/, namespace AnointedAutomation.Concepts.Reasoning.Language, dual engine
+  PR 3 of 5): ILanguageModel.cs (the port; no AI SDK or network in core). PromptComposer.cs (deterministic prompt
+  plus the exact ReplySchema; ComposedPrompt id = SHA-256 prefix). InterpretationParser.cs (strict JSON into
+  Interpretation.cs; any invalid reply throws InterpretationRejected.cs, logged at Error in full via
+  Microsoft.Extensions.Logging.Abstractions). LanguageReasoner.cs (one model call per query; Answer is Language and
+  Unverified; Interpret returns LanguageResult.cs with the whole interpretation). Reasoning/AnswerDescriber.cs renders
+  any Answer as text. Tests: Reasoning/Language/ with golden prompt, reply-fixture and Describe files in Golden/.
 
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
 Namespace `AnointedAutomation.Mathematics`. Curated catalogs that feed the epistemics engine with

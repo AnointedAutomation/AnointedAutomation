@@ -1,0 +1,11 @@
+Question: does MoralConcept:Compassion Upholds DivineAttribute:Mercy hold?
+Context: A neighbor is hungry
+Answer: True (confidence 1)
+Source: Canon engine, model canon, Verified, from canon.test-rule at 2026-11-12T00:00:00+00:00
+Classified as: none
+Reasoning:
+  1. Compassion is an act of mercy. [Upholds(Compassion, Mercy)]
+Facts used:
+  - MoralConcept:Compassion Upholds DivineAttribute:Mercy
+Explanation: Compassion upholds mercy.
+Scripture: Luke 6:36

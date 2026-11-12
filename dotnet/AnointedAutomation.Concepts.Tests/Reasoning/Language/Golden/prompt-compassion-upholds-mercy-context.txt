@@ -1,0 +1,59 @@
+You are interpreting a moral question against Scripture for the AnointedAutomation.Concepts reasoning engine.
+
+Question: does this assertion hold?
+Subject: MoralConcept:Compassion
+Relation: Upholds
+Object: DivineAttribute:Mercy
+
+Scripture already tied to these concepts:
+- MoralConcept:Compassion: none recorded
+- DivineAttribute:Mercy: none recorded
+
+Context:
+- A neighbor is hungry
+- It is the Sabbath
+
+Answer everything below in this one reply. Reply with ONLY one JSON object, with no prose and no code fences, matching this JSON schema exactly. A missing, extra or invalid field rejects the whole reply.
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["classification", "truth", "confidence", "explanation", "scripture", "sinIds", "assertions"],
+  "properties": {
+    "classification": { "type": "array", "items": { "$ref": "#/$defs/concept" } },
+    "truth": { "enum": ["true", "false", "unknown"] },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "explanation": { "type": "string", "minLength": 1 },
+    "scripture": { "type": "array", "items": { "type": "string" } },
+    "sinIds": { "type": "array", "items": { "type": "string" } },
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["subject", "relation", "object"],
+        "properties": {
+          "subject": { "$ref": "#/$defs/concept" },
+          "relation": { "type": "string" },
+          "object": { "$ref": "#/$defs/concept" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": { "kind": { "type": "string", "minLength": 1 }, "id": { "type": "string", "minLength": 1 } }
+    }
+  }
+}
+
+Rules:
+- "classification": every concept the situation falls under, as {"kind", "id"} (kinds such as "Sin" or "MoralConcept").
+- "truth": "true", "false" or "unknown". Answer "unknown" when Scripture does not settle it; never "false" for lack of proof.
+- "confidence": a number from 0 to 1.
+- "explanation": the reasoning in plain words.
+- "scripture": references of the form "Book chapter:verse" or "Book chapter:verse-verse", for example "1 Corinthians 13:4". Cite only verses that exist.
+- "sinIds": candidate SinId names from the AnointedAutomation sin catalog, for example "Abortion".
+- "assertions": suggested assertions; "relation" is one of: Violates, Upholds, IsInstanceOf, InCategory, HasGravity, GroundedIn, Commands, Forbids.

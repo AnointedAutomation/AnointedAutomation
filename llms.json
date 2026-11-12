@@ -116,20 +116,21 @@
     },
     {
       "id": "AnointedAutomation.Concepts",
-      "version": "2.1.0",
+      "version": "2.2.0",
       "targetFramework": "net10.0",
       "description": "Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts/README.md",
       "dependencies": {
-        "nuget": [],
+        "nuget": ["Microsoft.Extensions.Logging.Abstractions"],
         "anointed": ["AnointedAutomation.Enums"]
       },
       "keyNamespaces": [
         "AnointedAutomation.Concepts",
         "AnointedAutomation.Concepts.Epistemics",
-        "AnointedAutomation.Concepts.Reasoning"
+        "AnointedAutomation.Concepts.Reasoning",
+        "AnointedAutomation.Concepts.Reasoning.Language"
       ],
       "keyTypes": [
         "Love",
@@ -162,12 +163,17 @@
         "IReasoner",
         "CanonReasoner",
         "CanonFacts",
-        "ICanonRule"
+        "ICanonRule",
+        "LanguageReasoner",
+        "ILanguageModel",
+        "PromptComposer",
+        "InterpretationParser",
+        "AnswerDescriber"
       ],
       "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts. The Reasoning namespace adds the dual reasoning engine contracts (TruthValue with Kleene logic, Assertion, Query, Answer, Provenance, IReasoner) and, in 2.1.0, CanonReasoner (deterministic, offline, Scripture-grounded; Unknown is never False); Proposition.Standing and Examination.Standing are TruthValue (were bool?). Only the owner can approve promoting an AI interpretation into a permanent fact."
     },
     {
-      "id": "AnointedAutomation.Enums",
+      "id": "AnointedAutomation.Enums 2.2.0 adds LanguageReasoner (Reasoning.Language): an ILanguageModel port with no AI SDK in core, a deterministic PromptComposer that asks once for every field as one JSON object, a strict InterpretationParser that rejects any invalid reply (InterpretationRejected, logged in full), Language answers that are always Unverified, and AnswerDescriber.Describe for any answer.",
       "version": "1.0.7",
       "targetFramework": "net10.0",
       "description": "Shared enumerations for AnointedAutomation packages: payment types, providers, transaction and subscription statuses, payment operations, card types, webhook events, and moderation categories.",

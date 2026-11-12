@@ -27,4 +27,8 @@
     <ProjectReference Include="..\AnointedAutomation.Concepts\AnointedAutomation.Concepts.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Reasoning\Language\Golden\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
