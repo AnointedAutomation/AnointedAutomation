@@ -142,7 +142,7 @@ namespace AnointedAutomation.Concepts.Reasoning
 
         /// <summary>
         /// Builds the answer: classification from the subject's category and instance facts, Scripture
-        /// from the grounding facts, and canon provenance.
+        /// from the grounding facts, and canon provenance (Verified when established, Unverified when Unknown).
         /// </summary>
         /// <param name="query">The query.</param>
         /// <param name="chosen">The rule that settled it, or null when none did.</param>
@@ -188,7 +188,7 @@ namespace AnointedAutomation.Concepts.Reasoning
                 chosen == null ? 0.0 : 1.0,
                 classification,
                 new Justification(steps, scripture, used, explanation),
-                new Provenance(AnswerSource.Canon, ModelName, clock.GetUtcNow(), VerificationStatus.Verified, chosen == null ? NoRuleId : chosen.Id));
+                new Provenance(AnswerSource.Canon, ModelName, clock.GetUtcNow(), chosen == null ? VerificationStatus.Unverified : VerificationStatus.Verified, chosen == null ? NoRuleId : chosen.Id));
         }
     }
 }

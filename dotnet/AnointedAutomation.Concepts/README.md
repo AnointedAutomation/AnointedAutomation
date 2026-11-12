@@ -283,7 +283,7 @@ Answer answer = await canon.Ask(query, CancellationToken.None);
 | `FactRule` | A stated fact is True; a stated contrary (`Forbids` against `Upholds`/`Commands`) is False. |
 | `CanonRules.Default` | The rules above, in evaluation order. |
 
-A missing fact or rule gives Unknown (confidence 0), never False. False only comes from a stated contrary or a rule that proves the negation. An established answer has confidence 1.0, proof steps, the facts used and their Scripture, and `Provenance(Canon, "canon", now, Verified, rule id)`. Two rules establishing opposite answers throw (a canon contradiction). `ScriptureReference.Parse("1 Corinthians 13:4")` reads display references.
+A missing fact or rule gives Unknown (confidence 0), never False. False only comes from a stated contrary or a rule that proves the negation. An established answer has confidence 1.0, proof steps, the facts used and their Scripture, and `Provenance(Canon, "canon", now, Verified, rule id)`; an Unknown answer is `Unverified` with rule id `canon.none`. Two rules establishing opposite answers throw (a canon contradiction). `ScriptureReference.Parse("1 Corinthians 13:4")` reads display references.
 
 Only the owner can approve promoting an AI (language engine) interpretation into a permanent fact; `Provenance` records where an answer came from and never grants that.
 

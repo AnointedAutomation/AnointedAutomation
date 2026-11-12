@@ -59,6 +59,7 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Canon
             Assert.Empty(answer.Why.Scripture);
             Assert.Empty(answer.Why.FactsUsed);
             Assert.Equal(CanonReasoner.NoRuleId, answer.Provenance.RuleOrPromptId);
+            Assert.Equal(VerificationStatus.Unverified, answer.Provenance.Status);
         }
 
         [Fact]
@@ -66,6 +67,7 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Canon
         {
             var answer = CanonKit.Reasoner().Decide(CanonKit.Ask(new ConceptRef("Nowhere", "Nothing"), RelationKind.Violates, CanonKit.Love));
             Assert.Equal(TruthValue.Unknown, answer.Truth);
+            Assert.Equal(VerificationStatus.Unverified, answer.Provenance.Status);
             Assert.Empty(answer.Classification);
         }
 
