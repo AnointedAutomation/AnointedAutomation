@@ -60,6 +60,17 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Canon
             Assert.Empty(answer.Why.FactsUsed);
             Assert.Equal(CanonReasoner.NoRuleId, answer.Provenance.RuleOrPromptId);
             Assert.Equal(VerificationStatus.Unverified, answer.Provenance.Status);
+            Assert.Equal("I don't know. No scripture fact or rule in the catalog settles this question.", answer.Why.Explanation);
+        }
+
+        [Fact]
+        public void Decide_Unsettled_ExplanationIsPlainIDontKnow()
+        {
+            var answer = CanonKit.Reasoner().Decide(CanonKit.Ask(CanonKit.Abortion, RelationKind.Violates, CanonKit.Mercy));
+
+            Assert.StartsWith("I don't know.", answer.Why.Explanation);
+            Assert.DoesNotContain("not False", answer.Why.Explanation);
+            Assert.DoesNotContain("Unknown", answer.Why.Explanation);
         }
 
         [Fact]
