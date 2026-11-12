@@ -2,7 +2,7 @@
 
 Jesus is King ✝️
 
-A small log message model with no dependencies for .NET. `LogMessage` captures the message, severity, timestamp, program name and calling method, and raises a static event every time one is created so you can route logs wherever you like.
+A small log message model for .NET. `LogMessage` captures the message, severity, timestamp, program name and calling method, and raises a static event every time one is created so you can route logs wherever you like.
 
 [![NuGet](https://img.shields.io/nuget/v/AnointedAutomation.Logging.svg)](https://www.nuget.org/packages/AnointedAutomation.Logging) [![Downloads](https://img.shields.io/nuget/dt/AnointedAutomation.Logging.svg)](https://www.nuget.org/packages/AnointedAutomation.Logging)
 
@@ -13,7 +13,7 @@ dotnet add package AnointedAutomation.Logging
 ```
 
 - Target framework: `net10.0`
-- Dependencies: none
+- Dependencies: Microsoft.Extensions.Logging.Abstractions (only for the `LogMessageLogger` ILogger adapter)
 
 ## Quick start
 
@@ -123,3 +123,29 @@ This library is free and open source. The best way to support the work is to sho
 - **Everything else:** [https://www.mart.club](https://www.mart.club)
 
 Found a bug or have a request? Open an issue at [https://github.com/AnointedAutomation/AnointedAutomation/issues](https://github.com/AnointedAutomation/AnointedAutomation/issues).
+
+## Structured logging (1.1.0)
+
+```csharp
+// Up to four properties inline; they land in structuredProperties and, as JSON, in properties.
+LogMessage.Warning($"Refund failed for order {orderId}", ex, ("orderId", orderId), ("store", storeSlug));
+LogMessage.Debug($"cache miss {key}");          // MessageType.Debug = 7, Trace = 8 (appended, never renumbered)
+
+// Scopes flow through awaits and tasks (AsyncLocal); inner scopes and call-site values win on a repeated key.
+using IDisposable scope = LogMessage.Scope(("orderId", orderId));
+
+// category is the caller file name ("OrderService") by default; For<T>() stamps the type's full name instead.
+private static readonly LogSource Log = LogMessage.For<OrderService>();
+Log.Error("capture failed", ex, ("orderId", orderId));
+```
+
+| Type | Purpose |
+|---|---|
+| `LogCapture` | Test helper: `using LogCapture capture = LogCapture.Start();` records the messages of the current async flow only, so parallel xUnit/NUnit tests never see each other's logs. `Entries`, `OfLevel`, `Contains`. |
+| `LogThrottle` | Shared store throttle: 5 identical rows, 50 per template (200 for Errors) per 10-minute window, Critical never throttled; `TakeSummaries(force)` returns one summary per key that suppressed rows. |
+| `LogMessageLogger` / `LogMessageLoggerProvider` | `ILogger` adapter for third-party APIs that require one; writes through `LogMessage` with state pairs as properties. |
+
+Startup ordering: messages raised before the first `LogAdded` subscriber ever attaches are buffered (up to
+`LogMessage.PreSubscriptionBufferCapacity`, 1000; oldest dropped) and delivered to that subscriber, followed by one Warning
+with the dropped count if any were dropped. `LogAdded` handlers run synchronously on the logging thread: keep them fast and
+queue any I/O.

@@ -1,5 +1,6 @@
-// Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-06-12 11:24:21 Jesus is King ✝️
+﻿// Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-06-12 11:24:21 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
+// Edited 2026-11-12: appended Debug = 7 and Trace = 8.
 //Stewarded by Alexander Fields
 
 namespace AnointedAutomation.Optimization.Logging
@@ -36,6 +37,15 @@ namespace AnointedAutomation.Optimization.Logging
         /// <summary>
         /// Indicates a significant achievement or milestone.
         /// </summary>
-        Celebrate = 6
+        Celebrate = 6,
+        /// <summary>
+        /// Diagnostic detail useful while developing or investigating; hosts usually do not persist it in production.
+        /// Appended in 2026-11: values are a wire format, never renumber.
+        /// </summary>
+        Debug = 7,
+        /// <summary>
+        /// The most verbose tracing detail; hosts usually drop it. Appended in 2026-11: never renumber.
+        /// </summary>
+        Trace = 8
     }
 }
