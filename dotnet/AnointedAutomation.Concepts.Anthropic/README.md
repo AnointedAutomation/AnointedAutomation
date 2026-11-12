@@ -70,7 +70,7 @@ policy must allow only the owner's `Reviewer` (there is no default policy).
   `InterpretationParser` still validates every reply and throws `InterpretationRejected` for anything malformed.
 - 429, 408, 5xx, overload, network errors and timeouts are retried with exponential backoff (starting at
   `RetryBaseDelayMilliseconds`, capped at 30 seconds) for at most `MaxAttempts` calls in total, then raised as
-  `AnthropicTransientException`. A 429's `Retry-After` header wins over the local backoff (still capped). The SDK's own retries are off so there is one bounded policy.
+  `AnthropicTransientException`. A `Retry-After` header on any retried response (429, 408, overloaded, 5xx) wins over the local backoff (still capped). The SDK's own retries are off so there is one bounded policy.
 - 401 and 403 raise `AnthropicConfigurationException` immediately and are logged at Critical.
 - Other API errors (for example 400) are logged at Error with the request id and rethrown as the SDK exception.
 - Cancellation is rethrown quietly and never retried.
