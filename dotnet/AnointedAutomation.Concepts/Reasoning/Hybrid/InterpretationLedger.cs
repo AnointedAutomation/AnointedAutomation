@@ -43,7 +43,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Hybrid
         /// <param name="queryKey">The query hash (the composed prompt id).</param>
         /// <param name="model">The model name.</param>
         /// <param name="ask">Asks the language engine; called at most once per owner, query and model.</param>
-        /// <param name="cancellationToken">Cancels the read, the ask and the write.</param>
+        /// <param name="cancellationToken">Cancels only this caller's wait; the shared ask runs to completion.</param>
         /// <returns>The cached or newly recorded entry.</returns>
         public async Task<InterpretationEntry> GetOrRecord(
             OwnerScope owner,
