@@ -53,6 +53,8 @@ jobs:
           owner=${REPO%/*}
           name=${REPO#*/}
           failed=0
+          # Run-wide budget for waiting out fresh reviews (job timeout is 10 minutes); past it a fresh verdict is left to the next run
+          settle_deadline=$(( $(date +%s) + 420 ))
           # Same-repo PRs only; fork PRs are never auto-merged. Values are assigned before use because set -e does not
           # see a failure inside a for word list or a here-string.
           prs=$(gh pr list -R "$REPO" --base develop --state open --json number,isCrossRepository \
@@ -62,13 +64,40 @@ jobs:
             read -r head_sha draft mergeable_state author <<< "$info"
             echo "PR #$pr by $author head $head_sha draft=$draft mergeable_state=$mergeable_state"
 
-            # Only the reviewer account's LAST review carrying the marker for the CURRENT head counts
-            # Every state but DISMISSED counts, so a newer CHANGES_REQUESTED outranks an older approval (on its own PRs the
-            # reviewer posts COMMENTED, because GitHub forbids self-approval).
-            # --slurp joins every page so `last` really is the newest matching review.
-            verdict=$(gh api "repos/$REPO/pulls/$pr/reviews?per_page=100" --paginate --slurp \
-              | jq -r --arg reviewer "$REVIEWER" --arg marker "<!-- claude-review sha=$head_sha -->" \
-                '[add[] | select(.user.login == $reviewer and .state != "DISMISSED" and (.body | contains($marker)))] | last | if . == null then "none" else (.body | split("\n")[0]) end')
+            # Only the reviewer account's reviews carrying the marker for the CURRENT head count, and the LATEST of them by
+            # submitted_at is the verdict. Every state but DISMISSED counts, so a newer CHANGES_REQUESTED outranks an older
+            # approval (on its own PRs the reviewer posts COMMENTED, because GitHub forbids self-approval).
+            # The verdict must also be at least 5 minutes old: parallel reviewer runs on the same head can post a superseding
+            # "changes requested" seconds after an approval (AnointedAutomation#417). Same rule as refire-unreviewed-prs.sh.
+            # --slurp joins every page. Prints "<age in seconds> <first line of the latest marker review>" or "none".
+            latest_review() {
+              gh api "repos/$REPO/pulls/$pr/reviews?per_page=100" --paginate --slurp \
+                | jq -r --arg reviewer "$REVIEWER" --arg marker "<!-- claude-review sha=$head_sha -->" \
+                  '[add[] | select(.user.login == $reviewer and .state != "DISMISSED" and .submitted_at != null and (.body | contains($marker)))] | sort_by(.submitted_at) | last | if . == null then "none" else "\(now - (.submitted_at | fromdateiso8601) | floor) \(.body | split("\n")[0])" end'
+            }
+            min_age=300
+            result=$(latest_review)
+            if [ "$result" != "none" ]; then
+              age=${result%% *}
+              wait_s=$((min_age - age + 5))
+              if [ "$age" -lt "$min_age" ] && [ $(( $(date +%s) + wait_s )) -le "$settle_deadline" ]; then
+                # A fresh verdict is waited out inside this run (this run was triggered by that very review, and a superseding
+                # review triggers its own run), so the PR is not left for the 6-hourly schedule. Bounded by the run-wide settle_deadline.
+                echo "  latest Claude review is ${age}s old; waiting ${wait_s}s for a superseding verdict"
+                sleep "$wait_s"
+                result=$(latest_review)
+              fi
+            fi
+            if [ "$result" = "none" ]; then
+              verdict="none"
+            else
+              age=${result%% *}
+              verdict=${result#* }
+              if [ "$age" -lt "$min_age" ]; then
+                echo "  skip: latest Claude review for $head_sha is only ${age}s old; the next run picks it up"
+                continue
+              fi
+            fi
             case "$verdict" in
               "✅ Claude review: approved"*) ;;
               *) echo "  skip: no approving Claude review for $head_sha (got: ${verdict:-none})"; continue ;;
