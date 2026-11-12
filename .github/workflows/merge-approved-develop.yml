@@ -53,6 +53,8 @@ jobs:
           owner=${REPO%/*}
           name=${REPO#*/}
           failed=0
+          # Run-wide budget for waiting out fresh reviews (job timeout is 10 minutes); past it a fresh verdict is left to the next run
+          settle_deadline=$(( $(date +%s) + 420 ))
           # Same-repo PRs only; fork PRs are never auto-merged. Values are assigned before use because set -e does not
           # see a failure inside a for word list or a here-string.
           prs=$(gh pr list -R "$REPO" --base develop --state open --json number,isCrossRepository \
@@ -77,10 +79,10 @@ jobs:
             result=$(latest_review)
             if [ "$result" != "none" ]; then
               age=${result%% *}
-              if [ "$age" -lt "$min_age" ]; then
+              wait_s=$((min_age - age + 5))
+              if [ "$age" -lt "$min_age" ] && [ $(( $(date +%s) + wait_s )) -le "$settle_deadline" ]; then
                 # A fresh verdict is waited out inside this run (this run was triggered by that very review, and a superseding
-                # review triggers its own run), so the PR is not left for the 6-hourly schedule. At most min_age seconds.
-                wait_s=$((min_age - age + 5))
+                # review triggers its own run), so the PR is not left for the 6-hourly schedule. Bounded by the run-wide settle_deadline.
                 echo "  latest Claude review is ${age}s old; waiting ${wait_s}s for a superseding verdict"
                 sleep "$wait_s"
                 result=$(latest_review)
