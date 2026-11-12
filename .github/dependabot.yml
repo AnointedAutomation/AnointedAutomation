@@ -14,6 +14,16 @@ updates:
     labels:
       - "dependencies"
       - "automated pr"
+    ignore:
+      # Shopify (net10.0) and SSO.Owin (net472) are public NuGet packages. The 11.x line of these three raises every
+      # consumer's dependency floor to the .NET 11 major (and changes net472 binding redirects) while our package version
+      # only gets a patch bump. Remove these entries when the libraries target net11.0 and ship a major release.
+      - dependency-name: "Microsoft.Bcl.TimeProvider"
+        versions: ["11.x"]
+      - dependency-name: "Microsoft.Extensions.Logging.Abstractions"
+        versions: ["11.x"]
+      - dependency-name: "System.Text.Json"
+        versions: ["11.x"]
     groups:
       minor-and-patch:
         patterns:
