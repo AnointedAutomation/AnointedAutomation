@@ -34,6 +34,11 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
             this.clock = ReasoningGuard.NotNull(clock, nameof(clock));
         }
 
+        /// <summary>
+        /// Gets the name of the language model this engine asks, so callers can key a cache by query and model.
+        /// </summary>
+        public string ModelName => model.Name;
+
         /// <inheritdoc/>
         public async Task<Answer> Ask(Query query, CancellationToken cancellationToken)
         {

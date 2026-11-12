@@ -239,7 +239,7 @@ For a ready made set of foundational claims (64 laws, 12 theories and 3 conjectu
 
 Namespace: `AnointedAutomation.Concepts.Reasoning`
 
-The shared contracts for the reasoning engines (a deterministic canon engine, a language engine, and a hybrid) behind one API. The deterministic `CanonReasoner` ships in 2.1.0 and the `LanguageReasoner` in 2.2.0; the hybrid engine follows.
+The shared contracts for the reasoning engines (a deterministic canon engine, a language engine, and a hybrid) behind one API. The deterministic `CanonReasoner` ships in 2.1.0 the `LanguageReasoner` in 2.2.0, and the `HybridReasoner` with its `InterpretationLedger` in 2.3.0.
 
 | Type | Description |
 |---|---|
@@ -308,6 +308,27 @@ Console.WriteLine(AnswerDescriber.Describe(result.Answer));
 | `InterpretationParser` | Strict JSON parsing into an `Interpretation`. Malformed JSON, a missing, extra or repeated field, a truth outside the three values, a confidence outside [0,1], a scripture reference that fails `ScriptureReference.Parse` or its chapter bounds, or a SinId not in `SinCatalog` rejects the whole reply with `InterpretationRejected`, logged at Error with the full reply. A reply is never patched. |
 | `LanguageReasoner` | `Ask` returns the `Answer`; `Interpret` also returns the full `Interpretation` (candidate sins, suggested assertions) so later steps reuse it instead of paying for a second call. Provenance is `(Language, model.Name, now, Unverified, prompt id)`; an answer is never Verified, only the owner promotes an interpretation into a fact. |
 | `AnswerDescriber` | `Describe(Answer)` renders any answer, canon or language, as plain text: the question, the truth and confidence, the source, the reasoning steps, the facts used and the Scripture. |
+
+### HybridReasoner and InterpretationLedger
+
+`HybridReasoner : IReasoner` (namespace `AnointedAutomation.Concepts.Reasoning.Hybrid`) asks the canon first and returns its answer whenever it is True or False. Only on Unknown does it ask the language engine, once per owner, query and model, record the answer in the `InterpretationLedger` and return it marked `AnswerSource.Language` and `Unverified`. Language answers are never inserted into `CanonFacts`.
+
+```csharp
+using AnointedAutomation.Concepts.Reasoning.Hybrid;
+
+InterpretationLedger ledger = new InterpretationLedger(new InMemoryInterpretationStore(), myPolicy, TimeProvider.System);
+HybridReasoner hybrid = new HybridReasoner(new CanonReasoner(TimeProvider.System), language, ledger, new OwnerScope(chatId));
+HybridResult result = await hybrid.AskWithEntry(query, CancellationToken.None);
+FactPromotion promotion = await ledger.Promote(new OwnerScope(chatId), result.Entry.Id, reviewer, "Why", CancellationToken.None);
+```
+
+| Type | Description |
+|---|---|
+| `OwnerScope` | The user or chat an AI answer belongs to. AI answers are private to their owner's chat: every ledger write and read names an owner, and there is no listing across owners. |
+| `InterpretationLedger` | `GetOrRecord` is the cache: the same owner, query hash (prompt id) and model never call the model twice, and concurrent callers share one call. `Get`, `List` (paged, with total), `Promote` and `Reject`. |
+| `IInterpretationStore` | Storage port. Core ships `InMemoryInterpretationStore`; persistent stores live in consumers. `Replace` is compare-and-set on status so two reviews cannot both win. |
+| `IPromotionPolicy` | Who may promote or reject. Required, with no implementation in core, so there is no permissive default. Only the canon's owner should be allowed to promote. |
+| `FactPromotion` | What `Promote` returns: the assertion, truth and Scripture to add to the source catalog in a reviewed PR. The entry becomes `VerifiedPendingCatalog`; the running `CanonFacts` never change. |
 
 ## Related packages
 
