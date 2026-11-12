@@ -60,6 +60,7 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Canon
             Assert.Empty(answer.Why.FactsUsed);
             Assert.Equal(CanonReasoner.NoRuleId, answer.Provenance.RuleOrPromptId);
             Assert.Equal(VerificationStatus.Unverified, answer.Provenance.Status);
+            Assert.Equal("I don't know. No scripture fact or rule in the catalog settles this question.", answer.Why.Explanation);
         }
 
         [Fact]

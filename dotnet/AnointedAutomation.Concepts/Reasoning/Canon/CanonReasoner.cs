@@ -20,6 +20,9 @@ namespace AnointedAutomation.Concepts.Reasoning
         /// <summary>The model name recorded in <see cref="Provenance.Model"/>.</summary>
         public const string ModelName = "canon";
 
+        /// <summary>The explanation given when no fact or rule settles a query: plainly admits it does not know.</summary>
+        public const string UnknownExplanation = "I don't know. No scripture fact or rule in the catalog settles this question.";
+
         /// <summary>The rule id recorded when no rule settles a query.</summary>
         public const string NoRuleId = "canon.none";
 
@@ -180,7 +183,7 @@ namespace AnointedAutomation.Concepts.Reasoning
 
             string described = CanonProof.Describe(query.Assertion);
             string explanation = chosen == null
-                ? "No canon fact or rule settles " + described + ", so it is Unknown (not False)."
+                ? UnknownExplanation
                 : described + " is " + truth + " by rule " + chosen.Id + ".";
             return new Answer(
                 query,
