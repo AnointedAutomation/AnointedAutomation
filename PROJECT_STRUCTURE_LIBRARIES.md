@@ -396,7 +396,7 @@ All billing models include complete XML documentation
   RetryBaseDelayMilliseconds, all required, no defaults; the key is never logged
 - Errors: 429/408/5xx/overload/network/timeout retried with bounded exponential backoff, then
   `AnthropicTransientException`; 401/403 and invalid config raise `AnthropicConfigurationException`
-- DI: `services.AddAnthropicLanguageModel(IConfigurationSection)` (typed HttpClient, resolved as `ILanguageModel`)
+- DI: `services.AddAnthropicLanguageModel(IConfigurationSection)` (named HttpClient `HttpClientName`, resolved as `ILanguageModel`); Retry-After honored on 429
 - Usage: HybridReasoner = CanonReasoner + LanguageReasoner(AnthropicLanguageModel) + InterpretationLedger; only the
   owner promotes (IPromotionPolicy). Caching stays in the ledger.
 

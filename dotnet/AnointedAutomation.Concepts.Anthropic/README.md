@@ -36,7 +36,8 @@ store, never in source control. The key is never logged.
 using AnointedAutomation.Concepts.Anthropic;
 
 builder.Services.AddAnthropicLanguageModel(builder.Configuration.GetSection("Anthropic"));
-// ILanguageModel now resolves to AnthropicLanguageModel (a typed HttpClient).
+// ILanguageModel now resolves to AnthropicLanguageModel over the named HttpClient
+// AnthropicServiceCollectionExtensions.HttpClientName (add proxies or handlers there).
 ```
 
 ## Build a HybridReasoner
@@ -69,7 +70,7 @@ policy must allow only the owner's `Reviewer` (there is no default policy).
   `InterpretationParser` still validates every reply and throws `InterpretationRejected` for anything malformed.
 - 429, 408, 5xx, overload, network errors and timeouts are retried with exponential backoff (starting at
   `RetryBaseDelayMilliseconds`, capped at 30 seconds) for at most `MaxAttempts` calls in total, then raised as
-  `AnthropicTransientException`. The SDK's own retries are off so there is one bounded policy.
+  `AnthropicTransientException`. A 429's `Retry-After` header wins over the local backoff (still capped). The SDK's own retries are off so there is one bounded policy.
 - 401 and 403 raise `AnthropicConfigurationException` immediately and are logged at Critical.
 - Other API errors (for example 400) are logged at Error with the request id and rethrown as the SDK exception.
 - Cancellation is rethrown quietly and never retried.

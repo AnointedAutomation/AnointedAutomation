@@ -206,8 +206,8 @@ AnthropicLanguageModel.cs (ILanguageModel over AnthropicClient with SDK retries 
 question; own bounded backoff for 429/408/5xx/overload/IO/timeout; 401/403 to AnthropicConfigurationException.cs;
 exhausted retries to AnthropicTransientException.cs; other API errors logged and rethrown). AnthropicLanguageModelOptions.cs
 (all settings required, Problems()/ThrowIfInvalid()). ReplySchemaFormat.cs (internal; core ReplySchema minus
-minimum/maximum/minLength). AnthropicServiceCollectionExtensions.cs (AddAnthropicLanguageModel(section), typed
-HttpClient). Tests: AnointedAutomation.Concepts.Anthropic.Tests (RecordedHandler replays recorded HTTP responses, no
+minimum/maximum/minLength). RetryAfterRecorder.cs (internal DelegatingHandler capturing Retry-After per call). AnthropicServiceCollectionExtensions.cs
+(AddAnthropicLanguageModel(section), named HttpClient). Tests: AnointedAutomation.Concepts.Anthropic.Tests (RecordedHandler replays recorded HTTP responses, no
 network; ArchitectureTests check the dependency direction).
 
 ### 4b. AnointedAutomation.Mathematics (new package, references Concepts)
