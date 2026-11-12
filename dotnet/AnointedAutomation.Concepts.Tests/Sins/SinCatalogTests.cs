@@ -63,15 +63,14 @@ namespace AnointedAutomation.Concepts.Tests.Sins
         }
 
         [Fact]
-        public void EverySinIdValue_IsCatalogued_AndUnknownIsZero()
+        public void EverySinIdValue_IsCatalogued()
         {
-            Assert.Equal(0u, (uint)SinId.Unknown);
-            foreach (SinId id in Enum.GetValues<SinId>().Where(i => i != SinId.Unknown))
+            foreach (SinId id in Enum.GetValues<SinId>())
             {
                 Assert.True(SinCatalog.TryGet(id, out _), id + " is not catalogued");
             }
 
-            Assert.Equal(SinCatalog.All.Count, Enum.GetValues<SinId>().Length - 1);
+            Assert.Equal(SinCatalog.All.Count, Enum.GetValues<SinId>().Length);
         }
 
         [Fact]
@@ -81,8 +80,8 @@ namespace AnointedAutomation.Concepts.Tests.Sins
             {
                 Assert.NotEmpty(e.References);
                 Assert.False(string.IsNullOrWhiteSpace(e.Name));
-                Assert.NotEqual(SinCategory.Unknown, e.Category);
-                Assert.True(Enum.IsDefined(e.Category), e.Name);
+                Assert.True(e.Category.HasValue, e.Name);
+                Assert.True(Enum.IsDefined(e.Category.Value), e.Name);
                 if (e.CoarseSin.HasValue)
                 {
                     Assert.True(Enum.IsDefined(e.CoarseSin.Value), e.Name);
@@ -114,12 +113,12 @@ namespace AnointedAutomation.Concepts.Tests.Sins
         [Fact]
         public void Lookups_ByCategoryAndCoarseSin_AreConsistent()
         {
-            foreach (SinCategory c in Enum.GetValues<SinCategory>().Where(x => x != SinCategory.Unknown))
+            foreach (SinCategory c in Enum.GetValues<SinCategory>())
             {
                 Assert.All(SinCatalog.InCategory(c), e => Assert.Equal(c, e.Category));
             }
 
-            Assert.Empty(SinCatalog.InCategory(SinCategory.Unknown));
+            Assert.Empty(SinCatalog.InCategory((SinCategory)0u));
             int categorized = Enum.GetValues<SinCategory>().Sum(c => SinCatalog.InCategory(c).Count);
             Assert.Equal(SinCatalog.All.Count(e => !e.IsOmitted), categorized);
             foreach (Sin s in Enum.GetValues<Sin>())
@@ -166,9 +165,9 @@ namespace AnointedAutomation.Concepts.Tests.Sins
         }
 
         [Fact]
-        public void Get_UnknownOrMissingId_Throws()
+        public void Get_ZeroOrMissingId_Throws()
         {
-            Assert.Throws<KeyNotFoundException>(() => SinCatalog.Get(SinId.Unknown));
+            Assert.Throws<KeyNotFoundException>(() => SinCatalog.Get(default));
             Assert.Throws<KeyNotFoundException>(() => SinCatalog.Get((SinId)9999u));
             Assert.False(SinCatalog.TryGet((SinId)9999u, out _));
         }
@@ -187,8 +186,8 @@ namespace AnointedAutomation.Concepts.Tests.Sins
         public void SinEntry_RejectsMissingScriptureCategoryOrId()
         {
             Assert.Throws<ArgumentException>(() => new SinEntry(SinId.Abortion, 1, "x", SinCategory.Sexual, null, ""));
-            Assert.Throws<ArgumentException>(() => new SinEntry(SinId.Abortion, 1, "x", SinCategory.Unknown, null, "", new ScriptureReference(BibleBook.Genesis, 1, 1, 0)));
-            Assert.Throws<ArgumentException>(() => new SinEntry(SinId.Unknown, 1, "x", SinCategory.Sexual, null, "", new ScriptureReference(BibleBook.Genesis, 1, 1, 0)));
+            Assert.Throws<ArgumentException>(() => new SinEntry(SinId.Abortion, 1, "x", (SinCategory)0u, null, "", new ScriptureReference(BibleBook.Genesis, 1, 1, 0)));
+            Assert.Throws<ArgumentException>(() => new SinEntry(default, 1, "x", SinCategory.Sexual, null, "", new ScriptureReference(BibleBook.Genesis, 1, 1, 0)));
         }
 
         private sealed class Recorder : ISinConsequence<List<SinId>>
@@ -210,13 +209,13 @@ namespace AnointedAutomation.Concepts.Tests.Sins
         }
 
         [Fact]
-        public void ConsequenceRegistry_RejectsNullOmittedAndUnknown()
+        public void ConsequenceRegistry_RejectsNullOmittedAndZero()
         {
             var registry = new SinConsequenceRegistry<List<SinId>>();
             Assert.Throws<ArgumentNullException>(() => registry.Register(SinId.Adultery, null));
             Assert.Throws<ArgumentException>(() => registry.Register(SinId.Omitted367, new Recorder()));
-            Assert.Throws<KeyNotFoundException>(() => registry.Register(SinId.Unknown, new Recorder()));
-            Assert.Throws<KeyNotFoundException>(() => registry.Apply(SinId.Unknown, new List<SinId>()));
+            Assert.Throws<KeyNotFoundException>(() => registry.Register(default, new Recorder()));
+            Assert.Throws<KeyNotFoundException>(() => registry.Apply(default, new List<SinId>()));
         }
     }
 }

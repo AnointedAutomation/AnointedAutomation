@@ -126,7 +126,7 @@ Namespace `AnointedAutomation.Concepts`. Two areas live here: the original conce
 
 - Sin catalog (additive): Reality/Morals/Sins/ holds SinId.cs and SinCatalog.Entries.cs (the coded catalog: one
   SinId member and one SinEntry per checklist number, 668 entries; #367 omitted placeholder, the duplicate #566 is
-  id 668), SinEntry.cs, SinCategory.cs (Unknown=0), BibleBook.cs (Unknown=0, 66 books), ScriptureReference.cs
+  id 668), SinEntry.cs, SinCategory.cs (no Unknown; real categories from 1), BibleBook.cs (Unknown=0, 66 books), ScriptureReference.cs
   (validated book/chapter/verse range), SinCatalog.cs (Get/TryGet/InCategory/UnderCoarseSin/Concept, precomputed
   dictionaries), CataloguedSin.cs (a MoralConcept over an entry, grounded in the engine vice for its coarse
   Enums.Sin or its category, so Reality.Witness reads it), and ISinConsequence.cs/SinConsequenceRegistry.cs (the

@@ -44,7 +44,7 @@ namespace AnointedAutomation.Concepts.Tests.Sins
         public void Concept_WithoutCoarseSin_UsesItsCategoryVice()
         {
             SinEntry e = SinCatalog.All.First(x => !x.IsOmitted && !x.CoarseSin.HasValue);
-            Assert.Equal(CataloguedSin.ViceFor(e.Category).GetType(), SinCatalog.Concept(e.Id).GroundingVice.GetType());
+            Assert.Equal(CataloguedSin.ViceFor(e.Category.Value).GetType(), SinCatalog.Concept(e.Id).GroundingVice.GetType());
         }
 
         [Fact]
@@ -64,19 +64,19 @@ namespace AnointedAutomation.Concepts.Tests.Sins
                 Assert.True(CataloguedSin.ViceFor(s).Gravity > Gravity.None, s.ToString());
             }
 
-            foreach (SinCategory c in Enum.GetValues<SinCategory>().Where(x => x != SinCategory.Unknown))
+            foreach (SinCategory c in Enum.GetValues<SinCategory>())
             {
                 Assert.True(CataloguedSin.ViceFor(c).Gravity > Gravity.None, c.ToString());
             }
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => CataloguedSin.ViceFor(SinCategory.Unknown));
+            Assert.Throws<ArgumentOutOfRangeException>(() => CataloguedSin.ViceFor((SinCategory)0u));
         }
 
         [Fact]
-        public void Concept_RejectsOmittedNullAndUnknown()
+        public void Concept_RejectsOmittedNullAndZero()
         {
             Assert.Throws<KeyNotFoundException>(() => SinCatalog.Concept(SinId.Omitted367));
-            Assert.Throws<KeyNotFoundException>(() => SinCatalog.Concept(SinId.Unknown));
+            Assert.Throws<KeyNotFoundException>(() => SinCatalog.Concept(default));
             Assert.Throws<ArgumentException>(() => new CataloguedSin(SinCatalog.Get(SinId.Omitted367)));
             Assert.Throws<ArgumentNullException>(() => new CataloguedSin(null));
         }

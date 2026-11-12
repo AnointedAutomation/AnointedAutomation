@@ -60,3 +60,4 @@ Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 - Publish order matters: Serialization, Shopify, Objects, Repository.Mongo, Objects.API, SSO, SSO.UI, Templates.
 - NuGet README links must be absolute (relative links do not resolve on NuGet.org).
 - Consumers use TreatWarningsAsErrors: do not mark shims `[Obsolete]`.
+- Enum convention: value 0 of a public enum is `Unknown` or `None` ("not determined"). Deliberate exceptions, do not "fix" them: `MessageType.Error = 0` (AnointedAutomation.Logging, wire format; `MessageTypeTests`), `Enums.Sin.Blasphemy = 0`, and `SinId` / `SinCategory` in Concepts, which have no Unknown or None member at all because a sin is never unknown (use `SinId?` / `SinCategory?` for absence). `NoUnknownSinEnumsTests` fails if such a member is ever added.

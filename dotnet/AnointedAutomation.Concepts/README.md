@@ -118,7 +118,7 @@ Console.WriteLine(reality.Tablets.Coherence()); // drops as disorder is recorded
 
 Namespace: `AnointedAutomation.Concepts` (source folder `Reality/Morals/Sins/`)
 
-A typed catalog of sins, each with a stable `SinId` (persist it; 0 is `Unknown`), its checklist number, a short
+A typed catalog of sins, each with a stable `SinId` (persist it; there is no 0 and no `Unknown`: a sin is never unknown, so use `SinId?` for "no sin"), its checklist number, a short
 label, a `SinCategory`, the coarse moderation `AnointedAutomation.Enums.Sin` it falls under (when one fits), and
 validated `ScriptureReference` values (`BibleBook`, chapter, verse, optional end verse). Number 367 is an omitted
 placeholder; the checklist repeats 566, so the second entry is id 668.

@@ -5,13 +5,12 @@ namespace AnointedAutomation.Concepts
 {
     /// <summary>
     /// The finer grouping a catalogued sin belongs to. Coarser than a single sin, finer than the
-    /// moderation set in <c>AnointedAutomation.Enums.Sin</c>. 0 is reserved for <see cref="Unknown"/>.
+    /// moderation set in <c>AnointedAutomation.Enums.Sin</c>. Every member is a real category: there is deliberately
+    /// no Unknown or None member (a sin is never "unknown"), so the numbering starts at 1. Use a nullable
+    /// <c>SinCategory?</c> for "no category".
     /// </summary>
     public enum SinCategory : uint
     {
-        /// <summary>Not determined (only the omitted placeholder entry uses it).</summary>
-        Unknown = 0,
-
         /// <summary>Against God directly: unbelief, rebellion, irreverence, prayerlessness (Matthew 22:37).</summary>
         AgainstGod = 1,
 
