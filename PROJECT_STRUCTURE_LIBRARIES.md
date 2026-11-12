@@ -385,6 +385,26 @@ All billing models include complete XML documentation
 - **Internal:** None (foundational for Concepts/Mathematics)
 - **External:** .NET 10.0 (net10.0) framework only
 
+### 9a. AnointedAutomation.Concepts.Anthropic v1.0.0
+
+**Purpose & Functionality:**
+- Optional adapter (dual engine PR 5 of 5): `AnthropicLanguageModel` implements the core `ILanguageModel` port with
+  Claude through the official Anthropic .NET SDK (NuGet `Anthropic` 13.8.0)
+- One Messages API call per question with structured outputs (schema from `PromptComposer.ReplySchema`, minus the
+  numeric/length bounds structured outputs reject; the core parser still enforces them)
+- `AnthropicLanguageModelOptions`: ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts (1-10),
+  RetryBaseDelayMilliseconds, all required, no defaults; the key is never logged
+- Errors: 429/408/5xx/overload/network/timeout retried with bounded exponential backoff, then
+  `AnthropicTransientException`; 401/403 and invalid config raise `AnthropicConfigurationException`
+- DI: `services.AddAnthropicLanguageModel(IConfigurationSection)` (named HttpClient `HttpClientName`, resolved as `ILanguageModel`); Retry-After honored on 429
+- Usage: HybridReasoner = CanonReasoner + LanguageReasoner(AnthropicLanguageModel) + InterpretationLedger; only the
+  owner promotes (IPromotionPolicy). Caching stays in the ledger.
+
+**Dependencies:**
+- **Internal:** AnointedAutomation.Concepts (the core never references this package; ArchitectureTests check it)
+- **External:** Anthropic, Microsoft.Extensions.Configuration.Binder, Microsoft.Extensions.Http,
+  Microsoft.Extensions.Logging.Abstractions
+
 ### 10. AnointedAutomation.Mathematics v1.0.0
 
 **Purpose & Functionality:**
@@ -575,6 +595,9 @@ AnointedAutomation.Objects.Mongo
 
 AnointedAutomation.Concepts
 └── (no internal dependencies)
+
+AnointedAutomation.Concepts.Anthropic
+└── AnointedAutomation.Concepts (ILanguageModel port; optional adapter)
 
 AnointedAutomation.Mathematics
 └── AnointedAutomation.Concepts (Epistemics engine types)

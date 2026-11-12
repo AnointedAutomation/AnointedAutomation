@@ -74,6 +74,7 @@ jobs:
             ["AnointedAutomation.Objects/AnointedAutomation.Objects.csproj"]="AnointedAutomation.Objects"
             ["AnointedAutomation.Objects.API/AnointedAutomation.Objects.API.csproj"]="AnointedAutomation.Objects.API"
             ["AnointedAutomation.Concepts/AnointedAutomation.Concepts.csproj"]="AnointedAutomation.Concepts"
+            ["AnointedAutomation.Concepts.Anthropic/AnointedAutomation.Concepts.Anthropic.csproj"]="AnointedAutomation.Concepts.Anthropic"
             ["AnointedAutomation.Mathematics/AnointedAutomation.Mathematics.csproj"]="AnointedAutomation.Mathematics"
             ["AnointedAutomation.Optimization/AnointedAutomation.Optimization.csproj"]="AnointedAutomation.Optimization"
             ["AnointedAutomation.Shopify/AnointedAutomation.Shopify.csproj"]="AnointedAutomation.Shopify"

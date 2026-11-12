@@ -163,6 +163,26 @@ LogMessage.MessageSourceSetter = "MyService";
 LogMessage msg = LogMessage.Error("Payment webhook failed");
 ```
 
+### AnointedAutomation.Concepts.Anthropic 1.0.0
+
+Optional adapter that implements the AnointedAutomation.Concepts ILanguageModel port with Claude through the official Anthropic .NET SDK: one structured-output call per question, required options (ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts, RetryBaseDelayMilliseconds; no defaults), bounded backoff on 429/408/5xx/network/timeout, typed AnthropicTransientException and AnthropicConfigurationException (401/403, missing config), and services.AddAnthropicLanguageModel(section). The core never references it.
+
+- Depends on: NuGet Anthropic 13.8.0, Microsoft.Extensions.Configuration.Binder, Microsoft.Extensions.Http, Microsoft.Extensions.Logging.Abstractions; AnointedAutomation AnointedAutomation.Concepts
+- Namespaces: `AnointedAutomation.Concepts.Anthropic`
+- Key types: `AnthropicLanguageModel`, `AnthropicLanguageModelOptions`, `AnthropicServiceCollectionExtensions`, `AnthropicTransientException`, `AnthropicConfigurationException`
+- Notes: build a `HybridReasoner` from `CanonReasoner` + `LanguageReasoner(AnthropicLanguageModel)` + an `InterpretationLedger`; only the owner may promote an AI interpretation (the injected `IPromotionPolicy`). Caching stays in the ledger, not the adapter.
+- Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Concepts.Anthropic (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts.Anthropic/README.md)
+
+```bash
+dotnet add package AnointedAutomation.Concepts.Anthropic
+```
+
+```csharp
+using AnointedAutomation.Concepts.Anthropic;
+
+builder.Services.AddAnthropicLanguageModel(builder.Configuration.GetSection("Anthropic"));
+```
+
 ### AnointedAutomation.Mathematics 2.0.0
 
 Ready-made foundational claims to seed an EpistemicLedger. A curated catalog of laws, theories, and conjectures from logic, mathematics, physics, and chemistry, modeled as foundational claims for the AnointedAutomation.Concepts epistemics engine.
