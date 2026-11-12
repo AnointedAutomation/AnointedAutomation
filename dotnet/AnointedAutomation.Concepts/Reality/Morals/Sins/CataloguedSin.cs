@@ -35,7 +35,7 @@ namespace AnointedAutomation.Concepts
             }
 
             Entry = entry;
-            GroundingVice = entry.CoarseSin.HasValue ? ViceFor(entry.CoarseSin.Value) : ViceFor(entry.Category);
+            GroundingVice = entry.CoarseSin.HasValue ? ViceFor(entry.CoarseSin.Value) : ViceFor(entry.Category.Value);
         }
 
         /// <summary>The catalog entry.</summary>
@@ -99,9 +99,9 @@ namespace AnointedAutomation.Concepts
         /// <summary>
         /// The engine's vice for a sin category.
         /// </summary>
-        /// <param name="category">The category; never Unknown.</param>
+        /// <param name="category">The category.</param>
         /// <returns>The vice.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown for Unknown or an undefined value.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown for an undefined value.</exception>
         public static MoralConcept ViceFor(SinCategory category)
         {
             switch (category)

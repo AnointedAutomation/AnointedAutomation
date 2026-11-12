@@ -5,13 +5,12 @@ namespace AnointedAutomation.Concepts
 {
     /// <summary>
     /// Stable numeric id of every catalogued sin. The value is the entry's number in the source checklist,
-    /// so ids are never reused or renumbered; 0 is reserved for <see cref="Unknown"/>. Persist the number.
+    /// so ids are never reused or renumbered. Every member is a real catalogued sin (or the omitted placeholder for a
+    /// skipped number): there is deliberately no Unknown or None member and nothing is numbered 0, because a sin is
+    /// never "unknown". Use a nullable <c>SinId?</c> for "no sin". Persist the number.
     /// </summary>
     public enum SinId : uint
     {
-        /// <summary>Not determined. Never a real sin.</summary>
-        Unknown = 0,
-
         /// <summary>Abortion (Exodus 21:22-25; Jeremiah 1:4; Jeremiah 1:5)</summary>
         Abortion = 1,
 

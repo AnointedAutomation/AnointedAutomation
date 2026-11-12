@@ -37,10 +37,11 @@ namespace AnointedAutomation.Concepts
                     continue;
                 }
 
-                if (!cat.TryGetValue(entry.Category, out List<SinEntry> inCat))
+                SinCategory category = entry.Category.Value;
+                if (!cat.TryGetValue(category, out List<SinEntry> inCat))
                 {
                     inCat = new List<SinEntry>();
-                    cat.Add(entry.Category, inCat);
+                    cat.Add(category, inCat);
                 }
 
                 inCat.Add(entry);
@@ -79,7 +80,7 @@ namespace AnointedAutomation.Concepts
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns>The entry.</returns>
-        /// <exception cref="KeyNotFoundException">Thrown when the id is not catalogued (including Unknown).</exception>
+        /// <exception cref="KeyNotFoundException">Thrown when the id is not catalogued (including default(SinId), which is 0 and not a member).</exception>
         public static SinEntry Get(SinId id)
         {
             if (!ById.TryGetValue(id, out SinEntry entry))
