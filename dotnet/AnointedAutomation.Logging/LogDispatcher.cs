@@ -6,8 +6,8 @@ using System.Threading;
 namespace AnointedAutomation.Optimization.Logging
 {
     /// <summary>
-    /// Holds the <see cref="LogMessage.LogAdded"/> subscribers and the bounded startup buffer. Until the first subscriber
-    /// ever attaches, raised messages are queued (oldest dropped past the capacity); that subscriber receives the queue
+    /// Holds the <see cref="LogMessage.LogAdded"/> subscribers and the opt-in bounded startup buffer. Once
+    /// <see cref="EnableBuffering"/> is called and until the first subscriber ever attaches, raised messages are queued (oldest dropped past the capacity); that subscriber receives the queue
     /// in order, then one Warning with the dropped count when any were dropped. After that, nothing is buffered again,
     /// so a later subscriber never receives stale entries.
     /// </summary>
@@ -18,6 +18,7 @@ namespace AnointedAutomation.Optimization.Logging
         private readonly int _capacity;
         private LogMessage.LogAddedEventHandler _handlers;
         private bool _everSubscribed;
+        private bool _buffering;
         private long _dropped;
 
         /// <summary>
@@ -44,6 +45,23 @@ namespace AnointedAutomation.Optimization.Logging
                 {
                     return _pending.Count;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Turns on the startup buffer. Has no effect once a subscriber has attached (nothing would ever flush it).
+        /// </summary>
+        /// <returns>True when buffering is now on; false when a subscriber already attached.</returns>
+        internal bool EnableBuffering()
+        {
+            lock (_sync)
+            {
+                if (_everSubscribed)
+                {
+                    return false;
+                }
+                _buffering = true;
+                return true;
             }
         }
 
@@ -110,7 +128,7 @@ namespace AnointedAutomation.Optimization.Logging
             {
                 lock (_sync)
                 {
-                    if (!_everSubscribed)
+                    if (_buffering && !_everSubscribed)
                     {
                         if (_pending.Count >= _capacity)
                         {

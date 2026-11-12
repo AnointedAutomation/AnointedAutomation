@@ -112,7 +112,7 @@ namespace AnointedAutomation.Optimization.Logging
             DateTime now = _utcNow();
             if (_states.Count > MaxKeys)
             {
-                SummarizeAll(now, force: true, clear: true);
+                SummarizeAll(now, force: true, retireAll: true);
             }
             string identicalKey = "I|" + category + "|" + level + "|" + rendered;
             if (!Pass(identicalKey, category, rendered, level, rendered, MaxIdenticalPerWindow, now))
@@ -134,7 +134,7 @@ namespace AnointedAutomation.Optimization.Logging
         /// <returns>The summaries, possibly empty.</returns>
         public IReadOnlyList<LogThrottleSummary> TakeSummaries(bool force)
         {
-            SummarizeAll(_utcNow(), force, clear: false);
+            SummarizeAll(_utcNow(), force, retireAll: false);
             List<LogThrottleSummary> taken = new List<LogThrottleSummary>();
             while (_ready.TryDequeue(out LogThrottleSummary summary))
             {
@@ -143,7 +143,10 @@ namespace AnointedAutomation.Optimization.Logging
             return taken;
         }
 
-        private void SummarizeAll(DateTime now, bool force, bool clear)
+        // A State leaves the table only after it is marked Retired inside its own lock, with its pending count already
+        // summarized. Pass() re-fetches when it locks a retired State, so a concurrent entry is counted on the fresh State
+        // and never on one that is being dropped.
+        private void SummarizeAll(DateTime now, bool force, bool retireAll)
         {
             lock (_resetSync)
             {
@@ -153,6 +156,10 @@ namespace AnointedAutomation.Optimization.Logging
                     State state = pair.Value;
                     lock (state)
                     {
+                        if (state.Retired)
+                        {
+                            continue;
+                        }
                         bool windowOver = now - state.WindowStart >= _window;
                         if (!windowOver && !force)
                         {
@@ -164,54 +171,68 @@ namespace AnointedAutomation.Optimization.Logging
                         }
                         state.Suppressed = 0;
                         state.Samples.Clear();
-                        if (windowOver)
+                        if (windowOver || retireAll)
                         {
+                            // Every pending count of this key was just summarized, so dropping it loses nothing.
+                            state.Retired = true;
                             finished.Add(pair.Key);
                         }
                     }
                 }
-                if (clear)
-                {
-                    // Every pending count was just summarized, so trimming the table loses nothing.
-                    _states.Clear();
-                    return;
-                }
                 foreach (string key in finished)
                 {
-                    _states.TryRemove(key, out State _);
+                    // Remove only the retired instance: a fresh State added for the key meanwhile stays.
+                    if (_states.TryGetValue(key, out State current) && current.Retired)
+                    {
+                        _states.TryRemove(new KeyValuePair<string, State>(key, current));
+                    }
                 }
             }
         }
 
         private bool Pass(string key, string category, string shape, MessageType level, string rendered, int cap, DateTime now)
         {
-            State state = _states.GetOrAdd(key, _ => new State(now, category, shape, level));
-            lock (state)
+            while (true)
             {
-                if (now - state.WindowStart >= _window)
+                State state = _states.GetOrAdd(key, _ => new State(now, category, shape, level));
+                lock (state)
                 {
-                    if (state.Suppressed > 0)
+                    if (state.Retired)
                     {
-                        _ready.Enqueue(Summarize(state, now));
+                        // Being dropped by SummarizeAll: count this entry on the State that replaces it.
+                        Thread.Yield();
+                        continue;
                     }
-                    state.WindowStart = now;
-                    state.Count = 0;
-                    state.Suppressed = 0;
-                    state.Samples.Clear();
+                    return PassLocked(state, cap, rendered, now);
                 }
-                if (state.Count < cap)
-                {
-                    state.Count++;
-                    return true;
-                }
-                state.Suppressed++;
-                string sample = Clip(rendered, 300);
-                if (state.Samples.Count < MaxSamplesPerKey && !state.Samples.Contains(sample))
-                {
-                    state.Samples.Add(sample);
-                }
-                return false;
             }
+        }
+
+        private bool PassLocked(State state, int cap, string rendered, DateTime now)
+        {
+            if (now - state.WindowStart >= _window)
+            {
+                if (state.Suppressed > 0)
+                {
+                    _ready.Enqueue(Summarize(state, now));
+                }
+                state.WindowStart = now;
+                state.Count = 0;
+                state.Suppressed = 0;
+                state.Samples.Clear();
+            }
+            if (state.Count < cap)
+            {
+                state.Count++;
+                return true;
+            }
+            state.Suppressed++;
+            string sample = Clip(rendered, 300);
+            if (state.Samples.Count < MaxSamplesPerKey && !state.Samples.Contains(sample))
+            {
+                state.Samples.Add(sample);
+            }
+            return false;
         }
 
         private static LogThrottleSummary Summarize(State state, DateTime now)
@@ -242,6 +263,7 @@ namespace AnointedAutomation.Optimization.Logging
             internal DateTime WindowStart;
             internal int Count;
             internal int Suppressed;
+            internal bool Retired;
             internal readonly List<string> Samples = new List<string>();
             internal string Category { get; }
             internal string Template { get; }

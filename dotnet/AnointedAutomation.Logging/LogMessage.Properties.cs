@@ -226,12 +226,27 @@ namespace AnointedAutomation.Optimization.Logging
                 case DateTimeOffset date:
                     writer.WriteStringValue(date.ToString("O", CultureInfo.InvariantCulture));
                     break;
-                case IFormattable formattable:
-                    writer.WriteStringValue(formattable.ToString(null, CultureInfo.InvariantCulture));
-                    break;
                 default:
-                    writer.WriteStringValue(value.ToString());
+                    writer.WriteStringValue(SafeText(value));
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Invariant text of a property value. Its ToString is caller code: if it throws, the failure is written to
+        /// <see cref="Console.Error"/> with the full exception and the value's type name is used, so logging never throws.
+        /// </summary>
+        internal static string SafeText(object value)
+        {
+            try
+            {
+                return value is IFormattable formattable ? formattable.ToString(null, CultureInfo.InvariantCulture) : value.ToString();
+            }
+            catch (Exception ex)
+            {
+                string typeName = value.GetType().FullName;
+                Console.Error.WriteLine($"[AnointedAutomation.Logging] ToString of a {typeName} log property threw; the type name was logged instead: {ex}");
+                return "<" + typeName + " ToString threw " + ex.GetType().Name + ">";
             }
         }
 

@@ -145,7 +145,8 @@ Log.Error("capture failed", ex, ("orderId", orderId));
 | `LogThrottle` | Shared store throttle: 5 identical rows, 50 per template (200 for Errors) per 10-minute window, Critical never throttled; `TakeSummaries(force)` returns one summary per key that suppressed rows. |
 | `LogMessageLogger` / `LogMessageLoggerProvider` | `ILogger` adapter for third-party APIs that require one; writes through `LogMessage` with state pairs as properties. |
 
-Startup ordering: messages raised before the first `LogAdded` subscriber ever attaches are buffered (up to
-`LogMessage.PreSubscriptionBufferCapacity`, 1000; oldest dropped) and delivered to that subscriber, followed by one Warning
-with the dropped count if any were dropped. `LogAdded` handlers run synchronously on the logging thread: keep them fast and
+Startup ordering (opt-in): call `LogMessage.BufferUntilFirstSubscriber()` first thing in `Main`; messages raised before the
+first `LogAdded` subscriber attaches are then buffered (up to `LogMessage.PreSubscriptionBufferCapacity`, 1000; oldest
+dropped) and delivered to that subscriber, followed by one Warning with the dropped count if any were dropped. Off by
+default, so libraries and test runs never hold or replay stale messages. `LogAdded` handlers run synchronously on the logging thread: keep them fast and
 queue any I/O.

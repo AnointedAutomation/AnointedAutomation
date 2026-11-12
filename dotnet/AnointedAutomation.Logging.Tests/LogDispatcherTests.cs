@@ -20,6 +20,7 @@ namespace AnointedAutomation.Logging.Tests
         public void FirstSubscriber_ReceivesBufferedLogsInOrder_WithSourceRestamped()
         {
             LogDispatcher dispatcher = new LogDispatcher(10);
+            Assert.True(dispatcher.EnableBuffering());
             dispatcher.Raise(Row("one", LogMessage.UnsetMessageSource));
             dispatcher.Raise(Row("two", "Named"));
             Assert.Equal(2, dispatcher.PendingCount);
@@ -41,6 +42,7 @@ namespace AnointedAutomation.Logging.Tests
         public void Overflow_DropsOldest_AndWarnsWithTheDroppedCount()
         {
             LogDispatcher dispatcher = new LogDispatcher(2);
+            Assert.True(dispatcher.EnableBuffering());
             dispatcher.Raise(Row("a", "S"));
             dispatcher.Raise(Row("b", "S"));
             dispatcher.Raise(Row("c", "S"));
@@ -57,6 +59,7 @@ namespace AnointedAutomation.Logging.Tests
         public void AfterAllUnsubscribe_NothingIsBufferedAgain()
         {
             LogDispatcher dispatcher = new LogDispatcher(5);
+            Assert.True(dispatcher.EnableBuffering());
             LogMessage.LogAddedEventHandler handler = (s, e) => { };
             dispatcher.Subscribe(handler);
             dispatcher.Unsubscribe(handler);
@@ -64,6 +67,20 @@ namespace AnointedAutomation.Logging.Tests
             dispatcher.Raise(Row("late", "S"));
 
             Assert.Equal(0, dispatcher.PendingCount);
+        }
+
+        [Fact]
+        public void BufferingIsOffByDefault_AndCannotStartAfterASubscriber()
+        {
+            LogDispatcher dispatcher = new LogDispatcher(5);
+            dispatcher.Raise(Row("unbuffered", "S"));
+            Assert.Equal(0, dispatcher.PendingCount);
+            List<string> seen = new List<string>();
+
+            dispatcher.Subscribe((s, e) => seen.Add(e.log.message));
+
+            Assert.Empty(seen);
+            Assert.False(dispatcher.EnableBuffering());
         }
 
         [Fact]

@@ -1,4 +1,4 @@
-﻿// Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-06-12 11:23:55 Jesus is King ✝️
+// Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-06-12 11:23:55 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 // Edited 2026-10-28: UTC timestamps, caller file:line, exception overloads, isolated LogAdded subscribers, long ids.
 // Edited 2026-11-12: Debug/Trace, structured properties, scopes, categories, LogCapture, pre-subscription buffer.
@@ -217,6 +217,18 @@ namespace AnointedAutomation.Optimization.Logging
         public const string UnsetMessageSource = "You didn't set the name of your program!";
 
         /// <summary>
+        /// Opt-in for hosts: buffers messages raised before the first <see cref="LogAdded"/> subscriber attaches (up to
+        /// <see cref="PreSubscriptionBufferCapacity"/>) and delivers them to it, so startup logs are not lost. Call it first
+        /// thing in Main, before anything logs. Off by default, so libraries and test processes never hold or replay stale
+        /// messages. Has no effect (returns false) once a subscriber has attached.
+        /// </summary>
+        /// <returns>True when buffering is on; false when a subscriber already attached.</returns>
+        public static bool BufferUntilFirstSubscriber()
+        {
+            return Dispatcher.EnableBuffering();
+        }
+
+        /// <summary>
         /// Most messages kept for the first <see cref="LogAdded"/> subscriber while none exists (startup ordering).
         /// When more arrive the oldest are dropped and the first subscriber receives one Warning with the dropped count.
         /// </summary>
@@ -239,9 +251,8 @@ namespace AnointedAutomation.Optimization.Logging
         /// Event triggered when a new log message is added. Handlers run synchronously on the logging thread, so they
         /// must be fast and must not block (queue the work). Each subscriber is invoked in isolation: an exception in
         /// one subscriber is written to <see cref="Console.Error"/> and does not reach the logging caller or other subscribers.
-        /// Messages raised before the FIRST subscriber ever attaches are buffered (up to
-        /// <see cref="PreSubscriptionBufferCapacity"/>) and delivered to that subscriber when it attaches, so logs written
-        /// during startup are not lost.
+        /// After <see cref="BufferUntilFirstSubscriber"/>, messages raised before the FIRST subscriber ever attaches are
+        /// buffered (up to <see cref="PreSubscriptionBufferCapacity"/>) and delivered to that subscriber when it attaches.
         /// </summary>
         public static event LogAddedEventHandler LogAdded
         {

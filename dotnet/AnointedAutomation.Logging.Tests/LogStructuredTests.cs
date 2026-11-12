@@ -18,6 +18,19 @@ namespace AnointedAutomation.Logging.Tests
         {
         }
 
+        private sealed class ThrowingToString
+        {
+            public override string ToString() => throw new InvalidOperationException("bad ToString");
+        }
+
+        [Fact]
+        public void Property_WhoseToStringThrows_DoesNotBreakLogging()
+        {
+            LogMessage log = LogMessage.Warning("still logged", ("bad", new ThrowingToString()));
+
+            Assert.Contains("ToString threw InvalidOperationException", log.properties);
+        }
+
         [Fact]
         public void DebugAndTrace_FactoriesSetLevelAndFileCategory()
         {
