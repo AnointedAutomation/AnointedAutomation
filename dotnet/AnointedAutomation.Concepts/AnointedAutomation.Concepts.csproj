@@ -25,4 +25,8 @@
 	  <None Include="README.md" Pack="true" PackagePath="/" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="..\AnointedAutomation.Enums\AnointedAutomation.Enums.csproj" />
+	</ItemGroup>
+
 </Project>

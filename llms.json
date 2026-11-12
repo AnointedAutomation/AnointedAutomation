@@ -124,7 +124,7 @@
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts/README.md",
       "dependencies": {
         "nuget": [],
-        "anointed": []
+        "anointed": ["AnointedAutomation.Enums"]
       },
       "keyNamespaces": [
         "AnointedAutomation.Concepts",
@@ -133,6 +133,13 @@
       "keyTypes": [
         "Love",
         "LoveAction",
+        "SinCatalog",
+        "SinEntry",
+        "SinId",
+        "SinCategory",
+        "CataloguedSin",
+        "ScriptureReference",
+        "ISinConsequence",
         "Situation",
         "MoralConcept",
         "Trinity",

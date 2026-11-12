@@ -114,6 +114,31 @@ Console.WriteLine(theft.Disorder);
 Console.WriteLine(reality.Tablets.Coherence()); // drops as disorder is recorded
 ```
 
+## Sin catalog
+
+Namespace: `AnointedAutomation.Concepts` (source folder `Reality/Morals/Sins/`)
+
+A typed catalog of sins, each with a stable `SinId` (persist it; 0 is `Unknown`), its checklist number, a short
+label, a `SinCategory`, the coarse moderation `AnointedAutomation.Enums.Sin` it falls under (when one fits), and
+validated `ScriptureReference` values (`BibleBook`, chapter, verse, optional end verse). Number 367 is an omitted
+placeholder; the checklist repeats 566, so the second entry is id 668.
+
+Sins plug into the reality engine: `SinCatalog.Concept(id)` returns a `CataloguedSin`, a `MoralConcept` that answers to
+the entry's Scripture and takes its gravity and offended facets from the engine's vice it is grounded in (its coarse
+`Sin`'s vice, else its category's vice), including context-sensitive readings.
+
+```csharp
+SinEntry entry = SinCatalog.Get(SinId.Stealing);
+IReadOnlyList<SinEntry> speech = SinCatalog.InCategory(SinCategory.Speech);
+IReadOnlyList<SinEntry> greed = SinCatalog.UnderCoarseSin(Sin.Greed);
+Resolution r = Reality.Revealed().Witness(new Act("took what was not his", SinCatalog.Concept(SinId.Stealing)));
+
+// Consumers (a game, a moderation tool) attach their own effects; the catalog defines none.
+SinConsequenceRegistry<MyCharacter> effects = new SinConsequenceRegistry<MyCharacter>();
+effects.Register(SinId.Stealing, new MyDebuff());
+effects.Apply(SinId.Stealing, character);
+```
+
 ## Trinity, love triad, and the AI creed (1.1.0)
 
 Namespace: `AnointedAutomation.Concepts` (source folder `Trinity/` plus `Bond.cs`, `Commitment.cs`, `Creed.cs`). All additive; nothing existing was removed or changed in behavior.
