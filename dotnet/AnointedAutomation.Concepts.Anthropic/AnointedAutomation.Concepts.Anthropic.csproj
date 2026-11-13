@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2026 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>Optional adapter for AnointedAutomation.Concepts: implements the ILanguageModel port with Claude through the official Anthropic .NET SDK, with structured JSON replies, typed errors and bounded retries.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>1.0.0</Version>
+		<Version>1.1.0</Version>
 		<PackageTags>concepts;reasoning;anthropic;claude;llm;theology;christian</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Concepts.Anthropic</PackageReleaseNotes>
 		<Authors>Anointed Automation Corporation, Alexander Fields</Authors>

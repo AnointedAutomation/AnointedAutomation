@@ -176,7 +176,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
         /// <summary>
         /// Requires an object with exactly the given fields, each once.
         /// </summary>
-        private static void RequireExactFields(JsonElement element, string where, string[] fields, string reply)
+        internal static void RequireExactFields(JsonElement element, string where, string[] fields, string reply)
         {
             if (element.ValueKind != JsonValueKind.Object)
             {
@@ -207,7 +207,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
             }
         }
 
-        private static JsonElement RequireArray(JsonElement element, string field, string reply)
+        internal static JsonElement RequireArray(JsonElement element, string field, string reply)
         {
             JsonElement value = element.GetProperty(field);
             if (value.ValueKind != JsonValueKind.Array)
@@ -218,12 +218,12 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
             return value;
         }
 
-        private static string RequireString(JsonElement element, string field, string reply)
+        internal static string RequireString(JsonElement element, string field, string reply)
         {
             return RequireStringValue(element.GetProperty(field), field, reply);
         }
 
-        private static string RequireStringValue(JsonElement value, string where, string reply)
+        internal static string RequireStringValue(JsonElement value, string where, string reply)
         {
             if (value.ValueKind != JsonValueKind.String)
             {
@@ -256,7 +256,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Language
             return new ConceptRef(kind, id);
         }
 
-        private static TruthValue ReadTruth(string text, string reply)
+        internal static TruthValue ReadTruth(string text, string reply)
         {
             if (text.Equals("true", StringComparison.Ordinal))
             {

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Anthropic.Exceptions;
 using AnointedAutomation.Concepts.Reasoning;
 using AnointedAutomation.Concepts.Reasoning.Language;
+using AnointedAutomation.Concepts.Reasoning.Language.FreeText;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
@@ -305,6 +306,40 @@ namespace AnointedAutomation.Concepts.Anthropic.Tests
             Assert.False(schema["additionalProperties"].GetBoolean());
             Assert.Equal(7, schema["required"].GetArrayLength());
             Assert.True(schema.ContainsKey("$defs"));
+        }
+        [Fact]
+        public async Task CallerSchema_IsSentInsteadOfTheCoreSchema()
+        {
+            (AnthropicLanguageModel model, RecordedHandler handler, CapturingLogger<AnthropicLanguageModel> logger) = Build(() => TestKit.Message("{}"), () => TestKit.Message("{}"));
+
+            await model.Complete("free text", FreeTextPromptComposer.ReplySchema, CancellationToken.None);
+            await model.Complete("free text again", FreeTextPromptComposer.ReplySchema, CancellationToken.None);
+
+            Assert.Equal(2, handler.Requests.Count);
+            foreach (string sent in handler.Bodies)
+            {
+                using (JsonDocument body = JsonDocument.Parse(sent))
+                {
+                    JsonElement schema = body.RootElement.GetProperty("output_config").GetProperty("format").GetProperty("schema");
+                    Assert.Equal(5, schema.GetProperty("required").GetArrayLength());
+                    Assert.True(schema.GetProperty("properties").TryGetProperty("originalLanguageWords", out JsonElement _));
+                }
+
+                Assert.DoesNotContain("\"minLength\"", sent, StringComparison.Ordinal);
+            }
+
+            AssertKeyNeverLogged(logger);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData(" ")]
+        public async Task CallerSchema_Blank_IsRejected_BeforeAnyCall(string replySchema)
+        {
+            (AnthropicLanguageModel model, RecordedHandler handler, CapturingLogger<AnthropicLanguageModel> _) = Build(() => TestKit.Message("{}"));
+
+            await Assert.ThrowsAsync<ArgumentException>(() => model.Complete("prompt", replySchema, CancellationToken.None));
+            Assert.Empty(handler.Requests);
         }
     }
 }
