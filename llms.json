@@ -116,7 +116,7 @@
     },
     {
       "id": "AnointedAutomation.Concepts",
-      "version": "2.3.1",
+      "version": "2.4.0",
       "targetFramework": "net10.0",
       "description": "Models Biblical concepts as .NET types: love as a behavior tree, a moral reality that reads acts against God's character, and an epistemics engine that checks claims for consistency.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts",
@@ -124,14 +124,15 @@
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Concepts/README.md",
       "dependencies": {
         "nuget": ["Microsoft.Extensions.Logging.Abstractions"],
-        "anointed": ["AnointedAutomation.Enums"]
+        "anointed": ["AnointedAutomation.Enums", "AnointedAutomation.Logging"]
       },
       "keyNamespaces": [
         "AnointedAutomation.Concepts",
         "AnointedAutomation.Concepts.Epistemics",
         "AnointedAutomation.Concepts.Reasoning",
         "AnointedAutomation.Concepts.Reasoning.Language",
-        "AnointedAutomation.Concepts.Reasoning.Hybrid"
+        "AnointedAutomation.Concepts.Reasoning.Hybrid",
+        "AnointedAutomation.Concepts.Reasoning.Language.FreeText"
       ],
       "keyTypes": [
         "Love",
@@ -173,10 +174,19 @@
         "HybridReasoner",
         "InterpretationLedger",
         "IInterpretationStore",
+        "IStructuredLanguageModel",
+        "FreeTextQuestion",
+        "AskMode",
+        "FreeTextPromptComposer",
+        "FreeTextAnswerParser",
+        "FreeTextReasoner",
+        "FreeTextAnswer",
+        "OriginalLanguage",
+        "OriginalLanguageWord",
         "IPromotionPolicy",
         "FactPromotion"
       ],
-      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts. The Reasoning namespace adds the dual reasoning engine contracts (TruthValue with Kleene logic, Assertion, Query, Answer, Provenance, IReasoner) and, in 2.1.0, CanonReasoner (deterministic, offline, Scripture-grounded; Unknown is never False); Proposition.Standing and Examination.Standing are TruthValue (were bool?). Only the owner can approve promoting an AI interpretation into a permanent fact. 2.2.0 adds LanguageReasoner (Reasoning.Language): an ILanguageModel port with no AI SDK in core, a deterministic PromptComposer that asks once for every field as one JSON object, a strict InterpretationParser that rejects any invalid reply (InterpretationRejected, logged in full), Language answers that are always Unverified, and AnswerDescriber.Describe for any answer. 2.3.0 adds HybridReasoner (Reasoning.Hybrid): canon first, and only on Unknown one cached language call per owner, query and model, kept in an owner-private InterpretationLedger (no cross-owner listing, never inserted into CanonFacts); Promote and Reject need an injected IPromotionPolicy (no default), and Promote returns a FactPromotion for a reviewed catalog PR."
+      "notes": "Mathematics supplies a catalog of FoundationalClaim values for the EpistemicLedger. 1.1.0 adds the Trinity, the triadic coherence rule, the love triad with a commitment gate, and Creed.ToJson()/Creed.ToPrompt() for AI system prompts. The Reasoning namespace adds the dual reasoning engine contracts (TruthValue with Kleene logic, Assertion, Query, Answer, Provenance, IReasoner) and, in 2.1.0, CanonReasoner (deterministic, offline, Scripture-grounded; Unknown is never False); Proposition.Standing and Examination.Standing are TruthValue (were bool?). Only the owner can approve promoting an AI interpretation into a permanent fact. 2.2.0 adds LanguageReasoner (Reasoning.Language): an ILanguageModel port with no AI SDK in core, a deterministic PromptComposer that asks once for every field as one JSON object, a strict InterpretationParser that rejects any invalid reply (InterpretationRejected, logged in full), Language answers that are always Unverified, and AnswerDescriber.Describe for any answer. 2.3.0 adds HybridReasoner (Reasoning.Hybrid): canon first, and only on Unknown one cached language call per owner, query and model, kept in an owner-private InterpretationLedger (no cross-owner listing, never inserted into CanonFacts); Promote and Reject need an injected IPromotionPolicy (no default), and Promote returns a FactPromotion for a reviewed catalog PR. 2.4.0: free-text asks (Reasoning.Language.FreeText): FreeTextQuestion (1-2000 chars, AskMode BibleAnswer/BibleStudy/DreamAnalysis), FreeTextPromptComposer with its own reply schema (answer, verdict, confidence, scripture, Hebrew/Aramaic/Greek words; NASB English; question JSON-encoded), strict FreeTextAnswerParser, one-call FreeTextReasoner over IStructuredLanguageModel."
     },
     {
       "id": "AnointedAutomation.Enums",
@@ -258,7 +268,7 @@
     },
     {
       "id": "AnointedAutomation.Concepts.Anthropic",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "targetFramework": "net10.0",
       "description": "Optional adapter that implements the AnointedAutomation.Concepts ILanguageModel port with Claude through the official Anthropic .NET SDK.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Concepts.Anthropic",
@@ -285,7 +295,7 @@
         "AnthropicTransientException",
         "AnthropicConfigurationException"
       ],
-      "notes": "All options required (ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts, RetryBaseDelayMilliseconds); no defaults or fallback model. One structured-output Messages call per question; bounded backoff on 429/408/5xx/network/timeout then AnthropicTransientException; 401/403 and missing config raise AnthropicConfigurationException. Register with services.AddAnthropicLanguageModel(section). Core never references this package; only the owner may promote AI interpretations (IPromotionPolicy)."
+      "notes": "All options required (ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts, RetryBaseDelayMilliseconds); no defaults or fallback model. One structured-output Messages call per question; bounded backoff on 429/408/5xx/network/timeout then AnthropicTransientException; 401/403 and missing config raise AnthropicConfigurationException. Register with services.AddAnthropicLanguageModel(section). Core never references this package; only the owner may promote AI interpretations (IPromotionPolicy). 1.1.0 implements IStructuredLanguageModel: Complete(prompt, replySchema, ct) sends a caller reply schema (cached per schema)."
     },
     {
       "id": "AnointedAutomation.Mathematics",

@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Microsoft.Extensions.Logging;
+using AnointedAutomation.Optimization.Logging;
 
 namespace AnointedAutomation.Concepts.Reasoning.Language.FreeText
 {
@@ -11,23 +11,12 @@ namespace AnointedAutomation.Concepts.Reasoning.Language.FreeText
     /// Strictly parses a reply to a free-text question. Any deviation from <see cref="FreeTextPromptComposer.ReplySchema"/>
     /// (malformed JSON, a missing, extra or duplicate field, a verdict or language outside its list, a confidence outside
     /// 0..1, a blank answer or word field, or a verse that does not parse or does not exist) rejects the whole reply with
-    /// <see cref="InterpretationRejected"/>, logged in full. A reply is never patched.
+    /// <see cref="InterpretationRejected"/>, logged in full at Error through LogMessage. A reply is never patched.
     /// </summary>
     public sealed class FreeTextAnswerParser
     {
         private static readonly string[] RootFields = { "answer", "verdict", "confidence", "scripture", "originalLanguageWords" };
         private static readonly string[] WordFields = { "language", "lemma", "transliteration", "gloss", "reference" };
-
-        private readonly ILogger<FreeTextAnswerParser> logger;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FreeTextAnswerParser"/> class.
-        /// </summary>
-        /// <param name="logger">Receives every rejection with the full reply.</param>
-        public FreeTextAnswerParser(ILogger<FreeTextAnswerParser> logger)
-        {
-            this.logger = ReasoningGuard.NotNull(logger, nameof(logger));
-        }
 
         /// <summary>
         /// Parses a reply.
@@ -45,7 +34,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Language.FreeText
             }
             catch (InterpretationRejected ex)
             {
-                logger.LogError(ex, "Free-text reply rejected for prompt {PromptId} from model {Model}: {Reason}. Reply: {Reply}", promptId, model, ex.Reason, reply);
+                LogRejected(ex, promptId, model);
                 throw;
             }
             catch (JsonException ex)
@@ -137,11 +126,18 @@ namespace AnointedAutomation.Concepts.Reasoning.Language.FreeText
             throw new InterpretationRejected("language must be hebrew, aramaic or greek, got '" + text + "'.", reply, null);
         }
 
-        private InterpretationRejected Rejected(string reason, string reply, Exception inner, string promptId, string model)
+        private static InterpretationRejected Rejected(string reason, string reply, Exception inner, string promptId, string model)
         {
             InterpretationRejected rejected = new InterpretationRejected(reason, reply, inner);
-            logger.LogError(rejected, "Free-text reply rejected for prompt {PromptId} from model {Model}: {Reason}. Reply: {Reply}", promptId, model, reason, reply);
+            LogRejected(rejected, promptId, model);
             return rejected;
+        }
+
+        private static void LogRejected(InterpretationRejected rejected, string promptId, string model)
+        {
+            LogMessage.Error(
+                "Free-text reply rejected for prompt " + promptId + " from model " + model + ": " + rejected.Reason + ". Reply: " + rejected.Reply,
+                rejected);
         }
     }
 }

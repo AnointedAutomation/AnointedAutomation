@@ -27,6 +27,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\AnointedAutomation.Enums\AnointedAutomation.Enums.csproj" />
+		<ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.15" />
 	</ItemGroup>
 
