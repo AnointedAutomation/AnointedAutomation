@@ -15,15 +15,22 @@ updates:
       - "dependencies"
       - "automated pr"
     ignore:
-      # Shopify (net10.0) and SSO.Owin (net472) are public NuGet packages. The 11.x line of these three raises every
-      # consumer's dependency floor to the .NET 11 major (and changes net472 binding redirects) while our package version
-      # only gets a patch bump. Remove these entries when the libraries target net11.0 and ship a major release.
+      # Our libraries are public NuGet packages. The 11.x line of Microsoft.Extensions.* and Microsoft.Bcl.TimeProvider
+      # raises every consumer's dependency floor to the .NET 11 major while our package version only gets a patch bump,
+      # and splits Concepts.Anthropic from Concepts/Shopify/Logging. Remove these entries when the libraries target
+      # net11.0 and ship a major release.
       - dependency-name: "Microsoft.Bcl.TimeProvider"
         versions: ["11.x"]
-      - dependency-name: "Microsoft.Extensions.Logging.Abstractions"
+      - dependency-name: "Microsoft.Extensions.*"
         versions: ["11.x"]
+      # SSO.Owin (net472) on System.Text.Json 9+ fails at runtime (FileNotFoundException for the 10.0 assembly without
+      # new binding redirects; PR #449 broke 55 SSO.Owin tests). Move it with a hand-made net472 binding-redirect change.
       - dependency-name: "System.Text.Json"
-        versions: ["11.x"]
+        versions: [">=9.0.0"]
+      # MySqlConnector 3.x has breaking changes and is outside what Pomelo.EntityFrameworkCore.MySql 9.0.0 was built
+      # against. Bump it together with a Pomelo release that supports 3.x, in a Repository.MySql major release.
+      - dependency-name: "MySqlConnector"
+        versions: [">=3.0.0"]
     groups:
       minor-and-patch:
         patterns:
