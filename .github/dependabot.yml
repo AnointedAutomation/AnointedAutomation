@@ -19,6 +19,8 @@ updates:
       # raises every consumer's dependency floor to the .NET 11 major while our package version only gets a patch bump,
       # and splits Concepts.Anthropic from Concepts/Shopify/Logging. Remove these entries when the libraries target
       # net11.0 and ship a major release.
+      # Owner rule: references to our own AnointedAutomation.* packages use Version="*" and are never pinned.
+      - dependency-name: "AnointedAutomation.*"
       - dependency-name: "Microsoft.Bcl.TimeProvider"
         versions: ["11.x"]
       - dependency-name: "Microsoft.Extensions.*"
