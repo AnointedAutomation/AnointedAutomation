@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AnointedAutomation.Concepts.Reasoning;
 using AnointedAutomation.Concepts.Reasoning.Language;
 using AnointedAutomation.Concepts.Reasoning.Language.FreeText;
+using AnointedAutomation.Optimization.Logging;
 using Xunit;
 
 namespace AnointedAutomation.Concepts.Tests.Reasoning.Language.FreeText
@@ -122,12 +123,15 @@ namespace AnointedAutomation.Concepts.Tests.Reasoning.Language.FreeText
         [InlineData("{\"answer\":\"a\",\"verdict\":\"unknown\",\"confidence\":0.5,\"scripture\":[\"John 99:1\"],\"originalLanguageWords\":[]}", "John has 21 chapters")]
         [InlineData("{\"answer\":\"a\",\"verdict\":\"unknown\",\"confidence\":0.5,\"scripture\":[],\"originalLanguageWords\":[{\"language\":\"latin\",\"lemma\":\"x\",\"transliteration\":\"x\",\"gloss\":\"x\",\"reference\":\"John 3:16\"}]}", "language must be")]
         [InlineData("{\"answer\":\"a\",\"verdict\":\"unknown\",\"confidence\":0.5,\"scripture\":[],\"originalLanguageWords\":[{\"language\":\"hebrew\",\"lemma\":\"\",\"transliteration\":\"x\",\"gloss\":\"x\",\"reference\":\"Genesis 1:1\"}]}", "lemma is blank")]
-        public void Parse_BadReply_Rejected(string reply, string expectedReason)
+        public void Parse_BadReply_RejectedAndLoggedAtError(string reply, string expectedReason)
         {
+            using LogStoreCapture capture = LogStoreCapture.Start();
+
             InterpretationRejected rejected = Assert.Throws<InterpretationRejected>(() => new FreeTextAnswerParser().Parse(reply, "freetext-1", LanguageKit.ModelName));
 
             Assert.Contains(expectedReason, rejected.Reason, StringComparison.Ordinal);
             Assert.Equal(reply, rejected.Reply);
+            Assert.True(capture.Contains(MessageType.Error, "Free-text reply rejected for prompt freetext-1"));
         }
 
         [Fact]
