@@ -11,21 +11,21 @@ namespace AnointedAutomation.Optimization.Logging
     /// logs, and code awaited or started as a task inside the capture is included. Work that does not flow the
     /// execution context (for example a timer created before the capture) is not recorded.
     /// <code>
-    /// using LogCapture capture = LogCapture.Start();
+    /// using LogStoreCapture capture = LogStoreCapture.Start();
     /// service.Refund(order);
     /// Assert.Contains(capture.Entries, e => e.messageType == MessageType.Warning);
     /// </code>
     /// Captures nest: an inner capture's entries also reach the outer one.
     /// </summary>
-    public sealed class LogCapture : IDisposable
+    public sealed class LogStoreCapture : IDisposable
     {
-        private static readonly AsyncLocal<LogCapture> Current = new AsyncLocal<LogCapture>();
+        private static readonly AsyncLocal<LogStoreCapture> Current = new AsyncLocal<LogStoreCapture>();
 
-        private readonly LogCapture _parent;
+        private readonly LogStoreCapture _parent;
         private readonly List<LogMessage> _entries = new List<LogMessage>();
         private volatile bool _disposed;
 
-        private LogCapture(LogCapture parent)
+        private LogStoreCapture(LogStoreCapture parent)
         {
             _parent = parent;
         }
@@ -34,9 +34,9 @@ namespace AnointedAutomation.Optimization.Logging
         /// Starts recording for the current async flow.
         /// </summary>
         /// <returns>The capture; dispose it to stop recording.</returns>
-        public static LogCapture Start()
+        public static LogStoreCapture Start()
         {
-            LogCapture capture = new LogCapture(Current.Value);
+            LogStoreCapture capture = new LogStoreCapture(Current.Value);
             Current.Value = capture;
             return capture;
         }
@@ -113,7 +113,7 @@ namespace AnointedAutomation.Optimization.Logging
         /// <param name="log">The new message.</param>
         internal static void Record(LogMessage log)
         {
-            for (LogCapture capture = Current.Value; capture != null; capture = capture._parent)
+            for (LogStoreCapture capture = Current.Value; capture != null; capture = capture._parent)
             {
                 if (capture._disposed)
                 {

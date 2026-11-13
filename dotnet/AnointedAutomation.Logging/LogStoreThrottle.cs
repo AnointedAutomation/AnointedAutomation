@@ -9,11 +9,11 @@ using System.Threading;
 namespace AnointedAutomation.Optimization.Logging
 {
     /// <summary>
-    /// One summary produced by <see cref="LogThrottle"/> for a key that suppressed entries.
+    /// One summary produced by <see cref="LogStoreThrottle"/> for a key that suppressed entries.
     /// </summary>
-    public sealed class LogThrottleSummary
+    public sealed class LogStoreThrottleSummary
     {
-        internal LogThrottleSummary(string category, MessageType level, int suppressed, string text)
+        internal LogStoreThrottleSummary(string category, MessageType level, int suppressed, string text)
         {
             Category = category;
             Level = level;
@@ -39,10 +39,10 @@ namespace AnointedAutomation.Optimization.Logging
     /// <see cref="MaxIdenticalPerWindow"/> rows with the same rendered text (category + level), and per (category, level,
     /// template) at most <see cref="MaxErrorsPerTemplatePerWindow"/> Errors or <see cref="MaxWarningsPerTemplatePerWindow"/>
     /// of any other level. Critical is never throttled. Every key that suppressed anything yields ONE
-    /// <see cref="LogThrottleSummary"/> when its window ends (or when forced), collected with <see cref="TakeSummaries"/>.
+    /// <see cref="LogStoreThrottleSummary"/> when its window ends (or when forced), collected with <see cref="TakeSummaries"/>.
     /// Thread safe.
     /// </summary>
-    public sealed class LogThrottle
+    public sealed class LogStoreThrottle
     {
         /// <summary>Most rows with the same rendered text (category + level) per window.</summary>
         public const int MaxIdenticalPerWindow = 5;
@@ -63,7 +63,7 @@ namespace AnointedAutomation.Optimization.Logging
         public static readonly TimeSpan DefaultWindow = TimeSpan.FromMinutes(10);
 
         private readonly ConcurrentDictionary<string, State> _states = new ConcurrentDictionary<string, State>(StringComparer.Ordinal);
-        private readonly ConcurrentQueue<LogThrottleSummary> _ready = new ConcurrentQueue<LogThrottleSummary>();
+        private readonly ConcurrentQueue<LogStoreThrottleSummary> _ready = new ConcurrentQueue<LogStoreThrottleSummary>();
         private readonly Func<DateTime> _utcNow;
         private readonly TimeSpan _window;
         private readonly object _resetSync = new object();
@@ -71,7 +71,7 @@ namespace AnointedAutomation.Optimization.Logging
         /// <summary>
         /// Creates a throttle with the <see cref="DefaultWindow"/> and the system UTC clock.
         /// </summary>
-        public LogThrottle()
+        public LogStoreThrottle()
             : this(DefaultWindow, () => DateTime.UtcNow)
         {
         }
@@ -81,7 +81,7 @@ namespace AnointedAutomation.Optimization.Logging
         /// </summary>
         /// <param name="window">Window length; must be positive.</param>
         /// <param name="utcNow">The UTC clock.</param>
-        public LogThrottle(TimeSpan window, Func<DateTime> utcNow)
+        public LogStoreThrottle(TimeSpan window, Func<DateTime> utcNow)
         {
             if (window <= TimeSpan.Zero)
             {
@@ -132,11 +132,11 @@ namespace AnointedAutomation.Optimization.Logging
         /// </summary>
         /// <param name="force">Summarize keys whose window is still open too.</param>
         /// <returns>The summaries, possibly empty.</returns>
-        public IReadOnlyList<LogThrottleSummary> TakeSummaries(bool force)
+        public IReadOnlyList<LogStoreThrottleSummary> TakeSummaries(bool force)
         {
             SummarizeAll(_utcNow(), force, retireAll: false);
-            List<LogThrottleSummary> taken = new List<LogThrottleSummary>();
-            while (_ready.TryDequeue(out LogThrottleSummary summary))
+            List<LogStoreThrottleSummary> taken = new List<LogStoreThrottleSummary>();
+            while (_ready.TryDequeue(out LogStoreThrottleSummary summary))
             {
                 taken.Add(summary);
             }
@@ -235,7 +235,7 @@ namespace AnointedAutomation.Optimization.Logging
             return false;
         }
 
-        private static LogThrottleSummary Summarize(State state, DateTime now)
+        private static LogStoreThrottleSummary Summarize(State state, DateTime now)
         {
             StringBuilder text = new StringBuilder();
             text.Append(string.Create(CultureInfo.InvariantCulture,
@@ -245,7 +245,7 @@ namespace AnointedAutomation.Optimization.Logging
             {
                 text.Append("; suppressed samples: ").Append(string.Join(" | ", state.Samples));
             }
-            return new LogThrottleSummary(state.Category, state.Level, state.Suppressed, text.ToString());
+            return new LogStoreThrottleSummary(state.Category, state.Level, state.Suppressed, text.ToString());
         }
 
         private static string Clip(string text, int max) => text.Length <= max ? text : text.Substring(0, max);

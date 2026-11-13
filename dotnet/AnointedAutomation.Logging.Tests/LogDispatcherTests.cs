@@ -47,7 +47,7 @@ namespace AnointedAutomation.Logging.Tests
             dispatcher.Raise(Row("b", "S"));
             dispatcher.Raise(Row("c", "S"));
             List<string> seen = new List<string>();
-            using LogCapture capture = LogCapture.Start();
+            using LogStoreCapture capture = LogStoreCapture.Start();
 
             dispatcher.Subscribe((s, e) => seen.Add(e.log.message));
 

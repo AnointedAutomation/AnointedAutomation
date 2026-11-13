@@ -1,7 +1,7 @@
 // Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-06-12 11:23:55 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 // Edited 2026-10-28: UTC timestamps, caller file:line, exception overloads, isolated LogAdded subscribers, long ids.
-// Edited 2026-11-12: Debug/Trace, structured properties, scopes, categories, LogCapture, pre-subscription buffer.
+// Edited 2026-11-12: Debug/Trace, structured properties, scopes, categories, LogStoreCapture, pre-subscription buffer.
 //Stewarded by Alexander Fields
 using System;
 using System.Collections.Generic;
@@ -201,13 +201,13 @@ namespace AnointedAutomation.Optimization.Logging
         }
 
         /// <summary>
-        /// Records the message in every active <see cref="LogCapture"/> of this async flow, then hands it to the
+        /// Records the message in every active <see cref="LogStoreCapture"/> of this async flow, then hands it to the
         /// <see cref="LogAdded"/> subscribers (or to the pre-subscription buffer when none has subscribed yet).
         /// </summary>
         /// <param name="log">The new message.</param>
         private static void RaiseLogAdded(LogMessage log)
         {
-            LogCapture.Record(log);
+            LogStoreCapture.Record(log);
             Dispatcher.Raise(log);
         }
 

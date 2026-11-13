@@ -19,7 +19,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Utility
         [Fact]
         public void LogThrottle_LetsOnePerWindowThroughAndCountsTheRest()
         {
-            LogThrottle throttle = new LogThrottle(TimeSpan.FromMinutes(5));
+            WindowLogGate throttle = new WindowLogGate(TimeSpan.FromMinutes(5));
             DateTime start = new DateTime(2026, 10, 28, 12, 0, 0, DateTimeKind.Utc);
 
             Assert.True(throttle.TryEnter(start, out int first));

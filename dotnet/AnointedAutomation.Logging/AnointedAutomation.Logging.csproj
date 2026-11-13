@@ -10,7 +10,7 @@
     <Title>AnointedAutomation.Logging</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
     <Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
-    <Description>A lightweight log message model with severity levels (Debug and Trace included), automatic caller detection, structured properties, async scopes, categories, a per-flow LogCapture test helper, a shared LogThrottle, an ILogger adapter and a static LogAdded event for routing logs.</Description>
+    <Description>A lightweight log message model with severity levels (Debug and Trace included), automatic caller detection, structured properties, async scopes, categories, a per-flow LogStoreCapture test helper, a shared LogStoreThrottle, an ILogger adapter and a static LogAdded event for routing logs.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
     <Version>1.1.0</Version>
     <PackageTags>logging;log;diagnostics;events;anointedautomation</PackageTags>
