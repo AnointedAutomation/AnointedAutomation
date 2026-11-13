@@ -1,8 +1,10 @@
 // Copyright © Anointed Automation Corporation., 2024. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2024-06-12 11:23:55 Jesus is King ✝️
 // Edited by Alexander Fields https://www.alexanderfields.me 2025-07-02 11:48:25
 // Edited 2026-10-28: UTC timestamps, caller file:line, exception overloads, isolated LogAdded subscribers, long ids.
+// Edited 2026-11-12: Debug/Trace, structured properties, scopes, categories, LogStoreCapture, pre-subscription buffer.
 //Stewarded by Alexander Fields
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
@@ -11,7 +13,7 @@ namespace AnointedAutomation.Optimization.Logging
     /// <summary>
     /// Log Message Object for easier logging
     /// </summary>
-    public class LogMessage
+    public partial class LogMessage
     {
         /// <summary>
         /// Extracts the actual method name from async state machine types
@@ -126,8 +128,19 @@ namespace AnointedAutomation.Optimization.Logging
         /// Factory constructor: uses the compiler-supplied caller information instead of a stack walk.
         /// </summary>
         private LogMessage(long id, MessageType messageType, string message, Exception exception, string callerMemberName, string callerFilePath, int callerLineNumber)
+            : this(id, messageType, message, exception, null, null, callerMemberName, callerFilePath, callerLineNumber)
+        {
+        }
+
+        /// <summary>
+        /// Factory constructor with an explicit category (null derives it from the caller file) and call-site properties
+        /// (merged over the active <see cref="Scope"/> properties).
+        /// </summary>
+        private LogMessage(long id, MessageType messageType, string message, Exception exception, string category, (string Key, object Value)[] callProperties, string callerMemberName, string callerFilePath, int callerLineNumber)
         {
             this.id = id;
+            this.category = category == null ? FileStem(callerFilePath) : category;
+            ApplyProperties(this, callProperties);
             timeStamp = DateTime.UtcNow;
             messageSource = MessageSourceSetter;
             this.callerMemberName = callerMemberName;
@@ -165,38 +178,66 @@ namespace AnointedAutomation.Optimization.Logging
             {
                 return null;
             }
-            int slash = Math.Max(file.LastIndexOf('/'), file.LastIndexOf('\\'));
-            string fileName = slash >= 0 ? file.Substring(slash + 1) : file;
-            int dot = fileName.LastIndexOf('.');
-            string stem = dot > 0 ? fileName.Substring(0, dot) : fileName;
+            string stem = FileStem(file);
             return line > 0 ? $"{stem}.{member}:{line}" : $"{stem}.{member}";
         }
 
         /// <summary>
-        /// Raises <see cref="LogAdded"/> for each subscriber separately. A subscriber that throws is reported on
-        /// <see cref="Console.Error"/> and never propagates into the code that merely logged.
+        /// The file name without directory or extension ("C:\src\OrderService.cs" gives "OrderService"), used as the
+        /// default category. Null or empty input gives null.
+        /// </summary>
+        /// <param name="file">A source file path.</param>
+        /// <returns>The file stem, or null.</returns>
+        internal static string FileStem(string file)
+        {
+            if (string.IsNullOrEmpty(file))
+            {
+                return null;
+            }
+            int slash = Math.Max(file.LastIndexOf('/'), file.LastIndexOf('\\'));
+            string fileName = slash >= 0 ? file.Substring(slash + 1) : file;
+            int dot = fileName.LastIndexOf('.');
+            return dot > 0 ? fileName.Substring(0, dot) : fileName;
+        }
+
+        /// <summary>
+        /// Records the message in every active <see cref="LogStoreCapture"/> of this async flow, then hands it to the
+        /// <see cref="LogAdded"/> subscribers (or to the pre-subscription buffer when none has subscribed yet).
         /// </summary>
         /// <param name="log">The new message.</param>
         private static void RaiseLogAdded(LogMessage log)
         {
-            LogAddedEventHandler handlers = LogAdded;
-            if (handlers == null)
-            {
-                return;
-            }
-            LogMessageEventArgs args = new LogMessageEventArgs(log);
-            foreach (Delegate handler in handlers.GetInvocationList())
-            {
-                try
-                {
-                    ((LogAddedEventHandler)handler)(log, args);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"[AnointedAutomation.Logging] LogAdded subscriber {handler.Method.DeclaringType?.FullName}.{handler.Method.Name} threw while handling a {log.messageType} log from {log.localOperationName}: {ex}");
-                }
-            }
+            LogStoreCapture.Record(log);
+            Dispatcher.Raise(log);
         }
+
+        /// <summary>
+        /// Value of <see cref="MessageSourceSetter"/> until the host names itself.
+        /// </summary>
+        public const string UnsetMessageSource = "You didn't set the name of your program!";
+
+        /// <summary>
+        /// Opt-in for hosts: buffers messages raised before the first <see cref="LogAdded"/> subscriber attaches (up to
+        /// <see cref="PreSubscriptionBufferCapacity"/>) and delivers them to it, so startup logs are not lost. Call it first
+        /// thing in Main, before anything logs. Off by default, so libraries and test processes never hold or replay stale
+        /// messages. Has no effect (returns false) once a subscriber has attached.
+        /// </summary>
+        /// <returns>True when buffering is on; false when a subscriber already attached.</returns>
+        public static bool BufferUntilFirstSubscriber()
+        {
+            return Dispatcher.EnableBuffering();
+        }
+
+        /// <summary>
+        /// Most messages kept for the first <see cref="LogAdded"/> subscriber while none exists (startup ordering).
+        /// When more arrive the oldest are dropped and the first subscriber receives one Warning with the dropped count.
+        /// </summary>
+        public const int PreSubscriptionBufferCapacity = 1000;
+
+        /// <summary>
+        /// The process-wide subscriber list and startup buffer behind <see cref="LogAdded"/>.
+        /// </summary>
+        internal static readonly LogDispatcher Dispatcher = new LogDispatcher(PreSubscriptionBufferCapacity);
 
         // Define the delegate and event
         /// <summary>
@@ -207,16 +248,23 @@ namespace AnointedAutomation.Optimization.Logging
         public delegate void LogAddedEventHandler(object sender, LogMessageEventArgs e);
 
         /// <summary>
-        /// Event triggered when a new log message is added. Each subscriber is invoked in isolation: an exception in
+        /// Event triggered when a new log message is added. Handlers run synchronously on the logging thread, so they
+        /// must be fast and must not block (queue the work). Each subscriber is invoked in isolation: an exception in
         /// one subscriber is written to <see cref="Console.Error"/> and does not reach the logging caller or other subscribers.
+        /// After <see cref="BufferUntilFirstSubscriber"/>, messages raised before the FIRST subscriber ever attaches are
+        /// buffered (up to <see cref="PreSubscriptionBufferCapacity"/>) and delivered to that subscriber when it attaches.
         /// </summary>
-        public static event LogAddedEventHandler LogAdded;
+        public static event LogAddedEventHandler LogAdded
+        {
+            add { Dispatcher.Subscribe(value); }
+            remove { Dispatcher.Unsubscribe(value); }
+        }
 
         /// <summary>
         /// Gets or sets the default message source for all log messages.
         /// Default value indicates that the program name hasn't been set.
         /// </summary>
-        public static string MessageSourceSetter { get; set; } = "You didn't set the name of your program!";
+        public static string MessageSourceSetter { get; set; } = UnsetMessageSource;
 
         /// <summary>
         /// Gets or sets the unique identifier for the log message.
@@ -269,9 +317,17 @@ namespace AnointedAutomation.Optimization.Logging
         /// </summary>
         public string storeSlug { get; set; }
         /// <summary>
-        /// Gets or sets optional structured properties (for example a JSON object of ids), or null.
+        /// Gets or sets optional structured properties as a JSON object, or null. The factories fill it from the
+        /// <see cref="Scope"/> and call-site properties (see <see cref="structuredProperties"/>).
         /// </summary>
         public string properties { get; set; }
+        /// <summary>
+        /// Gets or sets the structured properties (active scopes first, call-site values win on a repeated key), or null
+        /// when there are none. <see cref="properties"/> holds the same values as JSON, and is the field to persist: this one
+        /// is in-memory only (internal setter, ignored by JSON) so existing document mappings of LogMessage do not change.
+        /// </summary>
+        [System.Text.Json.Serialization.JsonIgnore]
+        public IReadOnlyDictionary<string, object> structuredProperties { get; internal set; }
 
         /// <summary>
         /// Creates a celebrate log message (MessageType.Celebrate) and raises <see cref="LogAdded"/>.

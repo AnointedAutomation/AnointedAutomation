@@ -52,7 +52,7 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.2.0
+### AnointedAutomation.APIMiddlewares 1.2.1
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
@@ -142,14 +142,14 @@ string svg = QrRenderer.ToSvg(matrix);
 byte[] png = QrRenderer.ToPng(matrix, moduleSize: 10);
 ```
 
-### AnointedAutomation.Logging 1.0.8
+### AnointedAutomation.Logging 1.1.0
 
-A tiny log record plus a static event you can route to any sink. A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.
+A tiny log record plus a static event you can route to any sink. A lightweight log message model with severity levels (Debug and Trace included), automatic caller detection, structured properties, async scopes, categories, a per-flow LogStoreCapture test helper, a shared LogStoreThrottle, an ILogger adapter and a static LogAdded event for routing logs.
 
-- Depends on: NuGet none; AnointedAutomation none
+- Depends on: NuGet Microsoft.Extensions.Logging.Abstractions; AnointedAutomation none
 - Namespaces: `AnointedAutomation.Optimization.Logging`
-- Key types: `LogMessage`, `MessageType`, `LogMessageEventArgs`
-- Notes: Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational; Error/Warning/Critical also take (message, Exception). Timestamps are UTC; factories record caller file:line. Embedded PDBs.
+- Key types: `LogMessage`, `MessageType`, `LogMessageEventArgs`, `LogSource`, `LogStoreCapture`, `LogStoreThrottle`, `LogStoreThrottleSummary`, `LogMessageLogger`, `LogMessageLoggerProvider`
+- Notes: Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational; Error/Warning/Critical also take (message, Exception). 1.1.0: Debug/Trace (MessageType 7/8), up to four inline properties per call (`LogMessage.Warning(msg, ex, ("orderId", id))`), `LogMessage.Scope(...)` (AsyncLocal), category from the caller file or `LogMessage.For<T>()`, `LogStoreCapture.Start()` per-flow test capture, `LogStoreThrottle`, `LogMessageLogger`/`LogMessageLoggerProvider` ILogger adapter, opt-in startup buffer (`LogMessage.BufferUntilFirstSubscriber()`) flushed to the first LogAdded subscriber. Timestamps are UTC; factories record caller file:line. Embedded PDBs.
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Logging (README: https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Logging/README.md)
 
 ```bash

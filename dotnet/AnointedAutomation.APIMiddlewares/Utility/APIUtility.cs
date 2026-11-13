@@ -22,7 +22,7 @@ namespace AnointedAutomation.APIMiddleware.Utility
         internal const string UnknownClientIp = "198.51.100.255";
 
         /// <summary>One "no client IP" warning per 5 minutes, with the count of the ones held back.</summary>
-        internal static readonly LogThrottle MissingIpThrottle = new LogThrottle(TimeSpan.FromMinutes(5));
+        internal static readonly WindowLogGate MissingIpThrottle = new WindowLogGate(TimeSpan.FromMinutes(5));
 
         /// <summary>
         /// "METHOD /path" for log lines (no query string, which can carry tokens). Never throws.

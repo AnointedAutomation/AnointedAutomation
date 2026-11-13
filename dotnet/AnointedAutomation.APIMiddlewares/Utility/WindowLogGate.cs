@@ -6,8 +6,10 @@ namespace AnointedAutomation.APIMiddleware.Utility
     /// <summary>
     /// Lets one log line through per time window and counts the ones it held back, so a per-request condition
     /// is recorded once (with how often it happened) instead of once per request.
+    /// Deliberately not AnointedAutomation.Logging's LogStoreThrottle: that one caps lines per template and level and
+    /// queues summaries for a sink, while this gate guards one fixed condition and reports the held-back count inline.
     /// </summary>
-    internal sealed class LogThrottle
+    internal sealed class WindowLogGate
     {
         private readonly object _gate = new object();
         private readonly TimeSpan _window;
@@ -16,7 +18,7 @@ namespace AnointedAutomation.APIMiddleware.Utility
 
         /// <summary>Creates a throttle.</summary>
         /// <param name="window">How long one logged line covers.</param>
-        internal LogThrottle(TimeSpan window)
+        internal WindowLogGate(TimeSpan window)
         {
             _window = window;
         }

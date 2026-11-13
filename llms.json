@@ -65,7 +65,7 @@
     },
     {
       "id": "AnointedAutomation.APIMiddlewares",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "targetFramework": "net10.0",
       "description": "ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.APIMiddlewares",
@@ -228,14 +228,16 @@
     },
     {
       "id": "AnointedAutomation.Logging",
-      "version": "1.0.8",
+      "version": "1.1.0",
       "targetFramework": "net10.0",
-      "description": "A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.",
+      "description": "A lightweight log message model with severity levels (Debug and Trace included), automatic caller detection, structured properties, async scopes, categories, a per-flow LogStoreCapture test helper, a shared LogStoreThrottle, an ILogger adapter and a static LogAdded event for routing logs.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Logging",
       "source": "https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.Logging",
       "readme": "https://github.com/AnointedAutomation/AnointedAutomation/blob/master/dotnet/AnointedAutomation.Logging/README.md",
       "dependencies": {
-        "nuget": [],
+        "nuget": [
+          "Microsoft.Extensions.Logging.Abstractions"
+        ],
         "anointed": []
       },
       "keyNamespaces": [
@@ -244,7 +246,13 @@
       "keyTypes": [
         "LogMessage",
         "MessageType",
-        "LogMessageEventArgs"
+        "LogMessageEventArgs",
+        "LogSource",
+        "LogStoreCapture",
+        "LogStoreThrottle",
+        "LogStoreThrottleSummary",
+        "LogMessageLogger",
+        "LogMessageLoggerProvider"
       ],
       "notes": "Namespace is AnointedAutomation.Optimization.Logging (historical). Factories: LogMessage.Info, Error, Critical, Celebrate, Informational; Error/Warning/Critical also take (message, Exception). Timestamps are UTC; factories record caller file:line. Embedded PDBs."
     },

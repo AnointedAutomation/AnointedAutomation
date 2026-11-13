@@ -10,9 +10,9 @@
     <Title>AnointedAutomation.Logging</Title>
     <Company>Anointed Automation Corporation - Alexander Fields</Company>
     <Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
-    <Description>A lightweight log message model with severity levels, automatic caller detection and a static LogAdded event for routing logs.</Description>
+    <Description>A lightweight log message model with severity levels (Debug and Trace included), automatic caller detection, structured properties, async scopes, categories, a per-flow LogStoreCapture test helper, a shared LogStoreThrottle, an ILogger adapter and a static LogAdded event for routing logs.</Description>
     <RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-    <Version>1.0.8</Version>
+    <Version>1.1.0</Version>
     <PackageTags>logging;log;diagnostics;events;anointedautomation</PackageTags>
     <PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Logging</PackageReleaseNotes>
 	  <Authors>Anointed Automation Corporation, Alexander Fields</Authors>
@@ -31,6 +31,10 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.15" />
   </ItemGroup>
 
   <ItemGroup>
