@@ -9,18 +9,18 @@ using Xunit;
 namespace AnointedAutomation.Logging.Tests
 {
     /// <summary>
-    /// The shared LogThrottle limits and summaries.
+    /// The shared LogStoreThrottle limits and summaries.
     /// </summary>
-    public class LogThrottleTests
+    public class LogStoreThrottleTests
     {
         private DateTime _now = new DateTime(2026, 11, 12, 0, 0, 0, DateTimeKind.Utc);
 
-        private LogThrottle NewThrottle() => new LogThrottle(TimeSpan.FromMinutes(10), () => _now);
+        private LogStoreThrottle NewThrottle() => new LogStoreThrottle(TimeSpan.FromMinutes(10), () => _now);
 
         [Fact]
         public void IdenticalText_PassesFiveTimesPerWindow_ThenSummarizesWhenWindowEnds()
         {
-            LogThrottle throttle = NewThrottle();
+            LogStoreThrottle throttle = NewThrottle();
             int passed = 0;
             for (int i = 0; i < 8; i++)
             {
@@ -30,12 +30,12 @@ namespace AnointedAutomation.Logging.Tests
                 }
             }
 
-            Assert.Equal(LogThrottle.MaxIdenticalPerWindow, passed);
+            Assert.Equal(LogStoreThrottle.MaxIdenticalPerWindow, passed);
             Assert.Empty(throttle.TakeSummaries(force: false));
 
             _now = _now.AddMinutes(11);
-            IReadOnlyList<LogThrottleSummary> summaries = throttle.TakeSummaries(force: false);
-            LogThrottleSummary summary = Assert.Single(summaries);
+            IReadOnlyList<LogStoreThrottleSummary> summaries = throttle.TakeSummaries(force: false);
+            LogStoreThrottleSummary summary = Assert.Single(summaries);
             Assert.Equal(3, summary.Suppressed);
             Assert.Equal("Cat", summary.Category);
             Assert.Equal(MessageType.Warning, summary.Level);
@@ -46,7 +46,7 @@ namespace AnointedAutomation.Logging.Tests
         [Fact]
         public void Template_CapsWarningsAndErrorsSeparately()
         {
-            LogThrottle throttle = NewThrottle();
+            LogStoreThrottle throttle = NewThrottle();
             int warnings = 0;
             int errors = 0;
             for (int i = 0; i < 300; i++)
@@ -55,14 +55,14 @@ namespace AnointedAutomation.Logging.Tests
                 if (throttle.TryPass("Cat", MessageType.Error, "order {Id}", "order " + i)) errors++;
             }
 
-            Assert.Equal(LogThrottle.MaxWarningsPerTemplatePerWindow, warnings);
-            Assert.Equal(LogThrottle.MaxErrorsPerTemplatePerWindow, errors);
+            Assert.Equal(LogStoreThrottle.MaxWarningsPerTemplatePerWindow, warnings);
+            Assert.Equal(LogStoreThrottle.MaxErrorsPerTemplatePerWindow, errors);
         }
 
         [Fact]
         public void Critical_IsNeverThrottled()
         {
-            LogThrottle throttle = NewThrottle();
+            LogStoreThrottle throttle = NewThrottle();
             for (int i = 0; i < 50; i++)
             {
                 Assert.True(throttle.TryPass("Cat", MessageType.Critical, null, "same"));
@@ -72,7 +72,7 @@ namespace AnointedAutomation.Logging.Tests
         [Fact]
         public void ForcedSummaries_ReportOpenWindowsOnce_AndRolledWindowsQueueTheirSummary()
         {
-            LogThrottle throttle = NewThrottle();
+            LogStoreThrottle throttle = NewThrottle();
             for (int i = 0; i < 7; i++)
             {
                 throttle.TryPass("Cat", MessageType.Error, null, "x");
@@ -91,7 +91,7 @@ namespace AnointedAutomation.Logging.Tests
         public async Task ConcurrentPassesAndSummaries_NeverLoseACount()
         {
             long ticks = new DateTime(2026, 11, 12, 0, 0, 0, DateTimeKind.Utc).Ticks;
-            LogThrottle throttle = new LogThrottle(TimeSpan.FromMinutes(10), () => new DateTime(Interlocked.Read(ref ticks), DateTimeKind.Utc));
+            LogStoreThrottle throttle = new LogStoreThrottle(TimeSpan.FromMinutes(10), () => new DateTime(Interlocked.Read(ref ticks), DateTimeKind.Utc));
             const int writers = 4;
             const int perWriter = 5000;
             int passed = 0;
@@ -103,7 +103,7 @@ namespace AnointedAutomation.Logging.Tests
                 while (!stop.IsCancellationRequested)
                 {
                     Interlocked.Add(ref ticks, TimeSpan.FromMinutes(3).Ticks);
-                    foreach (LogThrottleSummary summary in throttle.TakeSummaries(force: true))
+                    foreach (LogStoreThrottleSummary summary in throttle.TakeSummaries(force: true))
                     {
                         Interlocked.Add(ref suppressed, summary.Suppressed);
                     }
@@ -121,7 +121,7 @@ namespace AnointedAutomation.Logging.Tests
             });
             stop.Cancel();
             await sweeper;
-            foreach (LogThrottleSummary summary in throttle.TakeSummaries(force: true))
+            foreach (LogStoreThrottleSummary summary in throttle.TakeSummaries(force: true))
             {
                 suppressed += summary.Suppressed;
             }
@@ -132,9 +132,9 @@ namespace AnointedAutomation.Logging.Tests
         [Fact]
         public void Constructor_RejectsBadArguments()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => new LogThrottle(TimeSpan.Zero, () => DateTime.UtcNow));
-            Assert.Throws<ArgumentNullException>(() => new LogThrottle(TimeSpan.FromMinutes(1), null));
-            Assert.Throws<ArgumentNullException>(() => new LogThrottle().TryPass("c", MessageType.Warning, null, null));
+            Assert.Throws<ArgumentOutOfRangeException>(() => new LogStoreThrottle(TimeSpan.Zero, () => DateTime.UtcNow));
+            Assert.Throws<ArgumentNullException>(() => new LogStoreThrottle(TimeSpan.FromMinutes(1), null));
+            Assert.Throws<ArgumentNullException>(() => new LogStoreThrottle().TryPass("c", MessageType.Warning, null, null));
         }
     }
 }

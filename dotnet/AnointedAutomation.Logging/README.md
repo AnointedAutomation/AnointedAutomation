@@ -141,8 +141,8 @@ Log.Error("capture failed", ex, ("orderId", orderId));
 
 | Type | Purpose |
 |---|---|
-| `LogCapture` | Test helper: `using LogCapture capture = LogCapture.Start();` records the messages of the current async flow only, so parallel xUnit/NUnit tests never see each other's logs. `Entries`, `OfLevel`, `Contains`. |
-| `LogThrottle` | Shared store throttle: 5 identical rows, 50 per template (200 for Errors) per 10-minute window, Critical never throttled; `TakeSummaries(force)` returns one summary per key that suppressed rows. |
+| `LogStoreCapture` | Test helper: `using LogStoreCapture capture = LogStoreCapture.Start();` records the messages of the current async flow only, so parallel xUnit/NUnit tests never see each other's logs. `Entries`, `OfLevel`, `Contains`. |
+| `LogStoreThrottle` | Shared store throttle: 5 identical rows, 50 per template (200 for Errors) per 10-minute window, Critical never throttled; `TakeSummaries(force)` returns one summary per key that suppressed rows. |
 | `LogMessageLogger` / `LogMessageLoggerProvider` | `ILogger` adapter for third-party APIs that require one; writes through `LogMessage` with state pairs as properties. |
 
 Startup ordering (opt-in): call `LogMessage.BufferUntilFirstSubscriber()` first thing in `Main`; messages raised before the

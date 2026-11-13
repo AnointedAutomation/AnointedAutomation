@@ -10,7 +10,7 @@ using Xunit;
 namespace AnointedAutomation.Logging.Tests
 {
     /// <summary>
-    /// Debug/Trace levels, structured properties, scopes, categories, LogCapture and the ILogger adapter.
+    /// Debug/Trace levels, structured properties, scopes, categories, LogStoreCapture and the ILogger adapter.
     /// </summary>
     public class LogStructuredTests
     {
@@ -34,7 +34,7 @@ namespace AnointedAutomation.Logging.Tests
         [Fact]
         public void DebugAndTrace_FactoriesSetLevelAndFileCategory()
         {
-            using LogCapture capture = LogCapture.Start();
+            using LogStoreCapture capture = LogStoreCapture.Start();
 
             LogMessage debug = LogMessage.Debug("cache miss");
             LogMessage trace = LogMessage.Trace(7, "step");
@@ -143,7 +143,7 @@ namespace AnointedAutomation.Logging.Tests
         }
 
         [Fact]
-        public async Task LogCapture_IsIsolatedPerAsyncFlow()
+        public async Task LogStoreCapture_IsIsolatedPerAsyncFlow()
         {
             string markerA = "cap-a-" + Guid.NewGuid().ToString("N");
             string markerB = "cap-b-" + Guid.NewGuid().ToString("N");
@@ -162,7 +162,7 @@ namespace AnointedAutomation.Logging.Tests
 
         private static IReadOnlyList<LogMessage> CaptureWhileOtherLogs(string marker, Barrier barrier)
         {
-            using LogCapture capture = LogCapture.Start();
+            using LogStoreCapture capture = LogStoreCapture.Start();
             barrier.SignalAndWait();
             LogMessage.Warning(marker);
             barrier.SignalAndWait();
@@ -170,10 +170,10 @@ namespace AnointedAutomation.Logging.Tests
         }
 
         [Fact]
-        public void LogCapture_NestsAndStopsOnDispose()
+        public void LogStoreCapture_NestsAndStopsOnDispose()
         {
-            using LogCapture outer = LogCapture.Start();
-            LogCapture inner = LogCapture.Start();
+            using LogStoreCapture outer = LogStoreCapture.Start();
+            LogStoreCapture inner = LogStoreCapture.Start();
             LogMessage.Error("both");
             inner.Dispose();
             LogMessage.Error("outer only");
@@ -214,7 +214,7 @@ namespace AnointedAutomation.Logging.Tests
         [Fact]
         public void LogMessageLogger_MapsLevelsStateEventIdAndException()
         {
-            using LogCapture capture = LogCapture.Start();
+            using LogStoreCapture capture = LogStoreCapture.Start();
             LogMessageLogger logger = new LogMessageLogger("Sdk.Client", LogLevel.Information);
 
             logger.LogWarning(new EventId(12), new InvalidOperationException("x"), "Retry {Attempt} for {Url}", 3, "https://a");
@@ -244,7 +244,7 @@ namespace AnointedAutomation.Logging.Tests
             Assert.Equal(MessageType.Informational, LogMessageLogger.ToMessageType(LogLevel.Information));
             Assert.Throws<ArgumentOutOfRangeException>(() => LogMessageLogger.ToMessageType(LogLevel.None));
 
-            using LogCapture capture = LogCapture.Start();
+            using LogStoreCapture capture = LogStoreCapture.Start();
             using (logger.BeginScope(new Dictionary<string, object> { ["jobId"] = "j1" }))
             using (logger.BeginScope("plain text"))
             {
@@ -260,7 +260,7 @@ namespace AnointedAutomation.Logging.Tests
         public void LogMessageLoggerProvider_CreatesCategoryLoggers()
         {
             using LogMessageLoggerProvider provider = new LogMessageLoggerProvider(LogLevel.Debug);
-            using LogCapture capture = LogCapture.Start();
+            using LogStoreCapture capture = LogStoreCapture.Start();
 
             provider.CreateLogger("Third.Party").LogDebug("hello");
 
