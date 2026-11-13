@@ -17,7 +17,7 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Utility
     public class LogNoiseTests
     {
         [Fact]
-        public void LogThrottle_LetsOnePerWindowThroughAndCountsTheRest()
+        public void WindowLogGate_LetsOnePerWindowThroughAndCountsTheRest()
         {
             WindowLogGate throttle = new WindowLogGate(TimeSpan.FromMinutes(5));
             DateTime start = new DateTime(2026, 10, 28, 12, 0, 0, DateTimeKind.Utc);

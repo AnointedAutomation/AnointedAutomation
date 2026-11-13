@@ -143,7 +143,7 @@ namespace AnointedAutomation.Logging.Tests
         }
 
         [Fact]
-        public async Task LogCapture_IsIsolatedPerAsyncFlow()
+        public async Task LogStoreCapture_IsIsolatedPerAsyncFlow()
         {
             string markerA = "cap-a-" + Guid.NewGuid().ToString("N");
             string markerB = "cap-b-" + Guid.NewGuid().ToString("N");
@@ -170,7 +170,7 @@ namespace AnointedAutomation.Logging.Tests
         }
 
         [Fact]
-        public void LogCapture_NestsAndStopsOnDispose()
+        public void LogStoreCapture_NestsAndStopsOnDispose()
         {
             using LogStoreCapture outer = LogStoreCapture.Start();
             LogStoreCapture inner = LogStoreCapture.Start();
