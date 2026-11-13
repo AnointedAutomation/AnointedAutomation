@@ -51,6 +51,9 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     target-branch: "develop"
+    ignore:
+      # Owner rule: references to our own AnointedAutomation.* packages use Version="*" and are never pinned.
+      - dependency-name: "AnointedAutomation.*"
     labels:
       - "dependencies"
       - "automated pr"
@@ -72,6 +75,9 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     target-branch: "develop"
+    ignore:
+      # Owner rule: references to our own AnointedAutomation.* packages use Version="*" and are never pinned.
+      - dependency-name: "AnointedAutomation.*"
     labels:
       - "dependencies"
       - "automated pr"
