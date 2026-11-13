@@ -22,7 +22,7 @@ namespace AnointedAutomation.Concepts.Reasoning.Language.FreeText
             Lemma = ReasoningGuard.NotBlank(lemma, nameof(lemma));
             Transliteration = ReasoningGuard.NotBlank(transliteration, nameof(transliteration));
             Gloss = ReasoningGuard.NotBlank(gloss, nameof(gloss));
-            Reference = ReasoningGuard.NotNull(reference, nameof(reference));
+            Reference = reference;
         }
 
         /// <summary>
