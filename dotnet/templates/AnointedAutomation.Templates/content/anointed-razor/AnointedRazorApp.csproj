@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AnointedAutomation.SSO" Version="*" />
-    <PackageReference Include="AnointedAutomation.SSO.UI" Version="*" />
+    <PackageReference Include="AnointedAutomation.SSO" Version="1.0.4" />
+    <PackageReference Include="AnointedAutomation.SSO.UI" Version="1.0.1" />
   </ItemGroup>
 
 </Project>

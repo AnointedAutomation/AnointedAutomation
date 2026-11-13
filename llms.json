@@ -654,7 +654,7 @@
     },
     {
       "id": "AnointedAutomation.Templates",
-      "version": "1.0.2",
+      "version": "1.0.3",
       "targetFramework": "net10.0",
       "description": "dotnet new templates: anointed-razor (Razor Pages) and anointed-blazor (Blazor Web App, interactive server), wired to AnointedAutomation.SSO and AnointedAutomation.SSO.UI with the client id and secret in user-secrets.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Templates",
