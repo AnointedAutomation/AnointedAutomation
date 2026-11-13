@@ -52,7 +52,7 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.2.0
+### AnointedAutomation.APIMiddlewares 1.2.1
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
