@@ -469,8 +469,8 @@ store, `AnointedSessionStatusClient`, `AnointedSignInButton` HTML helper. Tests:
 on Windows (`test-owin-windows` CI job).
 
 ### 15. AnointedAutomation.Templates v1.0.0 (`dotnet/templates/AnointedAutomation.Templates/`)
-`dotnet new` template pack: `anointed-razor`, `anointed-blazor`. `content/*/*.csproj` pin SSO and SSO.UI; the
-version-increment workflow keeps those pins current.
+`dotnet new` template pack: `anointed-razor`, `anointed-blazor`. `content/*/*.csproj` reference SSO and SSO.UI with
+`Version="*"` and are never pinned.
 
 ## JavaScript Packages (`js/`)
 
