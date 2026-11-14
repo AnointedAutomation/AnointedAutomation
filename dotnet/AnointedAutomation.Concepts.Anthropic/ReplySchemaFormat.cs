@@ -19,7 +19,17 @@ namespace AnointedAutomation.Concepts.Anthropic
 
         internal static Dictionary<string, JsonElement> Create()
         {
-            JsonObject root = JsonNode.Parse(PromptComposer.ReplySchema).AsObject();
+            return Create(PromptComposer.ReplySchema);
+        }
+
+        internal static Dictionary<string, JsonElement> Create(string replySchema)
+        {
+            if (string.IsNullOrWhiteSpace(replySchema))
+            {
+                throw new System.ArgumentException("The reply schema is empty.", nameof(replySchema));
+            }
+
+            JsonObject root = JsonNode.Parse(replySchema).AsObject();
             Strip(root);
             Dictionary<string, JsonElement> schema = new Dictionary<string, JsonElement>();
             foreach (KeyValuePair<string, JsonNode> property in root)

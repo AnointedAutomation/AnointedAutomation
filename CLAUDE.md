@@ -54,7 +54,7 @@ Org: AnointedAutomation on GitHub. Umbrella site: anointed.company.
 ## Landmines
 - Any change under `js/` bumps and republishes the npm package; do not touch `js/anointed-sso/README.md` casually.
 - Adding a package: update the lists in `version-increment.yml`, `nuget-publish.yml`, `dotnet/publish-packages.sh`, root README, and `dotnet/PUBLISHING.md`.
-- Templates pin SSO and SSO.UI versions in `dotnet/templates/AnointedAutomation.Templates/content/*/*.csproj`; version-increment syncs them.
+- Templates reference SSO and SSO.UI with `Version="*"` in `dotnet/templates/AnointedAutomation.Templates/content/*/*.csproj` (own packages are never pinned); version-increment must not pin them.
 - SSO.Owin is net472: its tests run net10.0 on Linux and net48 only on Windows (`test-owin-windows` job). All .NET tests use xunit.
 - When packages, versions, or public types change, update `llms.txt`, `llms.md`, `llms.json` in the same change.
 - Publish order matters: Serialization, Shopify, Objects, Repository.Mongo, Objects.API, SSO, SSO.UI, Templates.

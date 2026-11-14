@@ -373,6 +373,10 @@ All billing models include complete XML documentation
 - 1.1.0: Trinity (one essence, three distinct Persons, undivided works), Presence (Holy Spirit),
   the triadic coherence rule (ground x Word x Spirit), the love triad (Lover x Beloved x Bond) with a
   binary commitment gate and condilectio, and Creed.ToJson()/Creed.ToPrompt() (AI constitution)
+- 2.4.0: free-text asks (`Reasoning/Language/FreeText`): `FreeTextQuestion` (text 1-2000 chars, `AskMode` BibleAnswer,
+  BibleStudy, DreamAnalysis), `FreeTextPromptComposer` (one prompt, own `ReplySchema`: answer, verdict, confidence,
+  scripture, originalLanguageWords; Hebrew/Aramaic/Greek reasoning, NASB English), strict `FreeTextAnswerParser`,
+  `FreeTextReasoner` (one call), and the `IStructuredLanguageModel` port (reply schema per call)
 - See PROJECT_STRUCTURE_CODE.md sections 4a for full class-level detail and the design spec at
   `docs/design/specs/2026-07-02-theology-engine-design.md`
 
@@ -385,13 +389,15 @@ All billing models include complete XML documentation
 - **Internal:** None (foundational for Concepts/Mathematics)
 - **External:** .NET 10.0 (net10.0) framework only
 
-### 9a. AnointedAutomation.Concepts.Anthropic v1.0.0
+### 9a. AnointedAutomation.Concepts.Anthropic v1.1.0
 
 **Purpose & Functionality:**
 - Optional adapter (dual engine PR 5 of 5): `AnthropicLanguageModel` implements the core `ILanguageModel` port with
   Claude through the official Anthropic .NET SDK (NuGet `Anthropic` 13.8.0)
 - One Messages API call per question with structured outputs (schema from `PromptComposer.ReplySchema`, minus the
   numeric/length bounds structured outputs reject; the core parser still enforces them)
+- 1.1.0: also implements `IStructuredLanguageModel`: `Complete(prompt, replySchema, ct)` sends a caller schema (cached per
+  schema), used by `FreeTextReasoner`
 - `AnthropicLanguageModelOptions`: ApiKey, Model, MaxTokens, TimeoutSeconds, MaxAttempts (1-10),
   RetryBaseDelayMilliseconds, all required, no defaults; the key is never logged
 - Errors: 429/408/5xx/overload/network/timeout retried with bounded exponential backoff, then
@@ -463,8 +469,8 @@ store, `AnointedSessionStatusClient`, `AnointedSignInButton` HTML helper. Tests:
 on Windows (`test-owin-windows` CI job).
 
 ### 15. AnointedAutomation.Templates v1.0.0 (`dotnet/templates/AnointedAutomation.Templates/`)
-`dotnet new` template pack: `anointed-razor`, `anointed-blazor`. `content/*/*.csproj` pin SSO and SSO.UI; the
-version-increment workflow keeps those pins current.
+`dotnet new` template pack: `anointed-razor`, `anointed-blazor`. `content/*/*.csproj` reference SSO and SSO.UI with
+`Version="*"` and are never pinned.
 
 ## JavaScript Packages (`js/`)
 

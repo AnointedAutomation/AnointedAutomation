@@ -1,6 +1,7 @@
 // Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-11-12 Jesus is King ✝️
 // Stewarded by Alexander Fields
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -17,14 +18,14 @@ namespace AnointedAutomation.Concepts.Anthropic
 {
     /// <summary>
     /// The Claude implementation of the core <see cref="ILanguageModel"/> port, through the official Anthropic .NET SDK.
-    /// One <see cref="Complete"/> call is one Messages API request: the core prompt already asks for everything at once,
+    /// One <see cref="Complete(string, CancellationToken)"/> call is one Messages API request: the core prompt already asks for everything at once,
     /// and the reply is constrained to the core reply schema with structured outputs. 429, 408, 5xx, overload, network
     /// errors and timeouts are retried with exponential backoff up to <see cref="AnthropicLanguageModelOptions.MaxAttempts"/>
     /// and then raised as <see cref="AnthropicTransientException"/>; 401 and 403 raise
     /// <see cref="AnthropicConfigurationException"/> at once. Answers are not cached here: HybridReasoner caches by
     /// prompt and model. The API key is never logged.
     /// </summary>
-    public sealed class AnthropicLanguageModel : ILanguageModel
+    public sealed class AnthropicLanguageModel : IStructuredLanguageModel
     {
         internal const string SystemInstruction =
             "You answer for the AnointedAutomation.Concepts reasoning engine. Reply with exactly one JSON object that matches "
@@ -39,6 +40,8 @@ namespace AnointedAutomation.Concepts.Anthropic
         private readonly int maxAttempts;
         private readonly int retryBaseDelayMilliseconds;
         private readonly Dictionary<string, JsonElement> schema;
+        private readonly ConcurrentDictionary<string, Dictionary<string, JsonElement>> schemas =
+            new ConcurrentDictionary<string, Dictionary<string, JsonElement>>(StringComparer.Ordinal);
 
         /// <summary>
         /// Creates the adapter. Throws <see cref="AnthropicConfigurationException"/> when a required option is missing.
@@ -81,7 +84,23 @@ namespace AnointedAutomation.Concepts.Anthropic
         public string Name => "anthropic/" + model;
 
         /// <inheritdoc />
-        public async Task<string> Complete(string prompt, CancellationToken ct)
+        public Task<string> Complete(string prompt, CancellationToken ct)
+        {
+            return CompleteWith(prompt, schema, ct);
+        }
+
+        /// <inheritdoc />
+        public Task<string> Complete(string prompt, string replySchema, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(replySchema))
+            {
+                throw new ArgumentException("The reply schema is empty.", nameof(replySchema));
+            }
+
+            return CompleteWith(prompt, schemas.GetOrAdd(replySchema, ReplySchemaFormat.Create), ct);
+        }
+
+        private async Task<string> CompleteWith(string prompt, Dictionary<string, JsonElement> replySchema, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(prompt))
             {
@@ -94,7 +113,7 @@ namespace AnointedAutomation.Concepts.Anthropic
                 MaxTokens = maxTokens,
                 System = SystemInstruction,
                 Messages = [new UserMessageParam { Content = prompt }],
-                OutputConfig = new OutputConfig { Format = new JsonOutputFormat { Schema = schema } },
+                OutputConfig = new OutputConfig { Format = new JsonOutputFormat { Schema = replySchema } },
             };
 
             for (int attempt = 1; ; attempt++)

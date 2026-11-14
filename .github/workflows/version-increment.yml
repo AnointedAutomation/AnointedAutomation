@@ -170,47 +170,6 @@ jobs:
           echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Sync template package pins with SSO and SSO.UI
-        id: template-pins
-        run: |
-          set -euo pipefail
-          # The dotnet new templates pin AnointedAutomation.SSO and AnointedAutomation.SSO.UI. Keep the pins on the
-          # versions this PR will publish, and bump the Templates package when a pin moves.
-          VERSIONS_UPDATED=0
-          UPDATED_PROJECTS=""
-          TEMPLATES=templates/AnointedAutomation.Templates/AnointedAutomation.Templates.csproj
-          PIN_CHANGED=0
-          for PKG in AnointedAutomation.SSO AnointedAutomation.SSO.UI; do
-            VERSION=$(grep -o '<Version>[^<]*</Version>' "$PKG/$PKG.csproj" | sed 's/<Version>\(.*\)<\/Version>/\1/')
-            for CONTENT in templates/AnointedAutomation.Templates/content/*/*.csproj; do
-              BEFORE=$(md5sum "$CONTENT")
-              sed -i -E "s|(<PackageReference Include=\"${PKG//./\\.}\" Version=\")[^\"]*(\")|\1${VERSION}\2|" "$CONTENT"
-              if [ "$BEFORE" != "$(md5sum "$CONTENT")" ]; then
-                echo "  $CONTENT: $PKG pinned to $VERSION"
-                PIN_CHANGED=1
-              fi
-            done
-          done
-          if [ "$PIN_CHANGED" -eq 1 ]; then
-            PR_VERSION=$(grep -o '<Version>[^<]*</Version>' "$TEMPLATES" | sed 's/<Version>\(.*\)<\/Version>/\1/')
-            MASTER_VERSION=$(git show master:"./$TEMPLATES" 2>/dev/null | grep -o '<Version>[^<]*</Version>' | sed 's/<Version>\(.*\)<\/Version>/\1/' || echo "")
-            if [ -n "$MASTER_VERSION" ] && [ "$PR_VERSION" = "$MASTER_VERSION" ]; then
-              IFS='.' read -r -a VERSION_PARTS <<< "$PR_VERSION"
-              if [ "${VERSION_PARTS[2]}" -ge 9 ]; then
-                NEW_VERSION="${VERSION_PARTS[0]}.$((VERSION_PARTS[1] + 1)).0"
-              else
-                NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$((VERSION_PARTS[2] + 1))"
-              fi
-              sed -i "s|<Version>${PR_VERSION}</Version>|<Version>${NEW_VERSION}</Version>|" "$TEMPLATES"
-              UPDATED_PROJECTS="\n- ${TEMPLATES}: ${PR_VERSION} → ${NEW_VERSION}"
-            fi
-            VERSIONS_UPDATED=1
-          fi
-          echo "versions_updated=$VERSIONS_UPDATED" >> $GITHUB_OUTPUT
-          echo "updated_projects<<EOF" >> $GITHUB_OUTPUT
-          echo -e "$UPDATED_PROJECTS" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Check and increment Python package versions (python/)
         id: py-version-check
         working-directory: .
@@ -353,24 +312,24 @@ jobs:
 
       # llms.json/llms.md/llms.txt list every package version; keep them on the bumped versions in the same commit
       - name: Sync llms.* versions
-        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         working-directory: .
         run: |
           python3 -m unittest discover -s .github/workflows -p 'test_sync_llms_versions.py'
           python3 -I .github/workflows/sync-llms-versions.py
 
       - name: Commit version changes
-        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         run: |
           git add -A
           git commit -m "Auto-increment versions for the next release"
           git push origin develop
 
       - name: Report version updates
-        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.template-pins.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
+        if: steps.version-check.outputs.versions_updated != '0' || steps.js-version-check.outputs.versions_updated != '0' || steps.py-version-check.outputs.versions_updated != '0' || steps.file-version-check.outputs.versions_updated != '0'
         working-directory: .
         env:
-          UPDATED: ${{ steps.version-check.outputs.updated_projects }}${{ steps.template-pins.outputs.updated_projects }}${{ steps.js-version-check.outputs.updated_projects }}${{ steps.py-version-check.outputs.updated_projects }}${{ steps.file-version-check.outputs.updated_projects }}
+          UPDATED: ${{ steps.version-check.outputs.updated_projects }}${{ steps.js-version-check.outputs.updated_projects }}${{ steps.py-version-check.outputs.updated_projects }}${{ steps.file-version-check.outputs.updated_projects }}
         run: |
           {
             echo "## Version auto-increment"
@@ -379,6 +338,6 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: No version updates needed
-        if: steps.version-check.outputs.versions_updated == '0' && steps.js-version-check.outputs.versions_updated == '0' && steps.template-pins.outputs.versions_updated == '0' && steps.py-version-check.outputs.versions_updated == '0' && steps.file-version-check.outputs.versions_updated == '0'
+        if: steps.version-check.outputs.versions_updated == '0' && steps.js-version-check.outputs.versions_updated == '0' && steps.py-version-check.outputs.versions_updated == '0' && steps.file-version-check.outputs.versions_updated == '0'
         run: |
           echo "✓ All project versions are already different from master - no updates needed"

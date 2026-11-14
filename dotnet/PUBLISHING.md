@@ -36,9 +36,9 @@ published from it.
    version on NuGet.org. Unchanged packages are skipped.
 
 Publish order: Serialization, Shopify, Objects, Repository.Mongo, Objects.API, SSO, SSO.UI, Templates, then the
-rest. The templates pin `AnointedAutomation.SSO` and `AnointedAutomation.SSO.UI` in
-`templates/AnointedAutomation.Templates/content/*/*.csproj`; the version-increment workflow moves those pins to the
-current SSO / SSO.UI versions and bumps the Templates package when a pin changes.
+rest. The templates reference `AnointedAutomation.SSO` and `AnointedAutomation.SSO.UI` with `Version="*"` in
+`templates/AnointedAutomation.Templates/content/*/*.csproj`; our own packages are never pinned, and the
+version-increment workflow does not touch those references.
 
 Publishing uses [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (OIDC
 through `NuGet/login`), so no long lived API key is stored in the repository secrets.
