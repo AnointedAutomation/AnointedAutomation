@@ -415,7 +415,7 @@ app.MapAnointedAutomationAuth("/auth/anointed"); // GET start, POST sign-out, GE
 
 Sign in with Anointed Automation for classic ASP.NET (.NET Framework 4.7.2+, MVC 5 and Web Forms on OWIN/Katana): OpenID Connect middleware preset (code + PKCE S256, verified email only), back-channel logout with Logout Token validation and replay protection, a session status client, and a sign-in button for Razor and Web Forms.
 
-### AnointedAutomation.Templates 1.0.3
+### AnointedAutomation.Templates 1.0.2
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/templates/AnointedAutomation.Templates
 - Target: net10.0. Depends on AnointedAutomation.SSO, AnointedAutomation.SSO.UI.
