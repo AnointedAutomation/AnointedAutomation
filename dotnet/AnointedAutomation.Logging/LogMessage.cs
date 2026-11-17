@@ -16,6 +16,21 @@ namespace AnointedAutomation.Optimization.Logging
     public partial class LogMessage
     {
         /// <summary>
+        /// Names where a method lives: its declaring type, or for methods with no declaring type (dynamic methods,
+        /// module-level methods) the module name, so a log never loses its source.
+        /// </summary>
+        /// <param name="method">The method to describe.</param>
+        /// <returns>The declaring type's full name, or the module name when there is no declaring type.</returns>
+        internal static string DescribeDeclaringType(System.Reflection.MethodBase method)
+        {
+            if (method.DeclaringType != null && method.DeclaringType.FullName != null)
+            {
+                return method.DeclaringType.FullName;
+            }
+            return method.Module.Name;
+        }
+
+        /// <summary>
         /// Extracts the actual method name from async state machine types
         /// </summary>
         /// <param name="stackTrace">The stack trace to analyze</param>
@@ -31,7 +46,7 @@ namespace AnointedAutomation.Optimization.Logging
                 System.Reflection.MethodBase method = frame.GetMethod();
                 if (method == null) continue;
 
-                string declaringTypeName = method.DeclaringType?.FullName ?? "Unknown";
+                string declaringTypeName = DescribeDeclaringType(method);
                 string methodName = method.Name;
 
                 // Skip LogMessage constructors
@@ -72,11 +87,12 @@ namespace AnointedAutomation.Optimization.Logging
                 System.Reflection.MethodBase method = fallbackFrame.GetMethod();
                 if (method != null)
                 {
-                    return $"{method.DeclaringType?.FullName ?? "Unknown"}.{method.Name}";
+                    return $"{DescribeDeclaringType(method)}.{method.Name}";
                 }
             }
 
-            return "Unknown";
+            // No frame could be resolved: say so with the facts we have instead of pretending to know the caller.
+            return $"unresolved caller (stack frames: {stackTrace.FrameCount})";
         }
 
         /// <summary>

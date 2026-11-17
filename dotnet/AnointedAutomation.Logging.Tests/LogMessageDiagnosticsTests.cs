@@ -140,5 +140,37 @@ namespace AnointedAutomation.Logging.Tests
                 LogMessage.LogAdded -= handler;
             }
         }
+
+        [Fact]
+        public void DescribeDeclaringType_UsesDeclaringTypeFullName()
+        {
+            System.Reflection.MethodBase method = typeof(LogMessageDiagnosticsTests).GetMethod(nameof(DescribeDeclaringType_UsesDeclaringTypeFullName));
+
+            Assert.Equal(typeof(LogMessageDiagnosticsTests).FullName, LogMessage.DescribeDeclaringType(method));
+        }
+
+        [Fact]
+        public void DescribeDeclaringType_NoDeclaringType_UsesModuleName()
+        {
+            System.Reflection.Emit.DynamicMethod dynamicMethod = new System.Reflection.Emit.DynamicMethod("DynamicProbe", typeof(void), Type.EmptyTypes);
+            dynamicMethod.GetILGenerator().Emit(System.Reflection.Emit.OpCodes.Ret);
+
+            string described = LogMessage.DescribeDeclaringType(dynamicMethod);
+
+            Assert.False(string.IsNullOrEmpty(described));
+            Assert.NotEqual("Unknown", described);
+        }
+
+        [Fact]
+        public void Constructor_FromLambda_NamesTheEnclosingMethod()
+        {
+            Func<LogMessage> make = () => new LogMessage(MessageType.Warning, "lambda caller");
+
+            LogMessage log = make();
+
+            Assert.NotNull(log.localOperationName);
+            Assert.DoesNotContain("Unknown", log.localOperationName);
+            Assert.Contains(nameof(LogMessageDiagnosticsTests), log.localOperationName);
+        }
     }
 }

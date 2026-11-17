@@ -163,5 +163,47 @@ namespace AnointedAutomation.Optimization.Tests
             Utility.RecursiveDelete(new DirectoryInfo(root));
             Assert.False(Directory.Exists(root));
         }
+
+        [Fact]
+        public void ConvertDataTableToListFast_PreservesRowOrder()
+        {
+            List<Person> people = new List<Person>();
+            for (int i = 0; i < 50; i++)
+            {
+                people.Add(new Person { Id = i, Name = "n" + i, When = new DateTime(2026, 1, 1) });
+            }
+            DataTable table = Utility.ConvertListToDataTable(people);
+
+            List<Person> fast = Utility.ConvertDataTableToListFast<Person>(table, 4);
+
+            Assert.Equal(people.Select(p => p.Id), fast.Select(p => p.Id));
+        }
+
+        public class ThrowingRow
+        {
+            public int Id
+            {
+                get => 0;
+                set => throw new InvalidOperationException("row mapping failed");
+            }
+        }
+
+        [Fact]
+        public void ConvertDataTableToListFast_RowFailureIsNotWrappedInAggregateException()
+        {
+            DataTable table = new DataTable();
+            table.Columns.Add("Id", typeof(int));
+            table.Rows.Add(1);
+
+            System.Reflection.TargetInvocationException thrown = Assert.Throws<System.Reflection.TargetInvocationException>(() => Utility.ConvertDataTableToListFast<ThrowingRow>(table, 2));
+
+            Assert.IsType<InvalidOperationException>(thrown.InnerException);
+        }
+
+        [Fact]
+        public void ConvertDataTableToListFast_NonPositiveRowsAtOnce_Throws()
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => Utility.ConvertDataTableToListFast<Person>(new DataTable(), 0));
+        }
     }
 }
