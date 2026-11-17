@@ -52,7 +52,7 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 
 | Type | Description |
 |---|---|
-| `ResponseData` | Untyped envelope: `Message`, `Data`, `Error`, `success`, `Timestamp` (ISO 8601 UTC), plus fixed `Anointed`, `Automation`, `Copyright`, `Links` and `Trinity` fields. The `(string message, object data, object error)` constructor sets `success` from whether `Error` is null. |
+| `ResponseData` | Untyped envelope: `Message`, `Data`, `Error`, `success`, `Timestamp` (ISO 8601 UTC), plus fixed `Anointed`, `Automation`, `Copyright`, `Links` (including the public ChristianEngineMCP server) and `Trinity` fields. The `(string message, object data, object error)` constructor sets `success` from whether `Error` is null. |
 | `ResponseData<T>` | Typed envelope with `Data`, `Message`, `statusCode`, `success`, `Timestamp`, and static factories `Ok`, `Created`, `Accepted`, `NoContent`, `Error`, `BadRequest`, `Unauthorized`, `Forbidden`, `NotFound`, `Conflict`, `UnprocessableEntity`, `TooManyRequests`, `InternalServerError`, `ServiceUnavailable`. |
 | `PaginatedResponse<T>` | `Data`, `currentPage`, `pageSize`, `totalItems`, `totalPages`, `hasNextPage`, `hasPreviousPage`. |
 | `ChristianEmoticons` | String constants such as `LatinCross`, `PrayingHands`, `Dove`, `Bible`, `Fish`. |
