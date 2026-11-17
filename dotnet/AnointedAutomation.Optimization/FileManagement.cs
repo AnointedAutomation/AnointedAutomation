@@ -116,14 +116,15 @@ namespace AnointedAutomation.Optimization
 
         /// <summary>
         /// Downloads the content at <paramref name="hyperlink"/> to <paramref name="filePath"/> using a shared
-        /// <see cref="HttpClient"/>. See <see cref="GetFileFromInternetAsync(HttpClient, string, string)"/>.
+        /// <see cref="HttpClient"/>. See <see cref="GetFileFromInternetAsync(HttpClient, string, string, CancellationToken)"/>.
         /// </summary>
         /// <param name="hyperlink">The URL to download.</param>
         /// <param name="filePath">The file to write.</param>
+        /// <param name="cancellationToken">Cancels the download.</param>
         /// <exception cref="HttpRequestException">The server answered with a non-success status code; no file is written.</exception>
-        public static Task GetFileFromInternetAsync(string hyperlink, string filePath)
+        public static Task GetFileFromInternetAsync(string hyperlink, string filePath, CancellationToken cancellationToken = default)
         {
-            return GetFileFromInternetAsync(SharedHttpClient, hyperlink, filePath);
+            return GetFileFromInternetAsync(SharedHttpClient, hyperlink, filePath, cancellationToken);
         }
 
         /// <summary>
@@ -151,6 +152,13 @@ namespace AnointedAutomation.Optimization
             try
             {
                 await source.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                // Cancellation (shutdown) is expected: no error log, but never leave a partial file behind.
+                await destination.DisposeAsync().ConfigureAwait(false);
+                DeleteFileTry(filePath);
+                throw;
             }
             catch (Exception e)
             {

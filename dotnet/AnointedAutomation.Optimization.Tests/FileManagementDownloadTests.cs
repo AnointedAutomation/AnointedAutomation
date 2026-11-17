@@ -58,6 +58,41 @@ namespace AnointedAutomation.Optimization.Tests
             }
         }
 
+        private sealed class CancellingStream : Stream
+        {
+            private readonly CancellationTokenSource _source;
+            public CancellingStream(CancellationTokenSource source) { _source = source; }
+            public override bool CanRead => true;
+            public override bool CanSeek => false;
+            public override bool CanWrite => false;
+            public override long Length => throw new NotSupportedException();
+            public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+            public override void Flush() { }
+            public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+            public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+            {
+                _source.Cancel();
+                cancellationToken.ThrowIfCancellationRequested();
+                return ValueTask.FromResult(0);
+            }
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+            public override void SetLength(long value) => throw new NotSupportedException();
+            public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        }
+
+        private sealed class CancellingBodyHandler : HttpMessageHandler
+        {
+            private readonly CancellationTokenSource _source;
+            public CancellingBodyHandler(CancellationTokenSource source) { _source = source; }
+
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = new StreamContent(new CancellingStream(_source));
+                return Task.FromResult(response);
+            }
+        }
+
         private static string NewTempPath()
         {
             return Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -145,6 +180,18 @@ namespace AnointedAutomation.Optimization.Tests
         public void DescribeUrlWithoutSecrets_InvalidUrl_DoesNotEchoTheInput()
         {
             Assert.DoesNotContain("token=SECRET", FileManagement.DescribeUrlWithoutSecrets("not a url?token=SECRET"));
+        }
+
+        [Fact]
+        public async Task GetFileFromInternetAsync_CancelledMidCopy_ThrowsCancellationAndLeavesNoFile()
+        {
+            string path = NewTempPath();
+            using CancellationTokenSource source = new CancellationTokenSource();
+            using HttpClient client = new HttpClient(new CancellingBodyHandler(source));
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => FileManagement.GetFileFromInternetAsync(client, "http://example.test/big.bin", path, source.Token));
+
+            Assert.False(File.Exists(path));
         }
     }
 }
