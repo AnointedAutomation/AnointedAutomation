@@ -32,6 +32,24 @@ namespace AnointedAutomation.Repository.Mongo
 
         private static readonly ConcurrentQueue<LogMessage> mongoLogs = new ConcurrentQueue<LogMessage>();
 
+        private static readonly ConcurrentDictionary<string, MongoClient> sharedClients = new ConcurrentDictionary<string, MongoClient>(StringComparer.Ordinal);
+
+        /// <summary>
+        /// Gets the one shared <see cref="MongoClient"/> for a connection string, creating it on first use.
+        /// Each client owns a connection pool and monitor threads, so helpers created per request must reuse it.
+        /// </summary>
+        /// <param name="connectionString">The MongoDB connection string.</param>
+        /// <returns>The shared client for that connection string.</returns>
+        /// <exception cref="ArgumentException"><paramref name="connectionString"/> is null or empty.</exception>
+        public static MongoClient GetSharedClient(string connectionString)
+        {
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new ArgumentException("connectionString must be set", nameof(connectionString));
+            }
+            return sharedClients.GetOrAdd(connectionString, key => new MongoClient(key));
+        }
+
         /// <summary>
         /// default Constrcutor
         /// </summary>
@@ -45,7 +63,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <param name="connectionString"></param>
         public MongoHelper(string dbName, string connectionString)
         {
-            MongoClient client = new MongoClient(connectionString);
+            MongoClient client = GetSharedClient(connectionString);
             IMongoDatabase db = client.GetDatabase(dbName);
             database = db;
         }
@@ -263,7 +281,7 @@ namespace AnointedAutomation.Repository.Mongo
         /// <returns></returns>
         public IMongoDatabase CreateMongoDbInstance(string dbName, string connectionString)
         {
-            MongoClient client = new MongoClient(connectionString);
+            MongoClient client = GetSharedClient(connectionString);
             IMongoDatabase db = client.GetDatabase(dbName);
             return db;
         }

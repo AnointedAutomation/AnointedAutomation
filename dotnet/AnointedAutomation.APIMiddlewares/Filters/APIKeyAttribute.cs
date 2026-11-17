@@ -5,6 +5,8 @@ using AnointedAutomation.APIMiddleware.Utility;
 using AnointedAutomation.Optimization.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AnointedAutomation.APIMiddleware.Filters
@@ -17,6 +19,20 @@ namespace AnointedAutomation.APIMiddleware.Filters
     /// </summary>
     public class APIKeyAttribute : System.Attribute, IAsyncActionFilter
     {
+        private readonly string _apiKeyHeaderName;
+        private readonly byte[] _expectedKey;
+
+        /// <summary>
+        /// Reads API_KEY and API_KEY_NAME once. Both are required: a missing value fails here, at construction,
+        /// with a clear message instead of a NullReferenceException (HTTP 500) on every request.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when API_KEY or API_KEY_NAME is unset or empty.</exception>
+        public APIKeyAttribute()
+        {
+            _apiKeyHeaderName = RequireEnvironmentVariable("API_KEY_NAME");
+            _expectedKey = Encoding.UTF8.GetBytes(RequireEnvironmentVariable("API_KEY"));
+        }
+
         /// <summary>
         /// Validates the API key in the request headers before allowing the action to execute.
         /// </summary>
@@ -29,7 +45,7 @@ namespace AnointedAutomation.APIMiddleware.Filters
         /// </remarks>
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            string apiKeyHeaderName = GetKeyName();
+            string apiKeyHeaderName = _apiKeyHeaderName;
 
             Microsoft.Extensions.Primitives.StringValues potentialKey = "";
             string clientIP = APIUtility.GetClientPublicIPAddress(context);
@@ -43,10 +59,8 @@ namespace AnointedAutomation.APIMiddleware.Filters
                 return;
             }
 
-            string correctApiKey = GetKey();
-
-            // Check if the provided key matches the correct key
-            if (!correctApiKey.Equals(potentialKey))
+            // Constant-time comparison so a wrong key cannot be guessed by timing.
+            if (!ApiKeyAuthMiddleware.IsAuthorized(potentialKey.ToString(), _expectedKey))
             {
                 // Never log the key that was sent: it may be a real secret (another environment's key, a typo of ours).
                 IPBlacklistMiddleware.AddLog(LogMessage.Warning($"IP {clientIP} provided an incorrect key ({potentialKey.ToString().Length} chars) in header '{apiKeyHeaderName}' for {APIUtility.DescribeRequest(context.HttpContext)}"));
@@ -58,23 +72,19 @@ namespace AnointedAutomation.APIMiddleware.Filters
         }
 
         /// <summary>
-        /// Gets the correct API key from environment variables.
+        /// Reads a required environment variable.
         /// </summary>
-        /// <returns>The API key value from the API_KEY environment variable.</returns>
-        internal string GetKey()
+        /// <param name="name">The environment variable name.</param>
+        /// <returns>The non-empty value.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the variable is unset or empty.</exception>
+        private static string RequireEnvironmentVariable(string name)
         {
-            string apikey = System.Environment.GetEnvironmentVariable("API_KEY");
-            return apikey;
-        }
-
-        /// <summary>
-        /// Gets the name of the header that should contain the API key.
-        /// </summary>
-        /// <returns>The header name from the API_KEY_NAME environment variable.</returns>
-        internal string GetKeyName()
-        {
-            string keyName = System.Environment.GetEnvironmentVariable("API_KEY_NAME");
-            return keyName;
+            string value = Environment.GetEnvironmentVariable(name);
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new InvalidOperationException($"Environment variable {name} must be set to use APIKeyAttribute");
+            }
+            return value;
         }
     }
 }

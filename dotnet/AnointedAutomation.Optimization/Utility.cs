@@ -87,38 +87,21 @@ namespace AnointedAutomation.Optimization
         }
 
         /// <summary>
-        /// Parallel converter for a <see cref="DataTable"/> to a list of objects. Faster, but may
-        /// construct the list in a different order.
+        /// Converts a <see cref="DataTable"/> to a list of objects, preserving row order. Mapping in-memory rows is cheap CPU
+        /// work, so this runs sequentially (the former per-row Task.Run fan-out blocked threads with WaitAll and Result,
+        /// starved the pool on request threads and wrapped a bad row in an AggregateException). A failing row throws its
+        /// original exception.
         /// </summary>
         /// <param name="dataTable">The table to convert.</param>
-        /// <param name="rowsAtOnce">Maximum number of rows to convert concurrently.</param>
+        /// <param name="rowsAtOnce">Kept for source compatibility; rows are no longer converted concurrently. Must be positive.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="rowsAtOnce"/> is not positive.</exception>
         public static List<T> ConvertDataTableToListFast<T>(DataTable dataTable, int rowsAtOnce)
         {
-            List<T> data = new List<T>();
-            List<Task<T>> pool = new List<Task<T>>();
-
-            foreach (DataRow row in dataTable.Rows)
+            if (rowsAtOnce <= 0)
             {
-                while (pool.Count >= rowsAtOnce)
-                {
-                    Task.WaitAll(pool.ToArray());
-                    foreach (Task<T> tempTask in pool)
-                    {
-                        data.Add(tempTask.Result);
-                    }
-                    pool.RemoveAll(tempTask => tempTask.IsCompleted);
-                }
-
-                pool.Add(Task.Run(() => GetObjectFromDataRow<T>(row)));
+                throw new ArgumentOutOfRangeException(nameof(rowsAtOnce), rowsAtOnce, "rowsAtOnce must be positive");
             }
-
-            Task.WaitAll(pool.ToArray());
-            foreach (Task<T> task in pool)
-            {
-                data.Add(task.Result);
-            }
-
-            return data;
+            return ConvertDataTableToList<T>(dataTable);
         }
 
         /// <summary>Converts a list of objects to a <see cref="DataTable"/>.</summary>

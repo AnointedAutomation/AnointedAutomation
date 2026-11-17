@@ -111,16 +111,50 @@ namespace AnointedAutomation.Optimization
             return null;
         }
 
-        /// <summary>Downloads the content at <paramref name="hyperlink"/> and writes it to <paramref name="filePath"/>.</summary>
-        public static async Task GetFileFromInternetAsync(string hyperlink, string filePath)
+        private static readonly HttpClient SharedHttpClient = new HttpClient();
+
+        /// <summary>
+        /// Downloads the content at <paramref name="hyperlink"/> to <paramref name="filePath"/> using a shared
+        /// <see cref="HttpClient"/>. See <see cref="GetFileFromInternetAsync(HttpClient, string, string)"/>.
+        /// </summary>
+        /// <param name="hyperlink">The URL to download.</param>
+        /// <param name="filePath">The file to write.</param>
+        /// <exception cref="HttpRequestException">The server answered with a non-success status code; no file is written.</exception>
+        public static Task GetFileFromInternetAsync(string hyperlink, string filePath)
         {
-            using HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync(hyperlink).ConfigureAwait(false);
-            using HttpContent content = response.Content;
-            using Stream stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
-            using StreamReader reader = new StreamReader(stream);
-            string contentStr = await reader.ReadToEndAsync().ConfigureAwait(false);
-            await File.WriteAllTextAsync(filePath, contentStr).ConfigureAwait(false);
+            return GetFileFromInternetAsync(SharedHttpClient, hyperlink, filePath);
+        }
+
+        /// <summary>
+        /// Downloads the content at <paramref name="hyperlink"/> and streams the raw bytes to <paramref name="filePath"/>.
+        /// A non-success status throws before any file is created, and the bytes are never decoded, so binary files stay intact.
+        /// A partially written file is deleted when the download fails.
+        /// </summary>
+        /// <param name="client">The caller-owned client (carries the proxy, timeout and handler the host wants).</param>
+        /// <param name="hyperlink">The URL to download.</param>
+        /// <param name="filePath">The file to write.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="client"/> is null.</exception>
+        /// <exception cref="HttpRequestException">The server answered with a non-success status code.</exception>
+        public static async Task GetFileFromInternetAsync(HttpClient client, string hyperlink, string filePath)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+            using HttpResponseMessage response = await client.GetAsync(hyperlink, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            try
+            {
+                using Stream source = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                using FileStream destination = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+                await source.CopyToAsync(destination).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                LogMessage.Error($"FileManagement.GetFileFromInternetAsync: download of '{hyperlink}' to '{filePath}' failed", e);
+                DeleteFileTry(filePath);
+                throw;
+            }
         }
     }
 }
