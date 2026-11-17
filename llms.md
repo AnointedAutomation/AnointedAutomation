@@ -668,6 +668,13 @@ The Christian engine is a Scripture-grounded reasoning engine with a canon-first
   - `list_my_interpretations`: the signed-in user's own earlier AI interpretations, paged (`skip`, `limit`).
 - New AI answers are paid from the user's store credit after 3 free ones; canon answers, repeats and failed answers are free, and there is a daily cap per plan.
 
+Discovery endpoints (all public, GET-only, no sign-in):
+
+- OpenAPI spec: `https://api.anointedautomation.net/openapi.json`
+- API docs (Redoc): `https://api.anointedautomation.net/docs`
+- API catalog (RFC 9727): `https://api.anointedautomation.net/.well-known/api-catalog`
+- MCP server card: `https://api.anointedautomation.net/.well-known/mcp/server-card.json`
+
 Claude Code:
 
 ```bash

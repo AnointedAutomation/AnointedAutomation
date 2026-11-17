@@ -13,6 +13,12 @@
     "description": "Public Christian engine MCP server: a Scripture-grounded reasoning engine, canon first (the deterministic canon answers first; an AI reading is made only when the canon says Unknown).",
     "endpoint": "https://api.anointedautomation.net/api/christian-engine/mcp",
     "transport": "Streamable HTTP MCP (POST JSON-RPC, Accept: application/json, text/event-stream)",
+    "discovery": {
+      "openapi": "https://api.anointedautomation.net/openapi.json",
+      "docs": "https://api.anointedautomation.net/docs",
+      "apiCatalog": "https://api.anointedautomation.net/.well-known/api-catalog",
+      "serverCard": "https://api.anointedautomation.net/.well-known/mcp/server-card.json"
+    },
     "publicTools": [
       {
         "name": "lookup_sin",
