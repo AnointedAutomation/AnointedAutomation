@@ -71,7 +71,8 @@ namespace AnointedAutomation.Objects
 			{ "GitHub", "https://github.com/AnointedAutomation" },
 			{ "Online Shopping", "https://www.mart.club" },
 			{ "Steward", "https://www.alexanderfields.me" },
-			{ "VR Mall", "https://mallmart.online" }
+			{ "VR Mall", "https://mallmart.online" },
+			{ "ChristianEngineMCP", "https://api.anointedautomation.net/api/christian-engine/mcp" }
         };
         /// <summary>
         /// Gets or sets the response message.
@@ -123,7 +124,8 @@ namespace AnointedAutomation.Objects
 			{ "AutomationAPI", "https://api.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
             { "GitHub", "https://github.com/AnointedAutomation" },
-			{ "Steward", "https://www.alexanderfields.me" }
+			{ "Steward", "https://www.alexanderfields.me" },
+			{ "ChristianEngineMCP", "https://api.anointedautomation.net/api/christian-engine/mcp" }
         };
         /// <summary>
         /// Gets or sets the response message.

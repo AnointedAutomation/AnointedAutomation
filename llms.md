@@ -225,7 +225,7 @@ GarbageCollection gc = new GarbageCollection();
 gc.PerformGarbageCollection(null);
 ```
 
-### AnointedAutomation.Objects 3.0.0
+### AnointedAutomation.Objects 3.1.0
 
 Shared account, billing and response models so APIs and clients agree on shape. Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.
 
