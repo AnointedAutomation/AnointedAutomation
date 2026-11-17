@@ -120,9 +120,21 @@ namespace AnointedAutomation.Optimization
         /// </summary>
         /// <param name="hyperlink">The URL to download.</param>
         /// <param name="filePath">The file to write.</param>
+        /// <exception cref="HttpRequestException">The server answered with a non-success status code; no file is written.</exception>
+        public static Task GetFileFromInternetAsync(string hyperlink, string filePath)
+        {
+            return GetFileFromInternetAsync(SharedHttpClient, hyperlink, filePath, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Same as <see cref="GetFileFromInternetAsync(string, string)"/> but cancellable. A separate overload keeps the
+        /// published two-parameter method binary compatible.
+        /// </summary>
+        /// <param name="hyperlink">The URL to download.</param>
+        /// <param name="filePath">The file to write.</param>
         /// <param name="cancellationToken">Cancels the download.</param>
         /// <exception cref="HttpRequestException">The server answered with a non-success status code; no file is written.</exception>
-        public static Task GetFileFromInternetAsync(string hyperlink, string filePath, CancellationToken cancellationToken = default)
+        public static Task GetFileFromInternetAsync(string hyperlink, string filePath, CancellationToken cancellationToken)
         {
             return GetFileFromInternetAsync(SharedHttpClient, hyperlink, filePath, cancellationToken);
         }

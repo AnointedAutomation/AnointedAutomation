@@ -1,12 +1,14 @@
 // Copyright © Anointed Automation Corporation., 2026. Open source, provided "as is" without warranty (see LICENSE). Stewarded by Alexander Fields https://www.alexanderfields.me on 2026-11-17 Jesus is King ✝️
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AnointedAutomation.Optimization;
+using AnointedAutomation.Optimization.Logging;
 using Xunit;
 
 namespace AnointedAutomation.Optimization.Tests
@@ -183,15 +185,35 @@ namespace AnointedAutomation.Optimization.Tests
         }
 
         [Fact]
-        public async Task GetFileFromInternetAsync_CancelledMidCopy_ThrowsCancellationAndLeavesNoFile()
+        public async Task GetFileFromInternetAsync_CancelledMidCopy_ThrowsCancellationLeavesNoFileAndLogsNoError()
         {
             string path = NewTempPath();
-            using CancellationTokenSource source = new CancellationTokenSource();
-            using HttpClient client = new HttpClient(new CancellingBodyHandler(source));
+            List<LogMessage> errors = new List<LogMessage>();
+            LogMessage.LogAddedEventHandler handler = (sender, e) =>
+            {
+                if (e.log.messageType == MessageType.Error && e.log.message != null && e.log.message.Contains(path, StringComparison.Ordinal))
+                {
+                    lock (errors)
+                    {
+                        errors.Add(e.log);
+                    }
+                }
+            };
+            LogMessage.LogAdded += handler;
+            try
+            {
+                using CancellationTokenSource source = new CancellationTokenSource();
+                using HttpClient client = new HttpClient(new CancellingBodyHandler(source));
 
-            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => FileManagement.GetFileFromInternetAsync(client, "http://example.test/big.bin", path, source.Token));
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(() => FileManagement.GetFileFromInternetAsync(client, "http://example.test/big.bin", path, source.Token));
 
-            Assert.False(File.Exists(path));
+                Assert.False(File.Exists(path));
+                Assert.Empty(errors);
+            }
+            finally
+            {
+                LogMessage.LogAdded -= handler;
+            }
         }
     }
 }
