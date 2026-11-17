@@ -150,7 +150,7 @@ namespace AnointedAutomation.Logging.Tests
         }
 
         [Fact]
-        public void DescribeDeclaringType_NoDeclaringType_UsesModuleNameNotAnUnknownLiteral()
+        public void DescribeDeclaringType_NoDeclaringType_UsesModuleName()
         {
             System.Reflection.Emit.DynamicMethod dynamicMethod = new System.Reflection.Emit.DynamicMethod("DynamicProbe", typeof(void), Type.EmptyTypes);
             dynamicMethod.GetILGenerator().Emit(System.Reflection.Emit.OpCodes.Ret);
@@ -162,7 +162,7 @@ namespace AnointedAutomation.Logging.Tests
         }
 
         [Fact]
-        public void Constructor_FromLambda_NamesTheEnclosingMethodNotUnknown()
+        public void Constructor_FromLambda_NamesTheEnclosingMethod()
         {
             Func<LogMessage> make = () => new LogMessage(MessageType.Warning, "lambda caller");
 
