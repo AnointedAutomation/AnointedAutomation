@@ -195,9 +195,9 @@ namespace AnointedAutomation.Optimization.Tests
             table.Columns.Add("Id", typeof(int));
             table.Rows.Add(1);
 
-            Exception thrown = Assert.ThrowsAny<Exception>(() => Utility.ConvertDataTableToListFast<ThrowingRow>(table, 2));
+            System.Reflection.TargetInvocationException thrown = Assert.Throws<System.Reflection.TargetInvocationException>(() => Utility.ConvertDataTableToListFast<ThrowingRow>(table, 2));
 
-            Assert.NotEqual(typeof(AggregateException), thrown.GetType());
+            Assert.IsType<InvalidOperationException>(thrown.InnerException);
         }
 
         [Fact]

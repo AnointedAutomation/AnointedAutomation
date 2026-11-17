@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using AnointedAutomation.Optimization.Logging;
 
@@ -127,34 +128,52 @@ namespace AnointedAutomation.Optimization
 
         /// <summary>
         /// Downloads the content at <paramref name="hyperlink"/> and streams the raw bytes to <paramref name="filePath"/>.
-        /// A non-success status throws before any file is created, and the bytes are never decoded, so binary files stay intact.
-        /// A partially written file is deleted when the download fails.
+        /// A non-success status throws before any file is touched, and the bytes are never decoded, so binary files stay intact.
+        /// If the copy fails after the destination was opened, the partial file is deleted; a file that existed before is
+        /// left alone when the failure happens earlier.
         /// </summary>
         /// <param name="client">The caller-owned client (carries the proxy, timeout and handler the host wants).</param>
         /// <param name="hyperlink">The URL to download.</param>
         /// <param name="filePath">The file to write.</param>
+        /// <param name="cancellationToken">Cancels the download.</param>
         /// <exception cref="ArgumentNullException"><paramref name="client"/> is null.</exception>
         /// <exception cref="HttpRequestException">The server answered with a non-success status code.</exception>
-        public static async Task GetFileFromInternetAsync(HttpClient client, string hyperlink, string filePath)
+        public static async Task GetFileFromInternetAsync(HttpClient client, string hyperlink, string filePath, CancellationToken cancellationToken = default)
         {
             if (client == null)
             {
                 throw new ArgumentNullException(nameof(client));
             }
-            using HttpResponseMessage response = await client.GetAsync(hyperlink, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            using HttpResponseMessage response = await client.GetAsync(hyperlink, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
+            using Stream source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using FileStream destination = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
             try
             {
-                using Stream source = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                using FileStream destination = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-                await source.CopyToAsync(destination).ConfigureAwait(false);
+                await source.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                LogMessage.Error($"FileManagement.GetFileFromInternetAsync: download of '{hyperlink}' to '{filePath}' failed", e);
+                LogMessage.Error($"FileManagement.GetFileFromInternetAsync: download of '{DescribeUrlWithoutSecrets(hyperlink)}' to '{filePath}' failed", e);
+                await destination.DisposeAsync().ConfigureAwait(false);
                 DeleteFileTry(filePath);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Scheme, host and path only: the query string and user info of a download link can carry a token or signature
+        /// that must never reach a log.
+        /// </summary>
+        /// <param name="hyperlink">The URL.</param>
+        /// <returns>The URL without user info, query or fragment, or a marker when it is not a valid absolute URL.</returns>
+        internal static string DescribeUrlWithoutSecrets(string hyperlink)
+        {
+            if (Uri.TryCreate(hyperlink, UriKind.Absolute, out Uri? uri))
+            {
+                return uri.Scheme + "://" + uri.Authority.Substring(uri.Authority.IndexOf('@') + 1) + uri.AbsolutePath;
+            }
+            return "(not an absolute url)";
         }
     }
 }

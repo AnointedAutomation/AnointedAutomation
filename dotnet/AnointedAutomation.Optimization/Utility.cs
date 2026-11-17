@@ -89,8 +89,8 @@ namespace AnointedAutomation.Optimization
         /// <summary>
         /// Converts a <see cref="DataTable"/> to a list of objects, preserving row order. Mapping in-memory rows is cheap CPU
         /// work, so this runs sequentially (the former per-row Task.Run fan-out blocked threads with WaitAll and Result,
-        /// starved the pool on request threads and wrapped a bad row in an AggregateException). A failing row throws its
-        /// original exception.
+        /// starved the pool on request threads and wrapped a bad row in an AggregateException). A failing row throws the
+        /// mapping exception directly (a property setter failure arrives as a TargetInvocationException, as in <see cref="ConvertDataTableToList{T}"/>).
         /// </summary>
         /// <param name="dataTable">The table to convert.</param>
         /// <param name="rowsAtOnce">Kept for source compatibility; rows are no longer converted concurrently. Must be positive.</param>

@@ -33,6 +33,31 @@ namespace AnointedAutomation.Optimization.Tests
             }
         }
 
+        private sealed class FailingStream : Stream
+        {
+            public override bool CanRead => true;
+            public override bool CanSeek => false;
+            public override bool CanWrite => false;
+            public override long Length => throw new NotSupportedException();
+            public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+            public override void Flush() { }
+            public override int Read(byte[] buffer, int offset, int count) => throw new IOException("connection reset mid-body");
+            public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default) => throw new IOException("connection reset mid-body");
+            public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+            public override void SetLength(long value) => throw new NotSupportedException();
+            public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        }
+
+        private sealed class FailingBodyHandler : HttpMessageHandler
+        {
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = new StreamContent(new FailingStream());
+                return Task.FromResult(response);
+            }
+        }
+
         private static string NewTempPath()
         {
             return Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
@@ -74,6 +99,52 @@ namespace AnointedAutomation.Optimization.Tests
         public async Task GetFileFromInternetAsync_NullClient_Throws()
         {
             await Assert.ThrowsAsync<ArgumentNullException>(() => FileManagement.GetFileFromInternetAsync(null!, "http://example.test/x", NewTempPath()));
+        }
+
+        [Fact]
+        public async Task GetFileFromInternetAsync_BodyFailsMidCopy_RethrowsAndLeavesNoPartialFile()
+        {
+            string path = NewTempPath();
+            using HttpClient client = new HttpClient(new FailingBodyHandler());
+
+            await Assert.ThrowsAsync<IOException>(() => FileManagement.GetFileFromInternetAsync(client, "http://example.test/big.bin", path));
+
+            Assert.False(File.Exists(path));
+        }
+
+        [Fact]
+        public async Task GetFileFromInternetAsync_ErrorStatus_KeepsAnExistingFile()
+        {
+            string path = NewTempPath();
+            await File.WriteAllBytesAsync(path, new byte[] { 9, 9, 9 });
+            try
+            {
+                using HttpClient client = new HttpClient(new StubHandler(HttpStatusCode.NotFound, new byte[] { 1 }));
+
+                await Assert.ThrowsAsync<HttpRequestException>(() => FileManagement.GetFileFromInternetAsync(client, "http://example.test/x", path));
+
+                Assert.Equal(new byte[] { 9, 9, 9 }, await File.ReadAllBytesAsync(path));
+            }
+            finally
+            {
+                File.Delete(path);
+            }
+        }
+
+        [Fact]
+        public void DescribeUrlWithoutSecrets_DropsQueryFragmentAndUserInfo()
+        {
+            string described = FileManagement.DescribeUrlWithoutSecrets("https://user:pw@cdn.example.test/files/a.zip?token=SECRET&sig=abc#frag");
+
+            Assert.Equal("https://cdn.example.test/files/a.zip", described);
+            Assert.DoesNotContain("SECRET", described);
+            Assert.DoesNotContain("pw", described);
+        }
+
+        [Fact]
+        public void DescribeUrlWithoutSecrets_InvalidUrl_DoesNotEchoTheInput()
+        {
+            Assert.DoesNotContain("token=SECRET", FileManagement.DescribeUrlWithoutSecrets("not a url?token=SECRET"));
         }
     }
 }

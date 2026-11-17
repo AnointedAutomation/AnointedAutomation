@@ -33,4 +33,8 @@
     <ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="AnointedAutomation.Optimization.Tests" />
+  </ItemGroup>
+
 </Project>
