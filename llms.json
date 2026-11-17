@@ -388,7 +388,7 @@
     },
     {
       "id": "AnointedAutomation.Objects",
-      "version": "3.0.0",
+      "version": "3.1.0",
       "targetFramework": "net10.0",
       "description": "Plain POCO models for user accounts, billing and payments, single sign-on identities (Google, Microsoft, Apple, Facebook, Shopify), and standard API response envelopes.",
       "nuget": "https://www.nuget.org/packages/AnointedAutomation.Objects",

@@ -35,5 +35,21 @@ namespace AnointedAutomation.Objects.Tests
 
             Assert.Equal("https://www.anointedautomation.net", response.Links["Automation"]);
         }
+
+        [Fact]
+        public void ResponseData_Links_IncludesChristianEngineMcp()
+        {
+            ResponseData response = new ResponseData();
+
+            Assert.Equal("https://api.anointedautomation.net/api/christian-engine/mcp", response.Links["ChristianEngineMCP"]);
+        }
+
+        [Fact]
+        public void GenericResponseData_Links_IncludesChristianEngineMcp()
+        {
+            ResponseData<string> response = new ResponseData<string>();
+
+            Assert.Equal("https://api.anointedautomation.net/api/christian-engine/mcp", response.Links["ChristianEngineMCP"]);
+        }
     }
 }

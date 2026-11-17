@@ -1,5 +1,9 @@
 # Changelog: AnointedAutomation.Objects
 
+## 3.1.0
+
+- `ResponseData` and `ResponseData<T>` `Links` now include `ChristianEngineMCP` (https://api.anointedautomation.net/api/christian-engine/mcp), the public MCP server.
+
 ## 3.0.0 (breaking)
 
 No implicit currency.
