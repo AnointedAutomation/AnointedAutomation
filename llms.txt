@@ -57,6 +57,10 @@ NuGet profile: https://www.nuget.org/profiles/roku674
 - [llms.json](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/llms.json): the same package data as structured JSON
 - [README](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/README.md): overview, install, dependency graph
 - [CONTRIBUTING](https://github.com/AnointedAutomation/AnointedAutomation/blob/master/CONTRIBUTING.md): file header standard and conventions
+- [OpenAPI spec](https://api.anointedautomation.net/openapi.json): public GET-only OpenAPI of the Anointed API
+- [API docs](https://api.anointedautomation.net/docs): Redoc rendering of the spec
+- [API catalog](https://api.anointedautomation.net/.well-known/api-catalog): RFC 9727 API catalog
+- [MCP server card](https://api.anointedautomation.net/.well-known/mcp/server-card.json): discovery card for the Christian engine MCP server
 
 ## Project facts
 
