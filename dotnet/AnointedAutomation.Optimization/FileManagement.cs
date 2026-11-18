@@ -112,7 +112,15 @@ namespace AnointedAutomation.Optimization
             return null;
         }
 
-        private static readonly HttpClient SharedHttpClient = new HttpClient();
+        /// <summary>Pooled connections are recycled after this long so DNS changes are picked up.</summary>
+        internal static readonly TimeSpan SharedConnectionLifetime = TimeSpan.FromMinutes(5);
+
+        internal static readonly SocketsHttpHandler SharedHandler = new SocketsHttpHandler
+        {
+            PooledConnectionLifetime = SharedConnectionLifetime
+        };
+
+        internal static readonly HttpClient SharedHttpClient = new HttpClient(SharedHandler);
 
         /// <summary>
         /// Downloads the content at <paramref name="hyperlink"/> to <paramref name="filePath"/> using a shared

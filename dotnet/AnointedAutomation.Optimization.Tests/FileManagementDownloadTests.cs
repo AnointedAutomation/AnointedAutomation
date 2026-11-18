@@ -16,6 +16,14 @@ namespace AnointedAutomation.Optimization.Tests
     /// <summary>Tests for FileManagement.GetFileFromInternetAsync: status check, byte-exact writes, caller-supplied client.</summary>
     public class FileManagementDownloadTests
     {
+        [Fact]
+        public void SharedHttpClient_UsesHandlerWithFiveMinutePooledConnectionLifetime()
+        {
+            Assert.Equal(TimeSpan.FromMinutes(5), FileManagement.SharedHandler.PooledConnectionLifetime);
+            Assert.Equal(FileManagement.SharedConnectionLifetime, FileManagement.SharedHandler.PooledConnectionLifetime);
+            Assert.NotNull(FileManagement.SharedHttpClient);
+        }
+
         private sealed class StubHandler : HttpMessageHandler
         {
             private readonly HttpStatusCode _status;
