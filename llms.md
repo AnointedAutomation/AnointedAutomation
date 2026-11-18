@@ -52,7 +52,7 @@ Full-text search in-process, without Lucene.NET or Elasticsearch. In-process ful
 dotnet add package AnointedAutomation.Search
 ```
 
-### AnointedAutomation.APIMiddlewares 1.2.1
+### AnointedAutomation.APIMiddlewares 1.2.2
 
 Drop-in request guards for small ASP.NET Core APIs: API key check, IP bans, 404/401/403 tracking, idle GC. ASP.NET Core middleware and filters for API key authentication, IP blacklisting, invalid endpoint tracking and idle time memory cleanup.
 
@@ -142,7 +142,7 @@ string svg = QrRenderer.ToSvg(matrix);
 byte[] png = QrRenderer.ToPng(matrix, moduleSize: 10);
 ```
 
-### AnointedAutomation.Logging 1.1.0
+### AnointedAutomation.Logging 1.1.1
 
 A tiny log record plus a static event you can route to any sink. A lightweight log message model with severity levels (Debug and Trace included), automatic caller detection, structured properties, async scopes, categories, a per-flow LogStoreCapture test helper, a shared LogStoreThrottle, an ILogger adapter and a static LogAdded event for routing logs.
 
@@ -269,7 +269,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(o => JsonCasingConvention.Configure(o.JsonSerializerOptions));
 ```
 
-### AnointedAutomation.Optimization 1.0.5
+### AnointedAutomation.Optimization 1.0.6
 
 Everyday data helpers: chunking, CSV and DataTable, JSON flattening, safe field reads. Reusable optimization utilities: CSV/DataTable/DataReader helpers, chunking, string helpers, Roman numerals, JSON flattening, file management, and null-safe JsonElement/BsonDocument field accessors.
 
@@ -291,7 +291,7 @@ int n = Roman.RomanToInteger("XLII");     // 42
 foreach (IEnumerable<int> batch in Enumerable.Range(1, 1000).ToChunks(250)) { }
 ```
 
-### AnointedAutomation.Repository.Mongo 3.4.0
+### AnointedAutomation.Repository.Mongo 3.4.1
 
 A thin, consistent Mongo layer: helper, repository base classes, casing and tolerant BSON maps. A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.
 
@@ -408,7 +408,7 @@ app.MapAnointedAutomationAuth("/auth/anointed"); // GET start, POST sign-out, GE
 // Razor: <anointed-sign-in start-url="/auth/anointed/start" />  <anointed-sign-out action="/auth/anointed/sign-out" />
 ```
 
-### AnointedAutomation.SSO.Owin 1.0.2
+### AnointedAutomation.SSO.Owin 1.0.3
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/dotnet/AnointedAutomation.SSO.Owin
 - Target: net472.
@@ -514,7 +514,7 @@ Vue 3 sign-in button and useAnointedSignIn composable that send the browser to t
 
 Nuxt server routes (start, callback, logout, back-channel logout) built on @anointedautomation/sso. Server only. Key exports: `createAnointedEventHandlers`, `redirectTo`.
 
-### @anointedautomation/sso-angular 0.1.4
+### @anointedautomation/sso-angular 0.1.5
 
 - Source: https://github.com/AnointedAutomation/AnointedAutomation/tree/master/js/anointed-sso-angular
 - Runtime: Angular 17+ (browser). On npm: `npm install @anointedautomation/sso-angular`.
@@ -667,6 +667,13 @@ The Christian engine is a Scripture-grounded reasoning engine with a canon-first
   - `ask_christian_engine_text`: the same engine in plain words. Takes `text` and `mode` (`BibleAnswer`, `BibleStudy` or `DreamAnalysis`).
   - `list_my_interpretations`: the signed-in user's own earlier AI interpretations, paged (`skip`, `limit`).
 - New AI answers are paid from the user's store credit after 3 free ones; canon answers, repeats and failed answers are free, and there is a daily cap per plan.
+
+Discovery endpoints (all public, GET-only, no sign-in):
+
+- OpenAPI spec: `https://api.anointedautomation.net/openapi.json`
+- API docs (Redoc): `https://api.anointedautomation.net/docs`
+- API catalog (RFC 9727): `https://api.anointedautomation.net/.well-known/api-catalog`
+- MCP server card: `https://api.anointedautomation.net/.well-known/mcp/server-card.json`
 
 Claude Code:
 

@@ -21,6 +21,8 @@ namespace AnointedAutomation.SSO.Owin
     /// </summary>
     public static class AnointedAutomationAppBuilderExtensions
     {
+        private static readonly HttpClient SharedBackchannelClient = new HttpClient();
+
         /// <summary>The <c>app.Properties</c> key holding the back-channel logout handler.</summary>
         internal const string BackchannelLogoutHandlerKey = "AnointedAutomation.SSO.Owin.BackchannelLogoutHandler";
 
@@ -56,7 +58,7 @@ namespace AnointedAutomation.SSO.Owin
             };
             AnointedLogoutTokenValidator validator = new AnointedLogoutTokenValidator(
                 validation,
-                CreateConfigurationManager(new HttpClient(), validation.Issuer),
+                CreateConfigurationManager(SelectBackchannelClient(options), validation.Issuer),
                 TimeProvider.System);
             ILogger logger = app.CreateLogger<AnointedBackchannelLogoutHandler>();
             app.Properties[BackchannelLogoutHandlerKey] = new AnointedBackchannelLogoutHandler(validator, options.LogoutReplayStore, logger);
@@ -64,6 +66,21 @@ namespace AnointedAutomation.SSO.Owin
             OpenIdConnectAuthenticationOptions oidc = new OpenIdConnectAuthenticationOptions(options.AuthenticationType);
             ApplyTo(options, oidc);
             return app.UseOpenIdConnectAuthentication(oidc);
+        }
+
+        /// <summary>
+        /// Picks the client for back-channel logout key discovery: the caller's own when supplied, otherwise one shared
+        /// client (never a new undisposed client per registration).
+        /// </summary>
+        /// <param name="options">The validated settings.</param>
+        /// <returns>The client to use.</returns>
+        internal static HttpClient SelectBackchannelClient(AnointedAutomationOptions options)
+        {
+            if (options.BackchannelHttpClient != null)
+            {
+                return options.BackchannelHttpClient;
+            }
+            return SharedBackchannelClient;
         }
 
         /// <summary>

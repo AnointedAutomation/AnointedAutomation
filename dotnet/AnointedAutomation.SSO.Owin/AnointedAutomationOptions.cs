@@ -74,6 +74,12 @@ namespace AnointedAutomation.SSO.Owin
         public Action<OpenIdConnectAuthenticationOptions> ConfigureOpenIdConnect { get; set; }
 
         /// <summary>
+        /// Optional caller-owned client for the back-channel logout key discovery (OIDC discovery and JWKS). Use it to set a
+        /// proxy, timeout or handler. The host owns its lifetime. When null, one shared client is reused for every registration.
+        /// </summary>
+        public System.Net.Http.HttpClient BackchannelHttpClient { get; set; }
+
+        /// <summary>
         /// Throws <see cref="InvalidOperationException"/> naming the first missing or invalid setting.
         /// </summary>
         public void Validate()

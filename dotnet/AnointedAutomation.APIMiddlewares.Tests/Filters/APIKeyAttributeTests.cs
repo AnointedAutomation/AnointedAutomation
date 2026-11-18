@@ -57,33 +57,58 @@ namespace AnointedAutomation.APIMiddlewares.Tests.Filters
                 Environment.SetEnvironmentVariable("API_KEY_NAME", null);
         }
 
-        // Can't test GetKey directly as it's internal
-        // [Fact]
-        // public void GetKey_ReturnsEnvironmentVariable()
-        // {
-        //     // Arrange
-        //     var attribute = new APIKeyAttribute();
-        //     
-        //     // Act - can't call internal method directly
-        //     // string key = attribute.GetKey();
-        //     
-        //     // Assert
-        //     // Assert.Equal(TestApiKey, key);
-        // }
-        
-        // Can't test GetKeyName directly as it's internal
-        // [Fact]
-        // public void GetKeyName_ReturnsEnvironmentVariable()
-        // {
-        //     // Arrange
-        //     var attribute = new APIKeyAttribute();
-        //     
-        //     // Act - can't call internal method directly
-        //     // string keyName = attribute.GetKeyName();
-        //     
-        //     // Assert
-        //     // Assert.Equal(TestApiKeyName, keyName);
-        // }
+        /// <summary>
+        /// A missing API_KEY fails at construction with a clear message, not a NullReferenceException per request.
+        /// </summary>
+        [Fact]
+        public void Constructor_WithMissingApiKey_Throws()
+        {
+            Environment.SetEnvironmentVariable("API_KEY", null);
+
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => new APIKeyAttribute());
+
+            Assert.Contains("API_KEY", ex.Message);
+        }
+
+        /// <summary>
+        /// A missing API_KEY_NAME fails at construction instead of throwing on a null header name.
+        /// </summary>
+        [Fact]
+        public void Constructor_WithMissingApiKeyName_Throws()
+        {
+            Environment.SetEnvironmentVariable("API_KEY_NAME", null);
+
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => new APIKeyAttribute());
+
+            Assert.Contains("API_KEY_NAME", ex.Message);
+        }
+
+        /// <summary>
+        /// A key of the right length that differs only in the last character is still rejected.
+        /// </summary>
+        [Fact]
+        public async Task OnActionExecutionAsync_WithNearMissKey_ReturnsUnauthorized()
+        {
+            APIKeyAttribute attribute = new APIKeyAttribute();
+            DefaultHttpContext httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers[TestApiKeyName] = TestApiKey.Substring(0, TestApiKey.Length - 1) + "X";
+            httpContext.Connection.RemoteIpAddress = System.Net.IPAddress.Parse("192.168.1.3");
+            ActionContext actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            List<IFilterMetadata> filters = new List<IFilterMetadata>();
+            Mock<ControllerBase> controllerMock = new Mock<ControllerBase>();
+            ActionExecutingContext context = new ActionExecutingContext(actionContext, filters, new Dictionary<string, object>(), controllerMock.Object);
+            bool nextCalled = false;
+            ActionExecutionDelegate next = () =>
+            {
+                nextCalled = true;
+                return Task.FromResult(new ActionExecutedContext(actionContext, filters, controllerMock.Object));
+            };
+
+            await attribute.OnActionExecutionAsync(context, next);
+
+            Assert.False(nextCalled);
+            Assert.IsType<UnauthorizedResult>(context.Result);
+        }
 
         [Fact]
         /// <summary>

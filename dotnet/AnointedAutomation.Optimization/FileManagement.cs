@@ -5,6 +5,7 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using AnointedAutomation.Optimization.Logging;
 
@@ -111,16 +112,96 @@ namespace AnointedAutomation.Optimization
             return null;
         }
 
-        /// <summary>Downloads the content at <paramref name="hyperlink"/> and writes it to <paramref name="filePath"/>.</summary>
-        public static async Task GetFileFromInternetAsync(string hyperlink, string filePath)
+        /// <summary>Pooled connections are recycled after this long so DNS changes are picked up.</summary>
+        internal static readonly TimeSpan SharedConnectionLifetime = TimeSpan.FromMinutes(5);
+
+        internal static readonly SocketsHttpHandler SharedHandler = new SocketsHttpHandler
         {
-            using HttpClient client = new HttpClient();
-            using HttpResponseMessage response = await client.GetAsync(hyperlink).ConfigureAwait(false);
-            using HttpContent content = response.Content;
-            using Stream stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
-            using StreamReader reader = new StreamReader(stream);
-            string contentStr = await reader.ReadToEndAsync().ConfigureAwait(false);
-            await File.WriteAllTextAsync(filePath, contentStr).ConfigureAwait(false);
+            PooledConnectionLifetime = SharedConnectionLifetime
+        };
+
+        internal static readonly HttpClient SharedHttpClient = new HttpClient(SharedHandler);
+
+        /// <summary>
+        /// Downloads the content at <paramref name="hyperlink"/> to <paramref name="filePath"/> using a shared
+        /// <see cref="HttpClient"/>. See <see cref="GetFileFromInternetAsync(HttpClient, string, string, CancellationToken)"/>.
+        /// </summary>
+        /// <param name="hyperlink">The URL to download.</param>
+        /// <param name="filePath">The file to write.</param>
+        /// <exception cref="HttpRequestException">The server answered with a non-success status code; no file is written.</exception>
+        public static Task GetFileFromInternetAsync(string hyperlink, string filePath)
+        {
+            return GetFileFromInternetAsync(SharedHttpClient, hyperlink, filePath, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Same as <see cref="GetFileFromInternetAsync(string, string)"/> but cancellable. A separate overload keeps the
+        /// published two-parameter method binary compatible.
+        /// </summary>
+        /// <param name="hyperlink">The URL to download.</param>
+        /// <param name="filePath">The file to write.</param>
+        /// <param name="cancellationToken">Cancels the download.</param>
+        /// <exception cref="HttpRequestException">The server answered with a non-success status code; no file is written.</exception>
+        public static Task GetFileFromInternetAsync(string hyperlink, string filePath, CancellationToken cancellationToken)
+        {
+            return GetFileFromInternetAsync(SharedHttpClient, hyperlink, filePath, cancellationToken);
+        }
+
+        /// <summary>
+        /// Downloads the content at <paramref name="hyperlink"/> and streams the raw bytes to <paramref name="filePath"/>.
+        /// A non-success status throws before any file is touched, and the bytes are never decoded, so binary files stay intact.
+        /// If the copy fails after the destination was opened, the partial file is deleted; a file that existed before is
+        /// left alone when the failure happens earlier.
+        /// </summary>
+        /// <param name="client">The caller-owned client (carries the proxy, timeout and handler the host wants).</param>
+        /// <param name="hyperlink">The URL to download.</param>
+        /// <param name="filePath">The file to write.</param>
+        /// <param name="cancellationToken">Cancels the download.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="client"/> is null.</exception>
+        /// <exception cref="HttpRequestException">The server answered with a non-success status code.</exception>
+        public static async Task GetFileFromInternetAsync(HttpClient client, string hyperlink, string filePath, CancellationToken cancellationToken = default)
+        {
+            if (client == null)
+            {
+                throw new ArgumentNullException(nameof(client));
+            }
+            using HttpResponseMessage response = await client.GetAsync(hyperlink, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            using Stream source = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+            using FileStream destination = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+            try
+            {
+                await source.CopyToAsync(destination, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                // Cancellation (shutdown) is expected: no error log, but never leave a partial file behind.
+                await destination.DisposeAsync().ConfigureAwait(false);
+                DeleteFileTry(filePath);
+                throw;
+            }
+            catch (Exception e)
+            {
+                LogMessage.Error($"FileManagement.GetFileFromInternetAsync: download of '{DescribeUrlWithoutSecrets(hyperlink)}' to '{filePath}' failed", e);
+                await destination.DisposeAsync().ConfigureAwait(false);
+                DeleteFileTry(filePath);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Scheme, host and path only: the query string and user info of a download link can carry a token or signature
+        /// that must never reach a log.
+        /// </summary>
+        /// <param name="hyperlink">The URL.</param>
+        /// <returns>The URL without user info, query or fragment, or a marker when it is not a valid absolute URL.</returns>
+        internal static string DescribeUrlWithoutSecrets(string hyperlink)
+        {
+            if (Uri.TryCreate(hyperlink, UriKind.Absolute, out Uri? uri))
+            {
+                return uri.Scheme + "://" + uri.Authority.Substring(uri.Authority.IndexOf('@') + 1) + uri.AbsolutePath;
+            }
+            return "(not an absolute url)";
         }
     }
 }

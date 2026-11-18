@@ -12,7 +12,7 @@
 		<Copyright>Copyright © 2023 Anointed Automation Corporation. Open source, provided "as is" without warranty (see LICENSE).</Copyright>
 		<Description>A MongoDB helper and generic repository base for .NET, with CRUD, paging, aggregation, index management, BSON class maps and casing conventions.</Description>
 		<RepositoryUrl>https://github.com/AnointedAutomation/AnointedAutomation</RepositoryUrl>
-		<Version>3.4.0</Version>
+		<Version>3.4.1</Version>
 		<PackageTags>mongodb;mongo;repository;bson;database;nosql;anointedautomation</PackageTags>
 		<PackageReleaseNotes>https://github.com/AnointedAutomation/AnointedAutomation/commits/master/dotnet/AnointedAutomation.Repository.Mongo</PackageReleaseNotes>
 		<Authors>Anointed Automation Corporation, Alexander Fields</Authors>
@@ -29,8 +29,8 @@
 		<ProjectReference Include="..\AnointedAutomation.Logging\AnointedAutomation.Logging.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Objects\AnointedAutomation.Objects.csproj" />
 		<ProjectReference Include="..\AnointedAutomation.Serialization\AnointedAutomation.Serialization.csproj" />
-		<PackageReference Include="MongoDB.Bson" Version="3.13.0" />
-	  <PackageReference Include="MongoDB.Driver" Version="3.13.0" />
+		<PackageReference Include="MongoDB.Bson" Version="3.14.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.14.0" />
 	  <PackageReference Include="MongoDB.Libmongocrypt" Version="1.12.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>

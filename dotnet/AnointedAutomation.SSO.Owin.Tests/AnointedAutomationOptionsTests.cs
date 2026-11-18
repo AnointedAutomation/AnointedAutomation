@@ -250,6 +250,24 @@ namespace AnointedAutomation.SSO.Owin.Tests
             app.MapAnointedBackchannelLogout("/auth/anointed/backchannel-logout", (logout, context) => Task.CompletedTask);
             Assert.Equal(typeof(AnointedBackchannelLogoutMiddleware), app.Registered[1]);
         }
+
+        [Fact]
+        public void SelectBackchannelClient_UsesCallerClientWhenSupplied()
+        {
+            using System.Net.Http.HttpClient own = new System.Net.Http.HttpClient();
+            AnointedAutomationOptions options = ValidOptions();
+            options.BackchannelHttpClient = own;
+            Assert.Same(own, AnointedAutomationAppBuilderExtensions.SelectBackchannelClient(options));
+        }
+
+        [Fact]
+        public void SelectBackchannelClient_WithoutCallerClient_ReusesOneSharedClient()
+        {
+            System.Net.Http.HttpClient first = AnointedAutomationAppBuilderExtensions.SelectBackchannelClient(ValidOptions());
+            System.Net.Http.HttpClient second = AnointedAutomationAppBuilderExtensions.SelectBackchannelClient(ValidOptions());
+            Assert.NotNull(first);
+            Assert.Same(first, second);
+        }
     }
 
     public class AnointedClaimsTests
