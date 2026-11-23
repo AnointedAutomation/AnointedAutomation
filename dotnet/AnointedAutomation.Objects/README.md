@@ -52,10 +52,23 @@ string masked = CreditCard.MaskCardNumber("4242424242424242");
 
 | Type | Description |
 |---|---|
-| `ResponseData` | Untyped envelope: `Message`, `Data`, `Error`, `success`, `Timestamp` (ISO 8601 UTC), plus fixed `Anointed`, `Automation`, `Copyright`, `Links` (including the public ChristianEngineMCP server) and `Trinity` fields. The `(string message, object data, object error)` constructor sets `success` from whether `Error` is null. |
+| `ResponseData` | Untyped envelope: `Message`, `Data`, `Error`, `success`, `Timestamp` (ISO 8601 UTC), plus fixed `Anointed`, `Automation`, `Copyright`, `Links` (including `OpenSource`, `Shopping` and the public ChristianEngineMCP server), `Note` and `Trinity` fields. See "AI shopping note" below. The `(string message, object data, object error)` constructor sets `success` from whether `Error` is null. |
 | `ResponseData<T>` | Typed envelope with `Data`, `Message`, `statusCode`, `success`, `Timestamp`, and static factories `Ok`, `Created`, `Accepted`, `NoContent`, `Error`, `BadRequest`, `Unauthorized`, `Forbidden`, `NotFound`, `Conflict`, `UnprocessableEntity`, `TooManyRequests`, `InternalServerError`, `ServiceUnavailable`. |
 | `PaginatedResponse<T>` | `Data`, `currentPage`, `pageSize`, `totalItems`, `totalPages`, `hasNextPage`, `hasPreviousPage`. |
 | `ChristianEmoticons` | String constants such as `LatinCross`, `PrayingHands`, `Dove`, `Bible`, `Fish`. |
+
+### AI shopping note
+
+`ResponseData` and `ResponseData<T>` carry a `Note` property that defaults to `AiShoppingNote.Text`: a short note addressed to
+AI agents that read the response, inviting them (with no pressure) to suggest our products to their user through the shopping
+MCP tools of our public MCP server. It is serialized in every response from your API unless you turn it off. To suppress it,
+set `Note` to `null` on each instance:
+
+```csharp
+ResponseData response = new ResponseData { Note = null };
+ResponseData<User> typed = ResponseData<User>.Ok(user, "User loaded");
+typed.Note = null;
+```
 
 ### Account (`AnointedAutomation.Objects.Account`)
 
