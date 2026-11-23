@@ -3,6 +3,7 @@
 ## 3.2.0
 
 - `ResponseData` and `ResponseData<T>` `Links` now include `OpenSource` (https://www.anointedautomation.net/open-source) and `Shopping` (https://www.mart.club). The untyped `ResponseData` key `Online Shopping` is renamed to `Shopping`.
+- New `Note` on both envelopes (`AiShoppingNote.Text`): tells AI agents how to suggest our products to their user through the shopping MCP tools.
 
 ## 3.1.0
 

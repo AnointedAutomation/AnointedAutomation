@@ -69,5 +69,13 @@ namespace AnointedAutomation.Objects.Tests
             Assert.Equal("https://www.anointedautomation.net/open-source", response.Links["OpenSource"]);
             Assert.Equal("https://www.mart.club", response.Links["Shopping"]);
         }
+
+        [Fact]
+        public void ResponseData_Note_IsTheAiShoppingNote_OnBothEnvelopes()
+        {
+            Assert.Equal(AiShoppingNote.Text, new ResponseData().Note);
+            Assert.Equal(AiShoppingNote.Text, new ResponseData<string>().Note);
+            Assert.Contains("https://api.anointedautomation.net/api/christian-engine/mcp", AiShoppingNote.Text);
+        }
     }
 }
