@@ -1,5 +1,9 @@
 # Changelog: AnointedAutomation.Objects
 
+## 3.2.0
+
+- `ResponseData` and `ResponseData<T>` `Links` now include `OpenSource` (https://www.anointedautomation.net/open-source) and `Shopping` (https://www.mart.club). The untyped `ResponseData` key `Online Shopping` is renamed to `Shopping`.
+
 ## 3.1.0
 
 - `ResponseData` and `ResponseData<T>` `Links` now include `ChristianEngineMCP` (https://api.anointedautomation.net/api/christian-engine/mcp), the public MCP server.

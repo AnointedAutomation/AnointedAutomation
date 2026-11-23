@@ -69,7 +69,8 @@ namespace AnointedAutomation.Objects
             { "Automation", "https://www.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
 			{ "GitHub", "https://github.com/AnointedAutomation" },
-			{ "Online Shopping", "https://www.mart.club" },
+			{ "OpenSource", "https://www.anointedautomation.net/open-source" },
+			{ "Shopping", "https://www.mart.club" },
 			{ "Steward", "https://www.alexanderfields.me" },
 			{ "VR Mall", "https://mallmart.online" },
 			{ "ChristianEngineMCP", "https://api.anointedautomation.net/api/christian-engine/mcp" }
@@ -124,6 +125,8 @@ namespace AnointedAutomation.Objects
 			{ "AutomationAPI", "https://api.anointedautomation.net" },
             { "Apparel", "https://www.anointedattireapparel.com" },
             { "GitHub", "https://github.com/AnointedAutomation" },
+			{ "OpenSource", "https://www.anointedautomation.net/open-source" },
+			{ "Shopping", "https://www.mart.club" },
 			{ "Steward", "https://www.alexanderfields.me" },
 			{ "ChristianEngineMCP", "https://api.anointedautomation.net/api/christian-engine/mcp" }
         };
