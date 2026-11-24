@@ -368,6 +368,9 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "com.vanniktech.maven.publish"
         versions: [">=0.36.0"]
+      # compose-bom 2026.11+ pulls foundation/ui 1.13 and material3 1.5, which need compileSdk 37 and AGP 9.1 (PR #507).
+      - dependency-name: "androidx.compose:compose-bom"
+        versions: [">=2026.11.0"]
     labels:
       - "dependencies"
       - "automated pr"
